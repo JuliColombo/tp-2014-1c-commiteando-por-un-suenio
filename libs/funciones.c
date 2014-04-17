@@ -36,7 +36,7 @@ typedef struct { // se define un vector para los programas en new, y cuando el p
 //Tenemos una estructura con programas que se conectan o la funcion va a tener una llamada cada vez que entra uno nuevo?? lo modélo pensando lo ultimo
 
 int plp(programa){
-
+//Faltaria tambien inicializar el segmento de Stack y el puntero de Contexto Actual(tienen que coincidir), y setear el contador de variables locales en 0
 	int crearPcb(programa);
 	//Cuando creamos el PCB hay que aprovechar la obtencion de los datos(codigo literal, indice de etiquetas,indice de funciones, indice de codigo y stack) para conseguir los tamaños de este ""malloc"" de umv
 	int solicitarMemoria(codigo,indiceEtiquetas,indiceFunciones,indiceCodigoYStack);
