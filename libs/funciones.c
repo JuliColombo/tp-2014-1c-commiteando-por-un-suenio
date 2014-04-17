@@ -29,3 +29,19 @@ typedef struct { // se define un vector para los programas en new, y cuando el p
 	int cantLineas;
 
 } programa;
+
+
+//No creo que vaya aca, pero voy poniendo una idea de PLP:
+
+//Tenemos una estructura con programas que se conectan o la funcion va a tener una llamada cada vez que entra uno nuevo?? lo modélo pensando lo ultimo
+
+int plp(programa){
+
+	int crearPcb(programa);
+	//Cuando creamos el PCB hay que aprovechar la obtencion de los datos(codigo literal, indice de etiquetas,indice de funciones, indice de codigo y stack) para conseguir los tamaños de este ""malloc"" de umv
+	int solicitarMemoria(codigo,indiceEtiquetas,indiceFunciones,indiceCodigoYStack);
+	//Ni idea los tipos de esos parametros, no me da mas la nafta
+
+	int agregarACola(programa);
+
+}

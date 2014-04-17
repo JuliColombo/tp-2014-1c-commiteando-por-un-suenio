@@ -10,3 +10,5 @@ struct pcb {int ID;
 	    int* ProgramCounter;
 	    int TamanioContext;
 } ;
+
+
