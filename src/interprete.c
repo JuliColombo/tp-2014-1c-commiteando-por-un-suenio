@@ -11,6 +11,8 @@
 
 t_log* archLog;
 
+void imprimirPrompt(void);
+
 int main (int argc, char **argv){
 	//int i;
 
@@ -18,8 +20,9 @@ int main (int argc, char **argv){
 	//char* buffer=
 	archLog=log_create();
 
-   /*	for(i=0;i<argc;i++) {
+   //	for(i=0;i<argc;i++) {
    // imprime indicador de órdenes;
+	imprimirPrompt();
    // lee la línea de ordenes;
    // analiza la línea de ordenes (arg0,arg1,...,>,<,|,&,...);
    //prepara entorno según lo que aparece en línea de ordenes;
@@ -34,5 +37,10 @@ int main (int argc, char **argv){
 		}*/
 	return 0;
 }
+
+void imprimirPrompt(void) {
+	printf("commiteando-por-un-suenio:~$")
+}
+
 
 

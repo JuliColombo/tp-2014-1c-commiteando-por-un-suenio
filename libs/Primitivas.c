@@ -24,9 +24,9 @@ signed int* obtenerPosicionVariable(t_nombre_variable identificador_variable){
 	return 0;
 }
 
-signed int dereferenciar(signed int* direccion_variable){  //extrae el valor de la variable ubicada en direccion_variable
+signed int desreferenciar(signed int* direccion_variable){  //extrae el valor de la variable ubicada en direccion_variable
 	signed int aux;
-	aux=*direccion_variable;
+	aux=&direccion_variable;
 	return aux;
 }
 
