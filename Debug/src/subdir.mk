@@ -4,13 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/HelloWolrd.c 
+../src/HelloWolrd.c \
+../src/funcionesInterprete.c \
+../src/interprete.c 
 
 OBJS += \
-./src/HelloWolrd.o 
+./src/HelloWolrd.o \
+./src/funcionesInterprete.o \
+./src/interprete.o 
 
 C_DEPS += \
-./src/HelloWolrd.d 
+./src/HelloWolrd.d \
+./src/funcionesInterprete.d \
+./src/interprete.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

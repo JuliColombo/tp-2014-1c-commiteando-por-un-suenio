@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -56,8 +57,27 @@ signed int llamarSinRetorno(t_nombre_etiqueta etiqueta,t_puntero_instruccion lin
 }
 
 signed int llamarConRetorno(t_nombre_etiqueta etiqueta,t_puntero donde_retornar,t_puntero_instruccion linea_en_ejecucion){//Igual que el anterior solo que guardando la posicion donde se va a almacenar la variable que retorne la funcion
-	return ;
+	return 0;
 }
 
 
+//Aca hice la funcion contarDigitos de valor_mostrar de imprimir. Imprimir le manda al kernel el valor y a su vez devuelve la cantidad de digitos de este
+int contarDigitos(int numero) {
+	int contador=0;
+	while(numero != 0) {
+		contador++;
+		numero=numero/10;}
+	return contador;
 }
+
+int imprimir(t_valor_variable valor_mostrar) {
+	//enviarAKernel(valor_mostrar);
+	return contarDigitos(valor_mostrar);
+}
+
+int imprimirTexto(char* texto) {
+	//enviarAKernel(texto);
+	return strlen(texto);
+}
+
+
