@@ -19,12 +19,16 @@ int main (int argc, char **argv){
 	char* buffer = leerScript(&fileSize,argv[1]);
 	archLog=crear_log(PATHLOG);
 
+	if (buffer == NULL) {
 
+			log_escribir(archLog,"Nucleo PI",ERROR,"Error en la lectura del script");
+			return EXIT_FAILURE;
+	}
 	return 0;
 }
 
 void imprimirPrompt(void) {
-	printf("commiteando-por-un-suenio:~$")
+	printf("commiteando-por-un-suenio:~$");
 }
 
 
