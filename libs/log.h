@@ -26,6 +26,10 @@
 #include <sys/timeb.h>
 #define PATHLOG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio"
 
+
+
+
+
 #define MAX_MESSAGE_LENGHT 1024
 
 typedef enum {
@@ -43,6 +47,8 @@ typedef struct {
 	e_print_mode mode;
 } log_t;
 
+
+extern log_t* archLog;
 
 log_t* log_crear(char* pathLog);											// Crea un log
 

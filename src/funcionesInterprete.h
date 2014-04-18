@@ -9,7 +9,7 @@
 #define FUNCIONESINTERPRETE_H_
 #include <stdio.h>
 #include <stdlib.h>
-#include "log.h"
+#include "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/libs/log.h"
 
 
 char* leerScript(off_t* fileSize,char* path); //lee el script
