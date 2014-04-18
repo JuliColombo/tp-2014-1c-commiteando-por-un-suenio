@@ -7,6 +7,7 @@
 
 
 #include "funcionesInterprete.h"
+#include "log.h"
 
 char* leerScript(off_t* fileSize,char* path) {
 

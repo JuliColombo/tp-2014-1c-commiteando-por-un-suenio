@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "log.h"
+#include "funcionesInterprete.h"
 
 log_t* archLog;
 
@@ -17,7 +18,7 @@ int main (int argc, char **argv){
 
 	off_t fileSize=0;
 	char* buffer = leerScript(&fileSize,argv[1]);
-	archLog=crear_log(PATHLOG);
+	archLog=log_crear(PATHLOG);
 
 	if (buffer == NULL) {
 
