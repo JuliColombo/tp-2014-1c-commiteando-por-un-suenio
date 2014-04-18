@@ -11,7 +11,7 @@
 
 log_t* archLog;
 
-void imprimirPrompt(void);
+
 
 int main (int argc, char **argv){
 
@@ -27,9 +27,6 @@ int main (int argc, char **argv){
 	return 0;
 }
 
-void imprimirPrompt(void) {
-	printf("commiteando-por-un-suenio:~$");
-}
 
 
 
