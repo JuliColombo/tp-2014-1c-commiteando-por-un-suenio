@@ -48,3 +48,23 @@ typedef struct { // se define un vector para los programas en new, y cuando el p
 
 }
 */
+
+
+/*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
+ * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
+ * primera instruc, indice etiquetas, indice de codigo etc"
+ */
+
+int crearPcb(int primeraInstruc, int* indiceEti, Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
+	PCB nuevoPcb;
+	nuevoPcb->ID = getpid();
+	nuevoPcb->indiceEtiquetas = indiceEti;
+	nuevoPcb->indiceCodigo = indiceCod;
+	nuevoPcb->TamanioContext = tamanioContext;
+	nuevoPcb->ProgramCounter = PCB;
+	//No se que hacer con CODE, STACK y CursorSTACK
+	//Creo que aca podria venir el solicitarMemoria. No use el tamanioIndEti ni tamanioIndCod que son cosas que
+	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
+
+	return 0;
+	}
