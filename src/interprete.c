@@ -14,10 +14,10 @@ log_t* archLog;
 
 int main (int argc, char **argv){
 
-	log_t* archLog;
 	off_t fileSize=0;
+	archLog = log_crear(PATHLOG);
 	char* buffer = leerScript(&fileSize,argv[1]);
-	archLog=log_crear(PATHLOG);
+
 
 	if (buffer == NULL) {
 

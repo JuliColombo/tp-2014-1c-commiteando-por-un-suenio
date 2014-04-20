@@ -9,7 +9,6 @@
 #include "funcionesInterprete.h"
 #include "log.h"
 
-extern log_t* archLog;
 
 char* leerScript(off_t* fileSize,char* path) {
 
