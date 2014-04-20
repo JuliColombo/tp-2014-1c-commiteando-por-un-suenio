@@ -49,31 +49,30 @@ int log_vwrite(log_t *log, const char *program_name, e_message_type type,
 	struct tm *log_tm;
 	struct timeb tmili;
 	char str_time[128];
-	//unsigned int thread_id = pthread_self(); Esto esta hardcodeado porque la funcion pthread_self() da un error.
-	unsigned int thread_id = 2020;
+	unsigned int thread_id = pthread_self(); //Si no le pasas parametro al main da error
 	char *str_type = log_errorTypeAsString(type);
 	char logbuff[MAX_MESSAGE_LENGHT + 100];
 	char msgbuff[MAX_MESSAGE_LENGHT];
 
-	if (log->mode == M_NONE) //Debugger: Segmentation Fault
+	if (log->mode == M_NONE)
 		return 1;
 
-	vsprintf(msgbuff, format, args_list); //Debugger dice que no encuentra un archivo, no se puede ejecutar esta línea
+	vsprintf(msgbuff, format, args_list);
 
-	if ((log_time = time(NULL)) == -1) { //Debugger: Can't find a source file at "../sysdeps/unix/sysv/linux/time.c"
+	if ((log_time = time(NULL)) == -1) {
 		puts("[[CRITICAL]] :: Error, no se pudo obtener la hora\n");
 		return 0;
 	}
 
-	log_tm = localtime(&log_time); //Debugger: Can't find a source file at "localtime.c"
-	strftime(str_time, 127, "%y-%m-%d %H:%M:%S", log_tm); //Debugger: Can't find a source file at "strftime.c"
+	log_tm = localtime(&log_time);
+	strftime(str_time, 127, "%y-%m-%d %H:%M:%S", log_tm);
 
-	if (ftime(&tmili)) { //Debugger: Can't find a source file at "../sysdeps/unix/bsd/ftime.c"
+	if (ftime(&tmili)) {
 		puts("[[CRITICAL]] :: No se han podido obtener los milisendos\n");
 		return 0;
 	}
 
-	sprintf(logbuff, "[%s] - [%s - pid: %d] [Thread: %d] [%s]: %s\r\n", //Debugger: Segmentation Fault
+	sprintf(logbuff, "[%s] - [%s - pid: %d] [Thread: %d] [%s]: %s\r\n",
 			str_time, program_name, log->pid, thread_id, str_type, msgbuff);
 
 	if ((log->mode == M_FILE) || (log->mode == M_CONSOLEANDFILE)) {
