@@ -55,10 +55,10 @@ typedef struct { // se define un vector para los programas en new, y cuando el p
  * primera instruc, indice etiquetas, indice de codigo etc"
  *
 
-int crearPcb(int primeraInstruc, int* indiceEti, Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
+int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
 	PCB nuevoPcb;
 	nuevoPcb->ID = getpid();
-	nuevoPcb->indiceEtiquetas = indiceEti;
+	nuevoPcb->indiceEtiquetas = dictionary_create();
 	nuevoPcb->indiceCodigo = indiceCod;
 	nuevoPcb->TamanioContext = tamanioContext;
 	nuevoPcb->ProgramCounter = PCB;
