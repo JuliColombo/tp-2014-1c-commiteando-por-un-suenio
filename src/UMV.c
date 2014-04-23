@@ -18,5 +18,3 @@ int* crearMP(t_config archConfig) {
 
 	return MP;
 }
-
-
