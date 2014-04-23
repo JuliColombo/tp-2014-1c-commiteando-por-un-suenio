@@ -5,16 +5,19 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/libs/Estructuras.c \
+../src/libs/Primitivas.c \
 ../src/libs/funciones.c \
 ../src/libs/log.c 
 
 OBJS += \
 ./src/libs/Estructuras.o \
+./src/libs/Primitivas.o \
 ./src/libs/funciones.o \
 ./src/libs/log.o 
 
 C_DEPS += \
 ./src/libs/Estructuras.d \
+./src/libs/Primitivas.d \
 ./src/libs/funciones.d \
 ./src/libs/log.d 
 
