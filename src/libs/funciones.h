@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
+#include "commons/collections/node.h"
 
 typedef struct pares{
 		int desplazamiento;
