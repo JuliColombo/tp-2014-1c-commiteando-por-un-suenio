@@ -19,6 +19,8 @@ typedef struct { // se define un vector para los programas en new
 
 void calcularPeso (t_programa programa);
 
-void ordenarPorPeso (int p[], int n);
+void agregarAListaSegunPeso(t_programa programa, t_list* lista);
+
+void mostrarNodosPorPantalla(t_list* lista);
 
 #endif /* FUNCIONESPLP_H_ */
