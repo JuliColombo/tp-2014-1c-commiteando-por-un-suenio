@@ -11,7 +11,6 @@
 #include "commons/collections/list.h"
 #include "parser/metadata_program.h"
 
-
 typedef struct { // se define un vector para los programas en new
 	int peso;
 	t_medatada_program metadata;
