@@ -12,8 +12,6 @@
 #define ESTRUCTURAS_H_
 
 
-
-
 typedef struct {
 
 	uint16_t puerto_programa;	//Puerto de programa
@@ -28,17 +26,6 @@ typedef struct {
 
 } archivo_config;
 
-
-
-
-
-
-typedef struct {
-
-	t_link_element *head;
-	int elements_count;
-
-} t_list;
 
 typedef struct {
 

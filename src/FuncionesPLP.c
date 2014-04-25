@@ -18,15 +18,16 @@ void ordenarPorPeso (int p[], int n){//Ordena la cola de new según el peso (no 
 
 
 int main_plp(){
-	t_list cola_programas = list_create();
+	t_list* cola_programas=list_create();
 
 	//Cuando entra un programa nuevo
 	t_programa programa;
-	char* literal; //hay que ver como hacer para sacar un literal con el código
+	char* literal="Abc"; //hay que ver como hacer para sacar un literal con el código
 	metadatada_desde_literal(literal);
 	solicitarMemoria(programa);
-	programa.peso=calcularPeso(programa);
-	list_add(cola_programas, programa);
+	calcularPeso(programa);
+
+
 
 
 
