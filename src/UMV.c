@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include "commons/config.h"
 #include "commons/collections/dictionary.h"
+#include "FuncionesPLP.h"
 
 //Al iniciar, la UMV crea la MP de un tamaño configurable por un archivo de configuracion, que supuse era
 //el tamaño maximo que puede tener el diccionario de ese archivo de configuracion
@@ -22,5 +23,5 @@ int* crearMP(t_config archConfig) {
 
 
 //Funcion que recive el programa del PLP y le reserva memoria (si puede)
-void solicitarMemoria(t_programa prgrama){
+void solicitarMemoria(t_programa programa){
 }
