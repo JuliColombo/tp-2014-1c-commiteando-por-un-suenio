@@ -8,6 +8,6 @@
 #ifndef UMV_H_
 #define UMV_H_
 
-void solicitarMemoria(t_programa prgrama);
+_Bool solicitarMemoria(t_programa prgrama);
 
 #endif /* UMV_H_ */

@@ -23,5 +23,6 @@ int* crearMP(t_config archConfig) {
 
 
 //Funcion que recive el programa del PLP y le reserva memoria (si puede)
-void solicitarMemoria(t_programa programa){
+_Bool solicitarMemoria(t_programa programa){
+	return true;
 }
