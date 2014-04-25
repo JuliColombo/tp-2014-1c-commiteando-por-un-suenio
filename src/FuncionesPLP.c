@@ -17,22 +17,15 @@ void ordenarPorPeso (int p[], int n){//Ordena la cola de new según el peso (no 
 }
 
 void agregarAListaSegunPeso(t_programa programa, t_list* lista){
-	//t_link_element *element = lista->head;
-	//int position = 0;
+	t_link_element *element = lista->head;
+	int position = 0;
 
-	//while ((element != NULL)&&(element->data->peso < programa.peso) ) {
-		//element = element->next;
-		//position++;
-	//}
-
-	if (lista->elements_count==0) {
-		list_add(lista, &programa);
+	while ((element != NULL)&&(((t_programa*)(element->data))->peso < programa.peso) ) {
+		element = element->next;
+		position++;
 	}
 
-
-	//list_add_in_index(lista, &list_find(lista, index, programa);
-
-
+	list_add_in_index(lista, position, &programa);
 }
 
 
