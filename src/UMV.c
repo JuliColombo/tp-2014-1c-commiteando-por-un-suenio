@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "commons/config.h"
 #include "commons/collections/dictionary.h"
 
@@ -17,4 +18,9 @@ int* crearMP(t_config archConfig) {
 	int* MP = malloc(tamanio);
 
 	return MP;
+}
+
+
+//Funcion que recive el programa del PLP y le reserva memoria (si puede)
+void solicitarMemoria(t_programa prgrama){
 }
