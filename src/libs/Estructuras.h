@@ -23,6 +23,7 @@ typedef struct {
 	uint8_t semaforos[];	//Valores de semaforos
 	uint8_t retardo_hio[];	//Retardo de hio
 	char id_hio[];	//Identificadores de hio
+	uint16_t tamanio_mp;	//Tamaño fijo de la memoria principal
 
 } archivo_config;
 
