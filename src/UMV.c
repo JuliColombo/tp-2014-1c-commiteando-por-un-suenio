@@ -12,11 +12,11 @@
 #include "commons/collections/dictionary.h"
 #include "FuncionesPLP.h"
 #include <Estructuras.h>
-//Al iniciar, la UMV crea la MP de un tamaño configurable por un archivo de configuracion, que supuse era
+//Al iniciar, la UMV crea la MP de un tamaño configurable por el archivo de configuracion, que supuse era
 //el tamaño maximo que puede tener el diccionario de ese archivo de configuracion
 
 archivo_config configuracion;
-
+// Ojo!! Correccion del enunciado dice que es un campo del archivo,si es asi hay que revisar esto
 int* crearMP(t_config archConfig) {
 	int tamanio = (archConfig.properties)->table_max_size;
 	int* MP = malloc(tamanio);
@@ -25,8 +25,25 @@ int* crearMP(t_config archConfig) {
 }
 
 
-//Funcion que recive el programa del PLP y le reserva memoria (si puede)
+//Funcion que recibe el programa del PLP y le reserva memoria (si puede)
 _Bool solicitarMemoria(t_programa programa){
+	return true;
+}
+
+//Operacion Basica de UMV 1, se toma una cantidad de bytes (longitud) desde la posicion de memoria dada(base+offset)?
+void solicitarBytes(uint32_t base,uint32_t offset, uint32_t longitud){
+
+}
+
+//Operacion Basica de UMV 2, se envia una cantidad de bytes (en el buffer?) a la posicion dada(base+offset)
+void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
+
+}
+
+//Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
+_Bool validarSolicitud(uint32_t longitud){
+	if(/*MemoriaSuficiente*/){
+	}
 	return true;
 }
 
@@ -66,6 +83,7 @@ void leerConfiguracion(void) {
 
 }
 
+//Esta bien que esto sea una funcion de la UMV?
 void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("%d\n", configuracion.puerto_programa);
@@ -82,3 +100,25 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 }
 
 
+//Comandos de consola:
+
+void operacion(t_proceso proceso, uint32_t base,uint32_t offset, uint32_t longitud){
+	//Solicitar una posicion de memoria o escribir un buffer por teclado en una posicion
+	/*if ( esValido(buffer) ){
+	 * void enviarBytes(base,offset,longitud,buffer)
+	 * }else{
+	 *  solicitarBytes(base,offset,longitud)
+	 *  } */
+	printf(/*posicionDeMemoria*/);
+	/*OPCIONAL: grabar en archivo*/
+}
+
+void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
+
+}
+
+void algoritmo(char tipo){//Cambiar entre Worst fit y First fit
+
+//TODO compactar y dump !!
+
+}
