@@ -7,10 +7,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "Primitivas.h"
+#include "parser.h"
 
 
-/* definirVariable: Creo que esta mal pensado esto, no se le debría asignar al identificador de la variable la dirección de memoria sino devolver otra variable que sea de tipo puntero
+/*definirVariable: Creo que esta mal pensado esto, no se le debría asignar al identificador de la variable la dirección de memoria sino devolver otra variable que sea de tipo puntero
 t_puntero definirVariable(t_nombre_variable identificador_variable){
 	identificador_variable = malloc(sizeof(signed int));
 	if(identificador_variable!=NULL){
@@ -20,8 +20,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable){
 		printf("No se puede reservar memoria");
 		return (t_puntero)NULL;
 	}
-}
-*/
+}*/
+
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
 	return 0;
