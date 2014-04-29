@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "parser.h"
+#include "parser/parser.h"
 
 
 /*definirVariable: Creo que esta mal pensado esto, no se le debría asignar al identificador de la variable la dirección de memoria sino devolver otra variable que sea de tipo puntero

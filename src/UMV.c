@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "commons/config.h"
 #include "commons/collections/dictionary.h"
 #include "FuncionesPLP.h"
@@ -15,7 +16,7 @@
 //Al iniciar, la UMV crea la MP de un tamaño configurable por el archivo de configuracion, que supuse era
 //el tamaño maximo que puede tener el diccionario de ese archivo de configuracion
 
-archivo_config configuracion;
+//archivo_config configuracion;
 // Ojo!! Correccion del enunciado dice que es un campo del archivo,si es asi hay que revisar esto
 int* crearMP(t_config archConfig) {
 	int tamanio = (archConfig.properties)->table_max_size;
@@ -36,18 +37,18 @@ void solicitarBytes(uint32_t base,uint32_t offset, uint32_t longitud){
 }
 
 //Operacion Basica de UMV 2, se envia una cantidad de bytes (en el buffer?) a la posicion dada(base+offset)
-void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
+void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud/*,t_buffer buffer*/){
 
 }
 
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
 _Bool validarSolicitud(uint32_t longitud){
-	if(/*MemoriaSuficiente*/){
+	if(0/*MemoriaSuficiente*/){
 	}
 	return true;
 }
 
-void leerConfiguracion(void) {
+/*void leerConfiguracion(void) {
 
 	t_config* config = config_create("/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/src");
 
@@ -81,10 +82,10 @@ void leerConfiguracion(void) {
 	configuracion.tamanio_mp = config_get_int_value(config,
 				"Tamanio de Memoria Principal");
 
-}
+}*/
 
 //Esta bien que esto sea una funcion de la UMV?
-void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
+/*void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("%d\n", configuracion.puerto_programa);
 	printf("%d\n", configuracion.puerto_cpu);
@@ -96,20 +97,18 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 	printf("%d\n", configuracion.retardo_hio);
 	printf("%d\n", configuracion.id_hio);
 	printf("%d\n", configuracion.tamanio_mp);
-
-}
+}*/
 
 
 //Comandos de consola:
-
-void operacion(t_proceso proceso, uint32_t base,uint32_t offset, uint32_t longitud){
+void operacion(/*t_proceso proceso,*/ uint32_t base,uint32_t offset, uint32_t longitud){
 	//Solicitar una posicion de memoria o escribir un buffer por teclado en una posicion
 	/*if ( esValido(buffer) ){
 	 * void enviarBytes(base,offset,longitud,buffer)
 	 * }else{
 	 *  solicitarBytes(base,offset,longitud)
 	 *  } */
-	printf(/*posicionDeMemoria*/);
+	printf(" "/*posicionDeMemoria*/);
 	/*OPCIONAL: grabar en archivo*/
 }
 

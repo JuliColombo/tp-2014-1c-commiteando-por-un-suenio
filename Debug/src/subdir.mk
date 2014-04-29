@@ -5,18 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/FuncionesPLP.c \
+../src/Stack.c \
 ../src/UMV.c \
 ../src/funcionesInterprete.c \
 ../src/interprete.c 
 
 OBJS += \
 ./src/FuncionesPLP.o \
+./src/Stack.o \
 ./src/UMV.o \
 ./src/funcionesInterprete.o \
 ./src/interprete.o 
 
 C_DEPS += \
 ./src/FuncionesPLP.d \
+./src/Stack.d \
 ./src/UMV.d \
 ./src/funcionesInterprete.d \
 ./src/interprete.d 
