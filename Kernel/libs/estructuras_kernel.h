@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 
-typedef struct {
+typedef struct { //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	uint16_t puerto_programa;	//Puerto de programa
 	uint16_t puerto_cpu;	//Puerto de Cpu
 	uint8_t quantum;	//Quantum
