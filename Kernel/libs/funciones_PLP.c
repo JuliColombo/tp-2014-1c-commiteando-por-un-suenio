@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "funciones_PLP.h"
+#include "estructuras_kernel.h"
 #include "parser/metadata_program.h"
 #include "commons/config.h"
-#include "estructuras_kernel.h"
+#include "commons/collections/list.h"
 
 
 void calcularPeso (t_programa programa){ //Calcula peso del programa
@@ -74,10 +76,10 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 	}
 */
 
-void leerConfiguracion(t_config_kernel configuracion) {
-	t_config* config = config_create("/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/src");
+void leerConfiguracion(t_config_kernel configuracion, char* path) {
+	t_config* config=config_create(path);
 
-	configuracion.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos InterpretesCPU");
+	configuracion.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
 	configuracion.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
 	configuracion.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
 	configuracion.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
@@ -91,7 +93,6 @@ void leerConfiguracion(t_config_kernel configuracion) {
 	//configuracion.var_globales = config_get_array(config,"Variables globales");
 }
 
-//Esta bien que esto sea una funcion de la UMV?
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("%d\n", configuracion.puerto_programas);

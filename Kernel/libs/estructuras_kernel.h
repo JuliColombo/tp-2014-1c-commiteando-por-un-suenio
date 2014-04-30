@@ -2,6 +2,8 @@
 #define ESTRUCTURAS_H_
 
 #include <stdint.h>
+#include <pthread.h>
+#include "commons/collections/list.h"
 
 typedef uint16_t t_puerto_programa;
 typedef uint16_t t_puerto_cpu;
