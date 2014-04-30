@@ -3,81 +3,64 @@
 
 #include <stdint.h>
 
+typedef uint16_t t_puerto_programa;
+typedef uint16_t t_puerto_cpu;
+typedef uint16_t t_tamanio_mp;
+typedef uint16_t t_ip_umv;
+typedef uint16_t t_puerto_umv;
 
-typedef struct { //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
-	uint16_t puerto_programa;	//Puerto de programa
-	uint16_t puerto_cpu;	//Puerto de Cpu
-	uint8_t quantum;	//Quantum
-	uint8_t retardo_quantum;	//Retardo del Quantum
-	uint8_t grado_mp;	//Grado de multiprogramacion
-	//char id_semaforos[];	//Identificadores de semaforos
-	//uint8_t semaforos[];	//Valores de semaforos
-	//uint8_t retardo_hio[];	//Retardo de hio
-	//char id_hio[];	//Identificadores de hio
-	uint16_t tamanio_mp;	//Tamaño fijo de la memoria principal
-} archivo_config_kernel;
+typedef uint8_t t_cuantum;
+typedef uint8_t t_retardo_quantum;
+typedef uint8_t t_grado_multip;
+
+typedef int t_pid;
+typedef int t_program_counter;
+typedef int tamanio_indice;
+typedef int t_tamanio_contexto;
+typedef int t_tamanio_indice;
+typedef int* t_segmento_codigo;
+typedef int* t_segmento_stack;
+typedef int* t_cursor_stack;
+typedef int* t_index_codigo;
+typedef int* t_index_etiquetas;
+
+typedef struct t_config_kernel { //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
+	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas
+	t_puerto_cpu puerto_cpus;				//Puerto TCP utilizado para recibir las conexiones de los CPUs
+	t_cuantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
+	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
+	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
+	//char id_semaforos[];					//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
+	//uint8_t valor_semaforos[];			//Valor inicial de cada semáforo
+	//char id_hio[];						//Identificador de cada dispositivo de entrada/salida
+	//uint8_t retardo_hio[];				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
+											//Cada posición del array representa un dispositivo de entrada/salida
+											//Cada posición del vector está asociada a su correspondiente retardo
+	t_ip_umv uvm_ip;						//IP de la UMV
+	t_puerto_umv umv_puerto;				//Puerto de la UMV
+	//t_variables_globales var_globales[]	//Variables globales del sistema
+} t_config_kernel;
 
 typedef struct {
 	t_list* lista;
 	pthread_mutex_t* mutex;
 	int8_t* prioridad;
 	int8_t* nombre_de_la_Cola;
-} lista;
+} t_lista_programas;
 
-typedef struct {
-	uint16_t valor;
-	char* nombre;
-} variable_t;
-
-typedef struct {
-	char* nombre;
-	int llamada;
-} stk_funcion;
-
-typedef struct {
-	char** linea;
-	uint16_t cantidad;
-} list_codigo;
-
-typedef struct {
-	variable_t* lista;
-	uint16_t cantidad;
-} list_variables;
-
-typedef struct {
-	stk_funcion* lista;
-	uint16_t cantidad;
-} list_funciones;
-
-typedef struct {
-	uint32_t pid;		 	 // ID del proceso
-	int pc; 		 	 // Program counter
-	int* cursor_stack;	//Cursor del Stack
-	list_codigo codigo;  	 // Codigo del script
-	list_variables datos; 	 // Tamaño de Contexto Actual
-	list_funciones stack; 	 // Stack funciones
+typedef struct PCB {
+	t_pid pid;								//Identificador único del Programa en el sistema
+	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
+	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
+	t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
+	t_index_codigo index_codigo;			//Dirección del primer byte en la UMV del Índice de Código
+	t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
+	t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
+	t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
+	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
-typedef struct pares{
-		int desplazamiento;
-		int longitudLinea;
-} Pares;
 
-typedef struct {
-	t_hash_element **elements;
-	int elements_amount;
-} diccionario;
-
-typedef struct pcb {
-		int ID;
-	    int* CODE, STACK, CursorSTACK;
-	    //estaba int* indiceEtiquetas, pero por lo que dice la consigna: el indice de etiquetas constara de la serializacion
-	    //de un diccionario que ontiene el id de cada funcion o etiqueta...
-	    diccionario* indiceEtiquetas;
-	    int* ProgramCounter;
-	    int TamanioContext;
-	    Pares indiceCodigo[];
-} PCB;
 
 #endif /* ESTRUCTURAS_H_ */
 

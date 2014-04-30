@@ -8,3 +8,6 @@ Lista de valores de Semaforos= [1, 0, 0]
 Retardo de hio= [2, 1, 1]
 Lista de hio= ["Impresora", "Disco", "Scanner"]
 Tamanio de Memoria Principal= 2048
+Direccion IP para conectarse a la UMV=127.0.0.1
+Puerto TCP para conectarse a la UMV=868
+Variables globales=[g1, g2, g3]
