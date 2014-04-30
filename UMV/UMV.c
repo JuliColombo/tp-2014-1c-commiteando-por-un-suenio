@@ -16,7 +16,7 @@
 //Al iniciar, la UMV crea la MP de un tamaño configurable por el archivo de configuracion, que supuse era
 //el tamaño maximo que puede tener el diccionario de ese archivo de configuracion
 
-//archivo_config configuracion;
+archivo_config configuracion;
 // Ojo!! Correccion del enunciado dice que es un campo del archivo,si es asi hay que revisar esto
 int* crearMP(t_config archConfig) {
 	int tamanio = (archConfig.properties)->table_max_size;
@@ -48,8 +48,7 @@ _Bool validarSolicitud(uint32_t longitud){
 	return true;
 }
 
-/*void leerConfiguracion(void) {
-
+void leerConfiguracion(void) {
 	t_config* config = config_create("/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/src");
 
 	configuracion.puerto_programa = config_get_int_value(config,
@@ -67,25 +66,25 @@ _Bool validarSolicitud(uint32_t longitud){
 	configuracion.grado_mp = config_get_int_value(config,
 			"Maximo nivel de multiprogramacion");
 
-	configuracion.id_semaforos = config_get_array_value(config,
+	configuracion.id_semaforos = config_get_string_value(config,
 			"Lista de nombres de Semaforos");
 
-	configuracion.semaforos = config_get_array_value(config,
+	configuracion.semaforos = config_get_string_value(config,
 			"Lista de valores de Semaforos");
 
-	configuracion.retardo_hio = config_get_array_value(config,
+	configuracion.retardo_hio = config_get_string_value(config,
 			"Retardo de hio");
 
-	configuracion.id_hio = config_get_array_value(config,
+	configuracion.id_hio = config_get_string_value(config,
 			"Lista de hio");
 
 	configuracion.tamanio_mp = config_get_int_value(config,
 				"Tamanio de Memoria Principal");
 
-}*/
+}
 
 //Esta bien que esto sea una funcion de la UMV?
-/*void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
+void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("%d\n", configuracion.puerto_programa);
 	printf("%d\n", configuracion.puerto_cpu);
@@ -97,7 +96,7 @@ _Bool validarSolicitud(uint32_t longitud){
 	printf("%d\n", configuracion.retardo_hio);
 	printf("%d\n", configuracion.id_hio);
 	printf("%d\n", configuracion.tamanio_mp);
-}*/
+}
 
 
 //Comandos de consola:

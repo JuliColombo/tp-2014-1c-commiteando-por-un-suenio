@@ -18,11 +18,11 @@ typedef struct {
 	uint8_t quantum;	//Quantum
 	uint8_t retardo_quantum;	//Retardo del Quantum
 	uint8_t grado_mp;	//Grado de multiprogramacion
+	char* id_semaforos;	//Identificadores de semaforos
+	uint8_t* semaforos;	//Valores de semaforos
+	uint8_t* retardo_hio;	//Retardo de hio
+	char* id_hio;	//Identificadores de hio
 	uint16_t tamanio_mp;	//Tamaño fijo de la memoria principal
-	//char id_semaforos[];	//Identificadores de semaforos
-	//uint8_t semaforos[];	//Valores de semaforos
-	//uint8_t retardo_hio[];	//Retardo de hio
-	//char id_hio[];	//Identificadores de hio
 } archivo_config;
 
 
@@ -43,7 +43,6 @@ typedef struct {
 	char* nombre;
 	int llamada;
 } stk_funcion;
-
 
 typedef struct {
 	char** linea;
