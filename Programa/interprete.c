@@ -7,8 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "log.h"
-#include "funcionesInterprete.h"
+#include "libs/log.h"
+#include "libs/funcionesInterprete.h"
 
 log_t* archLog;
 

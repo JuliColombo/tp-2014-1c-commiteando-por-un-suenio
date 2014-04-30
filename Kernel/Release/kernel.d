@@ -1,0 +1,1 @@
+kernel.d: ../kernel.c

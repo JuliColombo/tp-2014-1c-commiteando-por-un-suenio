@@ -1,15 +1,7 @@
-/*
- * Estructuras.h
- *
- *  Created on: 23/04/2014
- *      Author: utnso
- */
-
-/*Ideas de estructuras del tp, por ahora archivo_config y pcb*/
-
-
 #ifndef ESTRUCTURAS_H_
 #define ESTRUCTURAS_H_
+
+#include <stdint.h>
 
 
 typedef struct {
@@ -18,13 +10,12 @@ typedef struct {
 	uint8_t quantum;	//Quantum
 	uint8_t retardo_quantum;	//Retardo del Quantum
 	uint8_t grado_mp;	//Grado de multiprogramacion
-	char* id_semaforos;	//Identificadores de semaforos
-	uint8_t* semaforos;	//Valores de semaforos
-	uint8_t* retardo_hio;	//Retardo de hio
-	char* id_hio;	//Identificadores de hio
+	//char id_semaforos[];	//Identificadores de semaforos
+	//uint8_t semaforos[];	//Valores de semaforos
+	//uint8_t retardo_hio[];	//Retardo de hio
+	//char id_hio[];	//Identificadores de hio
 	uint16_t tamanio_mp;	//Tamaño fijo de la memoria principal
-} archivo_config;
-
+} archivo_config_kernel;
 
 typedef struct {
 	t_list* lista;
@@ -32,7 +23,6 @@ typedef struct {
 	int8_t* prioridad;
 	int8_t* nombre_de_la_Cola;
 } lista;
-
 
 typedef struct {
 	uint16_t valor;
@@ -67,6 +57,27 @@ typedef struct {
 	list_variables datos; 	 // Tamaño de Contexto Actual
 	list_funciones stack; 	 // Stack funciones
 } t_pcb;
+
+typedef struct pares{
+		int desplazamiento;
+		int longitudLinea;
+} Pares;
+
+typedef struct {
+	t_hash_element **elements;
+	int elements_amount;
+} diccionario;
+
+typedef struct pcb {
+		int ID;
+	    int* CODE, STACK, CursorSTACK;
+	    //estaba int* indiceEtiquetas, pero por lo que dice la consigna: el indice de etiquetas constara de la serializacion
+	    //de un diccionario que ontiene el id de cada funcion o etiqueta...
+	    diccionario* indiceEtiquetas;
+	    int* ProgramCounter;
+	    int TamanioContext;
+	    Pares indiceCodigo[];
+} PCB;
 
 #endif /* ESTRUCTURAS_H_ */
 

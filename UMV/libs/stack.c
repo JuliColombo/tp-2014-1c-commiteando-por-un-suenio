@@ -6,7 +6,7 @@
  */
 
 #include "parser/parser.h"
-#include "Stack.h"
+#include "stack.h"
 
 int create_stack(STACK *s,int size) {
 	s->pila = (datatype*) malloc(size*sizeof(datatype));
@@ -26,7 +26,7 @@ int destroy_stack(STACK *s) {
 
 int push(STACK *s, datatype* element) {
 	if(s->top_index == (s->max_size-1)) {
-		return "STACK_OVERFLOW";
+		return (int)"STACK_OVERFLOW";
 	}
 	s->top_index++;
 	s->pila[s->top_index] = *element;
@@ -35,7 +35,7 @@ int push(STACK *s, datatype* element) {
 
 int pop(STACK *s, datatype* ptr) {
 	if(s->top_index==-1){
-		return "STACK_UNDERFLOW";
+		return (int)"STACK_UNDERFLOW";
 	}
 	*ptr = s->pila[s->top_index];
 	s->top_index--;
