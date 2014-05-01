@@ -17,11 +17,10 @@
 #include "commons/config.h"
 #include "commons/collections/list.h"
 #include "log.h"
-#define PATH "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Kernel/configuracion_Kernel"
 
 extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
-
+extern char* PATH;
 
 typedef struct { // se define un vector para los programas en new
 	int peso;
@@ -34,8 +33,8 @@ void calcularPeso (t_programa programa);
 void agregarAListaSegunPeso(t_programa programa, t_list* lista);
 
 void mostrarNodosPorPantalla(t_list* lista);
-void inicializarConfiguracion(void);
-void leerConfiguracion(void);
+void inicializarConfiguracion(char*);
+void leerConfiguracion(char*);
 
 void imprimirConfiguracion(t_config_kernel configuracion);
 

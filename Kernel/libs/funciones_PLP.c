@@ -78,14 +78,14 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 */
 
 
-void inicializarConfiguracion(void) {
+void inicializarConfiguracion(char* PATH) {
 
-	leerConfiguracion();
+	leerConfiguracion(PATH);
 	archLog = log_crear(PATHLOG);
 
 }
 
-void leerConfiguracion(void) {
+void leerConfiguracion(char* PATH) {
 	t_config* config=config_create(PATH);
 
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
