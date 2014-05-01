@@ -13,6 +13,7 @@
 #include "libs/estructuras_kernel.h"
 #include "libs/funciones_PLP.h"
 
-int main (int argc, char **argv);
+
+
 
 #endif /* KERNEL_H_ */

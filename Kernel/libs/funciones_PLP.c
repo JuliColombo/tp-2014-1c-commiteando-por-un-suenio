@@ -6,6 +6,7 @@
 #include "parser/metadata_program.h"
 #include "commons/config.h"
 #include "commons/collections/list.h"
+#include "log.h"
 
 
 void calcularPeso (t_programa programa){ //Calcula peso del programa
@@ -76,21 +77,29 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 	}
 */
 
-void leerConfiguracion(t_config_kernel configuracion, char* path) {
-	t_config* config=config_create(path);
 
-	configuracion.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
-	configuracion.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
-	configuracion.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
-	configuracion.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
-	configuracion.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
-	//configuracion.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
-	//configuracion.semaforos = config_get_array_value(config,"Lista de valores de Semaforos");
-	//configuracion.retardo_hio = config_get_array_value(config,"Retardo de hio");
-	//configuracion.id_hio = config_get_array_value(config,"Lista de hio");
-	configuracion.uvm_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
-	configuracion.umv_puerto = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
-	//configuracion.var_globales = config_get_array(config,"Variables globales");
+void inicializarConfiguracion(void) {
+
+	leerConfiguracion();
+	archLog = log_crear(PATHLOG);
+
+}
+
+void leerConfiguracion(void) {
+	t_config* config=config_create(PATH);
+
+	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
+	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
+	configuracion_kernel.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
+	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
+	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
+	//configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
+	//configuracion_kernel.semaforos = config_get_array_value(config,"Lista de valores de Semaforos");
+	//configuracion_kernel.retardo_hio = config_get_array_value(config,"Retardo de hio");
+	//configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
+	configuracion_kernel.uvm_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
+	configuracion_kernel.umv_puerto = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
+	//configuracion_kernel.var_globales = config_get_array(config,"Variables globales");
 }
 
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion

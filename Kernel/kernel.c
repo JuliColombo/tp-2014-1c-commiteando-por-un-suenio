@@ -7,15 +7,20 @@
 
 #include "kernel.h"
 
-int main(int argc, char **argv){ //el kernel recive el archivo de configuracion como primer parametro
+/* Variables Globales */
+
 	t_config_kernel configuracion_kernel;
-	char *cwd = (char *)malloc(sizeof(char)*1000);
+	log_t* archLog;
+
+int main(int argc, char **argv){ // No recibe nada ahora
+
+	/*char *cwd = (char *)malloc(sizeof(char)*1000);
     getcwd(cwd, sizeof(cwd));
 
-    printf("%s", cwd);
+    printf("%s", cwd);*/
 
-    leerConfiguracion(configuracion_kernel, cwd);
-    imprimirConfiguracion(configuracion_kernel);
+    inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
+    imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
 
     return 0;
 }
