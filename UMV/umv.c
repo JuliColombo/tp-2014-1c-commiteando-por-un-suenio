@@ -13,7 +13,7 @@
 #include "libs/estructuras_umv.h"
 
 int main (int argc, char **argv){
-	char comando[12];
+	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	gets(comando);
 	while(estaEnDicOP(comando)== 0){
@@ -22,7 +22,7 @@ int main (int argc, char **argv){
 	}
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
-				char tipoOperacion[9];
+				char tipoOperacion[32];
 				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?\n");
 				gets(tipoOperacion);
 				while(estaEnDicTOP(tipoOperacion)== 0){
@@ -55,12 +55,13 @@ int main (int argc, char **argv){
 			   if (strcmp(comando,"dump") ==0){
 				//generarReporte();
 							}
-			   else{
-				   puts("Tipo de Operacion erronea\n");
-			   	   }
 			}
 		puts("Escriba la siguiente operacion\n");
 		gets(comando);
+		while(estaEnDicOP(comando)== 0){
+				puts("Operacion erronea, escriba la operacion de nuevo");
+				gets(comando);
+			}
 		}
 
 	return 0;
