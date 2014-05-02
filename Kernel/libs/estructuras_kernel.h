@@ -32,10 +32,10 @@ typedef struct t_config_kernel { //Hay que pensar bien esta estructura, porque n
 	t_cuantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
-	//char id_semaforos;					//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
-	//uint8_t valor_semaforos;			//Valor inicial de cada semáforo
-	//char id_hio;						//Identificador de cada dispositivo de entrada/salida
-	//uint8_t retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
+	char** id_semaforos;					//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
+	uint8_t* valor_semaforos;			//Valor inicial de cada semáforo
+	char** id_hio;						//Identificador de cada dispositivo de entrada/salida
+	uint8_t* retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
 	t_ip_umv uvm_ip;						//IP de la UMV
 	t_puerto_umv umv_puerto;				//Puerto de la UMV
 	//t_variables_globales var_globales[]	//Variables globales del sistema
