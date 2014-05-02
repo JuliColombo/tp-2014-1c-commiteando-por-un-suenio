@@ -88,7 +88,7 @@ void inicializarConfiguracion(char* PATH) {
 	else{
 	leerConfiguracion(PATH);
 	imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
-		}
+	}
 }
 
 void leerConfiguracion(char* PATH) {
@@ -100,7 +100,7 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	//configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
-	//configuracion_kernel.semaforos = config_get_array_value(config,"Lista de valores de Semaforos");
+	//configuracion_kernel.valor_semaforos = config_get_array_value(config,"Lista de valores de Semaforos");
 	//configuracion_kernel.retardo_hio = config_get_array_value(config,"Retardo de hio");
 	//configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.uvm_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");

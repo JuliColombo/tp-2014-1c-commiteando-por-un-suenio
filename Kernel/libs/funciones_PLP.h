@@ -28,13 +28,11 @@ typedef struct { // se define un vector para los programas en new
 
 } t_programa;
 
-void calcularPeso (t_programa programa);
-
-void agregarAListaSegunPeso(t_programa programa, t_list* lista);
-
-void mostrarNodosPorPantalla(t_list* lista);
-void inicializarConfiguracion(char*);
-void leerConfiguracion(char*);
+void calcularPeso(t_programa programa); //Calcula el peso del programa
+void agregarAListaSegunPeso(t_programa programa, t_list* lista); //Agrega ordenadamente en la cola de new
+void mostrarNodosPorPantalla(t_list* lista); //Muestra los programas que estan en New por pantalla
+void inicializarConfiguracion(char*); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
+void leerConfiguracion(char*); //Lee la config del archivo y la asigna la struct correspondiente
 
 void imprimirConfiguracion(t_config_kernel configuracion);
 
