@@ -12,11 +12,47 @@
 #include "commons/config.h"
 #include "commons/collections/dictionary.h"
 #include "estructuras_umv.h"
+#include "funciones_UMV.h"
+#include <string.h>
 //#include "FuncionesPLP.h"
 //#include <Estructuras.h>
 //Al iniciar, la UMV crea la MP de un tamaño configurable por el archivo de configuracion, que supuse era
 //el tamaño maximo que puede tener el diccionario de ese archivo de configuracion
 
+int estaEnDicOP(char palabra[]){
+					char *dic_op[]={"operacion",
+									  "dump",
+									  "compactacion",
+									  "retardo",
+									  "algoritmo",
+									  "exit"
+					};
+					int aux;
+					for(aux=0;aux<6;aux++){
+						if(strcmp(dic_op[aux], palabra) == 0){
+							return 1;
+							break;
+						}
+
+					}
+					return 0;
+}
+
+int estaEnDicTOP(char palabra[]){
+					char *dic_top[]={"solicitar",
+							        "escribir",
+							        "crear",
+							        "destruir"
+						};
+					int aux;
+					for(aux=0;aux<4;aux++){
+						if((strcmp(dic_top[aux], palabra)) == 0){
+							return 1;
+							break;
+						}
+					}
+					return 0;
+}
 
 // Ojo!! Correccion del enunciado dice que es un campo del archivo,si es asi hay que revisar esto
 int* crearMP(t_config archConfig) {
