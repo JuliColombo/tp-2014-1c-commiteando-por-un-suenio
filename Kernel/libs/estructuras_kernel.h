@@ -36,8 +36,6 @@ typedef struct t_config_kernel { //Hay que pensar bien esta estructura, porque n
 	//uint8_t valor_semaforos[];			//Valor inicial de cada semáforo
 	//char id_hio[];						//Identificador de cada dispositivo de entrada/salida
 	//uint8_t retardo_hio[];				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
-											//Cada posición del array representa un dispositivo de entrada/salida
-											//Cada posición del vector está asociada a su correspondiente retardo
 	t_ip_umv uvm_ip;						//IP de la UMV
 	t_puerto_umv umv_puerto;				//Puerto de la UMV
 	//t_variables_globales var_globales[]	//Variables globales del sistema

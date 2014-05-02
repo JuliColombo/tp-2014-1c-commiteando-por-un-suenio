@@ -79,17 +79,23 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 
 
 void inicializarConfiguracion(char* PATH) {
-
-	leerConfiguracion(PATH);
 	archLog = log_crear(PATHLOG);
-
+	struct stat file_info;
+	int control = lstat(PATH, &file_info);
+	if (control == -1) {
+		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
+		}
+	else{
+	leerConfiguracion(PATH);
+	imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
+		}
 }
 
 void leerConfiguracion(char* PATH) {
 	t_config* config=config_create(PATH);
 
-	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
-	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de Procesos Interpretes");
+	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
+	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de los CPUs");
 	configuracion_kernel.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
 	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");

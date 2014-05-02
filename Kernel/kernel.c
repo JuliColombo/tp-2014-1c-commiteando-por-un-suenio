@@ -13,17 +13,11 @@
 	log_t* archLog;
 	char* PATH;
 
-int main(int argc, char **argv){ // No recibe nada ahora
+int main(int argc, char **argv){ // Recibe la ruta del archivo de configuracion del Kernel
 	PATH=argv[1];
 
-
-	/*char *cwd = (char *)malloc(sizeof(char)*1000);
-    getcwd(cwd, sizeof(cwd));
-
-    printf("%s", cwd);*/
-
     inicializarConfiguracion(PATH); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
-    imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
+
 
     return 0;
 }
