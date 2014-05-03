@@ -26,7 +26,7 @@ typedef int* t_cursor_stack;
 typedef int* t_index_codigo;
 typedef int* t_index_etiquetas;
 
-typedef struct t_config_kernel { //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
+typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas
 	t_puerto_cpu puerto_cpus;				//Puerto TCP utilizado para recibir las conexiones de los CPUs
 	t_cuantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin

@@ -9,6 +9,7 @@
 #include "log.h"
 
 
+
 void calcularPeso (t_programa programa){ //Calcula peso del programa
 	programa.peso=(5*programa.metadata.cantidad_de_etiquetas + 3* programa.metadata.cantidad_de_funciones + programa.metadata.instrucciones_size);
 }
@@ -106,7 +107,7 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.uvm_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.umv_puerto = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	//configuracion_kernel.var_globales = config_get_array(config,"Variables globales");
-}
+	}
 
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
 
@@ -115,7 +116,7 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	printf("%d\n", configuracion.quantum);
 	printf("%d\n", configuracion.retardo_quantum);
 	printf("%d\n", configuracion.multiprogramacion);
-	//printf("%d\n", configuracion.id_semaforos);
+	//printf("%s\n", configuracion.id_semaforos[1]);
 	//printf("%d\n", configuracion.semaforos);
 	//printf("%d\n", configuracion.retardo_hio);
 	//printf("%d\n", configuracion.id_hio);

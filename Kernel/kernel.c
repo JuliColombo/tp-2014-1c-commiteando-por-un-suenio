@@ -17,7 +17,12 @@ int main(int argc, char **argv) { // Recibe la ruta del archivo de configuracion
 	PATH = argv[1];
 
 	inicializarConfiguracion(PATH); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
+	t_pcb* proceso = NULL;
+	int i, cant_hilos;
 
+	while(i=0;i<=cant_hilos;i++){
 
-	return 0;
+	}
+
+	return EXIT_SUCCESS;
 }
