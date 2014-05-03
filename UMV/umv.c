@@ -5,16 +5,12 @@
  *      Author: utnso
  */
 
-
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include "libs/funciones_UMV.h"
-#include "libs/estructuras_umv.h"
+#include "umv.h"
 
 int main (int argc, char **argv){
 	//Acceder a archConfig y obtener datos
 	crearMP(/*configuracionUMV*/);
+	//Crear estructuras administrativas
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	gets(comando);
