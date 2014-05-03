@@ -41,14 +41,14 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	//t_variables_globales var_globales[]	//Variables globales del sistema
 } t_config_kernel;
 
-typedef struct {
+typedef struct{
 	t_list* lista;
 	pthread_mutex_t* mutex;
 	int8_t* prioridad;
 	int8_t* nombre_de_la_Cola;
 } t_lista_programas;
 
-typedef struct PCB {
+typedef struct{
 	t_pid pid;								//Identificador único del Programa en el sistema
 	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
 	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
