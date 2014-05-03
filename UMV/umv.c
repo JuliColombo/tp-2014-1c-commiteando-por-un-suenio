@@ -9,7 +9,7 @@
 
 int main (int argc, char **argv){
 	//Acceder a archConfig y obtener datos
-	crearMP(/*configuracionUMV*/);
+	char* MP=crearMP(/*configuracionUMV*/);
 	//Crear estructuras administrativas
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
@@ -23,7 +23,7 @@ int main (int argc, char **argv){
 				char tipoOperacion[32];
 				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?\n");
 				gets(tipoOperacion);
-				while(estaEnDicTOP(tipoOperacion)== 0){
+				while(estaEnDicTOP(tipoOperacion)== 0/*<- aca no iria un 1?*/){
 						puts("Tipo de Operacion erronea, escriba el tipo de operacion de nuevo");
 						gets(tipoOperacion);
 					}
@@ -37,15 +37,15 @@ int main (int argc, char **argv){
 					//crearSegmentoPrograma();
 				 }
 				if(strcmp(tipoOperacion, "destruir") == 0){
-					//destruirSegmentoPrograma();
+					//destruirSegmentoPrograma(t_programa Programa);
 				 }
 			}
 
 		else { if (strcmp(comando, "retardo") == 0){
-				//retardarRespuesta();
+				//retardo(int valorRetardoEnMilisegundos);
 			       }
 			   if (strcmp(comando, "algoritmo") == 0){
-				//cambiarAlgoritmo();
+				//algoritmo(char tipo);
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
 				//compactar();
