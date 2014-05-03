@@ -54,9 +54,9 @@ int estaEnDicTOP(char palabra[]){
 					return 0;
 }
 
-// Ojo!! Correccion del enunciado dice que es un campo del archivo,si es asi hay que revisar esto
-int* crearMP(t_config archConfig) {
-	int tamanio = (archConfig.properties)->table_max_size;
+
+int* crearMP(t_config_UMV configuracionUMV) {
+	int tamanio = configuracionUMV.MemSize;
 	int* MP = malloc(tamanio);
 
 	return MP;
@@ -103,6 +103,14 @@ void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar 
 
 void algoritmo(char tipo){//Cambiar entre Worst fit y First fit
 
-//TODO compactar y dump !!
+void compactar(){
+	//Forzar compactacion (ver para checkpoint 3)
+}
+
+void dump(){
+	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
+}
+
+
 
 }

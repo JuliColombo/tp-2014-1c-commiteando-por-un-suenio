@@ -16,4 +16,8 @@ typedef struct { // se define un vector para los programas en new
 
 } t_programa;
 
+typedef struct t_config_UMV {
+uint32_t MemSize;
+} t_config_UMV;
+
 #endif /* ESTRUCTURAS_UMV_H_ */
