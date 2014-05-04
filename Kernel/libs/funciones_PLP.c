@@ -104,8 +104,8 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.valor_semaforos = malloc(sizeof(config_get_array_value(config,"Lista de valores de Semaforos")));
 	configuracion_kernel.retardo_hio = malloc(sizeof(config_get_array_value(config,"Retardo de hio")));
 	configuracion_kernel.id_hio = malloc(sizeof(config_get_array_value(config,"Lista de hio")));
-	configuracion_kernel.uvm_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
-	configuracion_kernel.umv_puerto = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
+	configuracion_kernel.umv_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
+	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	//configuracion_kernel.var_globales = config_get_array(config,"Variables globales");
 	}
 
@@ -120,12 +120,24 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	//printf("%d\n", configuracion.semaforos);
 	//printf("%d\n", configuracion.retardo_hio);
 	//printf("%d\n", configuracion.id_hio);
-	printf("%d\n", configuracion.uvm_ip);
-	printf("%d\n", configuracion.umv_puerto);
+	printf("%d\n", configuracion.umv_ip);
+	printf("%d\n", configuracion.puerto_umv);
 	//printf("%d\n", configuracion.var_globales);
 	free(configuracion_kernel.id_semaforos);
 	free(configuracion_kernel.valor_semaforos);
 	free(configuracion_kernel.retardo_hio);
 	free(configuracion_kernel.id_hio);
+
+}
+
+
+void plp_main (){
+
+	//Abrir socket para programas
+
+
+	while(1){
+
+	}
 
 }

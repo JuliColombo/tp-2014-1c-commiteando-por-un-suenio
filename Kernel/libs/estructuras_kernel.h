@@ -26,26 +26,36 @@ typedef int* t_cursor_stack;
 typedef int* t_index_codigo;
 typedef int* t_index_etiquetas;
 
+typedef char** t_id_semaforos;
+typedef char** t_id_hio;
+
+typedef uint8_t* t_valor_semaforos;
+typedef uint8_t* t_retardo_hio;
+
+typedef int8_t* t_prioridad;
+typedef int8_t* t_nombre_cola;
+
+
 typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas
 	t_puerto_cpu puerto_cpus;				//Puerto TCP utilizado para recibir las conexiones de los CPUs
 	t_cuantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
-	char** id_semaforos;					//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
-	uint8_t* valor_semaforos;			//Valor inicial de cada semáforo
-	char** id_hio;						//Identificador de cada dispositivo de entrada/salida
-	uint8_t* retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
-	t_ip_umv uvm_ip;						//IP de la UMV
-	t_puerto_umv umv_puerto;				//Puerto de la UMV
+	t_id_semaforos id_semaforos;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
+	t_valor_semaforos valor_semaforos;		//Valor inicial de cada semáforo
+	t_id_hio id_hio;						//Identificador de cada dispositivo de entrada/salida
+	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
+	t_ip_umv umv_ip;						//IP de la UMV
+	t_puerto_umv puerto_umv;				//Puerto de la UMV
 	//t_variables_globales var_globales[]	//Variables globales del sistema
 } t_config_kernel;
 
 typedef struct{
 	t_list* lista;
 	pthread_mutex_t* mutex;
-	int8_t* prioridad;
-	int8_t* nombre_de_la_Cola;
+	t_prioridad prioridad;
+	t_nombre_cola nombre_de_la_Cola;
 } t_lista_programas;
 
 typedef struct{
