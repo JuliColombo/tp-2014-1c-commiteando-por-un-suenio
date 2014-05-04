@@ -1,1 +1,3 @@
-cpu.d: ../cpu.c
+cpu.d: ../cpu.c ../stack.h
+
+../stack.h:
