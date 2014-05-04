@@ -10,11 +10,12 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "libs/estructuras_kernel.h"
 #include "libs/funciones_PLP.h"
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <pthread.h>
+#include "libs/socket.h"
+
+int main(int argc, char **argv);
 
 
 #endif /* KERNEL_H_ */

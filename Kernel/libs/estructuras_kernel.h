@@ -46,7 +46,7 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_valor_semaforos valor_semaforos;		//Valor inicial de cada semáforo
 	t_id_hio id_hio;						//Identificador de cada dispositivo de entrada/salida
 	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
-	t_ip_umv umv_ip;						//IP de la UMV
+	t_ip_umv ip_umv;						//IP de la UMV
 	t_puerto_umv puerto_umv;				//Puerto de la UMV
 	//t_variables_globales var_globales[]	//Variables globales del sistema
 } t_config_kernel;

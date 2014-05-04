@@ -36,6 +36,6 @@ void leerConfiguracion(char*); //Lee la config del archivo y la asigna la struct
 
 void imprimirConfiguracion(t_config_kernel configuracion);
 
-void plp_main ();
+void* core_plp ();
 
 #endif /* FUNCIONESPLP_H_ */

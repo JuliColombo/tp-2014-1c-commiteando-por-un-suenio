@@ -7,6 +7,7 @@
 #include "commons/config.h"
 #include "commons/collections/list.h"
 #include "log.h"
+#include "socket.h"
 
 
 
@@ -38,7 +39,7 @@ int p;
 	}
 }
 
-int main_plp(){
+/*int main_plp(){
 	t_list* cola_programas=list_create();
 	printf("La cola está vacia");
 
@@ -46,7 +47,7 @@ int main_plp(){
 		t_programa programa;
 		calcularPeso(programa);
 		//programa.metadata=*(metadatada_desde_literal(literal));
-		if(1 /*solicitarMemoria(programa)*/){
+		if(solicitarMemoria(programa)){
 			agregarAListaSegunPeso(programa,cola_programas);
 			}
 			else{
@@ -56,7 +57,7 @@ int main_plp(){
 
 
 	return 0;
-}
+}*/
 
 /*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
  * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
@@ -88,7 +89,7 @@ void inicializarConfiguracion(char* PATH) {
 		}
 	else{
 	leerConfiguracion(PATH);
-	imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
+	//imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
@@ -104,7 +105,7 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.valor_semaforos = malloc(sizeof(config_get_array_value(config,"Lista de valores de Semaforos")));
 	configuracion_kernel.retardo_hio = malloc(sizeof(config_get_array_value(config,"Retardo de hio")));
 	configuracion_kernel.id_hio = malloc(sizeof(config_get_array_value(config,"Lista de hio")));
-	configuracion_kernel.umv_ip = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
+	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	//configuracion_kernel.var_globales = config_get_array(config,"Variables globales");
 	}
@@ -120,7 +121,7 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	//printf("%d\n", configuracion.semaforos);
 	//printf("%d\n", configuracion.retardo_hio);
 	//printf("%d\n", configuracion.id_hio);
-	printf("%d\n", configuracion.umv_ip);
+	printf("%d\n", configuracion.ip_umv);
 	printf("%d\n", configuracion.puerto_umv);
 	//printf("%d\n", configuracion.var_globales);
 	free(configuracion_kernel.id_semaforos);
@@ -131,13 +132,17 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 }
 
 
-void plp_main (){
+void* core_plp (){
 
 	//Abrir socket para programas
-
+	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){
+			printf("Todo bien\n");
+		} else {
+			printf("Todo mal\n");
+		}
 
 	while(1){
-
+		break;
 	}
-
+return 0;
 }

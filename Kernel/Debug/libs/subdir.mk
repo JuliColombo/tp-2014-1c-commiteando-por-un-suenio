@@ -4,13 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../libs/funciones_PLP.c 
+../libs/funciones_PLP.c \
+../libs/log.c \
+../libs/socket.c 
 
 OBJS += \
-./libs/funciones_PLP.o 
+./libs/funciones_PLP.o \
+./libs/log.o \
+./libs/socket.o 
 
 C_DEPS += \
-./libs/funciones_PLP.d 
+./libs/funciones_PLP.d \
+./libs/log.d \
+./libs/socket.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
