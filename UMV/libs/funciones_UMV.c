@@ -56,7 +56,8 @@ int estaEnDicTOP(char palabra[]){
 
 int* crearMP(t_config_UMV configuracionUMV) {
 	int tamanio = configuracionUMV.MemSize;
-	char* MP = malloc(tamanio);
+	int* MP;
+	MP = malloc(tamanio);
 
 	return MP;
 }
@@ -69,9 +70,9 @@ _Bool solicitarMemoria(t_programa programa){
 
 //Operacion Basica de UMV 1, se toma una cantidad de bytes (longitud) desde la posicion de memoria dada(base+offset)?
 void solicitarBytes(uint32_t base,uint32_t offset, uint32_t longitud){
-	if (pedidoMpEsValido(base,offset,longitud)){
-		MP[base]
-	}
+//	if (pedidoMpEsValido(base,offset,longitud)){
+//		MP[base]
+//	}
 
 }
 

@@ -4,16 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../libs/funciones_UMV.c \
-../libs/stack.c 
+../libs/funciones_UMV.c 
 
 OBJS += \
-./libs/funciones_UMV.o \
-./libs/stack.o 
+./libs/funciones_UMV.o 
 
 C_DEPS += \
-./libs/funciones_UMV.d \
-./libs/stack.d 
+./libs/funciones_UMV.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
