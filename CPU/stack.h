@@ -8,10 +8,14 @@
 #ifndef STACK_H_
 #define STACK_H_
 
+#include "parser/parser.h"
+
 typedef struct {
-     int *elementos;
+     t_valor_variable *elementos;
  	 int max_size;
   	 int top_index;
+  	 int* stack_base;
+  	 int* contexto_actual;
  } t_stack;
 
  t_stack* CREATE_STACK (int tamanoMax);
@@ -20,10 +24,20 @@ typedef struct {
 
  int IS_EMPTY (t_stack *pila);
 
- int TOP (t_stack *pila);
+ int IS_FULL (t_stack *pila, int pos);
 
- int POP (t_stack *pila);
+ t_valor_variable TOP (t_stack *pila);
 
- void PUSH (int* x, t_stack* pila);
+ t_valor_variable POP (t_stack *pila);
+
+ void PUSH (t_valor_variable* x, t_stack* pila);
+
+ void PUSH_POSITION (t_valor_variable* x, t_stack* pila,int pos);
+
+ int PUSH_SIZE_CHECK (t_valor_variable* x, t_stack* pila, int pos);
+
+ //int CANT_ELEMENTOS (t_stack* pila);
+
+ t_valor_variable POP_SIZE_CHECK(t_stack* pila);
 
 #endif /* STACK_H_ */
