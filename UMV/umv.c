@@ -7,9 +7,11 @@
 
 #include "umv.h"
 
+int* MP;
+
 int main (int argc, char **argv){
 	//Acceder a archConfig y obtener datos
-	char* MP=crearMP(/*configuracionUMV*/);
+	MP=crearMP(/*configuracionUMV*/);
 	//Crear estructuras administrativas
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");

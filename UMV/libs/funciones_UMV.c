@@ -58,10 +58,26 @@ int* crearMP(t_config_UMV configuracionUMV) {
 	int tamanio = configuracionUMV.MemSize;
 	int* MP;
 	MP = malloc(tamanio);
-
 	return MP;
 }
 
+_Bool segmentationFault(uint32_t base,uint32_t offset){
+	if (MP[base+offset] == NULL) {
+	    puts("Segmentation Fault al intentar acceder a posicion %d", base+offset);
+		return true;
+	} else{
+		return false;
+	}
+}
+
+_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
+	if (MP[base+offset+longitud] == NULL) {
+		    puts("Memory Overload al intentar escribir %d bytes en la posicion %d", longitud,base+offset);
+			return true;
+		} else{
+			return false;
+		}
+}
 
 //Funcion que recibe el programa del PLP y le reserva memoria (si puede)
 _Bool solicitarMemoria(t_programa programa){
@@ -70,9 +86,11 @@ _Bool solicitarMemoria(t_programa programa){
 
 //Operacion Basica de UMV 1, se toma una cantidad de bytes (longitud) desde la posicion de memoria dada(base+offset)?
 void solicitarBytes(uint32_t base,uint32_t offset, uint32_t longitud){
-//	if (pedidoMpEsValido(base,offset,longitud)){
-//		MP[base]
-//	}
+//	if (validarSolicitud(base,offset,longitud)){
+//		SOLICITAR LOS BYTES
+//	} else {
+//		puts("No se pudo realizar la asignacion");
+//    }
 
 }
 
@@ -82,10 +100,21 @@ void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud/*,t_buffer buf
 }
 
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
-_Bool validarSolicitud(uint32_t longitud){
-	if(0/*MemoriaSuficiente*/){
+_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
+	if(hayEspacioEnMemoria()){
+		return true;
+	} else{
+		puts("No alcanza el espacio en memoria:");
+		switch(base,offset,longitud){
+			case segmentationFault(base,offset):
+				return false;
+			case memoryOverload(base,offset,longitud):
+				return false;
+			default:
+				//puts("Excepcion Desconocida"); ???
+				return false;
+		}
 	}
-	return true;
 }
 
 //Comandos de consola:
