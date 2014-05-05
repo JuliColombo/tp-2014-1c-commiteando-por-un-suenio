@@ -134,15 +134,24 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 
 void* core_plp (void *arg){
 
-	//Abrir socket para programas
-	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){
+	//Crear socket
+	//Bindear socket
+	//Poner socket en listen
+	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){ //test
 			printf("Todo bien\n");
 		} else {
 			printf("Todo mal\n");
 		}
 
 	while(1){
+		//read()
 		break;
 	}
+	//Cerrar socket
 return 0;
+}
+
+
+void * core_pcp (void *arg){
+	
 }
