@@ -4,13 +4,13 @@
  *  Created on: 30/04/2014
  *      Author: utnso
  */
-
+#include "parser/metadata_program.h"
 #include "stack.h"
 #include <stdio.h>
 
 int main (int argc, char **argv){
 	//Esto es una prueba
-	t_valor_variable a = 'A';
+	/*t_valor_variable a = 'A';
 	t_valor_variable b = 2048;
 	t_valor_variable c = -156;
 	t_stack* pila=CREATE_STACK(1000);
@@ -30,7 +30,22 @@ int main (int argc, char **argv){
 	printf("El valor %c (char) esta en la posicion %p\n",POOP,&POOP);
 	POOOP=POP_SIZE_CHECK(pila);
 	printf("El valor es %d\n",POOOP);
-	DESTROY_STACK(pila);
+	DESTROY_STACK(pila);*/
+
+	char* programa = malloc(511);
+	strcpy(programa,"#!/usr/bin/ansisop \n begin \n # primero declaro las variables \n variables a, b \n a = 20 \n print a \n end \n");
+	t_medatada_program* metadata;
+	metadata = metadatada_desde_literal(programa);
+	printf("cantidad de instrucciones: %d\n", metadata->instrucciones_size);
+	printf("Cantidad de etiquetas %i\n",metadata->cantidad_de_etiquetas);
+	printf("----------- Funcion impresion -------- \n");
+	printf("Cantidad de etiquetas %i\n",metadata->cantidad_de_etiquetas);
+	printf("Cantidad de funciones %i\n",metadata->cantidad_de_funciones);
+	printf("Etiquetas %s\n",metadata->etiquetas);
+	printf("Tamaño del mapa serializado de etiquetas %i\n",metadata->etiquetas_size);
+	printf("Tamaño del mapa serializado de instrucciones %i\n",metadata->instrucciones_size);
+	printf("El numero de la primera instruccion es %i\n",metadata->instruccion_inicio);
+
 
 	return 0;
 }
