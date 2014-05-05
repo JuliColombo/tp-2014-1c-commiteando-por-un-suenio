@@ -132,7 +132,7 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 }
 
 
-void* core_plp (){
+void* core_plp (void *arg){
 
 	//Abrir socket para programas
 	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){
