@@ -20,7 +20,9 @@ int main(int argc, char **argv) { // Recibe la ruta del archivo de configuracion
 	inicializarConfiguracion(PATH); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
 
 	int thread_plp = pthread_create (&plp, NULL, core_plp(), NULL);
+	int thread_pcp = ptrhead_create (&pcp, NULL, core_pcp(), NULL);
 
+	pthread_join(thread_pcp, NULL);
 	pthread_join(thread_plp, NULL);
 
 	/*t_pcb* proceso = NULL;
