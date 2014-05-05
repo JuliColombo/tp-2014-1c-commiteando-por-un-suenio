@@ -132,7 +132,7 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 }
 
 
-void* core_plp (void *arg){
+void* core_plp(void){
 
 	//Crear socket
 	//Bindear socket
@@ -148,10 +148,10 @@ void* core_plp (void *arg){
 		break;
 	}
 	//Cerrar socket
-return 0;
+
 }
 
 
-void * core_pcp (void *arg){
+void* core_pcp(void){
 	
 }
