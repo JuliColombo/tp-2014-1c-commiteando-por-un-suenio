@@ -18,6 +18,9 @@
 //#include <Estructuras.h>
 
 
+
+
+
 int estaEnDicOP(char palabra[]){
 					char *dic_op[]={"operacion",
 									  "dump",
@@ -61,23 +64,23 @@ int* crearMP(t_config_UMV configuracionUMV) {
 	return MP;
 }
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){
-	if (MP[base+offset] == NULL) {
-	    puts("Segmentation Fault al intentar acceder a posicion %d", base+offset);
-		return true;
-	} else{
-		return false;
-	}
-}
-
-_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
-	if (MP[base+offset+longitud] == NULL) {
-		    puts("Memory Overload al intentar escribir %d bytes en la posicion %d", longitud,base+offset);
-			return true;
-		} else{
-			return false;
-		}
-}
+//_Bool segmentationFault(uint32_t base,uint32_t offset){
+//	if (MP[base+offset] == NULL) {
+//	    puts("Segmentation Fault al intentar acceder a posicion %d", base+offset);
+//		return true;
+//	} else{
+//		return false;
+//	}
+//}
+//
+//_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
+//	if (MP[base+offset+longitud] == NULL) {
+//		    puts("Memory Overload al intentar escribir %d bytes en la posicion %d", longitud,base+offset);
+//			return true;
+//		} else{
+//			return false;
+//		}
+//}
 
 //Funcion que recibe el programa del PLP y le reserva memoria (si puede)
 _Bool solicitarMemoria(t_programa programa){
@@ -100,22 +103,22 @@ void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud/*,t_buffer buf
 }
 
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
-_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
-	if(hayEspacioEnMemoria()){
-		return true;
-	} else{
-		puts("No alcanza el espacio en memoria:");
-		switch(base,offset,longitud){
-			case segmentationFault(base,offset):
-				return false;
-			case memoryOverload(base,offset,longitud):
-				return false;
-			default:
-				//puts("Excepcion Desconocida"); ???
-				return false;
-		}
-	}
-}
+//_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
+//	if(hayEspacioEnMemoria()){
+//		return true;
+//	} else{
+//		puts("No alcanza el espacio en memoria:");
+//		switch(base,offset,longitud){
+//			case segmentationFault(base,offset):
+//				return false;
+//			case memoryOverload(base,offset,longitud):
+//				return false;
+//			default:
+//				//puts("Excepcion Desconocida"); ???
+//				return false;
+//		}
+//	}
+//}
 
 //Comandos de consola:
 void operacion(/*t_proceso proceso,*/ uint32_t base,uint32_t offset, uint32_t longitud){
@@ -133,7 +136,17 @@ void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar 
 
 }
 
-void algoritmo(char tipo){//Cambiar entre Worst fit y First fit
+void algoritmo(int* algor){//Cambiar entre Worst fit y First fit
+	if(*algor==worstfit){
+							*algor=firstfit;
+							//printf("%d\n", *algor); para checkear el cambio del valor
+	}
+	else{
+							*algor=worstfit;
+							//printf("%d\n", *algor); para checkear el cambio del valor
+	}
+
+}
 
 void compactar(){
 	//Forzar compactacion (ver para checkpoint 3)
@@ -145,4 +158,4 @@ void dump(){
 
 
 
-}
+

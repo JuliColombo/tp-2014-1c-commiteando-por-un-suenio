@@ -20,4 +20,10 @@ typedef struct t_config_UMV {
 uint32_t MemSize;
 } t_config_UMV;
 
+enum tipoAlgoritmo{
+					firstfit,worstfit
+};
+
+
+
 #endif /* ESTRUCTURAS_UMV_H_ */

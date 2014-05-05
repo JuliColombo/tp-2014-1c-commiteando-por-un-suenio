@@ -14,6 +14,7 @@ _Bool solicitarMemoria(t_programa prgrama);
 
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
+void algoritmo(int* algor);
 
 
 #endif /* UMV_H_ */

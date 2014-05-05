@@ -8,6 +8,8 @@
 #include "umv.h"
 
 int* MP;
+int algor=firstfit;
+
 
 int main (int argc, char **argv){
 	//Acceder a archConfig y obtener datos
@@ -47,7 +49,7 @@ int main (int argc, char **argv){
 				//retardo(int valorRetardoEnMilisegundos);
 			       }
 			   if (strcmp(comando, "algoritmo") == 0){
-				//algoritmo(char tipo);
+				   algoritmo(&algor);
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
 				//compactar();
