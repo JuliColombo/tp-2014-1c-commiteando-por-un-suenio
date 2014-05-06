@@ -15,7 +15,5 @@
 #include "libs/funciones_PLP.h"
 #include "libs/socket.h"
 
-int main(int argc, char **argv);
-
 
 #endif /* KERNEL_H_ */

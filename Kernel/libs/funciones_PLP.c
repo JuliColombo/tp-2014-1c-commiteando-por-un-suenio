@@ -133,35 +133,31 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 
 
 void* core_plp(void){
+	int sock_plp;		//El socket de conexion
+	int n_sock_plp;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
 
-	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){ //test
-			printf("Todo bien\n");
-		} else {
-			printf("Todo mal\n");
-		}
-
-
-	int sock_plp;				//El socket de conexion
-	int n_sock_plp;				//El socket de datos
-	sockaddr_in addr_programas;		//Direccion de programas
-	int long_addr=sizeof(sockaddr_in);	//Longitud del struct sockaddr_in
-	char buffer[10];			//Tamaño del buffer para recibir. El 10 es provisorio
-	int datos_recividos;			//Cantidad de datos recividos
-	
-	//Crear socket
-	sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas;
-	//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
+	sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas); //El socket esta creado y listo para escuchar a los clientes por el puerto_programas
 
 	while(1){
 		printf("Esperando conexion...\n");
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
+		memset(paquete, 0, sizeof(paquete));
+		if (nipc_recibir(n_sock_plp,paquete)>0){
+			//Se recivieron datos
+		} else {
+			//No se recivieron datos
+		}
 		break; //Esto va a hacer que salga del bucle y solo se corra una vez
 	}
-	//Cerrar socket
-
+//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+	if (close(sock_plp)<0){
+		//Error con el close
+	}
+	return 0;
 }
 
 
 void* core_pcp(void){
-	
+	return 0;
 }
