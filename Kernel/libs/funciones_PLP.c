@@ -134,18 +134,28 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 
 void* core_plp(void){
 
-	//Crear socket
-	//Bindear socket
-	//Poner socket en listen
 	if(nipc_abrirConexion(configuracion_kernel.puerto_programas)>0){ //test
 			printf("Todo bien\n");
 		} else {
 			printf("Todo mal\n");
 		}
 
+
+	int sock_plp;				//El socket de conexion
+	int n_sock_plp;				//El socket de datos
+	sockaddr_in addr_programas;		//Direccion de programas
+	int long_addr=sizeof(sockaddr_in);	//Longitud del struct sockaddr_in
+	char buffer[10];			//Tamaño del buffer para recibir. El 10 es provisorio
+	int datos_recividos;			//Cantidad de datos recividos
+	
+	//Crear socket
+	sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas;
+	//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
+
 	while(1){
-		//read()
-		break;
+		printf("Esperando conexion...\n");
+		n_sock_plp = nipc_aceptarConexion(sock_plp);
+		break; //Esto va a hacer que salga del bucle y solo se corra una vez
 	}
 	//Cerrar socket
 
