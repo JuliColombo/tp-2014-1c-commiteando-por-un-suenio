@@ -8,7 +8,18 @@
 #ifndef ESTRUCTURAS_UMV_H_
 #define ESTRUCTURAS_UMV_H_
 
+#include <pthread.h>
 #include "parser/metadata_program.h"
+
+
+typedef uint16_t t_puerto_cpu;
+typedef uint16_t t_puerto_kernel;
+typedef uint32_t t_memoria_principal;
+typedef uint8_t t_algoritmo;
+typedef uint16_t t_ip_kernel;
+
+typedef char** t_id_semaforos;
+typedef uint8_t* t_valor_semaforos;
 
 typedef struct { // se define un vector para los programas en new
 	int peso;
@@ -17,7 +28,13 @@ typedef struct { // se define un vector para los programas en new
 } t_programa;
 
 typedef struct t_config_UMV {
-uint32_t MemSize;
+t_memoria_principal memSize;	//Tamanio de la memoria principal
+t_puerto_cpu puerto_cpus;	//Puerto tcp para recibir las conexiones de las cpus
+t_puerto_kernel puerto_kernel;	//Puerto tcp para recibir las conexiones del kernel
+t_ip_kernel ip_kernel;	//Direccion IP para conectarse al Kernel
+//t_id_semaforos id_semaforos;	//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
+//t_valor_semaforos valor_semaforos;	//Valor inicial de cada semáforo
+t_algoritmo algoritmo;	//Algoritmo de selección de ubicación de segmento (first-fit o worst-fit)
 } t_config_UMV;
 
 enum tipoAlgoritmo{
