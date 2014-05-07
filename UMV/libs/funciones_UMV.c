@@ -5,15 +5,9 @@
  *      Author: utnso
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include "commons/config.h"
-#include "commons/collections/dictionary.h"
-#include "estructuras_umv.h"
+
 #include "funciones_UMV.h"
-#include <string.h>
+
 //#include "FuncionesPLP.h"
 //#include <Estructuras.h>
 
@@ -58,7 +52,7 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(t_config_UMV configuracionUMV) {
-	int tamanio = configuracionUMV.MemSize;
+	int tamanio = configuracionUMV.memSize;
 	int* MP;
 	MP = malloc(tamanio);
 	return MP;
@@ -157,5 +151,39 @@ void dump(){
 }
 
 
+//Funciones para lectura del archivo config y una funcion que imprime dichos campos para testear la lectura
+
+void leerConfiguracion(void) {
+
+	t_config* config = config_create(PATHCONFIG);
+
+		configuracion_UMV.memSize = config_get_int_value(config,
+					"MemSize");
+
+		configuracion_UMV.puerto_cpus = config_get_int_value(config,
+					"Puerto TCP para recibir conexiones de los CPUs");
+
+		configuracion_UMV.puerto_kernel = config_get_int_value(config,
+					"Puerto TCP para recibir conexiones del Kernel");
+
+
+		configuracion_UMV.ip_kernel = config_get_int_value(config,
+					"Direccion IP para conectarse al Kernel");
+
+
+		configuracion_UMV.algoritmo = config_get_int_value(config,
+					"Algoritmo de seleccion de ubicacion de segmento");
+
+}
+
+void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
+
+	printf("%d\n", configuracion_UMV.memSize);
+	printf("%d\n", configuracion_UMV.puerto_cpus);
+	printf("%d\n", configuracion_UMV.puerto_kernel);
+//	printf("%d\n", configuracion.id_semaforos);
+//	printf("%d\n", configuracion.valor_semaforos);
+	printf("%d\n", configuracion_UMV.algoritmo);
+}
 
 

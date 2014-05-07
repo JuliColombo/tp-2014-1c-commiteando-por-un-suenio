@@ -13,7 +13,7 @@ int algor=firstfit;
 
 int main (int argc, char **argv){
 	//Acceder a archConfig y obtener datos
-	MP=crearMP(/*configuracionUMV*/);
+	MP=crearMP(/*configuracion_UMV*/);
 	//Crear estructuras administrativas
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
