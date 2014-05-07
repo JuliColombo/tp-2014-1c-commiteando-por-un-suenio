@@ -9,9 +9,13 @@
 
 int* MP;
 int algor=firstfit;
+char* PATH;
+t_config_UMV configuracion_UMV;
 
 
 int main (int argc, char **argv){
+	leerConfiguracion();
+	imprimirConfiguracion();
 	//Acceder a archConfig y obtener datos
 	MP=crearMP(/*configuracion_UMV*/);
 	//Crear estructuras administrativas

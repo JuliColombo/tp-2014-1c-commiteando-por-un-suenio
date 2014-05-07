@@ -181,6 +181,7 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 	printf("%d\n", configuracion_UMV.memSize);
 	printf("%d\n", configuracion_UMV.puerto_cpus);
 	printf("%d\n", configuracion_UMV.puerto_kernel);
+	printf("%d\n", configuracion_UMV.ip_kernel);
 //	printf("%d\n", configuracion.id_semaforos);
 //	printf("%d\n", configuracion.valor_semaforos);
 	printf("%d\n", configuracion_UMV.algoritmo);

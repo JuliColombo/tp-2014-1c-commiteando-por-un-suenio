@@ -22,7 +22,7 @@
 
 /*Macros del archivo config*/
 
-#define PATHCONFIG "/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_umv"
+#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 
@@ -35,8 +35,8 @@ _Bool solicitarMemoria(t_programa prgrama);
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 void algoritmo(int* algor);
-void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
 void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
+void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
 
 
 
