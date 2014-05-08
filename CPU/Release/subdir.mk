@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../cpu.c \
+../primitivas.c \
 ../stack.c 
 
 OBJS += \
 ./cpu.o \
+./primitivas.o \
 ./stack.o 
 
 C_DEPS += \
 ./cpu.d \
+./primitivas.d \
 ./stack.d 
 
 
