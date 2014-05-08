@@ -27,6 +27,14 @@ void agregarAListaSegunPeso(t_programa programa, t_list* lista){
 	list_add_in_index(lista, position, &programa);
 }
 
+int cant_hilos(t_id_hio* id_hio){
+	int i,a=0;
+	for(i=0;id_hio[i]!=NULL;i++){
+	a+=1;
+	}
+return a;
+}
+
 void mostrarNodosPorPantalla(t_list* lista){
 int i;
 int p;
@@ -167,3 +175,5 @@ void* core_plp(void){
 void* core_pcp(void){
 	return 0;
 }
+
+

@@ -25,13 +25,18 @@ int main(int argc, char **argv) { // Recibe la ruta del archivo de configuracion
 	pthread_join(thread_pcp, NULL);
 	pthread_join(thread_plp, NULL);
 
-	/*t_pcb* proceso = NULL;
+	t_pcb* proceso = NULL;
 	int i;
+	for(i=0;i < cant_hilos(*configuracion_kernel.id_hio); i++){
+		// ******  HAY QUE MODIFICAR LOS HILOS ACÁ ADENTRO ******
 
-	while(i=0;i<=cant_hilos;i++){
+		//pthread_create(&IO.thread[i].tid, NULL, (void*) &core_io, NULL);
 
+		/*pthread_mutex_lock(IO.mutex);
+		agregarHilo(IO.thread[i].tid);
+		pthread_mutex_unlock(IO.mutex);*/
 	}
-	*/
+
 
 	return EXIT_SUCCESS;
 }
