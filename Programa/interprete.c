@@ -5,12 +5,10 @@
  *      Author: utnso
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "libs/log.h"
-#include "libs/funcionesInterprete.h"
+#include "interprete.h"
 
 log_t* archLog;
+t_config_programa configuracion_programa;
 
 int main (int argc, char **argv){
 

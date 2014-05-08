@@ -34,3 +34,5 @@ char* leerScript(off_t* fileSize,char* path) {
 
 	return buffer;
 }
+
+
