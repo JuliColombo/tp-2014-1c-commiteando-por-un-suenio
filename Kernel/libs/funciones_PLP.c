@@ -89,7 +89,7 @@ void inicializarConfiguracion(char* PATH) {
 		}
 	else{
 	leerConfiguracion(PATH);
-	//imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
+	imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
@@ -117,16 +117,18 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	printf("%d\n", configuracion.quantum);
 	printf("%d\n", configuracion.retardo_quantum);
 	printf("%d\n", configuracion.multiprogramacion);
-	int i;
+	int i,a;
 	
-	for(i=0;configuracion_kernel.id_semaforos[i]!=NULL;i++){
+	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
+	a = atoi(configuracion.valor_semaforos[i]);
 	printf("%s\n", configuracion.id_semaforos[i]);
-	printf("%d\n", configuracion.valor_semaforos[i]);
+	printf("%d\n",a);
 	}
-	
-	for(i=0;configuracion_kernel.id_semaforos[i]!=NULL;i++){
+
+	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
+	a = atoi(configuracion.retardo_hio[i]);
 	printf("%s\n", configuracion.id_hio[i]);
-	printf("%d\n", configuracion.retardo_hio[i]);
+	printf("%d\n", a);
 	}
 	
 	printf("%d\n", configuracion.ip_umv);
@@ -146,7 +148,7 @@ void* core_plp(void){
 	while(1){
 		printf("Esperando conexion...\n");
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
-		memset(paquete, 0, sizeof(paquete));
+		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado!
 		if (nipc_recibir(n_sock_plp,paquete)>0){
 			//Se recivieron datos
 		} else {
