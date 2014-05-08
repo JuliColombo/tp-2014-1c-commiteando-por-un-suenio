@@ -120,27 +120,27 @@ void leerConfiguracion(char* PATH) {
 
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
 
-	printf("%d\n", configuracion.puerto_programas);
-	printf("%d\n", configuracion.puerto_cpus);
-	printf("%d\n", configuracion.quantum);
-	printf("%d\n", configuracion.retardo_quantum);
-	printf("%d\n", configuracion.multiprogramacion);
+	printf("Puerto programas: %d\n", configuracion.puerto_programas);
+	printf("Puerto CPUs: %d\n", configuracion.puerto_cpus);
+	printf("Quantum: %d\n", configuracion.quantum);
+	printf("Retardo quantum: %d\n", configuracion.retardo_quantum);
+	printf("Grado de multiprogramacion: %d\n", configuracion.multiprogramacion);
 	int i,a;
 	
 	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
 	a = atoi(configuracion.valor_semaforos[i]);
-	printf("%s\n", configuracion.id_semaforos[i]);
-	printf("%d\n",a);
+	printf("Id semaforo (valor): %s ", configuracion.id_semaforos[i]);
+	printf("(%d)\n",a);
 	}
 
 	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
 	a = atoi(configuracion.retardo_hio[i]);
-	printf("%s\n", configuracion.id_hio[i]);
-	printf("%d\n", a);
+	printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
+	printf("(%d)\n", a);
 	}
 	
-	printf("%d\n", configuracion.ip_umv);
-	printf("%d\n", configuracion.puerto_umv);
+	printf("IP de la UMV: %d\n", configuracion.ip_umv);
+	printf("Puerto UMV: %d\n", configuracion.puerto_umv);
 	//printf("%d\n", configuracion.var_globales);
 	
 }
@@ -151,12 +151,14 @@ void* core_plp(void){
 	int n_sock_plp;		//El socket de datos
 	t_nipc* paquete;	//El paquete que recibe el socket
 
-	sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas); //El socket esta creado y listo para escuchar a los clientes por el puerto_programas
+	if ((sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
+		abort();
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
 
 	while(1){
 		printf("Esperando conexion...\n");
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
-		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado!
+		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0's a la variable)
 		if (nipc_recibir(n_sock_plp,paquete)>0){
 			//Se recivieron datos
 		} else {
@@ -177,3 +179,6 @@ void* core_pcp(void){
 }
 
 
+void* core_io(void){
+	return 0;
+}

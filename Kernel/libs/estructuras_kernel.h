@@ -28,9 +28,8 @@ typedef int* t_index_etiquetas;
 
 typedef char** t_id_semaforos;
 typedef char** t_id_hio;
-
-typedef uint8_t** t_valor_semaforos;
-typedef uint8_t** t_retardo_hio;
+typedef char** t_valor_semaforos;
+typedef char** t_retardo_hio;
 
 typedef int8_t* t_prioridad;
 typedef int8_t* t_nombre_cola;
@@ -71,6 +70,16 @@ typedef struct{
 } t_pcb;
 
 
+typedef struct{
+	pthread_t tid;
+}t_thread_array;
+
+
+typedef struct{
+	int a;
+	pthread_mutex_t mutex;
+	t_thread_array thread[];
+} t_thread_io;
 
 #endif /* ESTRUCTURAS_H_ */
 
