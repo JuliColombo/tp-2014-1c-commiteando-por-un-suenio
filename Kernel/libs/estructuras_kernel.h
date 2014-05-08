@@ -11,7 +11,7 @@ typedef uint16_t t_tamanio_mp;
 typedef uint16_t t_ip_umv;
 typedef uint16_t t_puerto_umv;
 
-typedef uint8_t t_cuantum;
+typedef uint8_t t_quantum;
 typedef uint8_t t_retardo_quantum;
 typedef uint8_t t_grado_multip;
 
@@ -29,8 +29,8 @@ typedef int* t_index_etiquetas;
 typedef char** t_id_semaforos;
 typedef char** t_id_hio;
 
-typedef uint8_t* t_valor_semaforos;
-typedef uint8_t* t_retardo_hio;
+typedef uint8_t** t_valor_semaforos;
+typedef uint8_t** t_retardo_hio;
 
 typedef int8_t* t_prioridad;
 typedef int8_t* t_nombre_cola;
@@ -39,7 +39,7 @@ typedef int8_t* t_nombre_cola;
 typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas
 	t_puerto_cpu puerto_cpus;				//Puerto TCP utilizado para recibir las conexiones de los CPUs
-	t_cuantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
+	t_quantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
 	t_id_semaforos id_semaforos;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
