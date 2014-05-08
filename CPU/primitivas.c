@@ -7,13 +7,13 @@
 
 #include "parser/metadata_program.h"
 #include "stack.h"
+#include "commons/collections/dictionary.h"
 
 t_stack* pila;
 //t_puntero posicion;
-t_dictionary* diccionario = dictionary_create();
 
 t_puntero calcularPosAsignacion(t_stack* P) {
-	t_puntero posicion;
+	t_puntero posicion=0;
 	if(IS_EMPTY(P)) {
 		posicion = P->top_index +1;
 	} else {
@@ -24,7 +24,7 @@ t_puntero calcularPosAsignacion(t_stack* P) {
 	return posicion;}
 
 //No entendi si devuelve la posicion de la variable en la pila
-t_puntero definirVariable(t_nombre_variable identificador_variable) {
+t_puntero definirVariable(t_nombre_variable identificador_variable, t_dictionary *diccionario) {
 	t_valor_variable id = identificador_variable;
 	t_puntero posicion = calcularPosAsignacion(pila);
 	PUSH_SIZE_CHECK(&id,pila,posicion);

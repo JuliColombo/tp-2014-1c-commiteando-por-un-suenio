@@ -31,6 +31,8 @@ int main (int argc, char **argv){
 	POOOP=POP_SIZE_CHECK(pila);
 	printf("El valor es %d\n",POOOP);
 	DESTROY_STACK(pila);*/
+	t_dictionary *diccionario = dictionary_create();
+
 
 	char* programa = malloc(511);
 	strcpy(programa,"#!/usr/bin/ansisop \n begin \n # primero declaro las variables \n variables a, b \n a = 20 \n print a \n end \n");
