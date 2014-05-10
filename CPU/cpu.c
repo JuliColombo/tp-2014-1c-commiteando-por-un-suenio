@@ -31,7 +31,6 @@ int main (int argc, char **argv){
 	POOOP=POP_SIZE_CHECK(pila);
 	printf("El valor es %d\n",POOOP);
 	DESTROY_STACK(pila);*/
-	t_dictionary *diccionario = dictionary_create();
 
 
 	char* programa = malloc(511);

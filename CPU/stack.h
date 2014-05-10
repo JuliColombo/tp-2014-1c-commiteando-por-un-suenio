@@ -8,6 +8,7 @@
 #ifndef STACK_H_
 #define STACK_H_
 
+
 #include "parser/parser.h"
 
 typedef struct {
@@ -15,7 +16,7 @@ typedef struct {
  	 int max_size;
   	 int top_index;
   	 int* stack_base;
-  	 int* contexto_actual;
+  	 int* cursor_stack;
  } t_stack;
 
  t_stack* CREATE_STACK (int tamanoMax);

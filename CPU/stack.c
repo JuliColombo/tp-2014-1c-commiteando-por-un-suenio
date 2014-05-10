@@ -16,8 +16,8 @@
    pila->max_size = tamanoMax;
    pila->top_index = -1;
    pila->elementos = (t_valor_variable *) malloc(tamanoMax-sizeof(t_stack));
-   pila->stack_base= pila->elementos;
-   pila->contexto_actual = pila->elementos;
+   pila->stack_base = pila->elementos;
+   pila->cursor_stack = pila->elementos;
    return pila;
   }
 
