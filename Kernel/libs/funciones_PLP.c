@@ -115,7 +115,7 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
-	//configuracion_kernel.var_globales = config_get_array(config,"Variables globales");
+	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
 	}
 
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
@@ -125,24 +125,29 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	printf("Quantum: %d\n", configuracion.quantum);
 	printf("Retardo quantum: %d\n", configuracion.retardo_quantum);
 	printf("Grado de multiprogramacion: %d\n", configuracion.multiprogramacion);
+
 	int i,a;
-	
 	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
-	a = atoi(configuracion.valor_semaforos[i]);
-	printf("Id semaforo (valor): %s ", configuracion.id_semaforos[i]);
-	printf("(%d)\n",a);
+		a = atoi(configuracion.valor_semaforos[i]);
+		printf("Id semaforo (valor): %s ", configuracion.id_semaforos[i]);
+		printf("(%d)\n",a);
 	}
 
 	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
-	a = atoi(configuracion.retardo_hio[i]);
-	printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
-	printf("(%d)\n", a);
+		a = atoi(configuracion.retardo_hio[i]);
+		printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
+		printf("(%d)\n", a);
 	}
 	
 	printf("IP de la UMV: %d\n", configuracion.ip_umv);
 	printf("Puerto UMV: %d\n", configuracion.puerto_umv);
-	//printf("%d\n", configuracion.var_globales);
 	
+	printf("Variables globales: ");
+	for(i=0;configuracion.var_globales[i]!=NULL;i++){
+		printf("%s ", configuracion.var_globales[i]);
+	}
+	printf("\n");
+
 }
 
 
@@ -152,6 +157,9 @@ void* core_plp(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
+		if (close(sock_plp)<0){
+			//Error con el close
+		}
 		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
 
@@ -159,12 +167,12 @@ void* core_plp(void){
 		printf("Esperando conexion...\n");
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
 		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0's a la variable)
-		if (nipc_recibir(n_sock_plp,paquete)>0){
-			//Se recivieron datos
-		} else {
+		if (nipc_recibir(n_sock_plp,paquete)<0){
 			//No se recivieron datos
+		} else {
+			//Se recivieron datos
 		}
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez
+		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 	}
 //Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
 	if (close(sock_plp)<0){

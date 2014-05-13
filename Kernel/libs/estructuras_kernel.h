@@ -30,6 +30,7 @@ typedef char** t_id_semaforos;
 typedef char** t_id_hio;
 typedef char** t_valor_semaforos;
 typedef char** t_retardo_hio;
+typedef char** t_variables_globales;
 
 typedef int8_t* t_prioridad;
 typedef int8_t* t_nombre_cola;
@@ -47,7 +48,7 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
 	t_ip_umv ip_umv;						//IP de la UMV
 	t_puerto_umv puerto_umv;				//Puerto de la UMV
-	//t_variables_globales var_globales[]	//Variables globales del sistema
+	t_variables_globales var_globales;	//Variables globales del sistema
 } t_config_kernel;
 
 typedef struct{

@@ -23,7 +23,7 @@ int nipc_abrirConexion(unsigned short puerto) {
 		return sockfd;
 	}
 
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &resp, sizeof(int)) < 0) {
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&resp, sizeof(int)) < 0) {
 		perror("setsockopt");
 		return -1;
 	}
