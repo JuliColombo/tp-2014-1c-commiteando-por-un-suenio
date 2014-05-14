@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "funciones_PLP.h"
 #include "estructuras_kernel.h"
 #include "parser/metadata_program.h"
@@ -151,7 +152,31 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 }
 
 
+pthread_t plp_conexiones;
+
 void* core_plp(void){
+
+	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
+
+	//Logica del PLP
+
+	pthread_join(thread_plp_conexiones, NULL);
+
+	return 0;
+}
+
+
+void* core_pcp(void){
+	return 0;
+}
+
+
+void* core_io(void){
+	return 0;
+}
+
+
+void* core_plp_conexiones(void){
 	int sock_plp;		//El socket de conexion
 	int n_sock_plp;		//El socket de datos
 	t_nipc* paquete;	//El paquete que recibe el socket
@@ -174,19 +199,10 @@ void* core_plp(void){
 		}
 		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 	}
-//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
 	if (close(sock_plp)<0){
 		//Error con el close
 	}
-	return 0;
-}
 
-
-void* core_pcp(void){
-	return 0;
-}
-
-
-void* core_io(void){
 	return 0;
 }

@@ -37,6 +37,7 @@ void leerConfiguracion(char*); //Lee la config del archivo y la asigna la struct
 void imprimirConfiguracion(t_config_kernel configuracion);
 int cant_hilos(t_id_hio*);
 void* core_plp(void);
+void* core_plp_conexiones(void);
 void* core_pcp(void);
 void* core_io(void);
 
