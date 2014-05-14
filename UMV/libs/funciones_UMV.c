@@ -67,6 +67,8 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){
 	}
 }
 
+
+
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 	if (MP[base+offset+longitud] == NULL) {
 		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
@@ -98,20 +100,20 @@ void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud/*,t_buffer buf
 
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
 _Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
-	if(hayEspacioEnMemoria()){
+	if(/*hayEspacioEnMemoria()*/1){
 		return true;
 	} else{
 		puts("No alcanza el espacio en memoria:");
-		switch(base,offset,longitud){
-			case segmentationFault(base,offset):
-				return false;
-			case memoryOverload(base,offset,longitud):
-				return false;
-			default:
-				//puts("Excepcion Desconocida"); ???
-				return false;
-		}
-	}
+		if(segmentationFault(base,offset)){
+			return false;
+		} else { if(memoryOverload(base,offset,longitud)){
+												return false;
+					} else {
+							//puts("Excepcion Desconocida"); ???
+							return false;
+					}
+				}
+			}
 }
 
 //Comandos de consola:
@@ -188,3 +190,60 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 }
 
 
+//Consola UMV
+
+void consola (void){
+
+	char comando[32];
+	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
+	gets(comando);
+	while(estaEnDicOP(comando)== 0){
+		puts("Operacion erronea, escriba la operacion de nuevo");
+		gets(comando);
+	}
+	while(strcmp(comando, "exit") != 0){
+			if(strcmp(comando, "operacion") == 0){
+				char tipoOperacion[32];
+				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?\n");
+				gets(tipoOperacion);
+				while(estaEnDicTOP(tipoOperacion)== 0/*<- aca no iria un 1?*/){
+						puts("Tipo de Operacion erronea, escriba el tipo de operacion de nuevo");
+						gets(tipoOperacion);
+					}
+				if(strcmp(tipoOperacion, "solicitar") == 0){
+					//solicitarPosicionDeMemoria();
+				}
+				if(strcmp(tipoOperacion, "escribir") == 0){
+					//escribirBuffer();
+				}
+				if(strcmp(tipoOperacion, "crear") == 0){
+					//crearSegmentoPrograma();
+				 }
+				if(strcmp(tipoOperacion, "destruir") == 0){
+					//destruirSegmentoPrograma(t_programa Programa);
+				 }
+			}
+
+		else { if (strcmp(comando, "retardo") == 0){
+				//retardo(int valorRetardoEnMilisegundos);
+			       }
+			   if (strcmp(comando, "algoritmo") == 0){
+				   algoritmo(&algor);
+			   }
+			   if (strcmp(comando, "compactacion") == 0){
+				//compactar();
+							}
+			   if (strcmp(comando,"dump") ==0){
+				//generarReporte();
+							}
+			}
+		puts("Escriba la siguiente operacion\n");
+		gets(comando);
+		while(estaEnDicOP(comando)== 0){
+				puts("Operacion erronea, escriba la operacion de nuevo");
+				gets(comando);
+			}
+		}
+
+	return;
+}

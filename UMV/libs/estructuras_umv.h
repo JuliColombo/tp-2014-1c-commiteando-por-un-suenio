@@ -10,7 +10,7 @@
 
 #include <pthread.h>
 #include "parser/metadata_program.h"
-
+#include <stdint.h>
 
 typedef uint16_t t_puerto_cpu;
 typedef uint16_t t_puerto_kernel;
