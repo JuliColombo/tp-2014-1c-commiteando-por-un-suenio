@@ -35,6 +35,15 @@ int cant_hilos(t_id_hio* id_hio){
 return a;
 }
 
+int cant_semaforos(t_id_semaforos* id_semaforo){
+	int i,a=0;
+	for(i=0;id_semaforo[i]!=NULL;i++){
+	a+=1;
+	}
+return a;
+}
+
+
 void mostrarNodosPorPantalla(t_list* lista){
 int i;
 int p;
