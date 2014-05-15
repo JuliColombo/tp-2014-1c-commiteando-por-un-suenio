@@ -192,7 +192,7 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 
 //Consola UMV
 
-void consola (void){
+void *consola (void* parametro){
 
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
@@ -245,5 +245,5 @@ void consola (void){
 			}
 		}
 
-	return;
+	return NULL;
 }

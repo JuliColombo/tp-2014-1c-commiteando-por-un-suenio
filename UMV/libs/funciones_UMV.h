@@ -51,8 +51,8 @@ void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los
 
 /*Prototipos de threads*/
 
-void core_consola(void);
-void consola(void);
+void* core_consola(void*);
+void* consola(void*);
 
 #endif /* UMV_H_ */
 

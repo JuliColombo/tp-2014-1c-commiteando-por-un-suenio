@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "umv.h"
+#include "libs/funciones_UMV.h"
 
 
 int* MP;
@@ -21,9 +21,9 @@ int main (int argc, char **argv){
 	MP=crearMP(configuracion_UMV);
 	//Crear estructuras administrativas
 
-/*	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
-	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
-	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
+	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
+//	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
+/*	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
 
 	pthread_join(CONSOLA,NULL);
 	pthread_join(KERNEL,NULL);
@@ -36,8 +36,8 @@ int main (int argc, char **argv){
 
 //***********************************************Consola************************************
 
-void core_consola(void) {
+void *core_consola(void* parametro) {
 
 	pthread_t inicio;
-//	pthread_create(&inicio, NULL, (void*) &consola, NULL);
+	pthread_create(&inicio, NULL, (void*) &consola, NULL);
 }
