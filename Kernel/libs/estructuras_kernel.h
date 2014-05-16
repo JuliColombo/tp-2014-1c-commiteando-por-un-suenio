@@ -28,7 +28,7 @@ typedef int* t_index_etiquetas;
 
 typedef char** t_id_semaforos;
 typedef char** t_id_hio;
-typedef char** t_valor_semaforos;
+typedef int* t_valor_semaforos;
 typedef char** t_retardo_hio;
 typedef char** t_variables_globales;
 

@@ -23,7 +23,7 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 	//t_pcb* proceso = NULL;
 	int i;
-	for(i=0;i < cant_hilos(&configuracion_kernel.id_hio); i++){
+	for(i=0;i < cant_identificadores(configuracion_kernel.id_hio); i++){
 		// ******  HAY QUE MODIFICAR LOS HILOS ACÁ ADENTRO ******
 
 		//thread_io[i] = pthread_create(&io.thread[i].tid, NULL, core_io(), NULL); //La estructura io.thread[i].tid no la entendi, hice lo que me parecio para que funcione pero hay que cambiarla

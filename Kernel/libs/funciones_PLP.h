@@ -11,12 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "funciones_PLP.h"
+#include <pthread.h>
 #include "estructuras_kernel.h"
 #include "parser/metadata_program.h"
 #include "commons/config.h"
 #include "commons/collections/list.h"
 #include "log.h"
+#include "socket.h"
+
 
 extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
@@ -29,16 +31,23 @@ typedef struct { // se define un vector para los programas en new
 } t_programa;
 
 void calcularPeso(t_programa programa); //Calcula el peso del programa
-void agregarAListaSegunPeso(t_programa programa, t_list* lista); //Agrega ordenadamente en la cola de new
+void agregarAColaSegunPeso(t_programa programa, t_list* lista); //Agrega ordenadamente en la cola de new
 void mostrarNodosPorPantalla(t_list* lista); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(char*); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(char*); //Lee la config del archivo y la asigna la struct correspondiente
 
-void imprimirConfiguracion(t_config_kernel configuracion);
-int cant_hilos(t_id_hio*);
+void imprimirConfiguracion(t_config_kernel);
+
 void* core_plp(void);
 void* core_plp_conexiones(void);
 void* core_pcp(void);
 void* core_io(void);
+
+
+/***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
+void vector_num(char**, int*, void*);
+int cant_identificadores(char**);
+
+
 
 #endif /* FUNCIONESPLP_H_ */

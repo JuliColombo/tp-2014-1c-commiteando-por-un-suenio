@@ -1,14 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
+
 #include "funciones_PLP.h"
-#include "estructuras_kernel.h"
-#include "parser/metadata_program.h"
-#include "commons/config.h"
-#include "commons/collections/list.h"
-#include "log.h"
-#include "socket.h"
 
 
 
@@ -16,7 +7,7 @@ void calcularPeso (t_programa programa){ //Calcula peso del programa
 	programa.peso=(5*programa.metadata.cantidad_de_etiquetas + 3* programa.metadata.cantidad_de_funciones + programa.metadata.instrucciones_size);
 }
 
-void agregarAListaSegunPeso(t_programa programa, t_list* lista){
+void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 	t_link_element *element = lista->head;
 	int position = 0;
 
@@ -28,21 +19,7 @@ void agregarAListaSegunPeso(t_programa programa, t_list* lista){
 	list_add_in_index(lista, position, &programa);
 }
 
-int cant_hilos(t_id_hio* id_hio){
-	int i,a=0;
-	for(i=0;id_hio[i]!=NULL;i++){
-	a+=1;
-	}
-return a;
-}
 
-int cant_semaforos(t_id_semaforos* id_semaforo){
-	int i,a=0;
-	for(i=0;id_semaforo[i]!=NULL;i++){
-	a+=1;
-	}
-return a;
-}
 
 
 void mostrarNodosPorPantalla(t_list* lista){
@@ -98,11 +75,11 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 */
 
 
-void inicializarConfiguracion(char* PATH) {
+void inicializarConfiguracion(char* PATH){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
 	int control = lstat(PATH, &file_info);
-	if (control == -1) {
+	if (control == -1){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
 	else{
@@ -111,7 +88,7 @@ void inicializarConfiguracion(char* PATH) {
 	}
 }
 
-void leerConfiguracion(char* PATH) {
+void leerConfiguracion(char* PATH){
 	t_config* config=config_create(PATH);
 
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
@@ -120,12 +97,15 @@ void leerConfiguracion(char* PATH) {
 	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
-	configuracion_kernel.valor_semaforos = config_get_array_value(config,"Lista de valores de Semaforos");
+	char** j =config_get_array_value(config,"Lista de valores de Semaforos");
+	vector_num(j,configuracion_kernel.valor_semaforos,configuracion_kernel.id_semaforos);
+
 	configuracion_kernel.retardo_hio = config_get_array_value(config,"Retardo de hio");
 	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
+
 	}
 
 void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
@@ -136,14 +116,15 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	printf("Retardo quantum: %d\n", configuracion.retardo_quantum);
 	printf("Grado de multiprogramacion: %d\n", configuracion.multiprogramacion);
 
-	int i,a;
-	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
-		a = atoi(configuracion.valor_semaforos[i]);
-		printf("Id semaforo (valor): %s ", configuracion.id_semaforos[i]);
-		printf("(%d)\n",a);
-	}
 
-	for(i=0;configuracion.id_semaforos[i]!=NULL;i++){
+	int i,a;
+	/******     SEG FAULT ACA     ******/
+	/*for(i=0;i<cant_identificadores(configuracion_kernel.id_semaforos);i++){
+		printf("%d",configuracion.valor_semaforos[i]);
+	}*/
+	/****** Lo de abajo anda bien ******/
+	free(configuracion.valor_semaforos);
+	for(i=0;configuracion.id_hio[i]!=NULL;i++){
 		a = atoi(configuracion.retardo_hio[i]);
 		printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
 		printf("(%d)\n", a);
@@ -215,3 +196,28 @@ void* core_plp_conexiones(void){
 
 	return 0;
 }
+
+/***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
+
+void vector_num(char** vector_string_num, int* config_valores, void* config_ids){
+	int n;
+	config_valores=malloc(sizeof(int)*(cant_identificadores(config_ids)));
+	for(n=0;vector_string_num[n]!=NULL;n++){
+	config_valores[n]=atoi(vector_string_num[n]);
+	}
+
+	return;
+
+}
+
+
+int cant_identificadores(char** config){
+	int i,a=0;
+	for(i=0;config[i]!=NULL;i++){
+	a+=1;
+	}
+return a;
+}
+
+
+
