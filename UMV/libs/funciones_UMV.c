@@ -190,7 +190,17 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 }
 
 
-//Consola UMV
+
+
+//***********************************************Consola************************************
+
+void *core_consola(void* parametro) {
+
+	pthread_t inicio;
+	int thread_console = pthread_create(&inicio, NULL, (void*) &consola, NULL);
+	pthread_join(thread_console,NULL);
+	return EXIT_SUCCESS;
+}
 
 void *consola (void* parametro){
 

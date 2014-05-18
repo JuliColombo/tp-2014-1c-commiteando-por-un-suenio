@@ -21,23 +21,17 @@ int main (int argc, char **argv){
 	MP=crearMP(configuracion_UMV);
 	//Crear estructuras administrativas
 
-	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
+	int thread_consola = pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
 //	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
 /*	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
 
-	pthread_join(CONSOLA,NULL);
 	pthread_join(KERNEL,NULL);
 	pthread_join(CPU,NULL);
 */
+	pthread_join(thread_consola,NULL);
 	return 0;
 }
 
 
 
-//***********************************************Consola************************************
 
-void *core_consola(void* parametro) {
-
-	pthread_t inicio;
-	pthread_create(&inicio, NULL, (void*) &consola, NULL);
-}
