@@ -1,4 +1,3 @@
-
 #include "funciones_PLP.h"
 
 
@@ -98,8 +97,7 @@ void leerConfiguracion(char* PATH){
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
 	char** j =config_get_array_value(config,"Lista de valores de Semaforos");
-	vector_num(j,configuracion_kernel.valor_semaforos,configuracion_kernel.id_semaforos);
-
+	configuracion_kernel.valor_semaforos=vector_num(j);
 	configuracion_kernel.retardo_hio = config_get_array_value(config,"Retardo de hio");
 	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
@@ -118,12 +116,11 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 
 
 	int i,a;
-	/******     SEG FAULT ACA     ******/
-	/*for(i=0;i<cant_identificadores(configuracion_kernel.id_semaforos);i++){
-		printf("%d",configuracion.valor_semaforos[i]);
-	}*/
-	/****** Lo de abajo anda bien ******/
-	free(configuracion.valor_semaforos);
+	for(i=0;i<cant_identificadores(configuracion.id_semaforos);i++){
+		printf("Semaforo (valor): %s (%d)\n",configuracion.id_semaforos[i], configuracion.valor_semaforos[i]);
+	}
+
+	//free(configuracion.valor_semaforos); este free supongo que estaba por el malloc que hacias en la fucion, lo "saco" porque ya no esta ese malloc
 	for(i=0;configuracion.id_hio[i]!=NULL;i++){
 		a = atoi(configuracion.retardo_hio[i]);
 		printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
@@ -199,15 +196,14 @@ void* core_plp_conexiones(void){
 
 /***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
 
-void vector_num(char** vector_string_num, int* config_valores, void* config_ids){
-	int n;
-	config_valores=malloc(sizeof(int)*(cant_identificadores(config_ids)));
+int* vector_num(char** vector_string_num){
+	//int c=cant_identificadores(vector_string_num);
+	int n,*vector;
 	for(n=0;vector_string_num[n]!=NULL;n++){
-	config_valores[n]=atoi(vector_string_num[n]);
+	vector[n]=atoi(vector_string_num[n]);
 	}
 
-	return;
-
+	return vector;
 }
 
 
@@ -218,6 +214,3 @@ int cant_identificadores(char** config_ids){
 	}
 return a;
 }
-
-
-

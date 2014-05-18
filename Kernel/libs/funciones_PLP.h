@@ -45,7 +45,8 @@ void* core_io(void);
 
 
 /***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
-void vector_num(char**, int*, void*);
+//void vector_num(char**, int*, void*);
+int* vector_num(char** vector_string_num);
 int cant_identificadores(char**);
 
 
