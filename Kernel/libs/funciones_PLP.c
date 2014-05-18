@@ -96,10 +96,9 @@ void leerConfiguracion(char* PATH){
 	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
-	char** j =config_get_array_value(config,"Lista de valores de Semaforos");
-	configuracion_kernel.valor_semaforos=vector_num(j);
-	configuracion_kernel.retardo_hio = config_get_array_value(config,"Retardo de hio");
+	configuracion_kernel.valor_semaforos=vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.id_semaforos);
 	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
+	configuracion_kernel.retardo_hio = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.id_hio);
 	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
@@ -115,18 +114,17 @@ void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para test
 	printf("Grado de multiprogramacion: %d\n", configuracion.multiprogramacion);
 
 
-	int i,a;
+	int i;
 	for(i=0;i<cant_identificadores(configuracion.id_semaforos);i++){
 		printf("Semaforo (valor): %s (%d)\n",configuracion.id_semaforos[i], configuracion.valor_semaforos[i]);
 	}
 
-	//free(configuracion.valor_semaforos); este free supongo que estaba por el malloc que hacias en la fucion, lo "saco" porque ya no esta ese malloc
+	free(configuracion.valor_semaforos);
 	for(i=0;configuracion.id_hio[i]!=NULL;i++){
-		a = atoi(configuracion.retardo_hio[i]);
 		printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
-		printf("(%d)\n", a);
+		printf("(%d)\n", configuracion.retardo_hio[i]);
 	}
-	
+	free(configuracion.retardo_hio);
 	printf("IP de la UMV: %d\n", configuracion.ip_umv);
 	printf("Puerto UMV: %d\n", configuracion.puerto_umv);
 	

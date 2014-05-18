@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int* vector_num(char** vector_string_num);
+int* vector_num(char**, char**);
 int cant_identificadores(char**);
 
 #endif /* FUNCIONES_AUX_H_ */

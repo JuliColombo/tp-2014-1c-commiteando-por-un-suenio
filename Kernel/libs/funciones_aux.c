@@ -7,8 +7,9 @@
 
 #include "funciones_aux.h"
 
-int* vector_num(char** vector_string_num){
+int* vector_num(char** vector_string_num, char** config_ids){
 	int n,*vector;
+	vector=malloc(sizeof(int)*cant_identificadores(config_ids));
 	for(n=0;vector_string_num[n]!=NULL;n++){
 	vector[n]=atoi(vector_string_num[n]);
 	}
