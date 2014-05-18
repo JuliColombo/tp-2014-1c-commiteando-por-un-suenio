@@ -18,6 +18,7 @@
 #include "commons/collections/list.h"
 #include "log.h"
 #include "socket.h"
+#include "funciones_aux.h"
 
 
 extern t_config_kernel configuracion_kernel;
@@ -42,13 +43,6 @@ void* core_plp(void);
 void* core_plp_conexiones(void);
 void* core_pcp(void);
 void* core_io(void);
-
-
-/***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
-//void vector_num(char**, int*, void*);
-int* vector_num(char** vector_string_num);
-int cant_identificadores(char**);
-
 
 
 #endif /* FUNCIONESPLP_H_ */

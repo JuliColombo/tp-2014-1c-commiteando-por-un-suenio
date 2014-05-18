@@ -178,7 +178,7 @@ void* core_plp_conexiones(void){
 	while(1){
 		printf("Esperando conexion...\n");
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
-		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0's a la variable)
+		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0s a la variable)
 		if (nipc_recibir(n_sock_plp,paquete)<0){
 			//No se recivieron datos
 		} else {
@@ -192,25 +192,4 @@ void* core_plp_conexiones(void){
 	}
 
 	return 0;
-}
-
-/***************************************************************        FUNCIONES AUXILIARES        ***************************************************************/
-
-int* vector_num(char** vector_string_num){
-	//int c=cant_identificadores(vector_string_num);
-	int n,*vector;
-	for(n=0;vector_string_num[n]!=NULL;n++){
-	vector[n]=atoi(vector_string_num[n]);
-	}
-
-	return vector;
-}
-
-
-int cant_identificadores(char** config_ids){
-	int i,a=0;
-	for(i=0;config_ids[i]!=NULL;i++){
-	a+=1;
-	}
-return a;
 }
