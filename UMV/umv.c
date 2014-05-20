@@ -29,6 +29,7 @@ int main (int argc, char **argv){
 	pthread_join(CPU,NULL);
 */
 	pthread_join(thread_consola,NULL);
+	free(MP);
 	return 0;
 }
 
