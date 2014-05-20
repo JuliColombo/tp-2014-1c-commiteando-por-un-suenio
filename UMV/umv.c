@@ -18,7 +18,7 @@ int main (int argc, char **argv){
 	leerConfiguracion();
 	imprimirConfiguracion();
 	//Acceder a archConfig y obtener datos
-	MP=crearMP(configuracion_UMV);
+	MP=crearMP();
 	//Crear estructuras administrativas
 
 	int thread_consola = pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);

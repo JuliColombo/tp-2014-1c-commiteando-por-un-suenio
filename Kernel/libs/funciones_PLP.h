@@ -24,10 +24,13 @@
 extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
 extern char* PATH;
+extern t_thread_io io;
+extern pthread_t pcp, plp;
 
 typedef struct { // se define un vector para los programas en new
 	int peso;
 	t_medatada_program metadata;
+	t_pcb* pcb;
 
 } t_programa;
 
@@ -42,7 +45,7 @@ void imprimirConfiguracion(t_config_kernel);
 void* core_plp(void);
 void* core_plp_conexiones(void);
 void* core_pcp(void);
-void* core_io(void);
+void* core_io(int);
 
 
 #endif /* FUNCIONESPLP_H_ */

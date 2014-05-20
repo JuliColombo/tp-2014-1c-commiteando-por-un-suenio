@@ -59,6 +59,14 @@ typedef struct{
 } t_lista_programas;
 
 typedef struct{
+	t_list* ready;
+	t_list* new;
+	t_list* suspendidos;
+	t_list* exit;
+	t_list* block;
+} cola_procesos;
+
+typedef struct{
 	t_pid pid;								//Identificador único del Programa en el sistema
 	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
 	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack

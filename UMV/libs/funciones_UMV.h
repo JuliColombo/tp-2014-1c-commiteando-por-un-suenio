@@ -41,7 +41,7 @@ _Bool solicitarMemoria(t_programa prgrama);
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
 _Bool segmentationFault(uint32_t base,uint32_t offset);
 
-int* crearMP(t_config_UMV configuracionUMV);
+int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 void algoritmo(int* algor);

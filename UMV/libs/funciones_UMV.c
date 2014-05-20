@@ -51,8 +51,8 @@ int estaEnDicTOP(char palabra[]){
 }
 
 
-int* crearMP(t_config_UMV configuracionUMV) {
-	int tamanio = configuracionUMV.memSize;
+int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
+	int tamanio = configuracion_UMV.memSize;
 	int* MP;
 	MP = malloc(tamanio);
 	return MP;

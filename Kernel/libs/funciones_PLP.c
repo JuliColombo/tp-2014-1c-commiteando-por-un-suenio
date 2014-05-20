@@ -25,6 +25,9 @@ void mostrarNodosPorPantalla(t_list* lista){
 int i;
 int p;
 	//system("clear");
+	if(lista==NULL){
+		return;
+	}
 	printf("Estado de la cola:\n");
 	for (i=0;i<(list_size(lista));i++){
 		t_programa* aux=(t_programa*)list_get(lista, i);
@@ -142,7 +145,15 @@ pthread_t plp_conexiones;
 void* core_plp(void){
 
 	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
+	t_programa* programa= NULL;
 
+	int flag_comienzo=0;
+	int flag_terminado=0;
+	int flag_hio=0;
+
+	while(1){
+
+	}
 	//Logica del PLP
 
 	pthread_join(thread_plp_conexiones, NULL);
@@ -156,7 +167,8 @@ void* core_pcp(void){
 }
 
 
-void* core_io(void){
+void* core_io(int retardo){
+
 	return 0;
 }
 
