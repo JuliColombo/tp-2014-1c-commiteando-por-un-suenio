@@ -155,9 +155,9 @@ void dump(){
 
 //Funciones para lectura del archivo config y una funcion que imprime dichos campos para testear la lectura
 
-void leerConfiguracion(void) {
+void leerConfiguracion(char* PATH) {
 
-	t_config* config = config_create(PATHCONFIG);
+	t_config* config = config_create(PATH);
 
 		configuracion_UMV.memSize = config_get_int_value(config,
 					"MemSize");
@@ -178,18 +178,29 @@ void leerConfiguracion(void) {
 
 }
 
-void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
+void imprimirConfiguracion(t_config_UMV configuracin_UMV) { // Funcion para testear que lee correctamente el archivo de configuracion
 
-	printf("%d\n", configuracion_UMV.memSize);
-	printf("%d\n", configuracion_UMV.puerto_cpus);
-	printf("%d\n", configuracion_UMV.puerto_kernel);
-	printf("%d\n", configuracion_UMV.ip_kernel);
+	printf("Tamanio de memoria Principal: %d\n", configuracion_UMV.memSize);
+	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
+	printf("Puerto para conexiones con Kernel: %d\n", configuracion_UMV.puerto_kernel);
+	printf("IP del Kernel%d\n", configuracion_UMV.ip_kernel);
 //	printf("%d\n", configuracion.id_semaforos);
 //	printf("%d\n", configuracion.valor_semaforos);
-	printf("%d\n", configuracion_UMV.algoritmo);
+	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
 }
 
-
+void inicializarConfiguracion(char* PATH){
+	archLog = log_crear(PATHLOG);
+	struct stat file_info;
+	int control = lstat(PATH, &file_info);
+	if (control == -1){
+		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
+		}
+	else{
+	leerConfiguracion(PATH);
+	imprimirConfiguracion(configuracion_UMV); //Imprime las configuraciones actuales por pantalla
+	}
+}
 
 
 //***********************************************Consola************************************
@@ -197,7 +208,8 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 void *core_consola(void* parametro) {
 
 	pthread_t inicio;
-	int thread_console = pthread_create(&inicio, NULL, (void*) &consola, NULL);
+	int thread_console = pthread_create(&inicio, NULL, consola, NULL);
+	while(1);
 	pthread_join(thread_console,NULL);
 	return EXIT_SUCCESS;
 }
@@ -247,6 +259,7 @@ void *consola (void* parametro){
 				//generarReporte();
 							}
 			}
+		system("cls");
 		puts("Escriba la siguiente operacion\n");
 		gets(comando);
 		while(estaEnDicOP(comando)== 0){

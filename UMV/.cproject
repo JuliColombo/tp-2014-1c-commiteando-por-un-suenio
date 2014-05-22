@@ -34,8 +34,9 @@
 									<listOptionValue builtIn="false" value="/home/utnso/SisOp/tp-2014-1c-commiteando-por-un-suenio/UMV/libs"/>
 								</option>
 								<option id="gnu.c.link.option.libs.8930325" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="commons"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="parser-ansisop"/>
+									<listOptionValue builtIn="false" value="commons"/>
+									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" value="parser-ansisop"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.86966974" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -89,7 +90,7 @@
 								<option id="gnu.c.link.option.paths.563535140" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/home/utnso/SisOp/tp-2014-1c-commiteando-por-un-suenio/UMV/libs"/>
 								</option>
-								<option id="gnu.c.link.option.other.1734092075" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList"/>
+								<option id="gnu.c.link.option.other.1734092075" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other"/>
 								<option id="gnu.c.link.option.ldflags.1369404259" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2041259487" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

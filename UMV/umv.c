@@ -13,15 +13,16 @@ int algor=firstfit;
 char* PATH;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
+log_t* archLog;
 
 int main (int argc, char **argv){
-	leerConfiguracion();
-	imprimirConfiguracion();
+	PATH = argv[1];
+	inicializarConfiguracion(PATH);
 	//Acceder a archConfig y obtener datos
 	MP=crearMP();
 	//Crear estructuras administrativas
 
-	int thread_consola = pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
+	int thread_consola = pthread_create(&CONSOLA, NULL, core_consola, NULL);
 //	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
 /*	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
 

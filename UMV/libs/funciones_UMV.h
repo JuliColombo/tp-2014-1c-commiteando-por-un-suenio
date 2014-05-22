@@ -20,7 +20,7 @@
 #include "funciones_UMV.h"
 #include "commons/config.h"
 #include "commons/collections/list.h"
-
+#include "log.h"
 
 
 /*Macros del archivo config*/
@@ -33,7 +33,7 @@ extern t_config_UMV configuracion_UMV;
 extern int algor;
 extern int* MP;
 extern pthread_t CONSOLA;
-
+extern log_t* archLog;
 
 /*Prototipos de fuciones*/
 
@@ -45,9 +45,9 @@ int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 void algoritmo(int* algor);
-void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
-void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
-
+void leerConfiguracion(char* PATH);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
+void imprimirConfiguracion(t_config_UMV configuracion);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
+void inicializarConfiguracion(char* PATH);
 
 /*Prototipos de threads*/
 
