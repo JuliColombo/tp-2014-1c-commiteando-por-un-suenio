@@ -6,16 +6,19 @@
 C_SRCS += \
 ../cpu.c \
 ../primitivas.c \
+../primitivasAux.c \
 ../stack.c 
 
 OBJS += \
 ./cpu.o \
 ./primitivas.o \
+./primitivasAux.o \
 ./stack.o 
 
 C_DEPS += \
 ./cpu.d \
 ./primitivas.d \
+./primitivasAux.d \
 ./stack.d 
 
 

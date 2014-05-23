@@ -5,9 +5,11 @@
  *      Author: utnso
  */
 
-#include "parser/metadata_program.h"
-#include "stack.h"
-#include "commons/collections/dictionary.h"
+#include "primitivasAux.h"
+#include <sys/socket.h>
+#include "primitivas.h"
+#include <commons/collections/dictionary.h>
+#include <parser/metadata_program.h>
 
 
 /*typedef struct{
@@ -28,47 +30,6 @@ t_dictionary *diccionario;
 char* etiquetas;
 t_size etiquetas_size;
 
-int comprendidoEntre(int m, int n, int i) {
-	int menor = (i>=m);
-	int mayor = (i<=n);
-	return (menor && mayor);
-}
-
-
-t_valor_variable nombreParametro(int i) {
-	t_valor_variable nombre=0;
-	if(comprendidoEntre(0,9,i)) {
-		nombre = i;
-	} else {
-		nombre = -1;
-	}
-	return nombre;
-}
-
-
-t_puntero calcularPosicionAsignacion(t_stack* P) {
-	t_puntero posicion=0;
-	if(IS_EMPTY(P)) {
-		posicion = P->top_index++;
-	} else {
-		posicion = P->top_index + 5;
-	}
-	return posicion;}
-
-
-void reservarContexto(){
-	t_puntero posicionContextoViejo,posicionAVariable;
-	int posicionVar = pila->top_index;
-	int* cursor = pila->cursor_stack;
-
-	posicionContextoViejo = calcularPosicionAsignacion(pila);
-	PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
-
-	//Pushear Program Counter de proxima instruccion
-
-	posicionAVariable = calcularPosicionAsignacion(pila);
-	PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-}
 
 
 //No entendi si devuelve la posicion de la variable en la pila
@@ -96,13 +57,16 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	//Obtiene el valor resultante de leer a partir de direccion_variable, sin importar cual fuera el contexto actual
 	//Le pido a UMV los 4 bytes a partir del offset de direccion_variable.
 
-	return 0;
+	return POP_DESREFERENCIAR(pila, direccion_variable);
 }
 
 
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	//Inserta una copia del valor en la variable ubicada en direccion_variable.
 	//Almaceno en la UMV, en direccion_variable, el valor.
+	int top_index = pila->top_index;
+	PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
+	pila->top_index= top_index;
 }
 
 
@@ -134,7 +98,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	//Modifica las estructuras correspondientes para mostrar un nuevo contexto vacío.
 	//Los parámetros serán definidos luego de esta instrucción de la misma manera que una variable local, con identificadores numéricos empezando por el 0.
 
-	reservarContexto();
+	reservarContextoSinRetorno();
+
+	int posicionAPushear =  pila->top_index +1;
+	pila->cursor_stack = &posicionAPushear;
+
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 
@@ -150,9 +118,10 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Asignar a parametros
 	//Hacer algo con el tamaño de contexto
 
-	reservarContexto();
-	int posicionVar = pila->top_index;
-	PUSH_SIZE_CHECK(&posicionVar,pila,donde_retornar);
+	reservarContextoConRetorno();
+	int posicionAPushear =  pila->top_index +1;
+	pila->cursor_stack = &posicionAPushear;
+
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 
@@ -161,7 +130,9 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 t_puntero_instruccion finalizar() {
 	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual y el Program Counter previamente apilados en el Stack.
-	//En caso de estar finalizando el Contexto principal (el ubicado al inicio del Stack), deberá finalizar la ejecución del programa devolviendo.
+	//En caso de estar finalizando el Contexto principal (el ubicado al inicio del Stack), deberá finalizar la ejecución del programa.
+
+
 	return 0;
 }
 

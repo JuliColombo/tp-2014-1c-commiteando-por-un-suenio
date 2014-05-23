@@ -50,14 +50,13 @@
    return top;
   }
 
- void PUSH (t_valor_variable* x, t_stack* pila)
-  {
-   pila->top_index++;
-   pila->elementos[pila->top_index] = *x;
-  }
+ t_valor_variable POP_DESREFERENCIAR (t_stack *pila, t_puntero posicionValor) {
+	 int top = posicionValor;
+	 return pila->elementos[top+1];
+ }
+
 
  void PUSH_POSITION (t_valor_variable* x, t_stack* pila,int pos) {
-	 //pila->top_index++;
 	 pila->top_index = pos;
 	 pila->elementos[pos] = *x;
  }
@@ -78,3 +77,7 @@ t_valor_variable POP_SIZE_CHECK(t_stack* pila) {
 		return POP(pila);
 	}
 }
+
+/*void IR_A_POSICION(t_stack* pila,int pos) {
+	pila->elementos[pos];
+}*/

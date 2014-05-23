@@ -4,9 +4,11 @@
  *  Created on: 30/04/2014
  *      Author: utnso
  */
+#include <commons/collections/dictionary.h>
 #include "parser/metadata_program.h"
 #include "stack.h"
 #include <stdio.h>
+#include "primitivas.h"
 
 int main (int argc, char **argv){
 	//Esto es una prueba
@@ -46,6 +48,10 @@ int main (int argc, char **argv){
 	printf("Tamaño del mapa serializado de etiquetas %i\n",metadata->etiquetas_size);
 	printf("Tamaño del mapa serializado de instrucciones %i\n",metadata->instrucciones_size);
 	printf("El numero de la primera instruccion es %i\n",metadata->instruccion_inicio);
+
+	t_dictionary* dic = dictionary_create();
+
+
 
 
 	return 0;
