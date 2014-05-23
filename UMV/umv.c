@@ -22,14 +22,14 @@ int main (int argc, char **argv){
 	MP=crearMP();
 	//Crear estructuras administrativas
 
-	int thread_consola = pthread_create(&CONSOLA, NULL, core_consola, NULL);
+	pthread_create(&CONSOLA, NULL, core_consola, NULL);
 //	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
 /*	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
 
 	pthread_join(KERNEL,NULL);
 	pthread_join(CPU,NULL);
 */
-	pthread_join(thread_consola,NULL);
+	pthread_join(CONSOLA,NULL);
 	free(MP);
 	return 0;
 }

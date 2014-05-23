@@ -208,14 +208,14 @@ void inicializarConfiguracion(char* PATH){
 void *core_consola(void* parametro) {
 
 	pthread_t inicio;
-	int thread_console = pthread_create(&inicio, NULL, consola, NULL);
-	while(1);
-	pthread_join(thread_console,NULL);
+	pthread_create(&inicio, NULL, consola, NULL);
+	pthread_join(inicio,NULL);
 	return EXIT_SUCCESS;
 }
 
 void *consola (void* parametro){
 
+	//system("clear");
 	char comando[32];
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	gets(comando);
@@ -259,7 +259,7 @@ void *consola (void* parametro){
 				//generarReporte();
 							}
 			}
-		system("cls");
+
 		puts("Escriba la siguiente operacion\n");
 		gets(comando);
 		while(estaEnDicOP(comando)== 0){
@@ -268,5 +268,5 @@ void *consola (void* parametro){
 			}
 		}
 
-	return NULL;
+	return EXIT_SUCCESS;
 }
