@@ -32,7 +32,7 @@
 extern t_config_UMV configuracion_UMV;
 extern int algor;
 extern int* MP;
-extern pthread_t CONSOLA;
+extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;
 
 /*Prototipos de fuciones*/
@@ -50,15 +50,13 @@ void imprimirConfiguracion(t_config_UMV configuracion);			  				 			 // Muestra 
 void inicializarConfiguracion(char* PATH);
 
 /*Prototipos de threads*/
+void inicializarHilos(void);
+void esperarHilos(void);
 
-void* core_consola(void*);
-void* consola(void*);
+void* core_consola(void);
+void* consola(void);
 
-void* core_kernel(void*);
-void* kernel(void*);
-
-void* core_cpu(void*);
-void* cpu(void*;);
+void core_conexiones(void);
 
 #endif /* UMV_H_ */
 

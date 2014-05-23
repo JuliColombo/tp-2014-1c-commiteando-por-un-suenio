@@ -202,6 +202,8 @@ void inicializarConfiguracion(char* PATH){
 	}
 }
 
+//****************************************Atender Conexiones de Kernel/CPU*******************
+
 void core_conexiones(void){
 	int sock_umv;		//El socket de conexion
 	int n_sock_umv;		//El socket de datos
@@ -234,17 +236,31 @@ void core_conexiones(void){
 		}
 }
 
+//***********************************************Inicializacion y espera de hilos************************************
+
+void inicializarHilos(void){
+	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
+	pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
+	pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
+}
+
+void esperarHilos(void){
+	pthread_join(CPU,NULL);
+	pthread_join(CONSOLA,NULL);
+	pthread_join(KERNEL,NULL);
+}
+
 //***********************************************Consola************************************
 
-void *core_consola(void* parametro) {
+void *core_consola(void) {
 
 	pthread_t inicio;
-	pthread_create(&inicio, NULL, consola, NULL);
+	pthread_create(&inicio, NULL, (void*) &consola, NULL);
 	pthread_join(inicio,NULL);
 	return EXIT_SUCCESS;
 }
 
-void *consola (void* parametro){
+void *consola (void){
 
 	//system("clear");
 	char comando[32];
@@ -303,32 +319,5 @@ void *consola (void* parametro){
 }
 
 
-//***********************************************Hilo de Kernel************************************
 
-
-void *core_kernel(void* parametro) {
-
-	pthread_t inicio;
-	pthread_create(&inicio, NULL, kernel, NULL);
-	pthread_join(inicio,NULL);
-	return EXIT_SUCCESS;
-}
-
-void* kernel(void* parametro){
-	return EXIT_SUCCESS;
-}
-
-//***********************************************Hilo de CPU************************************
-
-void *core_cpu(void* parametro) {
-
-	pthread_t inicio;
-	pthread_create(&inicio, NULL, kernel, NULL);
-	pthread_join(inicio,NULL);
-	return EXIT_SUCCESS;
-}
-
-void* cpu(void* parametro){
-	return EXIT_SUCCESS;
-}
 

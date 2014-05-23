@@ -22,13 +22,8 @@ int main (int argc, char **argv){
 	MP=crearMP();
 	//Crear estructuras administrativas
 
-	int thread_consola = pthread_create(&CONSOLA, NULL, core_consola, NULL);
-	int thread_kernel = pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
-	int thread_cpu = pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
-
-	pthread_join(CPU,NULL);
-	pthread_join(thread_consola,NULL);
-	pthread_join(KERNEL,NULL);
+	inicializarHilos();
+	esperarHilos();
 
 	free(MP);
 	return 0;
