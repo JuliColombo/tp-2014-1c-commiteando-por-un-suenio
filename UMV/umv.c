@@ -26,9 +26,10 @@ int main (int argc, char **argv){
 	int thread_kernel = pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
 	int thread_cpu = pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
 
-	pthread_join(KERNEL,NULL);
 	pthread_join(CPU,NULL);
 	pthread_join(thread_consola,NULL);
+	pthread_join(KERNEL,NULL);
+
 	free(MP);
 	return 0;
 }
