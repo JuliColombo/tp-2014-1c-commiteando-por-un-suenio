@@ -39,6 +39,7 @@ typedef int8_t* t_nombre_cola;
 typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas
 	t_puerto_cpu puerto_cpus;				//Puerto TCP utilizado para recibir las conexiones de los CPUs
+	t_puerto_umv puerto_umv;				//Puerto de la UMV
 	t_quantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
@@ -47,7 +48,6 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_id_hio id_hio;						//Identificador de cada dispositivo de entrada/salida
 	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
 	t_ip_umv ip_umv;						//IP de la UMV
-	t_puerto_umv puerto_umv;				//Puerto de la UMV
 	t_variables_globales var_globales;	//Variables globales del sistema
 } t_config_kernel;
 

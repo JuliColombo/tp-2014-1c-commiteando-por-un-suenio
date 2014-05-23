@@ -202,6 +202,37 @@ void inicializarConfiguracion(char* PATH){
 	}
 }
 
+void core_conexiones(void){
+	int sock_umv;		//El socket de conexion
+	int n_sock_umv;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
+
+	if ((sock_umv = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
+		if (close(sock_umv)<0){
+			//Error con el close
+		}
+		abort();
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
+
+	if ((sock_umv = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
+			if (close(sock_umv)<0){
+				//Error con el close
+			}
+			abort();
+		}//El socket esta creado y listo para escuchar a los clientes por el puerto_kernel
+
+	while(1){
+			printf("Esperando conexion...\n");
+			n_sock_umv = nipc_aceptarConexion(sock_umv);
+			memset(paquete, 0, sizeof(paquete));
+			if (nipc_recibir(n_sock_umv,paquete)<0){
+				//No se recibieron datos
+			} else {
+				//Se recibieron datos
+			}
+			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+		}
+}
 
 //***********************************************Consola************************************
 
