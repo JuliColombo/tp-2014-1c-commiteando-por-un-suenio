@@ -54,5 +54,11 @@ void inicializarConfiguracion(char* PATH);
 void* core_consola(void*);
 void* consola(void*);
 
+void* core_kernel(void*);
+void* kernel(void*);
+
+void* core_cpu(void*);
+void* cpu(void*;);
+
 #endif /* UMV_H_ */
 

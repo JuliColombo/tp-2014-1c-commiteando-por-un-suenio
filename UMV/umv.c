@@ -23,12 +23,13 @@ int main (int argc, char **argv){
 	//Crear estructuras administrativas
 
 	pthread_create(&CONSOLA, NULL, core_consola, NULL);
-//	pthread_create(&KERNEL, NULL, (void*) &core_kernel, NULL);
-/*	pthread_create(&CPU, NULL, (void*) &core_cpu, NULL);
+	pthread_create(&KERNEL, NULL, core_kernel, NULL);
+	pthread_create(&CPU, NULL,  core_cpu, NULL);
+
+	pthread_join(CPU,NULL);
 
 	pthread_join(KERNEL,NULL);
-	pthread_join(CPU,NULL);
-*/
+
 	pthread_join(CONSOLA,NULL);
 	free(MP);
 	return 0;

@@ -270,3 +270,34 @@ void *consola (void* parametro){
 
 	return EXIT_SUCCESS;
 }
+
+
+//***********************************************Hilo de Kernel************************************
+
+
+void *core_kernel(void* parametro) {
+
+	pthread_t inicio;
+	pthread_create(&inicio, NULL, kernel, NULL);
+	pthread_join(inicio,NULL);
+	return EXIT_SUCCESS;
+}
+
+void* kernel(void* parametro){
+	return EXIT_SUCCESS;
+}
+
+//***********************************************Hilo de CPU************************************
+
+void *core_cpu(void* parametro) {
+
+	pthread_t inicio;
+	pthread_create(&inicio, NULL, kernel, NULL);
+	pthread_join(inicio,NULL);
+	return EXIT_SUCCESS;
+}
+
+void* cpu(void* parametro){
+	return EXIT_SUCCESS;
+}
+
