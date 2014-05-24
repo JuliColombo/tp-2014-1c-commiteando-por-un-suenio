@@ -32,31 +32,36 @@ t_size etiquetas_size;
 
 
 
-//No entendi si devuelve la posicion de la variable en la pila
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
+
 	t_puntero posicion = calcularPosicionAsignacion(pila);
 	PUSH_SIZE_CHECK(&id,pila,posicion);
-	dictionary_put(diccionario,&identificador_variable,&posicion); //en data va la posicion, no?
+
+	const char* str=convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str,posicion);
+	dictionary_put(diccionario,elem->name,elem);
+
 	return posicion;
 }
 
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
-	t_puntero* posicion = 0;
-	if(dictionary_has_key(diccionario,&identificador_variable)) {
-		posicion = dictionary_get(diccionario,&identificador_variable);
+	t_puntero posicion = 0;
+	char* str = convertirAString(identificador_variable);
+	if(dictionary_has_key(diccionario,str)) {
+		t_elemento* elemento = dictionary_get(diccionario,str);
+		posicion = elemento->pos;
 	} else {
-		*posicion = -1;
+		posicion = -1;
 	}
-	return *posicion;
+	return posicion;
 }
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	//Obtiene el valor resultante de leer a partir de direccion_variable, sin importar cual fuera el contexto actual
 	//Le pido a UMV los 4 bytes a partir del offset de direccion_variable.
-
 	return POP_DESREFERENCIAR(pila, direccion_variable);
 }
 
@@ -66,7 +71,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	//Almaceno en la UMV, en direccion_variable, el valor.
 	int top_index = pila->top_index;
 	PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
-	pila->top_index= top_index;
+	pila->top_index= top_index+1;
 }
 
 

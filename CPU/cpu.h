@@ -13,6 +13,7 @@
 #include "libs/stack.h"
 #include <stdio.h>
 #include "libs/primitivas.h"
+#include "libs/primitivasAux.h"
 #include "commons/config.h"
 
 

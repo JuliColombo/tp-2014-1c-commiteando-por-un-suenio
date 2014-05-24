@@ -36,12 +36,25 @@ t_valor_variable nombreParametro(int i) {
 t_puntero calcularPosicionAsignacion(t_stack* P) {
 	t_puntero posicion=0;
 	if(IS_EMPTY(P)) {
-		posicion = P->top_index++;
+		posicion = P->top_index +1;
 	} else {
-		posicion = P->top_index + 5;
+		posicion = P->top_index + 2;
 	}
 	return posicion;}
 
+char* convertirAString(t_nombre_variable c) {
+	static char str[2];
+	str[0]= c;
+	str[1]= '\0';
+	return str;
+}
+
+t_elemento* elemento_create(const char* name, t_puntero pos){
+	t_elemento *new = malloc(sizeof(t_elemento));
+	new->name = strdup(name);
+	new->pos = pos;
+	return new;
+}
 
 void reservarContextoSinRetorno() {
 	t_puntero posicionContextoViejo;

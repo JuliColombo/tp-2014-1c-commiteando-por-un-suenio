@@ -45,14 +45,17 @@
 
 
  t_valor_variable POP (t_stack *pila)
- {int top=pila->elementos[pila->top_index];
+ {t_valor_variable top=pila->elementos[pila->top_index];
    pila->top_index--;
    return top;
   }
 
  t_valor_variable POP_DESREFERENCIAR (t_stack *pila, t_puntero posicionValor) {
-	 int top = posicionValor;
-	 return pila->elementos[top+1];
+	 if(IS_EMPTY(pila)) {
+	 		return STACK_UNDERFLOW;
+	 } else {
+	 		int top = posicionValor;
+	 		return pila->elementos[top+1];}
  }
 
 

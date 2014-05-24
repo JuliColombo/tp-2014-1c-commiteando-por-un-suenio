@@ -1,5 +1,12 @@
-cpu.d: ../cpu.c ../stack.h ../primitivas.h
+cpu.d: ../cpu.c ../cpu.h ../libs/stack.h ../libs/primitivas.h \
+ ../libs/primitivasAux.h ../libs/stack.h
 
-../stack.h:
+../cpu.h:
 
-../primitivas.h:
+../libs/stack.h:
+
+../libs/primitivas.h:
+
+../libs/primitivasAux.h:
+
+../libs/stack.h:

@@ -6,52 +6,37 @@
  */
 #include "cpu.h"
 
+t_dictionary* diccionario;
+t_stack* pila;
+
+
 config_cpu configuracion_cpu;
 char* PATH;
+
+
 int main (int argc, char **argv){
 	PATH=argv[1];
 	leerConfiguracion(PATH);
-	//Esto es una prueba
-	/*t_valor_variable a = 'A';
-	t_valor_variable b = 2048;
-	t_valor_variable c = -156;
-	t_stack* pila=CREATE_STACK(1000);
-	PUSH_SIZE_CHECK(&a,pila,0);
-	PUSH_SIZE_CHECK(&b,pila,5);
-	PUSH_SIZE_CHECK(&c,pila,10);
-	t_valor_variable P,PO,POOP,POOOP;
-	printf("top_index vale %d\n",pila->top_index);
-	printf("el valor en esa pos es %d\n",pila->elementos[pila->top_index]);
-	printf("el valor en pos 5 es %d\n", pila->elementos[5]);
-	printf("el valor en pos 0 es %c\n", pila->elementos[0]);
-	P=POP_SIZE_CHECK (pila);
-	PO=POP_SIZE_CHECK (pila);
-	POOP=POP_SIZE_CHECK (pila);
-	printf("El valor es %d\n",P);
-	printf("El valor (char) es %c\n",PO);
-	printf("El valor %c (char) esta en la posicion %p\n",POOP,&POOP);
-	POOOP=POP_SIZE_CHECK(pila);
-	printf("El valor es %d\n",POOOP);
-	DESTROY_STACK(pila);*/
+
+	diccionario = dictionary_create();
+	pila = CREATE_STACK(1000);
+
+	definirVariable('a');
+	definirVariable('b');
+	definirVariable('c');
+
+	t_puntero a = obtenerPosicionVariable('a')+1;
+	t_puntero b = obtenerPosicionVariable('b')+1;
+	t_puntero c = obtenerPosicionVariable('c')+1;
+
+	asignar(a, 10);
+	asignar(b,-15);
+	asignar(c,9);
 
 
-	char* programa = malloc(511);
-	strcpy(programa,"#!/usr/bin/ansisop \n begin \n # primero declaro las variables \n variables a, b \n a = 20 \n print a \n end \n");
-	t_medatada_program* metadata;
-	metadata = metadatada_desde_literal(programa);
-	printf("cantidad de instrucciones: %d\n", metadata->instrucciones_size);
-	printf("Cantidad de etiquetas %i\n",metadata->cantidad_de_etiquetas);
-	printf("----------- Funcion impresion -------- \n");
-	printf("Cantidad de etiquetas %i\n",metadata->cantidad_de_etiquetas);
-	printf("Cantidad de funciones %i\n",metadata->cantidad_de_funciones);
-	printf("Etiquetas %s\n",metadata->etiquetas);
-	printf("Tamaño del mapa serializado de etiquetas %i\n",metadata->etiquetas_size);
-	printf("Tamaño del mapa serializado de instrucciones %i\n",metadata->instrucciones_size);
-	printf("El numero de la primera instruccion es %i\n",metadata->instruccion_inicio);
-
-	t_dictionary* dic = dictionary_create();
-
-
+	printf("para la variable a, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('a')));
+	printf("para la variable b, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('b')));
+	printf("para la variable c, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('c')));
 
 
 	return 0;
