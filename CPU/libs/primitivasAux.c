@@ -63,7 +63,14 @@ void reservarContextoSinRetorno() {
 	posicionContextoViejo = calcularPosicionAsignacion(pila);
 	PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
 
-	//Pushear Program Counter de proxima instruccion
+	//Pushear Program Counter de proxima instruccion:
+	//int posicionPC;
+	//pcb->program_counter +=1;
+	//int pc = pcb->program_counter;
+	//posicionPC = calcularPosicionAsignacion(pila);
+	//PUSH_SIZE_CHECK(&pc,pila,posicionPC);
+
+	//Borrar diccionario
 }
 
 void reservarContextoConRetorno(){

@@ -33,7 +33,6 @@ int main (int argc, char **argv){
 	asignar(b,-15);
 	asignar(c,9);
 
-
 	printf("para la variable a, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('a')));
 	printf("para la variable b, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('b')));
 	printf("para la variable c, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('c')));
