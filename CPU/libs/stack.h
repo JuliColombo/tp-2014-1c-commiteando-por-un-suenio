@@ -33,6 +33,8 @@ typedef struct {
 
  t_valor_variable POP_DESREFERENCIAR (t_stack *pila, t_puntero posicionValor);
 
+ t_valor_variable POP_RETORNAR (t_stack *pila, t_puntero posicionValor);
+
  void PUSH_POSITION (t_valor_variable* x, t_stack* pila,int pos);
 
  int PUSH_SIZE_CHECK (t_valor_variable* x, t_stack* pila, int pos);

@@ -30,6 +30,7 @@ t_dictionary *diccionario;
 char* etiquetas;
 t_size etiquetas_size;
 //t_pcb pcb:
+int sockfd;
 
 
 
@@ -41,7 +42,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,posicion);
-	dictionary_put(diccionario,elem->name,elem); //Se elimina elemento despues?
+	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio
 
 	//pcb->program_counter +=1;
 	//pcb->tamanio_contexto += 1;
@@ -98,18 +99,19 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 }
 
 
-t_puntero_instruccion irAlLabel(t_nombre_etiqueta etiqueta) {
+void irAlLabel(t_nombre_etiqueta etiqueta) {
 	//cambia la linea de ejecucion a la correspondiente de la etiqueta buscada.
 
-	reservarContextoSinRetorno(); //Tambien?
+	//reservarContextoSinRetorno(); Tambien?
 
 	int posicionAPushear =  pila->top_index +1;
-	//pcb->cursor_stack = &posicionAPushear;
+	//pcb->cursor_stack = &posicionAPushear;  entonces esto no, por lo de arriba
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 
-	return 0;
+	//Cambiar Program Counter
+
 }
 
 
@@ -142,7 +144,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno();
 	int posicionAPushear =  pila->top_index +1;
-	pila->cursor_stack = &posicionAPushear;
+	//pcb->cursor_stack = &posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
@@ -156,12 +158,30 @@ t_puntero_instruccion finalizar() {
 	//En caso de estar finalizando el Contexto principal (el ubicado al inicio del Stack), deberá finalizar la ejecución del programa.
 
 
+
+
 	return 0;
 }
 
-t_puntero retornar(){
+	void retornar(t_valor_variable retorno){
 	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual, el Program Counter y la direccion donde retornar, asignando el valor de retorno en esta, previamente apilados en el Stack.
-	return 0;
+
+	int cursor = 0;
+	int tamanio_contexto = 3; //en realidad usaria pcb->tamanio_contexto
+	//En vez de cursor, seria pcb->cursor_stack. O sea, que vaya a donde comienza mi contexto, para empezar a popear.
+	t_puntero posicionVariable = POP_RETORNAR(pila, cursor);
+	t_valor_variable* ret = &retorno;
+	t_puntero program_counter = POP(pila);
+	t_puntero cursor_stack_viejo = POP(pila);
+
+	PUSH_SIZE_CHECK(ret,pila,posicionVariable);
+	//pcb->program_counter = program_counter;
+	//pcb->cursor_stack = cursor_stack;
+
+	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+
+	regenerarDiccionario(pila,tamanio_contexto);
+
 }
 
 int imprimir(t_valor_variable valor_mostrar) {

@@ -56,6 +56,11 @@ t_elemento* elemento_create(const char* name, t_puntero pos){
 	return new;
 }
 
+void elemento_delete(t_elemento* elemento) {
+	free(elemento->name);
+	free(elemento);
+}
+
 void reservarContextoSinRetorno() {
 	t_puntero posicionContextoViejo;
 	int* cursor = pila->cursor_stack;
@@ -70,7 +75,8 @@ void reservarContextoSinRetorno() {
 	//posicionPC = calcularPosicionAsignacion(pila);
 	//PUSH_SIZE_CHECK(&pc,pila,posicionPC);
 
-	//Borrar diccionario
+	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
+	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 }
 
 void reservarContextoConRetorno(){
@@ -83,3 +89,27 @@ void reservarContextoConRetorno(){
 	PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
 
 }
+/*Lo que hago con esta funcion es:
+ * estoy en la posicion de cursor contexto. Asi que disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor)
+ * Pongo en el diccionario el id y su posicion. Lo hago tantas veces como el tamaño del contexto sea.
+ */
+void guardarAlternado (t_stack* pila) {
+	pila->top_index -= 2;
+	t_nombre_variable identificador_variable = TOP(pila);
+	const char* str=convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str,pila->top_index);
+	dictionary_put(diccionario,elem->name,elem);
+
+}
+//Una vez que regenere el diccionario, pongo el top_index en la posicion del valor de la ultima variable, cosa que si se quieren definir nuevas con la funcion
+//calcularPosicion, no tire error.
+void regenerarDiccionario(t_stack* pila, int tamanio_contexto) {
+	int i = 0;
+	int top_index = pila->top_index - 1;
+	while (i < tamanio_contexto) {
+		guardarAlternado(pila);
+		i++;
+	}
+	pila->top_index = top_index;
+}
+

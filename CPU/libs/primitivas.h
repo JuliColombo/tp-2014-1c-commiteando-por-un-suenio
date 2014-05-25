@@ -19,7 +19,7 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable);
 
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor);
 
-t_puntero_instruccion irAlLabel(t_nombre_etiqueta etiqueta);
+void irAlLabel(t_nombre_etiqueta etiqueta);
 
 void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 
@@ -27,7 +27,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 
 t_puntero_instruccion finalizar();
 
-t_puntero retornar();
+void retornar();
 
 int imprimir(t_valor_variable valor_mostrar);
 

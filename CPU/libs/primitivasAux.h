@@ -33,5 +33,11 @@ char* convertirAString(t_nombre_variable c);
 
 t_elemento* elemento_create(const char* name, t_puntero pos);
 
+void elemento_delete(t_elemento* elemento);
+
+void regenerarDiccionario(t_stack* pila, int tamanio_contexto);
+
+void guardarAlternado (t_stack* pila);
+
 
 #endif /* PRIMITIVASAUX_H_ */

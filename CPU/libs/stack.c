@@ -58,6 +58,14 @@
 	 		return pila->elementos[top+1];}
  }
 
+ t_valor_variable POP_RETORNAR (t_stack *pila, t_puntero posicionValor) {
+ 	 if(IS_EMPTY(pila)) {
+ 	 		return STACK_UNDERFLOW;
+ 	 } else {
+ 	 		int top = posicionValor;
+ 	 		return pila->elementos[top-1];}
+  }
+
 
  void PUSH_POSITION (t_valor_variable* x, t_stack* pila,int pos) {
 	 pila->top_index = pos;
