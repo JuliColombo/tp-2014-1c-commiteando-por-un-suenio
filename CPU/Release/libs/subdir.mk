@@ -6,16 +6,19 @@
 C_SRCS += \
 ../libs/primitivas.c \
 ../libs/primitivasAux.c \
+../libs/socket.c \
 ../libs/stack.c 
 
 OBJS += \
 ./libs/primitivas.o \
 ./libs/primitivasAux.o \
+./libs/socket.o \
 ./libs/stack.o 
 
 C_DEPS += \
 ./libs/primitivas.d \
 ./libs/primitivasAux.d \
+./libs/socket.d \
 ./libs/stack.d 
 
 

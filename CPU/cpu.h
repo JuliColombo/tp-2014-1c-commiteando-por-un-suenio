@@ -30,5 +30,5 @@ extern char* PATH;
 
 
 /*************  PROTOTIPO FUNCIONES  *************/
-void leerConfiguracion(char*);
+void leerConfiguracion();
 #endif /* CPU_H_ */

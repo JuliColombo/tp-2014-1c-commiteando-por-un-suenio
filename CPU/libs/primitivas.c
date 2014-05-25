@@ -6,7 +6,7 @@
  */
 
 #include "primitivasAux.h"
-#include <sys/socket.h>
+#include "socket.h"
 #include "primitivas.h"
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
@@ -166,6 +166,7 @@ t_puntero retornar(){
 
 int imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
+
 	return 0;
 }
 

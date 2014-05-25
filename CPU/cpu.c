@@ -43,7 +43,7 @@ int main (int argc, char **argv){
 
 /***************************************  FUNCIONES  ***************************************/
 
-void leerConfiguracion(char* PATH){
+void leerConfiguracion(void){
 	t_config* config=config_create(PATH);
 
 	configuracion_cpu.ip_kernel=config_get_int_value(config,"Direccion IP para conectarse al Kernel");
