@@ -27,10 +27,16 @@
 
 t_stack* pila;
 t_dictionary *diccionario;
+int sockfd;
+
+//t_pcb pcb:
+
+int stack_base;
+int c_stack;
+int program_counter;
+int tamanio_contexto;
 char* etiquetas;
 t_size etiquetas_size;
-//t_pcb pcb:
-int sockfd;
 
 
 
@@ -153,33 +159,30 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 }
 
-t_puntero_instruccion finalizar() {
+void finalizar() {
 	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual y el Program Counter previamente apilados en el Stack.
 	//En caso de estar finalizando el Contexto principal (el ubicado al inicio del Stack), deberá finalizar la ejecución del programa.
 
+	if(c_stack == stack_base) {
 
+	volverAContextoAnterior();
+	regenerarDiccionario(pila,tamanio_contexto);
+	} else {
 
-
-	return 0;
+		volverAContextoAnterior();
+		regenerarDiccionario(pila,tamanio_contexto);
+		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
+	}
 }
 
-	void retornar(t_valor_variable retorno){
+void retornar(t_valor_variable retorno){
 	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual, el Program Counter y la direccion donde retornar, asignando el valor de retorno en esta, previamente apilados en el Stack.
 
-	int cursor = 0;
-	int tamanio_contexto = 3; //en realidad usaria pcb->tamanio_contexto
-	//En vez de cursor, seria pcb->cursor_stack. O sea, que vaya a donde comienza mi contexto, para empezar a popear.
-	t_puntero posicionVariable = POP_RETORNAR(pila, cursor);
+
+	t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	t_valor_variable* ret = &retorno;
-	t_puntero program_counter = POP(pila);
-	t_puntero cursor_stack_viejo = POP(pila);
-
 	PUSH_SIZE_CHECK(ret,pila,posicionVariable);
-	//pcb->program_counter = program_counter;
-	//pcb->cursor_stack = cursor_stack;
-
-	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
-
+	volverAContextoAnterior();
 	regenerarDiccionario(pila,tamanio_contexto);
 
 }
@@ -196,6 +199,7 @@ int imprimirTexto(char* texto) {
 }
 
 int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
+	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
 	return 0;
 }
 

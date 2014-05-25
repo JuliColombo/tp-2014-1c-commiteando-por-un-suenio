@@ -39,5 +39,7 @@ void regenerarDiccionario(t_stack* pila, int tamanio_contexto);
 
 void guardarAlternado (t_stack* pila);
 
+void volverAContextoAnterior();
+
 
 #endif /* PRIMITIVASAUX_H_ */

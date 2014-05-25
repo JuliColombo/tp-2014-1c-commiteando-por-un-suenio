@@ -25,7 +25,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 
-t_puntero_instruccion finalizar();
+void finalizar();
 
 void retornar();
 

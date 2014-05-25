@@ -10,6 +10,14 @@
 //Esto de aca es para probar. Despues se pasan por sockets y esas cosas.
 t_stack* pila;
 t_dictionary *diccionario;
+int sockfd;
+
+//t_pcb pcb:
+
+int stack_base;
+int c_stack;
+int program_counter;
+int tamanio_contexto;
 char* etiquetas;
 t_size etiquetas_size;
 
@@ -89,6 +97,7 @@ void reservarContextoConRetorno(){
 	PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
 
 }
+
 /*Lo que hago con esta funcion es:
  * estoy en la posicion de cursor contexto. Asi que disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor)
  * Pongo en el diccionario el id y su posicion. Lo hago tantas veces como el tamaño del contexto sea.
@@ -101,6 +110,7 @@ void guardarAlternado (t_stack* pila) {
 	dictionary_put(diccionario,elem->name,elem);
 
 }
+
 //Una vez que regenere el diccionario, pongo el top_index en la posicion del valor de la ultima variable, cosa que si se quieren definir nuevas con la funcion
 //calcularPosicion, no tire error.
 void regenerarDiccionario(t_stack* pila, int tamanio_contexto) {
@@ -112,4 +122,18 @@ void regenerarDiccionario(t_stack* pila, int tamanio_contexto) {
 	}
 	pila->top_index = top_index;
 }
+
+void volverAContextoAnterior() {
+	//en realidad usaria pcb->tamanio_contexto
+	//En vez de cursor, seria pcb->c_stack. O sea, que vaya a donde comienza mi contexto, para empezar a popear.
+	t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
+	t_puntero program_counter = POP(pila);
+	t_puntero cursor_stack_viejo = POP(pila);
+
+	//pcb->program_counter = program_counter;
+	//pcb->c_stack = c_stack;
+
+	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+}
+
 
