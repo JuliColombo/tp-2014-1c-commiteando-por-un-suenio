@@ -51,6 +51,9 @@ void leerConfiguracion(char* PATH);				  				 			 // Lee en la macro del archivo
 void imprimirConfiguracion(t_config_UMV configuracion);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
 void inicializarConfiguracion(char* PATH);
 
+/*Prototipos de semaforos*/
+void inicializarSemaforos(void);
+
 /*Prototipos de threads*/
 void inicializarHilos(void);
 void esperarHilos(void);

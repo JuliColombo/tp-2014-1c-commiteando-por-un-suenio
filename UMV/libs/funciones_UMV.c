@@ -236,14 +236,17 @@ void core_conexiones(void){
 		}
 }
 
+//***********************************************Inicializacion de semaforos************************************
 
 
+void inicializarSemaforos(void){
+	mutex=malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(mutex,NULL);
+}
 
 //***********************************************Inicializacion y espera de hilos************************************
 
 void inicializarHilos(void){
-	mutex=malloc(sizeof(pthread_mutex_t));
-	pthread_mutex_init(mutex,NULL);
 	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
 	pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
 	pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
@@ -285,45 +288,46 @@ void *consola (void){
 						gets(tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
-					  pthread_mutex_lock(mutex);
+					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					//solicitarPosicionDeMemoria();
-					  pthread_mutex_unlock(mutex);
+					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
-					  pthread_mutex_lock(mutex);
+					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					//escribirBuffer();
-					  pthread_mutex_unlock(mutex);
+					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
-					  pthread_mutex_lock(mutex);
+					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					//crearSegmentoPrograma();
-					  pthread_mutex_unlock(mutex);
+					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
-					  pthread_mutex_lock(mutex);
+					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					//destruirSegmentoPrograma(t_programa Programa);
-					  pthread_mutex_unlock(mutex);
+					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 			}
 
 		else { if (strcmp(comando, "retardo") == 0){
-				  pthread_mutex_lock(mutex);
+				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				//retardo(int valorRetardoEnMilisegundos);
-				  pthread_mutex_unlock(mutex);
+				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
-				   pthread_mutex_lock(mutex);
+				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				   algoritmo(&algor);
-				   pthread_mutex_unlock(mutex);
+				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
-				   pthread_mutex_lock(mutex);
+				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				 //compactar();
-				   pthread_mutex_unlock(mutex);			}
+				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
+			   }
 			   if (strcmp(comando,"dump") ==0){
-				   pthread_mutex_lock(mutex);
+				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				 //generarReporte();
-				   pthread_mutex_unlock(mutex);
+				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
 

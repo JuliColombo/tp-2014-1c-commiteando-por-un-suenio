@@ -23,6 +23,7 @@ int main (int argc, char **argv){
 	MP=crearMP();
 	//Crear estructuras administrativas
 
+	inicializarSemaforos();
 	inicializarHilos();
 	esperarHilos();
 
