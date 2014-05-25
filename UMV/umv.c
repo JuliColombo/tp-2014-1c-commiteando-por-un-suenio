@@ -10,14 +10,13 @@
 
 int* MP;
 int algor=firstfit;
-char* PATH;
+char* PATH=PATHCONFIG;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;
 pthread_mutex_t* mutex;
 
 int main (int argc, char **argv){
-	PATH = argv[1];
 	inicializarConfiguracion(PATH);
 	//Acceder a archConfig y obtener datos
 	MP=crearMP();

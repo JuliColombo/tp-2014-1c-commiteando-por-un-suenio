@@ -10,9 +10,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "log.h"
+#include "commons/config.h"
+#include "estructuras_programa.h"
+#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Programa/configuracion_programa.cfg"
 
+
+/************** VARIABLES GLOBALES ***************/
+
+extern t_config_programa configuracion_programa;
+extern char* PATH;
+extern char* Archivo_Ansisop;
+
+
+/************** FUNCIONES **************/
 
 char* leerScript(off_t* fileSize,char* path); //lee el script
-
+void inicializarConfiguracion(void);
+void leerConfiguracion(void);
+void imprimirConfiguracion(void);
 
 #endif /* FUNCIONESINTERPRETE_H_ */

@@ -7,8 +7,7 @@
 
 
 #include "funcionesInterprete.h"
-#include "log.h"
-#include "commons/config.h"
+
 
 char* leerScript(off_t* fileSize,char* path) {
 
@@ -35,31 +34,31 @@ char* leerScript(off_t* fileSize,char* path) {
 	return buffer;
 }
 
-void inicializarConfiguracion(char* PATH) {
+void inicializarConfiguracion(void) {
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
-	int control = lstat(PATH, &file_info);
+	int control = lstat(Archivo_Ansisop, &file_info);
 	if (control == -1) {
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
 	else{
-	leerConfiguracion(PATH);
-	imprimirConfiguracion(configuracion_programa); //Imprime las configuraciones actuales por pantalla
+	leerConfiguracion();
+	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
-void leerConfiguracion(char* PATH) {
+void leerConfiguracion(void){
 	t_config* config=config_create(PATH);
 
-	configuracion_programa.ip_kernel = config_get_int_value(config,"Direccion IP donde se encuentra ejecutando el hilo PLP:");
-	configuracion_programa.puerto_kernel = config_get_int_value(config,"Puerto donde se encuentra ejecutando el hilo PLP:");
+	configuracion_programa.ip_kernel = config_get_int_value(config,"Puerto TCP para recibir conexiones del Kernel");
+	configuracion_programa.puerto_kernel = config_get_int_value(config,"Direccion IP para conectarse al Kernel");
 
 	}
 
-void imprimirConfiguracion(t_config_programa configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
+void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
-	printf("IP del Kernel: %d\n", configuracion.ip_kernel);
-	printf("Puerto Kernel: %d\n", configuracion.puerto_kernel);
+	printf("IP del Kernel: %d\n", configuracion_programa.ip_kernel);
+	printf("Puerto Kernel: %d\n", configuracion_programa.puerto_kernel);
 
 }
 

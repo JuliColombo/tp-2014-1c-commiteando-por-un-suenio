@@ -15,7 +15,7 @@ log_t* log_crear(char* dirLog) {
 	log->mode = M_CONSOLEANDFILE;
 	log->pid = getpid();
 
-	sprintf(pathLog,"%s PI.[%d].log",dirLog,log->pid);
+	sprintf(pathLog,"%s Programa.[%d].log",dirLog,log->pid);
 
 	if ((log->file = fopen(pathLog, "a")) == NULL) {
 		free(log);

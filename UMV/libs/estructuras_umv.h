@@ -32,8 +32,6 @@ t_memoria_principal memSize;	//Tamanio de la memoria principal
 t_puerto_cpu puerto_cpus;	//Puerto tcp para recibir las conexiones de las cpus
 t_puerto_kernel puerto_kernel;	//Puerto tcp para recibir las conexiones del kernel
 t_ip_kernel ip_kernel;	//Direccion IP para conectarse al Kernel
-//t_id_semaforos id_semaforos;	//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
-//t_valor_semaforos valor_semaforos;	//Valor inicial de cada semáforo
 t_algoritmo algoritmo;	//Algoritmo de selección de ubicación de segmento (first-fit o worst-fit)
 } t_config_UMV;
 

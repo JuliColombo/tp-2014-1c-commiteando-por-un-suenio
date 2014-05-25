@@ -9,13 +9,14 @@
 
 log_t* archLog;
 t_config_programa configuracion_programa;
-char* ANSISOP_CONFIG;
+char* PATH=PATHCONFIG;
+char* Archivo_Ansisop;
+
 
 int main (int argc, char **argv){
-	ANSISOP_CONFIG = argv[1];
-	inicializarConfiguracion(ANSISOP_CONFIG);
+	Archivo_Ansisop = argv[1];
+	inicializarConfiguracion();
 	off_t fileSize=0;
-	archLog = log_crear(PATHLOG);
 	char* buffer = leerScript(&fileSize,argv[1]);
 	if (buffer == NULL) {
 			log_escribir(archLog,"Nucleo PI",ERROR,"Error en la lectura del script");
