@@ -183,7 +183,7 @@ void imprimirConfiguracion(t_config_UMV configuracin_UMV) { // Funcion para test
 	printf("Tamanio de memoria Principal: %d\n", configuracion_UMV.memSize);
 	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
 	printf("Puerto para conexiones con Kernel: %d\n", configuracion_UMV.puerto_kernel);
-	printf("IP del Kernel%d\n", configuracion_UMV.ip_kernel);
+	printf("IP del Kernel: %d\n", configuracion_UMV.ip_kernel);
 //	printf("%d\n", configuracion.id_semaforos);
 //	printf("%d\n", configuracion.valor_semaforos);
 	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
@@ -236,9 +236,14 @@ void core_conexiones(void){
 		}
 }
 
+
+
+
 //***********************************************Inicializacion y espera de hilos************************************
 
 void inicializarHilos(void){
+	mutex=malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(mutex,NULL);
 	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
 	pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
 	pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
@@ -280,31 +285,46 @@ void *consola (void){
 						gets(tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
+					  pthread_mutex_lock(mutex);
 					//solicitarPosicionDeMemoria();
+					  pthread_mutex_unlock(mutex);
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
+					  pthread_mutex_lock(mutex);
 					//escribirBuffer();
+					  pthread_mutex_unlock(mutex);
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
+					  pthread_mutex_lock(mutex);
 					//crearSegmentoPrograma();
-				 }
+					  pthread_mutex_unlock(mutex);
+				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
+					  pthread_mutex_lock(mutex);
 					//destruirSegmentoPrograma(t_programa Programa);
-				 }
+					  pthread_mutex_unlock(mutex);
+				}
 			}
 
 		else { if (strcmp(comando, "retardo") == 0){
+				  pthread_mutex_lock(mutex);
 				//retardo(int valorRetardoEnMilisegundos);
-			       }
+				  pthread_mutex_unlock(mutex);
+			   }
 			   if (strcmp(comando, "algoritmo") == 0){
+				   pthread_mutex_lock(mutex);
 				   algoritmo(&algor);
+				   pthread_mutex_unlock(mutex);
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
-				//compactar();
-							}
+				   pthread_mutex_lock(mutex);
+				 //compactar();
+				   pthread_mutex_unlock(mutex);			}
 			   if (strcmp(comando,"dump") ==0){
-				//generarReporte();
-							}
+				   pthread_mutex_lock(mutex);
+				 //generarReporte();
+				   pthread_mutex_unlock(mutex);
+			   }
 			}
 
 		puts("Escriba la siguiente operacion\n");

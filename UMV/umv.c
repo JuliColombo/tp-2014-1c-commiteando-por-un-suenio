@@ -14,6 +14,7 @@ char* PATH;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;
+pthread_mutex_t* mutex;
 
 int main (int argc, char **argv){
 	PATH = argv[1];

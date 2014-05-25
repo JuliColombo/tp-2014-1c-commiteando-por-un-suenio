@@ -21,7 +21,8 @@
 #include "commons/config.h"
 #include "commons/collections/list.h"
 #include "log.h"
-
+#include <semaphore.h>
+#include "socket.h"
 
 /*Macros del archivo config*/
 
@@ -34,6 +35,7 @@ extern int algor;
 extern int* MP;
 extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;
+extern pthread_mutex_t* mutex;
 
 /*Prototipos de fuciones*/
 
