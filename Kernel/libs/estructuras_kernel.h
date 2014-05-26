@@ -83,6 +83,8 @@ typedef struct { // se define un vector para los programas en new
 	int peso;
 	t_medatada_program metadata;
 	t_pcb* pcb;
+	t_quantum quantum;
+	int flag_terminado;
 } t_programa;
 
 typedef struct{

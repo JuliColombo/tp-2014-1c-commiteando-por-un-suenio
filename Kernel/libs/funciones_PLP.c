@@ -20,7 +20,6 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 
 
 
-
 void mostrarNodosPorPantalla(t_list* lista){
 int i;
 int p;
@@ -36,6 +35,19 @@ int p;
 	}
 }
 
+int cantidadProgramasEnEjecucion(void){
+	return (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block));
+}
+
+void completarGradoMultip(void){
+	void* aux=list_remove(cola.new,0);
+
+	while(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion && aux!=NULL){
+		list_add(cola.ready,aux);
+		aux=list_remove(cola.new,0);
+	}
+
+}
 
 /*int main_plp(){
 	t_list* cola_programas=list_create();
@@ -144,36 +156,39 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 pthread_t plp_conexiones;
 
 void* core_plp(void){
-
+	sem_init(&sem_Programa,0,0);
 	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
-	t_programa* programa= NULL;
+	t_programa* programa = list_remove(cola.new,0);
+	/*int flag_comienzo=0;
+	int flag_hio=0;*/
 
-	int flag_comienzo=0;
-	int flag_terminado=0;
-	int flag_hio=0;
-	int quantum=0;
-	sem_t s1;
-	sem_init(&s1,0,0);
 
 
 	while(1){
-		sem_wait(s1);
-		flag_comienzo=0;
+		sem_wait(&sem_Programa);
+		/*flag_comienzo=0;
 		flag_terminado=0;
 		flag_hio=0;
-		quantum=0;
+		quantum=0;*/
 
 
-		while(quantum < configuracion_kernel.quantum && flag_terminado==0){
 
+
+
+		while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
+
+
+		if(programa->flag_terminado==1){
+			completarGradoMultip();
 		}
 
+	}
 	}
 	//Logica del PLP
 
 	pthread_join(thread_plp_conexiones, NULL);
 
-	return 0;
+	return;
 }
 
 
@@ -205,9 +220,10 @@ void* core_plp_conexiones(void){
 		n_sock_plp = nipc_aceptarConexion(sock_plp);
 		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0s a la variable)
 		if (nipc_recibir(n_sock_plp,paquete)<0){
-			//No se recivieron datos
+			//No se recibieron datos
 		} else {
-			//Se recivieron datos
+			//Se recibieron datos
+			sem_post(&sem_Programa);
 		}
 		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 	}
