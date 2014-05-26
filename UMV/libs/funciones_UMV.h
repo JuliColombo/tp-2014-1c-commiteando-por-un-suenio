@@ -47,7 +47,7 @@ _Bool segmentationFault(uint32_t base,uint32_t offset);
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
-void algoritmo(t_algoritmo* algor);
+void algoritmo(void);
 void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
 void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
 void inicializarConfiguracion(void);

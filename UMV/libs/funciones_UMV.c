@@ -132,13 +132,13 @@ void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar 
 
 }
 
-void algoritmo(t_algoritmo* algor){//Cambiar entre Worst fit y First fit
-	if(*algor==worstfit){
-							*algor=firstfit;
+void algoritmo(void){//Cambiar entre Worst fit y First fit
+	if(configuracion_UMV.algoritmo==worstfit){
+		configuracion_UMV.algoritmo=firstfit;
 							//printf("%d\n", *algor); para checkear el cambio del valor
 	}
 	else{
-							*algor=worstfit;
+		configuracion_UMV.algoritmo=worstfit;
 							//printf("%d\n", *algor); para checkear el cambio del valor
 	}
 
