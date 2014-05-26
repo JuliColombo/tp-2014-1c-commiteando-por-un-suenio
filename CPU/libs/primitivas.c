@@ -133,7 +133,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	program_counter = instruccion;
 	t_intructions inst = index_codigo[instruccion];
 
-	//Pedir a UMV instruccion a ejecutar, enviando inst
+	//Pedir a UMV instruccion a ejecutar, enviando instr
 
 	//Ejecutar instruccion con analizador_linea
 
@@ -142,7 +142,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Preserva el contexto de ejecución actual para poder retornar luego al mismo, junto con la posicion de la variable entregada por donde_retornar.
-	//Modifica las estructuras correspondientes para mostrar un nuevo contexto vacío.
+	//Modifica las eestructuras correspondientes para mostrar un nuevo contexto vacío.
 	//Los parámetros serán definidos luego de esta instrucción de la misma manera que una variable local, con identificadores numéricos empezando por el 0.
 
 	//definir variables si hay parametros
@@ -151,7 +151,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno();
 	int posicionAPushear =  pila->top_index +1;
-	c_stack = &posicionAPushear;
+	c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
@@ -208,6 +208,9 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
 	return 0;
 }
+
+
+/****************************** OPERACIONES DE KERNEL ************************************************/
 
 int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.

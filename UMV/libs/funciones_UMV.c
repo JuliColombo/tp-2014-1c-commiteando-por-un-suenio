@@ -52,14 +52,14 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
-	int tamanio = configuracion_UMV.memSize;
+	tamanioMP = configuracion_UMV.memSize;
 	int* MP;
-	MP = malloc(tamanio);
+	MP = malloc(tamanioMP);
 	return MP;
 }
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){
-	if (MP[base+offset] == NULL) {
+_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
+	if (base+offset > tamanioMP) {
 	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
 		return true;
 	} else{
@@ -70,7 +70,7 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){
 
 
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
-	if (MP[base+offset+longitud] == NULL) {
+	if (base+offset+longitud > tamanioMP) {
 		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
 			return true;
 		} else{
@@ -144,8 +144,34 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 }
 
+//****************************************Compactacion*****************************************
+
 void compactar(){
-	//Forzar compactacion (ver para checkpoint 3)
+	int sigSegmento;
+	int posicionDeDestino;
+	//Obtengo primer posicion libre en MP
+		int i=0;
+		while (i!=NULL) i++;
+		posicionDeDestino= i;
+	sigSegmento=i;
+
+	while (sigSegmento != tamanioMP){
+		if (sigSegmento == NULL){
+			sigSegmento++;
+		} else{
+			int tamanio= obtenerTamanioDelSegmento();
+			//actualizar tabla de segmentos de el proceso dueño del segmento
+			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
+			sigSegmento= sigSegmento+tamanio+1;
+			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
+		}
+	}
+}
+int obtenerTamanioDelSegmento(){
+	int tamanio;
+	//Habia pensado buscar hasta que sea NULL, pero si hay un segmento al lado de otro lo va a mover tambien,
+	//lo cual no seria un problema siempre y cuando actualizemos bien la tabla de segmentos de cada programa (suponiendo que esos dos segmentos corresponden a programas diferentes)
+	return tamanio;
 }
 
 void dump(){

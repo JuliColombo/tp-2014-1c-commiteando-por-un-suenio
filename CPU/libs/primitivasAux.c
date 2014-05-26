@@ -85,6 +85,7 @@ void reservarContextoSinRetorno() {
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+
 }
 
 void reservarContextoConRetorno(){
