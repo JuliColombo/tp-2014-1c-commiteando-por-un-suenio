@@ -14,12 +14,14 @@ log_t* archLog;
 pthread_t pcp, plp;
 t_thread_io io;
 char* PATH;
+cola_procesos cola;
+
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
 	PATH = argv[1];
+	cola.new,cola.ready,cola.exec,cola.block,cola.exit=NULL;
 
-
-	inicializarConfiguracion(PATH); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
+	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
 
 	int thread_plp = pthread_create (&plp, NULL, core_plp(), NULL);
 	int thread_pcp = pthread_create (&pcp, NULL, core_pcp(), NULL);
@@ -33,9 +35,9 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 		thread_io[i] = pthread_create(&io.thread[i].tid, NULL, core_io(configuracion_kernel.retardo_hio[i]), NULL); //La estructura io.thread[i].tid no la entendi, hice lo que me parecio para que funcione pero hay que cambiarla
 		printf("Thread %d para IO\n", i);
-		/*pthread_mutex_lock(IO.mutex);
-		agregarHilo(IO.thread[i].tid);
-		pthread_mutex_unlock(IO.mutex);*/
+		/*pthread_mutex_lock(io.mutex);
+		agregarHilo(io.thread[i].tid);
+		pthread_mutex_unlock(io.mutex);*/
 	}
 
 

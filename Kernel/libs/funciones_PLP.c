@@ -36,6 +36,7 @@ int p;
 	}
 }
 
+
 /*int main_plp(){
 	t_list* cola_programas=list_create();
 	printf("La cola está vacia");
@@ -77,7 +78,7 @@ int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioI
 */
 
 
-void inicializarConfiguracion(char* PATH){
+void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
 	int control = lstat(PATH, &file_info);
@@ -85,12 +86,12 @@ void inicializarConfiguracion(char* PATH){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
 	else{
-	leerConfiguracion(PATH);
-	imprimirConfiguracion(configuracion_kernel); //Imprime las configuraciones actuales por pantalla
+	leerConfiguracion();
+	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
-void leerConfiguracion(char* PATH){
+void leerConfiguracion(void){
 	t_config* config=config_create(PATH);
 
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
@@ -108,32 +109,32 @@ void leerConfiguracion(char* PATH){
 
 	}
 
-void imprimirConfiguracion(t_config_kernel configuracion) { // Funcion para testear que lee correctamente el archivo de configuracion
+void imprimirConfiguracion() { // Funcion para testear que lee correctamente el archivo de configuracion
 
-	printf("Puerto programas: %d\n", configuracion.puerto_programas);
-	printf("Puerto CPUs: %d\n", configuracion.puerto_cpus);
-	printf("Quantum: %d\n", configuracion.quantum);
-	printf("Retardo quantum: %d\n", configuracion.retardo_quantum);
-	printf("Grado de multiprogramacion: %d\n", configuracion.multiprogramacion);
+	printf("Puerto programas: %d\n", configuracion_kernel.puerto_programas);
+	printf("Puerto CPUs: %d\n", configuracion_kernel.puerto_cpus);
+	printf("Quantum: %d\n", configuracion_kernel.quantum);
+	printf("Retardo quantum: %d\n", configuracion_kernel.retardo_quantum);
+	printf("Grado de multiprogramacion: %d\n", configuracion_kernel.multiprogramacion);
 
 
 	int i;
-	for(i=0;i<cant_identificadores(configuracion.id_semaforos);i++){
-		printf("Semaforo (valor): %s (%d)\n",configuracion.id_semaforos[i], configuracion.valor_semaforos[i]);
+	for(i=0;i<cant_identificadores(configuracion_kernel.id_semaforos);i++){
+		printf("Semaforo (valor): %s (%d)\n",configuracion_kernel.id_semaforos[i], configuracion_kernel.valor_semaforos[i]);
 	}
 
-	free(configuracion.valor_semaforos);
-	for(i=0;configuracion.id_hio[i]!=NULL;i++){
-		printf("ID HIO (retardo): %s ", configuracion.id_hio[i]);
-		printf("(%d)\n", configuracion.retardo_hio[i]);
+	free(configuracion_kernel.valor_semaforos);
+	for(i=0;configuracion_kernel.id_hio[i]!=NULL;i++){
+		printf("ID HIO (retardo): %s ", configuracion_kernel.id_hio[i]);
+		printf("(%d)\n", configuracion_kernel.retardo_hio[i]);
 	}
-	free(configuracion.retardo_hio);
-	printf("IP de la UMV: %d\n", configuracion.ip_umv);
-	printf("Puerto UMV: %d\n", configuracion.puerto_umv);
+	free(configuracion_kernel.retardo_hio);
+	printf("IP de la UMV: %d\n", configuracion_kernel.ip_umv);
+	printf("Puerto UMV: %d\n", configuracion_kernel.puerto_umv);
 	
 	printf("Variables globales: ");
-	for(i=0;configuracion.var_globales[i]!=NULL;i++){
-		printf("%s ", configuracion.var_globales[i]);
+	for(i=0;configuracion_kernel.var_globales[i]!=NULL;i++){
+		printf("%s ", configuracion_kernel.var_globales[i]);
 	}
 	printf("\n");
 
@@ -150,8 +151,22 @@ void* core_plp(void){
 	int flag_comienzo=0;
 	int flag_terminado=0;
 	int flag_hio=0;
+	int quantum=0;
+	sem_t s1;
+	sem_init(&s1,0,0);
+
 
 	while(1){
+		sem_wait(s1);
+		flag_comienzo=0;
+		flag_terminado=0;
+		flag_hio=0;
+		quantum=0;
+
+
+		while(quantum < configuracion_kernel.quantum && flag_terminado==0){
+
+		}
 
 	}
 	//Logica del PLP
