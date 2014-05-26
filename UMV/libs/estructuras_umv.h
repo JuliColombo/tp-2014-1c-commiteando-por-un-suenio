@@ -15,7 +15,7 @@
 typedef uint16_t t_puerto_cpu;
 typedef uint16_t t_puerto_kernel;
 typedef uint32_t t_memoria_principal;
-typedef uint8_t t_algoritmo;
+typedef int t_algoritmo;
 typedef uint16_t t_ip_kernel;
 
 typedef char** t_id_semaforos;

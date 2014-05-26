@@ -31,7 +31,6 @@
 /*Variables globales*/
 
 extern t_config_UMV configuracion_UMV;
-extern int algor;
 extern int* MP;
 extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;

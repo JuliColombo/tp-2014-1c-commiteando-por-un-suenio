@@ -175,6 +175,7 @@ void leerConfiguracion(void) {
 
 		configuracion_UMV.algoritmo = config_get_int_value(config,
 					"Algoritmo de seleccion de ubicacion de segmento");
+		configuracion_UMV.algoritmo=firstfit;
 
 }
 
@@ -351,7 +352,7 @@ void *consola (void){
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				   algoritmo(&configuracion_UMV.algoritmo);
+				   algoritmo();
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "compactacion") == 0){

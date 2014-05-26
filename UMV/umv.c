@@ -9,7 +9,6 @@
 
 
 int* MP;
-int algor=firstfit;
 char* PATH=PATHCONFIG;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
