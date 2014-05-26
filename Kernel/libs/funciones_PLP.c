@@ -21,10 +21,11 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 
 
 void mostrarNodosPorPantalla(t_list* lista){
-int i;
-int p;
-	//system("clear");
-	if(lista==NULL){
+	int i;
+	int p;
+	system("clear");
+	if(lista->head==NULL){
+		printf("No hay nodos en la cola\n");
 		return;
 	}
 	printf("Estado de la cola:\n");
@@ -165,22 +166,15 @@ pthread_t plp_conexiones;
 
 void* core_plp(void){
 
+	mostrarNodosPorPantalla(cola.new);
 	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
-	t_programa* programa = list_remove(cola.new,0);
-	/*int flag_comienzo=0;
-	int flag_hio=0;*/
+	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso
 
+
+	t_programa* programa = list_remove(cola.new,0); //Saco el primer programa segun peso
 
 
 	while(1){
-
-		/*flag_comienzo=0;
-		flag_terminado=0;
-		flag_hio=0;
-		quantum=0;*/
-
-
-
 
 
 		while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
