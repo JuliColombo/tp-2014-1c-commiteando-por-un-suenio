@@ -27,7 +27,7 @@ int main (int argc, char **argv){
 	esperarHilos();
 
 	free(MP);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 

@@ -132,7 +132,7 @@ void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar 
 
 }
 
-void algoritmo(int* algor){//Cambiar entre Worst fit y First fit
+void algoritmo(t_algoritmo* algor){//Cambiar entre Worst fit y First fit
 	if(*algor==worstfit){
 							*algor=firstfit;
 							//printf("%d\n", *algor); para checkear el cambio del valor
@@ -184,8 +184,6 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
 	printf("Puerto para conexiones con Kernel: %d\n", configuracion_UMV.puerto_kernel);
 	printf("IP del Kernel: %d\n", configuracion_UMV.ip_kernel);
-//	printf("%d\n", configuracion.id_semaforos);
-//	printf("%d\n", configuracion.valor_semaforos);
 	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
 }
 
@@ -225,10 +223,22 @@ void core_conexion_cpu(void){
 				//No se recibieron datos
 			} else {
 				//Se recibieron datos
+				crear_hilo_por_cpu(paquete);
 			}
 			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 		}
 }
+
+void crear_hilo_por_cpu(t_nipc* paquete){
+	pthread_t atender_pedido;
+	pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, paquete);	//Crea un hilo para atender cada conexion de cpu
+	pthread_join(atender_pedido, NULL);	//Espera a que termine de ejecutarse la atencion del pedido
+}
+
+void atender_cpu(t_nipc* paquete){
+	//Aca habria que atender el pedido de una cpu
+}
+
 
 void core_conexion_kernel(void){
 	int sock_kernel;		//El socket de conexion
@@ -251,10 +261,17 @@ void core_conexion_kernel(void){
 				//No se recibieron datos
 			} else {
 				//Se recibieron datos
+				atender_kernel(paquete);
 			}
 			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 		}
 }
+
+void atender_kernel(t_nipc* paquete){
+	//Aca habria que atender el pedido del kernel
+}
+
+
 //***********************************************Inicializacion de semaforos************************************
 
 
@@ -280,7 +297,6 @@ void esperarHilos(void){
 //***********************************************Consola************************************
 
 void *core_consola(void) {
-
 	pthread_t inicio;
 	pthread_create(&inicio, NULL, (void*) &consola, NULL);
 	pthread_join(inicio,NULL);
@@ -302,7 +318,7 @@ void *consola (void){
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				gets(tipoOperacion);
-				while(estaEnDicTOP(tipoOperacion)== 0/*<- aca no iria un 1?*/){
+				while(estaEnDicTOP(tipoOperacion)== 0){
 						puts("\nTipo de Operacion erronea, escriba el tipo de operacion de nuevo");
 						gets(tipoOperacion);
 					}
@@ -335,7 +351,7 @@ void *consola (void){
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				   algoritmo(&algor);
+				   algoritmo(&configuracion_UMV.algoritmo);
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
