@@ -33,10 +33,11 @@ int sockfd;
 
 int stack_base;
 int c_stack;
-int program_counter;
+t_puntero_instruccion program_counter;
 int tamanio_contexto;
 char* etiquetas;
 t_size etiquetas_size;
+t_intructions* index_codigo;
 
 
 
@@ -48,10 +49,10 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,posicion);
-	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio
+	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
 
-	//pcb->program_counter +=1;
-	//pcb->tamanio_contexto += 1;
+	program_counter +=1;
+	tamanio_contexto += 1;
 
 	return posicion;
 }
@@ -82,7 +83,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 		pila->top_index = direccion_variable;
 	} else {
 	pila->top_index= top_index; }
-	//pcb->program_counter += 1;
+	program_counter += 1;
 }
 
 
@@ -100,7 +101,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 	//devuelve el valor asignado.
 
 
-	//pcb->program_counter += 1;
+	program_counter += 1;
 	return 0;
 }
 
@@ -108,15 +109,11 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 void irAlLabel(t_nombre_etiqueta etiqueta) {
 	//cambia la linea de ejecucion a la correspondiente de la etiqueta buscada.
 
-	//reservarContextoSinRetorno(); Tambien?
-
-	int posicionAPushear =  pila->top_index +1;
-	//pcb->cursor_stack = &posicionAPushear;  entonces esto no, por lo de arriba
-
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 
-	//Cambiar Program Counter
+	program_counter = instruccion;
+
 
 }
 
@@ -129,12 +126,16 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	reservarContextoSinRetorno();
 
 	int posicionAPushear =  pila->top_index +1;
-	//pcb->cursor_stack = &posicionAPushear;
+	c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
+	program_counter = instruccion;
+	t_intructions inst = index_codigo[instruccion];
 
-	//Ejecutar instruccion
+	//Pedir a UMV instruccion a ejecutar, enviando inst
+
+	//Ejecutar instruccion con analizador_linea
 
 }
 
@@ -150,12 +151,17 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno();
 	int posicionAPushear =  pila->top_index +1;
-	//pcb->cursor_stack = &posicionAPushear;
+	c_stack = &posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
+	program_counter = instruccion;
+	t_intructions inst = index_codigo[instruccion];
 
-	//Ejecutar instruccion
+	//Pedir a UMV instruccion a ejecutar, enviando inst
+
+	//Ejecutar instruccion con analizador_linea
+
 
 }
 
