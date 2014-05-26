@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <pthread.h>
 #include "commons/collections/list.h"
+#include "parser/metadata_program.h"
 
 typedef uint16_t t_puerto_programa;
 typedef uint16_t t_puerto_cpu;
@@ -59,11 +60,11 @@ typedef struct{
 } t_lista_programas;
 
 typedef struct{
-	t_list* ready;
 	t_list* new;
-	t_list* suspendidos;
-	t_list* exit;
+	t_list* ready;
+	t_list* exec;
 	t_list* block;
+	t_list* exit;
 } cola_procesos;
 
 typedef struct{
@@ -78,6 +79,11 @@ typedef struct{
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
+typedef struct { // se define un vector para los programas en new
+	int peso;
+	t_medatada_program metadata;
+	t_pcb* pcb;
+} t_programa;
 
 typedef struct{
 	pthread_t tid;

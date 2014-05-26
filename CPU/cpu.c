@@ -38,6 +38,8 @@ int main (int argc, char **argv){
 	printf("para la variable c, tenemos el valor %d\n",dereferenciar(obtenerPosicionVariable('c')));
 
 
+
+
 	return 0;
 }
 
