@@ -28,7 +28,7 @@ extern char* PATH;
 extern t_thread_io io;
 extern pthread_t pcp, plp;
 extern cola_procesos cola;
-extern sem_t sem_Programa;
+
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
@@ -40,6 +40,7 @@ void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct 
 void imprimirConfiguracion(void);
 int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que estan en el pcp actualmente
 void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
+void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 
 /************************* HILOS *************************/
 void* core_plp(void);

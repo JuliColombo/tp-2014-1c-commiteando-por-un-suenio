@@ -15,12 +15,12 @@ pthread_t pcp, plp;
 t_thread_io io;
 char* PATH;
 cola_procesos cola;
-sem_t Programa;
+
 
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
 	PATH = argv[1];
-	cola.new,cola.ready,cola.exec,cola.block,cola.exit=list_create();
+	inicializarColas();
 
 	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
 

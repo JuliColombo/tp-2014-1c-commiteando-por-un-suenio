@@ -14,7 +14,7 @@
 #include "libs/estructuras_kernel.h"
 #include "libs/funciones_PLP.h"
 #include "libs/socket.h"
-
+#include <semaphore.h>
 
 
 #endif /* KERNEL_H_ */

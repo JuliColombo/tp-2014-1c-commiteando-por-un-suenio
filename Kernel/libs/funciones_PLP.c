@@ -49,6 +49,14 @@ void completarGradoMultip(void){
 
 }
 
+void inicializarColas(void){
+	cola.new=list_create();
+	cola.ready=list_create();
+	cola.exec=list_create();
+	cola.block=list_create();
+	cola.exit=list_create();
+}
+
 /*int main_plp(){
 	t_list* cola_programas=list_create();
 	printf("La cola está vacia");
@@ -156,7 +164,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 pthread_t plp_conexiones;
 
 void* core_plp(void){
-	sem_init(&sem_Programa,0,0);
+
 	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
 	t_programa* programa = list_remove(cola.new,0);
 	/*int flag_comienzo=0;
@@ -165,7 +173,7 @@ void* core_plp(void){
 
 
 	while(1){
-		sem_wait(&sem_Programa);
+
 		/*flag_comienzo=0;
 		flag_terminado=0;
 		flag_hio=0;
@@ -182,13 +190,13 @@ void* core_plp(void){
 			completarGradoMultip();
 		}
 
-	}
+		}
 	}
 	//Logica del PLP
 
 	pthread_join(thread_plp_conexiones, NULL);
 
-	return;
+	return NULL;
 }
 
 
@@ -223,7 +231,6 @@ void* core_plp_conexiones(void){
 			//No se recibieron datos
 		} else {
 			//Se recibieron datos
-			sem_post(&sem_Programa);
 		}
 		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 	}
