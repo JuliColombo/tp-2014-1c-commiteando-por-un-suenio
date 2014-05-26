@@ -52,13 +52,13 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
-	int tamanio = configuracion_UMV.memSize;
+	tamanioMP = configuracion_UMV.memSize;
 	int* MP;
-	MP = malloc(tamanio);
+	MP = malloc(tamanioMP);
 	return MP;
 }
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){
+_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
 	if (MP[base+offset] == NULL) {
 	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
 		return true;
@@ -144,8 +144,28 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 }
 
+//****************************************Compactacion*****************************************
+
 void compactar(){
-	//Forzar compactacion (ver para checkpoint 3)
+	int sigSegmento;
+	int posicionDeDestino;
+	//Obtengo primer posicion libre en MP
+		int i=0;
+		while (i!=NULL) i++;
+		posicionDeDestino= i;
+	sigSegmento=i;
+
+	while (sigSegmento != tamanioMP){
+		if (sigSegmento == NULL){
+			sigSegmento++;
+		} else{
+			int tamanio= obtenerTamanioDelSegmento();
+			//actualizar tabla de segmentos de el proceso dueño del segmento
+			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
+			sigSegmento= sigSegmento+tamanio+1;
+			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
+		}
+	}
 }
 
 void dump(){
