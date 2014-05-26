@@ -204,30 +204,24 @@ void inicializarConfiguracion(char* PATH){
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
-void core_conexiones(void){
-	int sock_umv;		//El socket de conexion
-	int n_sock_umv;		//El socket de datos
+void core_conexion_cpu(void){
+	int sock_cpu;		//El socket de conexion
+	int n_sock_cpu;		//El socket de datos
 	t_nipc* paquete;	//El paquete que recibe el socket
 
-	if ((sock_umv = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
-		if (close(sock_umv)<0){
+	if ((sock_cpu = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
+		if (close(sock_cpu)<0){
 			//Error con el close
 		}
 		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
 
-	if ((sock_umv = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
-			if (close(sock_umv)<0){
-				//Error con el close
-			}
-			abort();
-		}//El socket esta creado y listo para escuchar a los clientes por el puerto_kernel
 
 	while(1){
-			printf("Esperando conexion...\n");
-			n_sock_umv = nipc_aceptarConexion(sock_umv);
+			printf("Esperando conexion de CPU...\n");
+			n_sock_cpu = nipc_aceptarConexion(sock_cpu);
 			memset(paquete, 0, sizeof(paquete));
-			if (nipc_recibir(n_sock_umv,paquete)<0){
+			if (nipc_recibir(n_sock_cpu,paquete)<0){
 				//No se recibieron datos
 			} else {
 				//Se recibieron datos
@@ -236,6 +230,31 @@ void core_conexiones(void){
 		}
 }
 
+void core_conexion_kernel(void){
+	int sock_kernel;		//El socket de conexion
+	int n_sock_kernel;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
+
+	if ((sock_kernel = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
+		if (close(sock_kernel)<0){
+			//Error con el close
+		}
+		abort();
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
+
+
+	while(1){
+			printf("Esperando conexion de Kernel...\n");
+			n_sock_kernel = nipc_aceptarConexion(sock_kernel);
+			memset(paquete, 0, sizeof(paquete));
+			if (nipc_recibir(n_sock_kernel,paquete)<0){
+				//No se recibieron datos
+			} else {
+				//Se recibieron datos
+			}
+			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+		}
+}
 //***********************************************Inicializacion de semaforos************************************
 
 
@@ -248,8 +267,8 @@ void inicializarSemaforos(void){
 
 void inicializarHilos(void){
 	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
-	pthread_create(&KERNEL, NULL, (void*) &core_conexiones, NULL);
-	pthread_create(&CPU, NULL, (void*) &core_conexiones, NULL);
+	pthread_create(&KERNEL, NULL, (void*) &core_conexion_kernel, NULL);
+	pthread_create(&CPU, NULL, (void*) &core_conexion_cpu, NULL);
 }
 
 void esperarHilos(void){
