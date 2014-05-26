@@ -77,11 +77,11 @@ void reservarContextoSinRetorno() {
 	PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
 
 	//Pushear Program Counter de proxima instruccion:
-	//int posicionPC;
-	//pcb->program_counter +=1;
-	//int pc = pcb->program_counter;
-	//posicionPC = calcularPosicionAsignacion(pila);
-	//PUSH_SIZE_CHECK(&pc,pila,posicionPC);
+	int posicionPC;
+	program_counter +=1;
+	int pc = program_counter;
+	posicionPC = calcularPosicionAsignacion(pila);
+	PUSH_SIZE_CHECK(&pc,pila,posicionPC);
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
