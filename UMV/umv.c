@@ -17,7 +17,7 @@ log_t* archLog;
 pthread_mutex_t* mutex;
 
 int main (int argc, char **argv){
-	inicializarConfiguracion(PATH);
+	inicializarConfiguracion();
 	//Acceder a archConfig y obtener datos
 	MP=crearMP();
 	//Crear estructuras administrativas

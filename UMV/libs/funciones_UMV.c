@@ -155,7 +155,7 @@ void dump(){
 
 //Funciones para lectura del archivo config y una funcion que imprime dichos campos para testear la lectura
 
-void leerConfiguracion(char* PATH) {
+void leerConfiguracion(void) {
 
 	t_config* config = config_create(PATH);
 
@@ -178,7 +178,7 @@ void leerConfiguracion(char* PATH) {
 
 }
 
-void imprimirConfiguracion(t_config_UMV configuracin_UMV) { // Funcion para testear que lee correctamente el archivo de configuracion
+void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("Tamanio de memoria Principal: %d\n", configuracion_UMV.memSize);
 	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
@@ -189,7 +189,7 @@ void imprimirConfiguracion(t_config_UMV configuracin_UMV) { // Funcion para test
 	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
 }
 
-void inicializarConfiguracion(char* PATH){
+void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
 	int control = lstat(PATH, &file_info);
@@ -197,8 +197,8 @@ void inicializarConfiguracion(char* PATH){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
 	else{
-	leerConfiguracion(PATH);
-	imprimirConfiguracion(configuracion_UMV); //Imprime las configuraciones actuales por pantalla
+	leerConfiguracion();
+	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
@@ -294,16 +294,16 @@ void *consola (void){
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	gets(comando);
 	while(estaEnDicOP(comando)== 0){
-		puts("Operacion erronea, escriba la operacion de nuevo");
+		puts("\nOperacion erronea, escriba la operacion de nuevo");
 		gets(comando);
 	}
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
 				char tipoOperacion[32];
-				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?\n");
+				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				gets(tipoOperacion);
 				while(estaEnDicTOP(tipoOperacion)== 0/*<- aca no iria un 1?*/){
-						puts("Tipo de Operacion erronea, escriba el tipo de operacion de nuevo");
+						puts("\nTipo de Operacion erronea, escriba el tipo de operacion de nuevo");
 						gets(tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
@@ -350,10 +350,10 @@ void *consola (void){
 			   }
 			}
 
-		puts("Escriba la siguiente operacion\n");
+		puts("\nEscriba la siguiente operacion");
 		gets(comando);
 		while(estaEnDicOP(comando)== 0){
-				puts("Operacion erronea, escriba la operacion de nuevo");
+				puts("\nOperacion erronea, escriba la operacion de nuevo");
 				gets(comando);
 			}
 		}

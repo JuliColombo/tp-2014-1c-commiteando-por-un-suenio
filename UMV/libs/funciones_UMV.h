@@ -36,6 +36,7 @@ extern int* MP;
 extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;
 extern pthread_mutex_t* mutex;
+extern char* PATH;
 
 /*Prototipos de fuciones*/
 
@@ -47,9 +48,9 @@ int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 void algoritmo(int* algor);
-void leerConfiguracion(char* PATH);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
-void imprimirConfiguracion(t_config_UMV configuracion);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
-void inicializarConfiguracion(char* PATH);
+void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
+void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
+void inicializarConfiguracion(void);
 
 /*Prototipos de semaforos*/
 void inicializarSemaforos(void);
