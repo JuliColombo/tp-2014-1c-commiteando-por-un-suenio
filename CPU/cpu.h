@@ -10,13 +10,13 @@
 
 #include <commons/collections/dictionary.h>
 #include "parser/metadata_program.h"
-#include "libs/stack.h"
 #include <stdio.h>
 #include "libs/primitivas.h"
 #include "libs/primitivasAux.h"
 #include "commons/config.h"
 #include "libs/log.h"
 #include "pthread.h"
+#include "libs/socket.h"
 #define PATHLOG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio"
 
 typedef struct{
@@ -36,4 +36,5 @@ void inicializarConfiguracion(void);
 void leerConfiguracion();
 void log_error_socket(void);
 void* core_conexion_plp_programas(void);
+void* core_conexion_kernel(void);
 #endif /* CPU_H_ */

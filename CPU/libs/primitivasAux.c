@@ -41,15 +41,6 @@ t_valor_variable nombreParametro(int i) {
 }
 
 
-t_puntero calcularPosicionAsignacion(t_stack* P) {
-	t_puntero posicion=0;
-	if(IS_EMPTY(P)) {
-		posicion = P->top_index +1;
-	} else {
-		posicion = P->top_index + 2;
-	}
-	return posicion;}
-
 t_puntero calcularPosicionAsignacionCPU(int top_index) {
 	t_puntero posicion=0;
 	if(top_index == -1) {

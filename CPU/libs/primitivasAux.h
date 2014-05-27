@@ -9,7 +9,6 @@
 #define PRIMITIVASAUX_H_
 
 #include <parser/metadata_program.h>
-#include "stack.h"
 #include <commons/collections/dictionary.h>
 
 typedef struct{
@@ -22,8 +21,6 @@ typedef struct{
 int comprendidoEntre(int m, int n, int i);
 
 t_valor_variable nombreParametro(int i);
-
-t_puntero calcularPosicionAsignacion(t_stack* P);
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 

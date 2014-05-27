@@ -7,22 +7,19 @@ C_SRCS += \
 ../libs/log.c \
 ../libs/primitivas.c \
 ../libs/primitivasAux.c \
-../libs/socket.c \
-../libs/stack.c 
+../libs/socket.c 
 
 OBJS += \
 ./libs/log.o \
 ./libs/primitivas.o \
 ./libs/primitivasAux.o \
-./libs/socket.o \
-./libs/stack.o 
+./libs/socket.o 
 
 C_DEPS += \
 ./libs/log.d \
 ./libs/primitivas.d \
 ./libs/primitivasAux.d \
-./libs/socket.d \
-./libs/stack.d 
+./libs/socket.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
