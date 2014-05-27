@@ -20,6 +20,8 @@ typedef uint16_t t_ip_kernel;
 typedef char** t_id_semaforos;
 typedef uint8_t* t_valor_semaforos;
 
+typedef char* t_buffer; //TODO ojo esto,no estoy seguro
+
 typedef struct { // se define un vector para los programas en new
 	int peso;
 	t_medatada_program metadata;

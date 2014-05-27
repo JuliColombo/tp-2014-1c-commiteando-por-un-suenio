@@ -85,25 +85,25 @@ _Bool solicitarMemoria(t_programa programa){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-void solicitarPosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
-	if (validarSolicitud(base,offset,longitud)){
-	asignarEnLaSegmentTable();
-	int posicionReal = asignarFisicamente(); /*va a retornar la direccion fisica*/
-	/*(tablasSegProgramas[programaEnUso][base]).ubicacionMP = posicionReal;    Falta resolver el armado de tablasSegProgramas*/
-	} else {
-		puts("No se pudo realizar la asignacion");
-    }
+void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
+
 
 }
 
 //Operacion Basica de UMV 2, se envia una cantidad de bytes (en el buffer?) a la posicion dada(base+offset)
-void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud/*,t_buffer buffer*/){
-
+void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
+	if (validarSolicitud(base,offset,longitud)){
+		asignarEnLaSegmentTable(base,offset,longitud);
+		int posicionReal = asignarFisicamente(buffer); /*va a retornar la direccion fisica - necesita solo buffer?*/
+		/*(tablasSegProgramas[programaEnUso][base]).ubicacionMP = posicionReal;    Falta resolver el armado de tablasSegProgramas*/
+		} else {
+			puts("No se pudo realizar la asignacion");
+	    }
 }
 
-//Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion
+//Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
 _Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
-	if(/*hayEspacioEnMemoria()*/1){
+	if(hayEspacioEnMemoriaPara(base,offset,longitud)){
 		return true;
 	} else{
 		puts("No alcanza el espacio en memoria:");
@@ -120,16 +120,6 @@ _Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
 }
 
 //Comandos de consola:
-void operacion(/*t_proceso proceso,*/ uint32_t base,uint32_t offset, uint32_t longitud){
-	//Solicitar una posicion de memoria o escribir un buffer por teclado en una posicion o crear segmentos de programa o destruirlos
-	/*if ( esValido(buffer) ){
-	 * void enviarBytes(base,offset,longitud,buffer)
-	 * }else{
-	 *  solicitarBytes(base,offset,longitud)
-	 *  } */
-	printf(" "/*posicionDeMemoria*/);
-	/*OPCIONAL: grabar en archivo*/
-}
 
 void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
 
@@ -361,18 +351,22 @@ void *consola (void){
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
+					  puts("\n Ingrese Base, Offset, Tamanio de segmento y Buffer a escribir");
+					  int unaBase,unOffset,unTamanio;
+					  t_buffer buffer;
+					  scanf("%d","%d","%d","%s",unaBase,unOffset,unTamanio,buffer);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					//escribirBuffer();
+					  enviarBytes(unaBase,unOffset,unTamanio,buffer);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					//crearSegmentoPrograma();
+					  //crearSegmentoPrograma(t_programa Programa);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					//destruirSegmentoPrograma(t_programa Programa);
+					  //destruirSegmentoPrograma(t_programa Programa);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 			}
