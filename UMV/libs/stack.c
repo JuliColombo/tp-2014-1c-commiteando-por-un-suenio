@@ -88,6 +88,4 @@ t_valor_variable POP_SIZE_CHECK(t_stack* pila) {
 	}
 }
 
-/*void IR_A_POSICION(t_stack* pila,int pos) {
-	pila->elementos[pos];
-}*/
+

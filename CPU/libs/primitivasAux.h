@@ -39,7 +39,7 @@ void elemento_delete(t_elemento* elemento);
 
 void regenerarDiccionario(int tamanio_contexto);
 
-void guardarAlternado (t_stack* pila);
+void guardarAlternado ();
 
 void volverAContextoAnterior();
 

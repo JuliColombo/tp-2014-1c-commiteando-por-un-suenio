@@ -25,13 +25,11 @@
 } t_pcb;*/
 
 
-t_stack* pila;
 t_dictionary *diccionario;
 int sockfd;
 int top_index;
 
 //t_pcb pcb:
-
 int stack_base;
 int c_stack;
 t_puntero_instruccion program_counter;
@@ -219,11 +217,15 @@ void retornar(t_valor_variable retorno){
 int imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
+	//Socket a Kernel enviandole el valor a mostrar
+
 	return 0;
 }
 
 int imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
+
+	//Socket a Kernel enviandole texto
 	return 0;
 }
 

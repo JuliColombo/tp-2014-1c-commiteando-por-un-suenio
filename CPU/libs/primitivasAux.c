@@ -8,7 +8,6 @@
 #include "primitivasAux.h"
 
 //Esto de aca es para probar. Despues se pasan por sockets y esas cosas.
-t_stack* pila;
 t_dictionary *diccionario;
 int sockfd;
 int top_index;
@@ -116,7 +115,7 @@ void reservarContextoConRetorno(){
  * estoy en la posicion de cursor contexto. Asi que disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor)
  * Pongo en el diccionario el id y su posicion. Lo hago tantas veces como el tamaño del contexto sea.
  */
-void guardarAlternado (t_stack* pila) {
+void guardarAlternado () {
 	top_index -=2;
 	//Socket a UMV para que haga: pila->top_index = top_index;
 
@@ -135,7 +134,7 @@ void regenerarDiccionario(int tamanio_contexto) {
 	int i = 0;
 	int top = top_index - 1;
 	while (i < tamanio_contexto) {
-		guardarAlternado(pila);
+		guardarAlternado();
 		i++;
 	}
 
