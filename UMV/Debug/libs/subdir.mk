@@ -6,17 +6,20 @@
 C_SRCS += \
 ../libs/funciones_UMV.c \
 ../libs/log.c \
-../libs/socket.c 
+../libs/socket.c \
+../libs/stack.c 
 
 OBJS += \
 ./libs/funciones_UMV.o \
 ./libs/log.o \
-./libs/socket.o 
+./libs/socket.o \
+./libs/stack.o 
 
 C_DEPS += \
 ./libs/funciones_UMV.d \
 ./libs/log.d \
-./libs/socket.d 
+./libs/socket.d \
+./libs/stack.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -5,7 +5,6 @@
  *      Author: utnso
  */
 
-
 #include "funciones_UMV.h"
 
 //#include "FuncionesPLP.h"
@@ -176,7 +175,7 @@ void compactar(){
 	int posicionDeDestino;
 	//Obtengo primer posicion libre en MP
 		int i=0;
-		while (i!=NULL) i++;
+		while (MP[i]!=NULL) i++;
 		posicionDeDestino= i;
 		sigSegmento=i;
 
@@ -201,6 +200,51 @@ int obtenerTamanioDelSegmento(){
 
 void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
+}
+
+void crearSegmentoPrograma(int id_prog, int tamanio){
+	int ubicacion;
+	//Escoge la ubicacion en base al algoritmo de config
+	if(configuracion_UMV.algoritmo == firstfit){
+		ubicacion = escogerUbicacionF(tamanio);
+	}
+	if(configuracion_UMV.algoritmo == worstfit){
+		ubicacion = escogerUbicacionW(tamanio);
+	}
+	//TODO: Crear el segmento en sí
+
+}
+
+int escogerUbicacionF(int tamanio){
+	int finDeSegmento;
+	int posicionDeDestino;
+		//Obtengo primer posicion libre en MP
+			int i=0;
+			while (MP[i]!=NULL) i++;
+			posicionDeDestino= i;
+			finDeSegmento=posicionDeDestino+tamanio;
+		//Checkeo si la ultima posicion del segmento esta libre, si no, busca de nuevo
+		if(MP[finDeSegmento] != NULL){
+			while(MP[finDeSegmento] !=NULL){
+				i=finDeSegmento;
+				while (MP[i]!=NULL)i++;
+				posicionDeDestino= i;
+				finDeSegmento=posicionDeDestino+tamanio;
+			}
+		}
+		//Devuelve la posicion de ubicacion del segmento
+			return posicionDeDestino;
+}
+
+int escogerUbicacionW(int tamanio){
+	int finDeSegmento;
+	int posicionDeDestino;
+	/*TODO: acá habría que recorrer la MP buscando la última posición en la
+que entraría el segmento del programa*/
+
+
+	//Devuelve la posicion
+		return posicionDeDestino;
 }
 
 
@@ -426,7 +470,7 @@ void *consola (void){
 			   }
 			   if (strcmp(comando,"dump") ==0){
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				 //generarReporte();
+				 //dump();
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
@@ -441,7 +485,4 @@ void *consola (void){
 
 	return EXIT_SUCCESS;
 }
-
-
-
 

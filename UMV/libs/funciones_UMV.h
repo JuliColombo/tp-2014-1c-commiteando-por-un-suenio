@@ -42,12 +42,13 @@ extern char* PATH;
 
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
-_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
-_Bool segmentationFault(uint32_t base,uint32_t offset);
+//_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
+//_Bool segmentationFault(uint32_t base,uint32_t offset);
+_Bool validarSolicitud(uint32_t longitud);
 
 
-_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud);
-
+int escogerUbicacionF(int tamanio);
+int escogerUbicacionW(int tamanio);
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
@@ -59,6 +60,7 @@ void compactar(void);
 void dump();
 void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
+void crearSegmentoPrograma(int id_prog, int tamanio);
 
 /*Funciones del archivo Config*/
 void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
