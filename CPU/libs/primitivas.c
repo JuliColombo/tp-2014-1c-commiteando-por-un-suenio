@@ -25,12 +25,11 @@
 } t_pcb;*/
 
 
-t_stack* pila;
 t_dictionary *diccionario;
 int sockfd;
+int top_index;
 
 //t_pcb pcb:
-
 int stack_base;
 int c_stack;
 t_puntero_instruccion program_counter;
@@ -44,8 +43,12 @@ t_intructions* index_codigo;
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 
-	t_puntero posicion = calcularPosicionAsignacion(pila);
-	PUSH_SIZE_CHECK(&id,pila,posicion);
+	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
+
+	//Socket enviando posicion e id para que la UMV pushee
+	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
+
+	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,posicion);
@@ -72,34 +75,42 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
-	return POP_DESREFERENCIAR(pila, direccion_variable);
+	//Socket enviando direccion_variable a UMV para que haga pop
+	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
+
+	//Socket recibiendo t_valor_variable id
+	//return id;
+	return 0; //no va
 }
 
 
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
-	int top_index = pila->top_index;
-	PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
+	//top_index que se actualiza cada vez que UMV pushea o popea
+
+	//Socket enviando direccion_variable y valor a UMV
+	//En UMV PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
+
 	if(top_index < direccion_variable) {
-		pila->top_index = direccion_variable;
-	} else {
-	pila->top_index= top_index; }
+		top_index = direccion_variable;
+	}
+
+	//Le digo a UMV que actualice su top_index del stack
+	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
 	program_counter += 1;
 }
 
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
-	//OBTENER VALOR de una variable COMPARTIDA
-	//pide al kernel el valor (copia, no puntero) de la variable compartida por parametro.
+
+	//Socket recibiendo la copia (no puntero) del valor de la "variable"
 
 	return 0;
 }
 
 
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
-	//ASIGNAR VALOR a variable COMPARTIDA
-	//pide al kernel asignar el valor a la variable compartida.
-	//devuelve el valor asignado.
 
+	//Socket enviando Kernel para que asigne el "valor" a "variable"
 
 	program_counter += 1;
 	return 0;
@@ -107,25 +118,33 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-	//cambia la linea de ejecucion a la correspondiente de la etiqueta buscada.
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 
 	program_counter = instruccion;
+
+	//Busco en indice de codigo qué le pido a UMV -----> creo que esto es asi
+
+	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
+
+	//Socket recibiendo la instruccion a ejecutar de UMV
+	//Meto eso en analizador_de_linea... para invocar al parser
 
 
 }
 
 
 void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
-	//Preserva el contexto de ejecución actual para poder retornar luego al mismo.
-	//Modifica las estructuras correspondientes para mostrar un nuevo contexto vacío.
-	//Los parámetros serán definidos luego de esta instrucción de la misma manera que una variable local, con identificadores numéricos empezando por el 0.
+	//definir variables si hay parametros
+	//Asignar a parametros
+	//HACER ALGO CON TAMAÑO DE CONTEXTO
 
 	reservarContextoSinRetorno();
 
-	int posicionAPushear =  pila->top_index +1;
+	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
+
+	int posicionAPushear =  top_index +1;
 	c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
@@ -133,24 +152,25 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	program_counter = instruccion;
 	t_intructions inst = index_codigo[instruccion];
 
-	//Pedir a UMV instruccion a ejecutar, enviando instr
+	//Busco en indice de codigo qué le pido a UMV
 
-	//Ejecutar instruccion con analizador_linea
+	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 
+	//Socket recibiendo la instruccion a ejecutar de UMV
+	//Meto eso en analizador_de_linea... para invocar al parser
 }
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-	//Preserva el contexto de ejecución actual para poder retornar luego al mismo, junto con la posicion de la variable entregada por donde_retornar.
-	//Modifica las eestructuras correspondientes para mostrar un nuevo contexto vacío.
-	//Los parámetros serán definidos luego de esta instrucción de la misma manera que una variable local, con identificadores numéricos empezando por el 0.
 
 	//definir variables si hay parametros
 	//Asignar a parametros
-	//Hacer algo con el tamaño de contexto
+	//HACER ALGO CON TAMAÑO DE CONTEXTO
 
 	reservarContextoConRetorno();
-	int posicionAPushear =  pila->top_index +1;
+	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
+
+	int posicionAPushear = top_index +1;
 	c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
@@ -158,49 +178,54 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	program_counter = instruccion;
 	t_intructions inst = index_codigo[instruccion];
 
-	//Pedir a UMV instruccion a ejecutar, enviando inst
+	//Busco en indice de codigo qué le pido a UMV
 
-	//Ejecutar instruccion con analizador_linea
+	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
+
+	//Socket recibiendo la instruccion a ejecutar de UMV
+	//Meto eso en analizador_de_linea... para invocar al parser
 
 
 }
 
 void finalizar() {
-	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual y el Program Counter previamente apilados en el Stack.
-	//En caso de estar finalizando el Contexto principal (el ubicado al inicio del Stack), deberá finalizar la ejecución del programa.
 
-	if(c_stack == stack_base) {
+	if(c_stack /= stack_base) {
 
 	volverAContextoAnterior();
-	regenerarDiccionario(pila,tamanio_contexto);
+	regenerarDiccionario(tamanio_contexto);
 	} else {
 
 		volverAContextoAnterior();
-		regenerarDiccionario(pila,tamanio_contexto);
+		regenerarDiccionario(tamanio_contexto);
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 	}
 }
 
 void retornar(t_valor_variable retorno){
-	//Cambia el Contexto de Ejecución Actual para volver al Contexto anterior al que se está ejecutando, recuperando el Cursor de Contexto Actual, el Program Counter y la direccion donde retornar, asignando el valor de retorno en esta, previamente apilados en el Stack.
+	//Socket de UMV para yo darle un valor a posicionVariable ---> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
+	//Socket de UMV para actualizar mi top_index
 
-
-	t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	t_valor_variable* ret = &retorno;
-	PUSH_SIZE_CHECK(ret,pila,posicionVariable);
+	//Socket a UMV para que haga: PUSH_SIZE_CHECK(ret,pila,posicionVariable);
+	//Socket de UMV para actualizar mi top_index
 	volverAContextoAnterior();
-	regenerarDiccionario(pila,tamanio_contexto);
+	regenerarDiccionario(tamanio_contexto);
 
 }
 
 int imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
+	//Socket a Kernel enviandole el valor a mostrar
+
 	return 0;
 }
 
 int imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
+
+	//Socket a Kernel enviandole texto
 	return 0;
 }
 

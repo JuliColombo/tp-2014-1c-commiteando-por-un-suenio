@@ -16,8 +16,7 @@
    pila->max_size = tamanoMax;
    pila->top_index = -1;
    pila->elementos = (t_valor_variable *) malloc(tamanoMax-sizeof(t_stack));
-  // pila->stack_base = pila->elementos;
-  // pila->cursor_stack = pila->elementos;
+
    return pila;
   }
 
@@ -89,6 +88,4 @@ t_valor_variable POP_SIZE_CHECK(t_stack* pila) {
 	}
 }
 
-/*void IR_A_POSICION(t_stack* pila,int pos) {
-	pila->elementos[pos];
-}*/
+
