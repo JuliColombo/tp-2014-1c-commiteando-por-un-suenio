@@ -67,8 +67,6 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto
 	}
 }
 
-
-
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 	if (base+offset+longitud > tamanioMP) {
 		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
@@ -79,9 +77,9 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 }
 
 //Funcion que recibe el programa del PLP y le reserva memoria (si puede)
-_Bool solicitarMemoria(t_programa programa){
+/*_Bool solicitarMemoria(t_programa programa){
 	return true;
-}
+}         esto quedo colgado no????*/
 
 // ***********************************Solicitar bytes en memoria*******************
 
@@ -146,7 +144,7 @@ void compactar(){
 		int i=0;
 		while (i!=NULL) i++;
 		posicionDeDestino= i;
-	sigSegmento=i;
+		sigSegmento=i;
 
 	while (sigSegmento != tamanioMP){
 		if (sigSegmento == NULL){
@@ -335,6 +333,12 @@ void *consola (void){
 	}
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
+				puts("Ingrese el numero de programa a usar");
+				int nuevoPrograma;
+				gets(nuevoPrograma);
+				if(nuevoPrograma != programaEnUso){
+					cambioDeProcesoActivo(nuevoPrograma);
+				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				gets(tipoOperacion);
@@ -347,7 +351,7 @@ void *consola (void){
 					  int unaBase,unOffset,unTamanio;
 					  scanf("%d","%d","%d",unaBase,unOffset,unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  solicitarPosicionDeMemoria(unaBase,unOffset,unTamanio);
+					  solicitarDesdePosicionDeMemoria(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
