@@ -25,6 +25,8 @@ t_valor_variable nombreParametro(int i);
 
 t_puntero calcularPosicionAsignacion(t_stack* P);
 
+t_puntero calcularPosicionAsignacionCPU(int top_index);
+
 void reservarContextoSinRetorno();
 
 void reservarContextoConRetorno();
@@ -35,7 +37,7 @@ t_elemento* elemento_create(const char* name, t_puntero pos);
 
 void elemento_delete(t_elemento* elemento);
 
-void regenerarDiccionario(t_stack* pila, int tamanio_contexto);
+void regenerarDiccionario(int tamanio_contexto);
 
 void guardarAlternado (t_stack* pila);
 
