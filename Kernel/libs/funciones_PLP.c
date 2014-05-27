@@ -1,8 +1,7 @@
 #include "funciones_PLP.h"
 
 
-
-void calcularPeso (t_programa programa){ //Calcula peso del programa
+void calcularPeso(t_programa programa){ //Calcula peso del programa
 	programa.peso=(5*programa.metadata.cantidad_de_etiquetas + 3* programa.metadata.cantidad_de_funciones + programa.metadata.instrucciones_size);
 }
 
@@ -17,8 +16,6 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 
 	list_add_in_index(lista, position, &programa);
 }
-
-
 
 void mostrarNodosPorPantalla(t_list* lista){
 	int i;
@@ -57,47 +54,6 @@ void inicializarColas(void){
 	cola.block=list_create();
 	cola.exit=list_create();
 }
-
-/*int main_plp(){
-	t_list* cola_programas=list_create();
-	printf("La cola está vacia");
-
-	//Cuando entra un programa nuevo
-		t_programa programa;
-		calcularPeso(programa);
-		//programa.metadata=*(metadatada_desde_literal(literal));
-		if(solicitarMemoria(programa)){
-			agregarAListaSegunPeso(programa,cola_programas);
-			}
-			else{
-				printf("No hay memoria suficiente para agregar el programa");
-			}
-		mostrarNodosPorPantalla(cola_programas);
-
-
-	return 0;
-}*/
-
-/*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
- * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
- * primera instruc, indice etiquetas, indice de codigo etc"
- *
-
-int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
-	PCB nuevoPcb;
-	nuevoPcb->ID = getpid();
-	nuevoPcb->indiceEtiquetas = dictionary_create();
-	nuevoPcb->indiceCodigo = indiceCod;
-	nuevoPcb->TamanioContext = tamanioContext;
-	nuevoPcb->ProgramCounter = PCB;
-	//No se que hacer con CODE, STACK y CursorSTACK
-	//Creo que aca podria venir el solicitarMemoria. No use el tamanioIndEti ni tamanioIndCod que son cosas que
-	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
-
-	return 0;
-	}
-*/
-
 
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
@@ -162,76 +118,173 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 }
 
 
-pthread_t plp_conexiones;
+/*int main_plp(){
+	t_list* cola_programas=list_create();
+	printf("La cola está vacia");
+
+	//Cuando entra un programa nuevo
+		t_programa programa;
+		calcularPeso(programa);
+		//programa.metadata=*(metadatada_desde_literal(literal));
+		if(solicitarMemoria(programa)){
+			agregarAListaSegunPeso(programa,cola_programas);
+			}
+			else{
+				printf("No hay memoria suficiente para agregar el programa");
+			}
+		mostrarNodosPorPantalla(cola_programas);
+
+
+	return 0;
+}*/
+
+/*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
+ * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
+ * primera instruc, indice etiquetas, indice de codigo etc"
+ *
+
+int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
+	PCB nuevoPcb;
+	nuevoPcb->ID = getpid();
+	nuevoPcb->indiceEtiquetas = dictionary_create();
+	nuevoPcb->indiceCodigo = indiceCod;
+	nuevoPcb->TamanioContext = tamanioContext;
+	nuevoPcb->ProgramCounter = PCB;
+	//No se que hacer con CODE, STACK y CursorSTACK
+	//Creo que aca podria venir el solicitarMemoria. No use el tamanioIndEti ni tamanioIndCod que son cosas que
+	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
+
+	return 0;
+	}
+*/
+
+
+
+pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void* core_plp(void){
 
 	mostrarNodosPorPantalla(cola.new);
-	int thread_plp_conexiones = pthread_create (&plp_conexiones, NULL, core_plp_conexiones(), NULL);
-	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso
+	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
+	int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
+	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
+	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 
 
-	t_programa* programa = list_remove(cola.new,0); //Saco el primer programa segun peso
-
+	t_programa* programa = list_remove(cola.new,0); //Saco el primer programa segun peso --Esto no va adentro del while?
 
 	while(1){
 
-
 		while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
-
-
-		if(programa->flag_terminado==1){
-			completarGradoMultip();
-		}
+			if(programa->flag_terminado==1){
+				completarGradoMultip();
+			}
 
 		}
 	}
 	//Logica del PLP
 
-	pthread_join(thread_plp_conexiones, NULL);
+	pthread_join(thread_conexion_plp_programas, NULL);
+	pthread_join(thread_conexion_plp_umv, NULL);
+	pthread_join(thread_conexion_plp_cpu, NULL);
 
 	return NULL;
 }
 
 
+void* core_conexion_plp_programas(void){
+	int sock;		//El socket de conexion
+	int n_sock;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
+
+	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
+		//Error abriendo el socket
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
+
+	while(1){
+		printf("Esperando conexion de programas...\n");
+		n_sock_plp = nipc_aceptarConexion(sock);
+		memset(paquete, 0, sizeof(paquete));
+		if (nipc_recibir(n_sock,paquete)<0){
+			//No se recibieron datos
+		} else {
+			//Se recibieron datos
+			//Acá va la lógica de qué hacer cuando llega un programa nuevo
+		}
+		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+	}
+	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+	if (close(sock)<0){
+		//Error con el close
+	}
+
+	return 0;
+}
+
+void* core_conexion_plp_umv(void){
+	int sock;		//El socket de conexion
+	int n_sock;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
+
+	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_umv))<0){
+		//Error abriendo el socket
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_umv
+
+	printf("Esperando conexion a la UMV...\n"); //Está afuera del while porque la UMV es una sola, o sea que la conexion es una sola vez y se intercambian muchos mensajes después
+	n_sock = nipc_aceptarConexion(sock);
+
+	while(1){
+		memset(paquete, 0, sizeof(paquete));
+		
+		//Acá va la lógica de los mensajes con la UMV.
+		//Supongo que podes hacer que los programas liberen un semaforo y que aca se tome y empiecen los mensajes con la UMV para ese programa que entró y cuando termina lo libera de nuevo para que entre otro programa a mensajearse con la UMV
+		
+		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+	}
+	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+	if (close(sock)<0){
+		//Error con el close
+	}
+	
+	return 0;
+}
+
+void* core_conexion_plp_cpu(void){
+	int sock;		//El socket de conexion
+	int n_sock;		//El socket de datos
+	t_nipc* paquete;	//El paquete que recibe el socket
+
+	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_cpu))<0){
+		//Error abriendo el socket
+	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpu
+
+	while(1){
+		printf("Esperando conexion de CPU...\n");
+		n_sock = nipc_aceptarConexion(sock);
+		memset(paquete, 0, sizeof(paquete));
+		if (nipc_recibir(n_sock,paquete)<0){
+			//No se recibieron datos
+		} else {
+			//Se recibieron datos
+			//Acá va la lógica de qué hacer cuando llega un CPU nuevo
+		}
+		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+	}
+	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+	if (close(sock)<0){
+		//Error con el close
+	}
+	
+	return 0;
+}
+
 void* core_pcp(void){
+
 	return 0;
 }
 
 
 void* core_io(int retardo){
-
-	return 0;
-}
-
-
-void* core_plp_conexiones(void){
-	int sock_plp;		//El socket de conexion
-	int n_sock_plp;		//El socket de datos
-	t_nipc* paquete;	//El paquete que recibe el socket
-
-	if ((sock_plp = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
-		if (close(sock_plp)<0){
-			//Error con el close
-		}
-		abort();
-	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
-
-	while(1){
-		printf("Esperando conexion...\n");
-		n_sock_plp = nipc_aceptarConexion(sock_plp);
-		memset(paquete, 0, sizeof(paquete)); // Hay que inicializar paquete en algún lado! //Aca lo estamos inicializando, el memset le pone todos 0s a la variable)
-		if (nipc_recibir(n_sock_plp,paquete)<0){
-			//No se recibieron datos
-		} else {
-			//Se recibieron datos
-		}
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
-	}
-	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
-	if (close(sock_plp)<0){
-		//Error con el close
-	}
 
 	return 0;
 }
