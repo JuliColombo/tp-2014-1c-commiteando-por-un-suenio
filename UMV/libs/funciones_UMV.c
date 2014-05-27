@@ -58,6 +58,10 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 	return MP;
 }
 
+void log_error_socket(void){
+	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
+}
+
 /*_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
 	if ( > tamanioMP) {
 	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
@@ -257,7 +261,7 @@ void core_conexion_cpu(void){
 
 	if ((sock_cpu = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
 		if (close(sock_cpu)<0){
-			//Error con el close
+			log_error_socket();	//Error con el close
 		}
 		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
@@ -295,7 +299,7 @@ void core_conexion_kernel(void){
 
 	if ((sock_kernel = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
 		if (close(sock_kernel)<0){
-			//Error con el close
+			log_error_socket();	//Error con el close
 		}
 		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus

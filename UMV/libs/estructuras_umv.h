@@ -47,9 +47,15 @@ typedef struct segmentDescriptor{
 	int ubicacionMP;
 } segmentDescriptor;
 
-typedef struct segmentDescriptor** tablasSegProgramas; //TODO Aca habria que crear un array multidimensional de
+typedef struct tablaSeg{
+	int id_prog;
+	segmentDescriptor* segmentos;
+} tablaSeg;
+
+typedef struct tablaSeg* tablasSegProgramas; //TODO Aca habria que crear un array multidimensional de
 //[numeroDePrograma] [segmentDescriptorID] que contenga su segmentDescriptor. Por lo que me acuerdo no se puede
 //hacer toodo dinamico, aparentemente en algun momento va a haber que instanciarlo con una cantidad de segmentos
+
 
 
 #endif /* ESTRUCTURAS_UMV_H_ */

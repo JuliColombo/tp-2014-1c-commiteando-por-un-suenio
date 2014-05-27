@@ -15,7 +15,7 @@
 
 int* vector_num(char**, char**);
 int cant_identificadores(char**);
-int log_error_socket(void);
+void log_error_socket(void);
 
 
 #endif /* FUNCIONES_AUX_H_ */

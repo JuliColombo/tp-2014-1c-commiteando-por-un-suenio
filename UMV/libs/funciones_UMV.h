@@ -37,16 +37,30 @@ extern log_t* archLog;
 extern pthread_mutex_t* mutex;
 extern char* PATH;
 
-/*Prototipos de fuciones*/
+/*Prototipos de funciones auxiliares*/
 
+
+void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
 _Bool segmentationFault(uint32_t base,uint32_t offset);
 
+
+_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud);
+
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
+
+/*Operaciones de Consola*/
 void algoritmo(void);
+void retardo(int valorRetardoEnMilisegundos);
+void compactar(void);
+void dump();
+void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
+void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
+
+/*Funciones del archivo Config*/
 void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
 void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los campos de la macro del archivo de configuracion
 void inicializarConfiguracion(void);
