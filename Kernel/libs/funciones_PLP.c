@@ -198,7 +198,7 @@ void* core_conexion_plp_programas(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
-		//Error abriendo el socket
+		log_error_socket();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
 
 	while(1){
@@ -227,7 +227,7 @@ void* core_conexion_plp_umv(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_umv))<0){
-		//Error abriendo el socket
+		log_error_socket();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_umv
 
 	printf("Esperando conexion a la UMV...\n"); //Está afuera del while porque la UMV es una sola, o sea que la conexion es una sola vez y se intercambian muchos mensajes después
@@ -255,7 +255,7 @@ void* core_conexion_plp_cpu(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_cpu))<0){
-		//Error abriendo el socket
+		log_error_socket();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpu
 
 	while(1){

@@ -11,8 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "log.h"
 
 int* vector_num(char**, char**);
 int cant_identificadores(char**);
+int log_error_socket(void);
+
 
 #endif /* FUNCIONES_AUX_H_ */

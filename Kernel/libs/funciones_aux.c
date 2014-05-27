@@ -25,3 +25,8 @@ int cant_identificadores(char** config_ids){
 	}
 return a;
 }
+
+int log_error_socket(void){
+	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
+}
+
