@@ -17,7 +17,6 @@ typedef uint16_t t_puerto_kernel;
 typedef uint32_t t_memoria_principal;
 typedef int t_algoritmo;
 typedef uint16_t t_ip_kernel;
-
 typedef char** t_id_semaforos;
 typedef uint8_t* t_valor_semaforos;
 
@@ -39,6 +38,16 @@ enum tipoAlgoritmo{
 					firstfit,worstfit
 };
 
+typedef struct segmentDescriptor{
+	int id;
+	int inicio;
+	int tamanio;
+	int ubicacionMP;
+} segmentDescriptor;
+
+typedef struct segmentDescriptor** tablasSegProgramas; //TODO Aca habria que crear un array multidimensional de
+//[numeroDePrograma] [segmentDescriptorID] que contenga su segmentDescriptor. Por lo que me acuerdo no se puede
+//hacer toodo dinamico, aparentemente en algun momento va a haber que instanciarlo con una cantidad de segmentos
 
 
 #endif /* ESTRUCTURAS_UMV_H_ */

@@ -7,9 +7,9 @@
 
 #include "libs/funciones_UMV.h"
 
-
 int* MP;
 int tamanioMP;
+int programaEnUso;
 char* PATH=PATHCONFIG;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;

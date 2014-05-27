@@ -83,13 +83,16 @@ _Bool solicitarMemoria(t_programa programa){
 	return true;
 }
 
-//Operacion Basica de UMV 1, se toma una cantidad de bytes (longitud) desde la posicion de memoria dada(base+offset)?
-void solicitarBytes(uint32_t base,uint32_t offset, uint32_t longitud){
-//	if (validarSolicitud(base,offset,longitud)){
-//		SOLICITAR LOS BYTES
-//	} else {
-//		puts("No se pudo realizar la asignacion");
-//    }
+// ***********************************Solicitar bytes en memoria*******************
+
+void solicitarPosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
+	if (validarSolicitud(base,offset,longitud)){
+	asignarEnLaSegmentTable();
+	int posicionReal = asignarFisicamente(); /*va a retornar la direccion fisica*/
+	/*(tablasSegProgramas[programaEnUso][base]).ubicacionMP = posicionReal;    Falta resolver el armado de tablasSegProgramas*/
+	} else {
+		puts("No se pudo realizar la asignacion");
+    }
 
 }
 
@@ -107,8 +110,8 @@ _Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
 		if(segmentationFault(base,offset)){
 			return false;
 		} else { if(memoryOverload(base,offset,longitud)){
-												return false;
-					} else {
+							return false;
+				} else {
 							//puts("Excepcion Desconocida"); ???
 							return false;
 					}
@@ -350,8 +353,11 @@ void *consola (void){
 						gets(tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
+					  puts("\n Ingrese Base, Offset y Tamanio de segmento");
+					  int unaBase,unOffset,unTamanio;
+					  scanf("%d","%d","%d",unaBase,unOffset,unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					//solicitarPosicionDeMemoria();
+					  solicitarPosicionDeMemoria(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
