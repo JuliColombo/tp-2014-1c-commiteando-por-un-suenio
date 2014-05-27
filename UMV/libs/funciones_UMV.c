@@ -58,8 +58,8 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 	return MP;
 }
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
-	if (base+offset > tamanioMP) {
+/*_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
+	if ( > tamanioMP) {
 	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
 		return true;
 	} else{
@@ -68,13 +68,13 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto
 }
 
 _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
-	if (base+offset+longitud > tamanioMP) {
+	if (> tamanioMP) {
 		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
 			return true;
 		} else{
 			return false;
 		}
-}
+}*/
 
 //Funcion que recibe el programa del PLP y le reserva memoria (si puede)
 /*_Bool solicitarMemoria(t_programa programa){
@@ -90,24 +90,25 @@ void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t lon
 
 //Operacion Basica de UMV 2, se envia una cantidad de bytes (en el buffer?) a la posicion dada(base+offset)
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
-	if (validarSolicitud(base,offset,longitud)){
+	if (validarSolicitud(longitud)){
 		asignarEnLaSegmentTable(base,offset,longitud);
-		int posicionReal = asignarFisicamente(buffer); /*va a retornar la direccion fisica - necesita solo buffer?*/
+		int posicionReal = asignarFisicamente(buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
 		/*(tablasSegProgramas[programaEnUso][base]).ubicacionMP = posicionReal;    Falta resolver el armado de tablasSegProgramas*/
 		} else {
 			puts("No se pudo realizar la asignacion");
 	    }
 }
 
+/*************************    Logica de validacion de solicitudes ***************************/
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
-_Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
-	if(hayEspacioEnMemoriaPara(base,offset,longitud)){
+_Bool validarSolicitud(uint32_t longitud){
+	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
 		puts("No alcanza el espacio en memoria:");
-		if(segmentationFault(base,offset)){
+		if(segmentationFault(longitud)){
 			return false;
-		} else { if(memoryOverload(base,offset,longitud)){
+		} else { if(memoryOverload(longitud)){
 							return false;
 				} else {
 							//puts("Excepcion Desconocida"); ???
@@ -116,6 +117,35 @@ _Bool validarSolicitud(uint32_t base,uint32_t offset, uint32_t longitud){
 				}
 			}
 }
+
+_Bool hayEspacioEnMemoriaPara(uint32_t longitud){
+	if( tamanioSuficienteEnMemoriaPara(longitud) ){
+		return true;
+	}else{
+		compactar();
+		if( tamanioSuficienteEnMemoriaPara(longitud) ) return true;
+		else return false;
+	}
+}
+
+_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
+	int aux=0;
+	int contador=0;
+	while (aux < tamanioMP){
+			if (MP[aux] != NULL){
+				aux++;
+			} else{
+				while (aux == NULL && contador < longitud){
+					contador++;
+					aux++;
+				}
+				if (contador == longitud)return true;
+				else contador=0;
+			}
+	}
+	return false;
+}
+
 
 //Comandos de consola:
 
@@ -333,7 +363,7 @@ void *consola (void){
 	}
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
-				puts("Ingrese el numero de programa a usar");
+				puts("Ingrese el processID de programa a usar");
 				int nuevoPrograma;
 				gets(nuevoPrograma);
 				if(nuevoPrograma != programaEnUso){
@@ -365,7 +395,7 @@ void *consola (void){
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  //crearSegmentoPrograma(t_programa Programa);
+					  //crearSegmentoPrograma(t_programa Programa);  acordarse que la ubicacion virtual es aleatoria
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
