@@ -15,7 +15,9 @@
 #include "libs/primitivas.h"
 #include "libs/primitivasAux.h"
 #include "commons/config.h"
-
+#include "libs/log.h"
+#include "pthread.h"
+#define PATHLOG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio"
 
 typedef struct{
 	int ip_kernel;
@@ -30,5 +32,8 @@ extern char* PATH;
 
 
 /*************  PROTOTIPO FUNCIONES  *************/
+void inicializarConfiguracion(void);
 void leerConfiguracion();
+void log_error_socket(void);
+void* core_conexion_plp_programas(void);
 #endif /* CPU_H_ */

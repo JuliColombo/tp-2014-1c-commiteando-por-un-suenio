@@ -203,7 +203,7 @@ void* core_conexion_plp_programas(void){
 
 	while(1){
 		printf("Esperando conexion de programas...\n");
-		n_sock_plp = nipc_aceptarConexion(sock);
+		n_sock = nipc_aceptarConexion(sock);
 		memset(paquete, 0, sizeof(paquete));
 		if (nipc_recibir(n_sock,paquete)<0){
 			//No se recibieron datos
