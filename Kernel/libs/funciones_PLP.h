@@ -26,7 +26,7 @@ extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
 extern char* PATH;
 extern t_thread_io io;
-extern pthread_t pcp, plp;
+extern pthread_t pcp, plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 extern cola_procesos cola;
 
 
@@ -42,11 +42,13 @@ int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que e
 void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 
-/************************* HILOS *************************/
+/************************* FUNCIONES HILOS *************************/
 void* core_plp(void);
-void* core_plp_conexiones(void);
 void* core_pcp(void);
 void* core_io(int);
+void* core_conexion_plp_programas(void);
+void* core_conexion_plp_umv(void);
+void* core_conexion_plp_cpu(void);
 
 
 #endif /* FUNCIONESPLP_H_ */
