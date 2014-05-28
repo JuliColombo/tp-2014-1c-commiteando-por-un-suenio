@@ -74,15 +74,24 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
-
-
+t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
+	t_buffer* buffer;
+	uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+	buffer = obtenerBytesDesdeHasta(posicionReal,longitud);
+	return buffer;
 }
+t_buffer* obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
+	uint32_t* buffer;
+
+	return buffer;
+}
+
+//Cambie los int por uint32_t , esta ok?
 
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
-		int posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
-		int nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
+		uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
 		tablaDeSegmentos[programaEnUso][base].ubicacionMP = posicionReal;
 		puts("resultadodelaasignacion");
 		} else {
@@ -91,7 +100,7 @@ void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffe
 }
 
 int asignarFisicamente(){
-	//Podria tambien ser una funcion modificarFisicamente(posicionReal,buffer,ASIGNAR-QUITAR) que valide que hacer segun el tercer parametro, habra que ver si conviene
+
 	return 0; //ojo que va a retornar la dir fisica
 }
 
