@@ -179,6 +179,8 @@ void compactar(){
 		}
 	}
 }
+
+
 int obtenerTamanioDelSegmento(){
 	int tamanio;
 	//Habia pensado buscar hasta que sea NULL, pero si hay un segmento al lado de otro lo va a mover tambien,

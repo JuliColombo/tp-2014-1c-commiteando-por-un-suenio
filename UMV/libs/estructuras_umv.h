@@ -41,21 +41,14 @@ enum tipoAlgoritmo{
 };
 
 typedef struct segmentDescriptor{
-	int id;
 	int inicio;
 	int tamanio;
 	int ubicacionMP;
 } segmentDescriptor;
 
-typedef struct tablaSeg{
-	int id_prog;
-	segmentDescriptor* segmentos;
-} tablaSeg;
+typedef segmentDescriptor* tablaSeg;
 
-typedef struct tablaSeg* tablasSegProgramas; //TODO Aca habria que crear un array multidimensional de
-//[numeroDePrograma] [segmentDescriptorID] que contenga su segmentDescriptor. Por lo que me acuerdo no se puede
-//hacer toodo dinamico, aparentemente en algun momento va a haber que instanciarlo con una cantidad de segmentos
-
+typedef tablaSeg* tablasSegProgramas;
 
 
 #endif /* ESTRUCTURAS_UMV_H_ */
