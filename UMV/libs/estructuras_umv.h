@@ -41,7 +41,7 @@ enum tipoAlgoritmo{
 };
 
 typedef struct segmentDescriptor{
-	int inicio;
+	int offset;
 	int tamanio;
 	int ubicacionMP;
 } segmentDescriptor;

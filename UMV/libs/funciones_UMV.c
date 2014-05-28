@@ -79,15 +79,20 @@ void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t lon
 
 }
 
-//Operacion Basica de UMV 2, se envia una cantidad de bytes (en el buffer?) a la posicion dada(base+offset)
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
-		asignarEnLaSegmentTable(base,offset,longitud);
-		int posicionReal = asignarFisicamente(buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
-		/*(tablasSegProgramas[programaEnUso][base]).ubicacionMP = posicionReal;    Falta resolver el armado de tablasSegProgramas*/
+		int posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+		int nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
+		tablaDeSegmentos[programaEnUso][base].ubicacionMP = posicionReal;
+		puts("resultadodelaasignacion");
 		} else {
 			puts("No se pudo realizar la asignacion");
 	    }
+}
+
+int asignarFisicamente(){
+	//Podria tambien ser una funcion modificarFisicamente(posicionReal,buffer,ASIGNAR-QUITAR) que valide que hacer segun el tercer parametro, habra que ver si conviene
+	return 0; //ojo que va a retornar la dir fisica
 }
 
 /*************************    Logica de validacion de solicitudes ***************************/
