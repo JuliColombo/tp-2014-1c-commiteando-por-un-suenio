@@ -164,7 +164,7 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void* core_plp(void){
 
-	mostrarNodosPorPantalla(cola.new);
+	//mostrarNodosPorPantalla(cola.new);
 	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
 	int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
 	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
@@ -199,25 +199,26 @@ void* core_conexion_plp_programas(void){
 
 	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_programas))<0){
 		log_error_socket();
+		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
-
-	while(1){
-		printf("Esperando conexion de programas...\n");
-		n_sock = nipc_aceptarConexion(sock);
-		memset(paquete, 0, sizeof(paquete));
-		if (nipc_recibir(n_sock,paquete)<0){
-			//No se recibieron datos
-		} else {
-			//Se recibieron datos
-			//Acá va la lógica de qué hacer cuando llega un programa nuevo
+	else{
+		while(1){
+			printf("Esperando conexion de programas...\n");
+			n_sock = nipc_aceptarConexion(sock);
+			memset(paquete, 0, sizeof(paquete));
+			if (nipc_recibir(n_sock,paquete)<0){
+				//No se recibieron datos
+			} else {
+				//Se recibieron datos
+				//Acá va la lógica de qué hacer cuando llega un programa nuevo
+			}
+			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 		}
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+		//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+		if (close(sock)<0){
+			//Error con el close
+		}
 	}
-	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
-	if (close(sock)<0){
-		//Error con el close
-	}
-
 	return 0;
 }
 
@@ -228,24 +229,25 @@ void* core_conexion_plp_umv(void){
 
 	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_umv))<0){
 		log_error_socket();
+		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_umv
+	else{
+		printf("Esperando conexion a la UMV...\n"); //Está afuera del while porque la UMV es una sola, o sea que la conexion es una sola vez y se intercambian muchos mensajes después
+		n_sock = nipc_aceptarConexion(sock);
 
-	printf("Esperando conexion a la UMV...\n"); //Está afuera del while porque la UMV es una sola, o sea que la conexion es una sola vez y se intercambian muchos mensajes después
-	n_sock = nipc_aceptarConexion(sock);
-
-	while(1){
-		memset(paquete, 0, sizeof(paquete));
+		while(1){
+			memset(paquete, 0, sizeof(paquete));
 		
-		//Acá va la lógica de los mensajes con la UMV.
-		//Supongo que podes hacer que los programas liberen un semaforo y que aca se tome y empiecen los mensajes con la UMV para ese programa que entró y cuando termina lo libera de nuevo para que entre otro programa a mensajearse con la UMV
+			//Acá va la lógica de los mensajes con la UMV.
+			//Supongo que podes hacer que los programas liberen un semaforo y que aca se tome y empiecen los mensajes con la UMV para ese programa que entró y cuando termina lo libera de nuevo para que entre otro programa a mensajearse con la UMV
 		
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+		}
+		//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+		if (close(sock)<0){
+			//Error con el close
+		}
 	}
-	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
-	if (close(sock)<0){
-		//Error con el close
-	}
-	
 	return 0;
 }
 
@@ -254,27 +256,28 @@ void* core_conexion_plp_cpu(void){
 	int n_sock;		//El socket de datos
 	t_nipc* paquete;	//El paquete que recibe el socket
 
-	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_cpu))<0){
+	if ((sock = nipc_abrirConexion(configuracion_kernel.puerto_cpus))<0){
 		log_error_socket();
+		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpu
-
-	while(1){
-		printf("Esperando conexion de CPU...\n");
-		n_sock = nipc_aceptarConexion(sock);
-		memset(paquete, 0, sizeof(paquete));
-		if (nipc_recibir(n_sock,paquete)<0){
-			//No se recibieron datos
-		} else {
-			//Se recibieron datos
-			//Acá va la lógica de qué hacer cuando llega un CPU nuevo
+	else{
+		while(1){
+			printf("Esperando conexion de CPU...\n");
+			n_sock = nipc_aceptarConexion(sock);
+			memset(paquete, 0, sizeof(paquete));
+			if (nipc_recibir(n_sock,paquete)<0){
+				//No se recibieron datos
+			} else {
+				//Se recibieron datos
+				//Acá va la lógica de qué hacer cuando llega un CPU nuevo
+			}
+			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
 		}
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
+		//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
+		if (close(sock)<0){
+			//Error con el close
+		}
 	}
-	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
-	if (close(sock)<0){
-		//Error con el close
-	}
-	
 	return 0;
 }
 

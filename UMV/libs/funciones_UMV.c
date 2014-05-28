@@ -15,38 +15,26 @@
 
 
 int estaEnDicOP(char palabra[]){
-					char *dic_op[]={"operacion",
-									  "dump",
-									  "compactacion",
-									  "retardo",
-									  "algoritmo",
-									  "exit"
-					};
-					int aux;
-					for(aux=0;aux<6;aux++){
-						if(strcmp(dic_op[aux], palabra) == 0){
-							return 1;
-							break;
-						}
+	char *dic_op[]={"operacion","dump","compactacion","retardo","algoritmo","exit"};
+	int aux;
+	for(aux=0;aux<6;aux++){
+		if(strcmp(dic_op[aux], palabra) == 0){
+			return 1;
+		}
 
-					}
-					return 0;
+	}
+	return 0;
 }
 
 int estaEnDicTOP(char palabra[]){
-					char *dic_top[]={"solicitar",
-							        "escribir",
-							        "crear",
-							        "destruir"
-						};
-					int aux;
-					for(aux=0;aux<4;aux++){
-						if((strcmp(dic_top[aux], palabra)) == 0){
-							return 1;
-							break;
-						}
-					}
-					return 0;
+	char *dic_top[]={"solicitar","escribir","crear","destruir"};
+	int aux;
+	for(aux=0;aux<4;aux++){
+		if((strcmp(dic_top[aux], palabra)) == 0){
+			return 1;
+		}
+	}
+	return 0;
 }
 
 
@@ -304,10 +292,8 @@ void core_conexion_cpu(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock_cpu = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
-		if (close(sock_cpu)<0){
 			log_error_socket();	//Error con el close
-		}
-		abort();
+			abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
 
 
@@ -342,9 +328,7 @@ void core_conexion_kernel(void){
 	t_nipc* paquete;	//El paquete que recibe el socket
 
 	if ((sock_kernel = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
-		if (close(sock_kernel)<0){
-			log_error_socket();	//Error con el close
-		}
+		log_error_socket();	//Error con el close
 		abort();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
 
