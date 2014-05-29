@@ -8,6 +8,7 @@
 
 #include "socket.h"
 
+
 int nipc_abrirConexion(unsigned short puerto) {
 
 	int sockfd;
@@ -58,42 +59,17 @@ int nipc_aceptarConexion(int sockfd) {
 
 }
 
-t_nipc nipc_crearPaquete(char type,int info, int length, char* payload) {
 
-	t_nipc paquete;
-	paquete.Type = type;
-	paquete.Info = info;
-	paquete.Lenght = length;
-	paquete.Payload = malloc(length);
-	memcpy(paquete.Payload, payload, length);
-	return paquete;
-
-}
-
-void nipc_destruirPaquete(t_nipc* paquete) {
-
-	if(paquete->Lenght > 0) {
-
-		free(paquete->Payload);
-		paquete->Payload=NULL;
-	}
-
-}
-
-t_stream nipc_serializar(t_nipc paquete) {
+/*t_stream nipc_serializar(t_nipc paquete) {
 
 	t_stream stream;
-	stream.length = sizeof(paquete.Type) + sizeof(paquete.Info) + sizeof(paquete.Lenght)
+	stream.length = sizeof(paquete.Type) + sizeof(paquete.Lenght)
 			+ paquete.Lenght;
 	stream.buffer = malloc(stream.length);
 	int offset = 0;
 	int temp_size = 0;
 
 	memcpy(stream.buffer, &paquete.Type, temp_size = sizeof(paquete.Type));
-	offset += temp_size;
-
-	memcpy(stream.buffer + offset, &paquete.Info, temp_size = sizeof(paquete.Info));
-
 	offset += temp_size;
 
 	memcpy(stream.buffer + offset, &paquete.Lenght, temp_size= sizeof (paquete.Lenght) );
@@ -114,9 +90,6 @@ t_nipc nipc_deserializar(char* buffer) {
 	paquete.Type = (*buffer);
 	offset += sizeof paquete.Type;
 
-	paquete.Info = *((int*)(buffer + offset));
-	offset += sizeof paquete.Info;
-
 	paquete.Lenght = *((int*) (buffer + offset));
 	offset += sizeof paquete.Lenght;
 
@@ -126,7 +99,7 @@ t_nipc nipc_deserializar(char* buffer) {
 		memcpy(paquete.Payload, buffer + offset, paquete.Lenght);
 	}
 	return paquete;
-}
+}*/
 
 
 int nipc_sendall(int socket, t_stream stream) {
@@ -185,6 +158,4 @@ int nipc_recibir(int sockfd, t_nipc* paquete) {
 	return tam_paquete;
 
 }
-
-
 

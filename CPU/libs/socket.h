@@ -22,6 +22,7 @@
 #include <sys/un.h>
 #include <sys/select.h>
 #include <linux/types.h>
+#include "paquete.h"
 
 /*  MACROS DE TYPE  */
 
@@ -37,27 +38,10 @@ typedef enum {
 
 } paquete_type;
 
-typedef struct {
-	char Type;
-	int Info;
-	int Lenght;
-	char* Payload;
-
-}__attribute__((packed)) t_nipc;
-
-
-typedef struct {
-
-	int length;
-	char* buffer;
-}__attribute__((packed)) t_stream ;
-
 
 int nipc_abrirConexion(unsigned short puerto);
 int nipc_aceptarConexion(int sockfd);
 int nipc_conectar(char *dirIP, unsigned short puerto);
-t_nipc nipc_crearPaquete(char type,int info, int length, char* payload);
-void nipc_destruirPaquete(t_nipc* paquete);
 t_stream nipc_serializar(t_nipc paquete);
 t_nipc nipc_deserializar(char* buffer);
 int nipc_sendall(int socket, t_stream stream);

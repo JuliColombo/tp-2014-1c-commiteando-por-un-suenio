@@ -29,7 +29,7 @@ all: CPU
 CPU: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L/home/utnso/SisOp/tp-2014-1c-commiteando-por-un-suenio/CPU/libs -o "CPU" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -lpthread -pthread -L/home/utnso/SisOp/tp-2014-1c-commiteando-por-un-suenio/CPU/libs -o "CPU" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

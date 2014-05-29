@@ -5,18 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../libs/log.c \
+../libs/paquete.c \
 ../libs/primitivas.c \
 ../libs/primitivasAux.c \
 ../libs/socket.c 
 
 OBJS += \
 ./libs/log.o \
+./libs/paquete.o \
 ./libs/primitivas.o \
 ./libs/primitivasAux.o \
 ./libs/socket.o 
 
 C_DEPS += \
 ./libs/log.d \
+./libs/paquete.d \
 ./libs/primitivas.d \
 ./libs/primitivasAux.d \
 ./libs/socket.d 

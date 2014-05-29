@@ -13,7 +13,7 @@ int top_index = -1;
 config_cpu configuracion_cpu;
 char* PATH;
 pthread_t conexion_kernel;
-
+log_t* archLog;
 
 int main (int argc, char **argv){
 	PATH=argv[1];

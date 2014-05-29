@@ -48,7 +48,9 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	//Socket enviando posicion e id para que la UMV pushee
 	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
 
+
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
+
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,posicion);
