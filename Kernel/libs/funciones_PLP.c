@@ -118,25 +118,6 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 }
 
 
-/*int main_plp(){
-	t_list* cola_programas=list_create();
-	printf("La cola está vacia");
-
-	//Cuando entra un programa nuevo
-		t_programa programa;
-		calcularPeso(programa);
-		//programa.metadata=*(metadatada_desde_literal(literal));
-		if(solicitarMemoria(programa)){
-			agregarAListaSegunPeso(programa,cola_programas);
-			}
-			else{
-				printf("No hay memoria suficiente para agregar el programa");
-			}
-		mostrarNodosPorPantalla(cola_programas);
-
-
-	return 0;
-}*/
 
 /*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
  * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
@@ -169,19 +150,24 @@ void* core_plp(void){
 	int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
 	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
+	// deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
 
-	t_programa* programa = list_remove(cola.new,0); //Saco el primer programa segun peso --Esto no va adentro del while?
+	while (1){
+		//socket de programas escucha
 
-	while(1){
+		t_programa programa; //Este programa llega por los sockets
+		crearPCB(programa);
+		programa.pcb.pid=getpid();
+		programa.quantum=0;
+		programa.flag_terminado=0;
+		programa.peso=calcularPeso(programa);
 
-		while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
-			if(programa->flag_terminado==1){
-				completarGradoMultip();
-			}
 
-		}
 	}
+
+
+
 	//Logica del PLP
 
 	pthread_join(thread_conexion_plp_programas, NULL);
@@ -282,6 +268,43 @@ void* core_conexion_plp_cpu(void){
 }
 
 void* core_pcp(void){
+
+	completarGradoMultip();
+
+
+	while(1){
+
+
+
+	t_programa programa = list_remove(cola.ready,0);
+
+
+			while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
+
+
+			//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
+
+				list_add(cola.exec,programa); //Agrego el programa a la lista exec porque está en la cpu, cuando vuelva se vé si vuelve a ready o pasa a block
+
+
+			//Aca deberia esperar a que la cpu lo devuelva, de todas formas no estoy seguro
+				if(programa.flag_bloqueado==0){
+				//Sacar al programa por el pid de la cola exec y ponerlo en ready
+				}else{
+					list_add(cola.block,programa);
+				}
+
+
+			}
+
+
+			if(programa->flag_terminado==1){ //Esto va al final,
+				list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
+				completarGradoMultip();
+			}
+	}
+
+
 
 	return 0;
 }

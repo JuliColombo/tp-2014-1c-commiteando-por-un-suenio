@@ -79,12 +79,13 @@ typedef struct{
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
-typedef struct { // se define un vector para los programas en new
+typedef struct {
 	int peso;
 	t_medatada_program metadata;
 	t_pcb* pcb;
 	t_quantum quantum;
 	int flag_terminado;
+	int flag_bloqueado;
 } t_programa;
 
 typedef struct{
