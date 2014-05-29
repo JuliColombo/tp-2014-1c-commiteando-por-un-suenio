@@ -175,6 +175,16 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 void compactar(){
 	int sigSegmento;
 	int posicionDeDestino;
+	typedef struct aux{
+		int programa;
+		int numSegDesc;
+		int inicio;
+		int tamanio;
+		int ubicacionMP;
+	}aux;
+
+	aux getDatosSegmentDescriptorDe();
+
 	//Obtengo primer posicion libre en MP
 		int i=0;
 		while (MP[i]!=NULL) i++;
@@ -185,22 +195,32 @@ void compactar(){
 		if (sigSegmento == NULL){
 			sigSegmento++;
 		} else{
-			int tamanio= obtenerTamanioDelSegmento();
-			//actualizar tabla de segmentos de el proceso dueño del segmento
+			aux datos=getDatosSegmentDescriptorDe(sigSegmento);
+			int programaDuenio = datos.programa;
+			int numSegDescDelProgramaDuenio = datos.numSegDesc;
+			int tamanio= tablaDeSegmentos[programaDuenio][numSegDescDelProgramaDuenio].tamanio; //o datos.tamanio si va a quedar asi
+
 			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
+
+			tablaDeSegmentos[programaDuenio][numSegDescDelProgramaDuenio].ubicacionMP = posicionDeDestino;
+
 			sigSegmento= sigSegmento+tamanio+1;
 			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
 		}
 	}
+
+		aux getDatosSegmentDescriptorDe(int unSegmento){
+			aux datos;
+
+			//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo?
+
+			return datos;
+			}
 }
 
 
-int obtenerTamanioDelSegmento(){
-	int tamanio;
-	//Habia pensado buscar hasta que sea NULL, pero si hay un segmento al lado de otro lo va a mover tambien,
-	//lo cual no seria un problema siempre y cuando actualizemos bien la tabla de segmentos de cada programa (suponiendo que esos dos segmentos corresponden a programas diferentes)
-	return tamanio;
-}
+
+
 
 void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
