@@ -54,11 +54,13 @@ typedef enum {
 	POP_RETORNAR,
 }tipo_operacion;
 
+void nipc_destruirPaquete(t_stream* paquete);
+t_stream* nipc_serializar2(int type, void* estructura);
+t_nipc cargarData(uint8_t estructura, uint32_t length);
+char* crearData(uint8_t estructura, uint32_t length);
 t_stream* nipc_paquetePopRetornar(struct_pop_retornar* estructura);
 t_stream* nipc_paquetePopDesreferenciar(struct_pop_desreferenciar* estructura);
 t_stream* nipc_paquetePop(struct_pop* estructura);
 t_stream* nipc_paquetePush(struct_push* estructura);
-t_stream* nipc_crearPaquete(char type,int length, char* payload);
-//void nipc_destruirPaquete(t_nipc* paquete);
-t_stream* nipc_serializar2(int type, void* estructura);
+
 #endif /* PAQUETE_H_ */

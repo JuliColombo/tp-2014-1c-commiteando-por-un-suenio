@@ -60,48 +60,6 @@ int nipc_aceptarConexion(int sockfd) {
 }
 
 
-/*t_stream nipc_serializar(t_nipc paquete) {
-
-	t_stream stream;
-	stream.length = sizeof(paquete.Type) + sizeof(paquete.Lenght)
-			+ paquete.Lenght;
-	stream.buffer = malloc(stream.length);
-	int offset = 0;
-	int temp_size = 0;
-
-	memcpy(stream.buffer, &paquete.Type, temp_size = sizeof(paquete.Type));
-	offset += temp_size;
-
-	memcpy(stream.buffer + offset, &paquete.Lenght, temp_size= sizeof (paquete.Lenght) );
-	offset += temp_size;
-
-	if (paquete.Lenght > 0)
-		memcpy(stream.buffer + offset, paquete.Payload, paquete.Lenght);
-
-	return stream;
-
-}
-
-t_nipc nipc_deserializar(char* buffer) {
-
-	t_nipc paquete;
-	int offset = 0;
-
-	paquete.Type = (*buffer);
-	offset += sizeof paquete.Type;
-
-	paquete.Lenght = *((int*) (buffer + offset));
-	offset += sizeof paquete.Lenght;
-
-	if (paquete.Lenght > 0) {
-
-		paquete.Payload = malloc(paquete.Lenght);
-		memcpy(paquete.Payload, buffer + offset, paquete.Lenght);
-	}
-	return paquete;
-}*/
-
-
 int nipc_sendall(int socket, t_stream stream) {
 	int total = 0; // cuántos bytes hemos enviado
 	int bytesleft = stream.length; // cuántos se han quedado pendientes
