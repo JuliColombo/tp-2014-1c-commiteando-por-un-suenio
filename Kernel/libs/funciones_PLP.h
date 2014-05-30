@@ -41,6 +41,7 @@ void imprimirConfiguracion(void);
 int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que estan en el pcp actualmente
 void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
+void crearPCB(t_programa); //Recive un programa y crea su PCB
 
 /************************* FUNCIONES HILOS *************************/
 void* core_plp(void);
