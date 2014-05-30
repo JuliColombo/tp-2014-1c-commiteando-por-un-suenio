@@ -13,10 +13,13 @@
 #include <stdint.h>
 #include <string.h>
 
-#define STRUCT_PUSH 0
-#define STRCUT_POP 1
-#define STRUCT_POP_DESREFERENCIAR 2
-#define STRUCT_POP_RETORNAR 3
+#define S_ERROR 0
+#define STRUCT_PUSH 1
+#define STRCUT_POP 2
+#define STRUCT_POP_DESREFERENCIAR 3
+#define STRUCT_POP_RETORNAR 4
+#define STRUCT_SIGNAL 5
+
 
 
 typedef struct {
@@ -84,7 +87,7 @@ typedef struct {
 
 
 typedef struct {
-
+	uint32_t signal;
 }__attribute__((packed)) struct_signal;
 
 
@@ -104,5 +107,6 @@ struct_push* nipc_sacarPaquetePop(char* data, uint32_t length);
 struct_push* nipc_sacarPaquetePopDesreferenciar(char* data, uint32_t length);
 struct_push* nipc_sacarPaquetePopRetornar(char* data, uint32_t length);
 void *nipc_deserializar2(int type, char* data, uint32_t length);
+t_nipc despaquetizarHeader(char * header);
 
 #endif /* PAQUETE_H_ */

@@ -60,9 +60,9 @@ void log_error_socket(void){
 void* core_conexion_kernel(void){
 	int sock;		//El socket de conexion
 	int n_sock;		//El socket de datos
-	t_nipc* paquete;	//El paquete que recibe el socket
+	t_stream* paquete;	//El paquete que recibe el socket
 
-	if ((sock = nipc_abrirConexion(configuracion_cpu.puerto_kernel))<0){
+	if ((sock = socket_crearServidor(configuracion_cpu.puerto_kernel))<0){
 		log_error_socket();
 	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
 
