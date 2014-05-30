@@ -8,7 +8,7 @@
 #ifndef ESTRUCTURASPACKAGE_H_
 #define ESTRUCTURASPACKAGE_H_
 
-#include "list.h"
+#include "commons/collections/list.h"
 
 /* Defino los tipos de señales que se pueden mandar
  *

@@ -469,8 +469,8 @@ int socket_enviar(int socketReceptor, t_tipoEstructura tipoEstructura, void* est
 
 	t_stream * paquete = paquetizar(tipoEstructura, estructura);
 
-	cantBytesEnviados = send(socketReceptor, paquete->buffer, paquete->length, 0);
-	free(paquete->buffer);
+	cantBytesEnviados = send(socketReceptor, paquete->data, paquete->length, 0);
+	free(paquete->data);
 	free(paquete);
 	if( cantBytesEnviados == -1){
 		perror("Server no encontrado\n");

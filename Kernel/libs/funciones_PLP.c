@@ -157,11 +157,11 @@ void* core_plp(void){
 		//socket de programas escucha
 
 		t_programa programa; //Este programa llega por los sockets
-		crearPCB(programa);
-		programa.pcb.pid=getpid();
+		//crearPCB(programa);
+		//programa.pcb.pid=getpid();
 		programa.quantum=0;
 		programa.flag_terminado=0;
-		programa.peso=calcularPeso(programa);
+		//programa.peso=calcularPeso(programa);
 
 
 	}
@@ -179,6 +179,7 @@ void* core_plp(void){
 
 
 void* core_conexion_plp_programas(void){
+	int sock_programas=socket_crearServidor((char*)INADDR_ANY, configuracion_kernel.puerto_programas);
 
 	return 0;
 }
@@ -197,7 +198,7 @@ void* core_pcp(void){
 
 	completarGradoMultip();
 
-
+/*
 	while(1){
 
 
@@ -231,7 +232,7 @@ void* core_pcp(void){
 	}
 
 
-
+*/
 	return 0;
 }
 
