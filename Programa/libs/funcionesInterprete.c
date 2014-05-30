@@ -50,8 +50,8 @@ void inicializarConfiguracion(void) {
 void leerConfiguracion(void){
 	t_config* config=config_create(PATH);
 
-	configuracion_programa.ip_kernel = config_get_string_value(config,"Puerto TCP para recibir conexiones del Kernel");
-	configuracion_programa.puerto_kernel = config_get_int_value(config,"Direccion IP para conectarse al Kernel");
+	configuracion_programa.ip_kernel = config_get_string_value(config,"Direccion IP para conectarse al Kernel");
+	configuracion_programa.puerto_kernel = config_get_int_value(config,"Puerto TCP para recibir conexiones del Kernel");
 
 	}
 
