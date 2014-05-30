@@ -180,3 +180,14 @@ void *nipc_deserializar2(int type, char* data, uint32_t length) {
 	}
 return estructuraDestino;
 }
+
+t_nipc despaquetizarHeader(char * header){
+	t_nipc estructuraHeader;
+
+	int tamanoTotal = 0, tamanoDato = 0;
+	memcpy(&estructuraHeader.Type, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
+	tamanoTotal = tamanoDato;
+	memcpy(&estructuraHeader.Lenght, header + tamanoTotal, tamanoDato = sizeof(uint16_t));
+
+	return estructuraHeader;
+}
