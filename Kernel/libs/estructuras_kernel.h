@@ -16,7 +16,7 @@ typedef uint8_t t_quantum;
 typedef uint8_t t_retardo_quantum;
 typedef uint8_t t_grado_multip;
 
-typedef int t_pid;
+typedef unsigned int t_pid;
 typedef int t_program_counter;
 typedef int tamanio_indice;
 typedef int t_tamanio_contexto;

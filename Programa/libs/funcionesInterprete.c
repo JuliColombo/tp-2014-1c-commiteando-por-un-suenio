@@ -50,14 +50,14 @@ void inicializarConfiguracion(void) {
 void leerConfiguracion(void){
 	t_config* config=config_create(PATH);
 
-	configuracion_programa.ip_kernel = config_get_int_value(config,"Puerto TCP para recibir conexiones del Kernel");
+	configuracion_programa.ip_kernel = config_get_string_value(config,"Puerto TCP para recibir conexiones del Kernel");
 	configuracion_programa.puerto_kernel = config_get_int_value(config,"Direccion IP para conectarse al Kernel");
 
 	}
 
 void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
-	printf("IP del Kernel: %d\n", configuracion_programa.ip_kernel);
+	printf("IP del Kernel: %s\n", configuracion_programa.ip_kernel);
 	printf("Puerto Kernel: %d\n", configuracion_programa.puerto_kernel);
 
 }

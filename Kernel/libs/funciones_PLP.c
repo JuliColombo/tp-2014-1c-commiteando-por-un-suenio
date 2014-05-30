@@ -20,7 +20,7 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 void mostrarNodosPorPantalla(t_list* lista){
 	int i;
 	int p;
-	system("clear");
+	//system("clear");
 	if(lista->head==NULL){
 		printf("No hay nodos en la cola\n");
 		return;
@@ -161,7 +161,7 @@ void* core_plp(void){
 		programa.pcb.pid=getpid();
 		programa.quantum=0;
 		programa.flag_terminado=0;
-		programa.peso=calcularPeso(programa);
+		calcularPeso(programa);
 
 
 	}
@@ -202,10 +202,11 @@ void* core_pcp(void){
 
 
 
-	t_programa programa = list_remove(cola.ready,0);
+
+	t_programa programa = (t_programa)list_remove(cola.ready,0);
 
 
-			while(programa->quantum < configuracion_kernel.quantum && programa->flag_terminado==0){
+			while(programa.quantum < configuracion_kernel.quantum && programa.flag_terminado==0){
 
 
 			//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
@@ -224,7 +225,7 @@ void* core_pcp(void){
 			}
 
 
-			if(programa->flag_terminado==1){ //Esto va al final,
+			if(programa.flag_terminado==1){ //Esto va al final,
 				list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
 				completarGradoMultip();
 			}

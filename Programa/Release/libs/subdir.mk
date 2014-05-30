@@ -6,17 +6,23 @@
 C_SRCS += \
 ../libs/funcionesInterprete.c \
 ../libs/log.c \
-../libs/primitivas.c 
+../libs/package.c \
+../libs/primitivas.c \
+../libs/socket.c 
 
 OBJS += \
 ./libs/funcionesInterprete.o \
 ./libs/log.o \
-./libs/primitivas.o 
+./libs/package.o \
+./libs/primitivas.o \
+./libs/socket.o 
 
 C_DEPS += \
 ./libs/funcionesInterprete.d \
 ./libs/log.d \
-./libs/primitivas.d 
+./libs/package.d \
+./libs/primitivas.d \
+./libs/socket.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

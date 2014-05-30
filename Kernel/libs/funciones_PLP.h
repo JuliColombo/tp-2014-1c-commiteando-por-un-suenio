@@ -32,9 +32,9 @@ extern cola_procesos cola;
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
-void calcularPeso(t_programa programa); //Calcula el peso del programa
-void agregarAColaSegunPeso(t_programa programa, t_list* lista); //Agrega ordenadamente en la cola de new
-void mostrarNodosPorPantalla(t_list* lista); //Muestra los programas que estan en New por pantalla
+void calcularPeso(t_programa); //Calcula el peso del programa
+void agregarAColaSegunPeso(t_programa, t_list*); //Agrega ordenadamente en la cola de new
+void mostrarNodosPorPantalla(t_list*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct correspondiente
 void imprimirConfiguracion(void);
@@ -43,7 +43,7 @@ void completarGradoMultip(void); //Completa grado de multiprogramacion del siste
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 
-/************************* FUNCIONES HILOS *************************/
+/************************* HILOS *************************/
 void* core_plp(void);
 void* core_pcp(void);
 void* core_io(int);

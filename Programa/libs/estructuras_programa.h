@@ -2,7 +2,7 @@
 #define ESTRUCTURAS_PROGRAMA_H_
 
 typedef uint16_t t_puerto_kernel;
-typedef uint16_t t_ip_kernel;
+typedef char* t_ip_kernel;
 
 typedef struct {
 t_ip_kernel ip_kernel;	//Direccion IP para conectarse al Kernel
