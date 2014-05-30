@@ -15,4 +15,5 @@ EXECUTABLES :=
 SUBDIRS := \
 . \
 libs \
+libs/Sockets \
 

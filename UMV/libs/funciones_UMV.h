@@ -22,7 +22,7 @@
 #include "commons/collections/list.h"
 #include "log.h"
 #include <semaphore.h>
-#include "socket.h"
+#include "Sockets/socket.h"
 
 /*Macros del archivo config*/
 
