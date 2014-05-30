@@ -20,9 +20,9 @@
 #define PATHLOG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio"
 
 typedef struct{
-	int ip_kernel;
+	char* ip_kernel;
 	int puerto_kernel;
-	int ip_umv;
+	char* ip_umv;
 	int puerto_umv;
 }config_cpu;
 
