@@ -80,7 +80,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.valor_semaforos=vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.id_semaforos);
 	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.retardo_hio = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.id_hio);
-	configuracion_kernel.ip_umv = config_get_int_value(config,"Direccion IP para conectarse a la UMV");
+	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
 
@@ -106,7 +106,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 		printf("(%d)\n", configuracion_kernel.retardo_hio[i]);
 	}
 	free(configuracion_kernel.retardo_hio);
-	printf("IP de la UMV: %d\n", configuracion_kernel.ip_umv);
+	printf("IP de la UMV: %s\n", configuracion_kernel.ip_umv);
 	printf("Puerto UMV: %d\n", configuracion_kernel.puerto_umv);
 	
 	printf("Variables globales: ");
@@ -181,16 +181,28 @@ void* core_plp(void){
 void* core_conexion_plp_programas(void){
 	int sock_programas=socket_crearServidor((char*)INADDR_ANY, configuracion_kernel.puerto_programas);
 
+
+	if(socket_cerrarConexion(sock_programas)<1){
+		//Error cerrando el socket
+	}
 	return 0;
 }
 
 void* core_conexion_plp_umv(void){
+	int sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv);
 
+	if(socket_cerrarConexion(sock_umv)<1){
+		//Error cerrando el socket
+	}
 	return 0;
 }
 
 void* core_conexion_plp_cpu(void){
+	int sock_cpu=socket_crearServidor((char*)INADDR_ANY, configuracion_kernel.puerto_cpus);
 
+	if(socket_cerrarConexion(sock_cpu)<1){
+		//Error cerrando el socket
+	}
 	return 0;
 }
 

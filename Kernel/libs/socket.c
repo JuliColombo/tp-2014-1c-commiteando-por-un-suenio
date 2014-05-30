@@ -597,7 +597,7 @@ int socket_recibirSignal(int socketEmisor, t_signal *signal){
 }
 
 /*
- * Nombre: socket_cerrarConexion/3
+ * Nombre: socket_cerrarConexion/1
  *
  * Argumentos:
  * 		- socket
@@ -605,7 +605,7 @@ int socket_recibirSignal(int socketEmisor, t_signal *signal){
  * Devuelve:
  * 		int (-1-> si se cerro ok, 0-> si hubo problemas).
  *
- * Funcion: recibir y despaquetizar, convierte el paquete recibido a la estructura que corresponda.
+ * Funcion: cerrar el socket
  */
 int socket_cerrarConexion(int socket){
 	return close(socket);
