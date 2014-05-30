@@ -6,23 +6,26 @@
 C_SRCS += \
 ../libs/funciones_PLP.c \
 ../libs/funciones_aux.c \
-../libs/list.c \
 ../libs/log.c \
-../libs/socket.c 
+../libs/package.c \
+../libs/socket.c \
+../libs/string.c 
 
 OBJS += \
 ./libs/funciones_PLP.o \
 ./libs/funciones_aux.o \
-./libs/list.o \
 ./libs/log.o \
-./libs/socket.o 
+./libs/package.o \
+./libs/socket.o \
+./libs/string.o 
 
 C_DEPS += \
 ./libs/funciones_PLP.d \
 ./libs/funciones_aux.d \
-./libs/list.d \
 ./libs/log.d \
-./libs/socket.d 
+./libs/package.d \
+./libs/socket.d \
+./libs/string.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

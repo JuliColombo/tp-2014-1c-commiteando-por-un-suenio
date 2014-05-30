@@ -9,8 +9,8 @@
 typedef uint16_t t_puerto_programa;
 typedef uint16_t t_puerto_cpu;
 typedef uint16_t t_tamanio_mp;
-typedef uint16_t t_ip_umv;
 typedef uint16_t t_puerto_umv;
+typedef char* t_ip_umv;
 
 typedef uint8_t t_quantum;
 typedef uint8_t t_retardo_quantum;
