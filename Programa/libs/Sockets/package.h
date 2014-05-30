@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "string.h"
-#include "estructurasPackage.h"
+#include "estructuras_socket.h"
 
 
 //FUNCION PRINCIPAL PAQUETIZAR

@@ -19,7 +19,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <sys/ioctl.h>
-#include "estructuras_socket.h"
+#include "package.h"
 #include "commons/string.h"
 
 
