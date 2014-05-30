@@ -17,7 +17,7 @@
 #include "commons/config.h"
 #include "commons/collections/list.h"
 #include "log.h"
-#include "socket.h"
+#include "Sockets/socket.h"
 #include "funciones_aux.h"
 #include <semaphore.h>
 

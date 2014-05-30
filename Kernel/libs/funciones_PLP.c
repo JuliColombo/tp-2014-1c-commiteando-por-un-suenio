@@ -147,13 +147,13 @@ void* core_plp(void){
 
 	//mostrarNodosPorPantalla(cola.new);
 	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
-	int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
-	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
+	//int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
+	//int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	// deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
 
-	while (1){
+	/*while (1){
 		//socket de programas escucha
 
 		t_programa programa; //Este programa llega por los sockets
@@ -168,19 +168,19 @@ void* core_plp(void){
 	}
 
 
-
+	*/
 	//Logica del PLP
 
 	pthread_join(thread_conexion_plp_programas, NULL);
-	pthread_join(thread_conexion_plp_umv, NULL);
-	pthread_join(thread_conexion_plp_cpu, NULL);
+	//pthread_join(thread_conexion_plp_umv, NULL);
+	//pthread_join(thread_conexion_plp_cpu, NULL);
 
 	return NULL;
 }
 
 
 void* core_conexion_plp_programas(void){
-	int sock_programas=socket_crearServidor((char*)INADDR_ANY, configuracion_kernel.puerto_programas);
+	int sock_programas=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_programas);
 
 
 	if(socket_cerrarConexion(sock_programas)<1){

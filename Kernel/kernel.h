@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include "libs/estructuras_kernel.h"
 #include "libs/funciones_PLP.h"
-#include "libs/socket.h"
+#include "libs/Sockets/socket.h"
 #include <semaphore.h>
 
 
