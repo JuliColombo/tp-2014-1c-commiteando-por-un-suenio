@@ -147,7 +147,7 @@ void* core_plp(void){
 
 	//mostrarNodosPorPantalla(cola.new);
 	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
-	int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
+	//int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
 	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	// deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
@@ -172,44 +172,64 @@ void* core_plp(void){
 	//Logica del PLP
 
 	pthread_join(thread_conexion_plp_programas, NULL);
-	pthread_join(thread_conexion_plp_umv, NULL);
+	//pthread_join(thread_conexion_plp_umv, NULL);
 	pthread_join(thread_conexion_plp_cpu, NULL);
 
-	return NULL;
+	return EXIT_SUCCESS;
 }
 
 
 void* core_conexion_plp_programas(void){
-	int sock_programas=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_programas);
-
-
-	if(socket_cerrarConexion(sock_programas)<1){
-		//Error cerrando el socket
+	int sock_programas;
+	if ((sock_programas=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_programas))>0){
+		printf("Escuchando programas\n");
 	}
-	return 0;
+
+	while (1){
+
+	}
+
+	if(socket_cerrarConexion(sock_programas)<0){
+		printf("Error cerrando socket programas\n");
+	} else {
+		printf("Socket programas cerrado\n");
+	}
+	return EXIT_SUCCESS;
 }
 
 void* core_conexion_plp_umv(void){
-	int sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv);
-
-	if(socket_cerrarConexion(sock_umv)<1){
-		//Error cerrando el socket
+	//Si este método está invocado, tira seg fault aca siempre. Pero sino lo ponemos, tira seg fault cada 5 o 6 veces que ejecutas
+	//LA MAGIA DEL ECLIPSE (╯°□°）╯︵ ┻━┻
+	int sock_umv;
+	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
+		printf("Conectado a la UMV\n");
 	}
-	return 0;
+
+	if(socket_cerrarConexion(sock_umv)<0){
+		printf("Error cerrando socket umv\n");
+	} else {
+		printf("Socket umv cerrado\n");
+	}
+	return EXIT_SUCCESS;
 }
 
 void* core_conexion_plp_cpu(void){
-	int sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
-
-	if(socket_cerrarConexion(sock_cpu)<1){
-		//Error cerrando el socket
+	int sock_cpu;
+	if ((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus))>0){
+		printf("Escuchando CPUs\n");
 	}
-	return 0;
+
+	if(socket_cerrarConexion(sock_cpu)<0){
+		printf("Error cerrando socket cpus\n");
+	} else {
+		printf("Socket cpus cerrado\n");
+	}
+	return EXIT_SUCCESS;
 }
 
 void* core_pcp(void){
 
-	completarGradoMultip();
+	//completarGradoMultip();
 
 /*
 	while(1){
@@ -247,11 +267,11 @@ void* core_pcp(void){
 
 
 */
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 
 void* core_io(int retardo){
 
-	return 0;
+	return EXIT_SUCCESS;
 }

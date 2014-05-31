@@ -6,5 +6,6 @@
 #include "libs/log.h"
 #include "libs/funcionesInterprete.h"
 #include "libs/estructuras_programa.h"
+#include "libs/Sockets/socket.h"
 
 #endif /* PROGRAMA_H_ */
