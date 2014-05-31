@@ -210,7 +210,7 @@ void finalizar() {
 }
 
 void retornar(t_valor_variable retorno){
-	//Socket de UMV para yo darle un valor a posicionVariable ---> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
+	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	//Socket de UMV para actualizar mi top_index
 
 	t_valor_variable* ret = &retorno;
