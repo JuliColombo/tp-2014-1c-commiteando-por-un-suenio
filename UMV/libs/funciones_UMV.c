@@ -111,9 +111,9 @@ _Bool validarSolicitud(uint32_t longitud){
 		return true;
 	} else{
 		puts("No alcanza el espacio en memoria:");
-		if(segmentationFault(longitud)){
+		if(/*segmentationFault(longitud)*/ 1){
 			return false;
-		} else { if(memoryOverload(longitud)){
+		} else { if(/*memoryOverload(longitud)*/ 1){
 							return false;
 				} else {
 							//puts("Excepcion Desconocida"); ???
@@ -183,7 +183,7 @@ void compactar(){
 		int ubicacionMP;
 	}aux;
 
-	aux getDatosSegmentDescriptorDe();
+	aux getDatosSegmentDescriptorDe(int segmento);
 
 	//Obtengo primer posicion libre en MP
 		int i=0;
@@ -240,30 +240,31 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 }
 
 int escogerUbicacionF(int tamanio){
-	int finDeSegmento;
 	int posicionDeDestino;
 		//Obtengo primer posicion libre en MP
 			int i=0;
+		while(i<tamanioMP){
+			int aux=0;
 			while (MP[i]!=NULL) i++;
 			posicionDeDestino= i;
-			finDeSegmento=posicionDeDestino+tamanio;
-		//Checkeo si la ultima posicion del segmento esta libre, si no, busca de nuevo
-		if(MP[finDeSegmento] != NULL){
-			while(MP[finDeSegmento] !=NULL){
-				i=finDeSegmento;
-				while (MP[i]!=NULL)i++;
-				posicionDeDestino= i;
-				finDeSegmento=posicionDeDestino+tamanio;
+			//Checkeo si todas las posiciones hasta la
+			//la ultima posicion del segmento esta libre, si no, busca de nuevo
+			while(MP[i] != NULL){
+				aux++;
+				i++;
 			}
-		}
-		//Devuelve la posicion de ubicacion del segmento
+			if(aux>=tamanio){
+			//Devuelve la posicion de ubicacion del segmento
 			return posicionDeDestino;
+			}
+	}
+			//Si llega hasta acá es porque no encontró una posición posible para el segmento
+			//Le pongo que retorne -1 para mostrar este error
+			return -1;
 }
-
 int escogerUbicacionW(int tamanio){
-	int finDeSegmento;
 	int posicionDeDestino;
-	/*TODO: acá habría que recorrer la MP buscando la última posición en la
+	/*TODO: acá habría que recorrer la MP buscando la posición más grande en la
 que entraría el segmento del programa*/
 
 
@@ -332,7 +333,7 @@ void core_conexion_cpu(void){
 
 void crear_hilo_por_cpu(void){
 	pthread_t atender_pedido;
-	pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, paquete);	//Crea un hilo para atender cada conexion de cpu
+	pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
 	pthread_join(atender_pedido, NULL);	//Espera a que termine de ejecutarse la atencion del pedido
 }
 
