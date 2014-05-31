@@ -78,11 +78,11 @@ void* core_consola(void);
 void* consola(void);
 
 void core_conexion_cpu(void);
-void crear_hilo_por_cpu(t_nipc*);
-void atender_cpu(t_nipc*);
+void crear_hilo_por_cpu(void);
+void atender_cpu(void);
 
 void core_conexion_kernel(void);
-void atender_kernel(t_nipc*);
+void atender_kernel(void);
 
 #endif /* UMV_H_ */
 

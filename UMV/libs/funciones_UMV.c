@@ -288,13 +288,12 @@ void leerConfiguracion(void) {
 					"Puerto TCP para recibir conexiones del Kernel");
 
 
-		configuracion_UMV.ip_kernel = config_get_int_value(config,
+		configuracion_UMV.ip_kernel = config_get_string_value(config,
 					"Direccion IP para conectarse al Kernel");
 
 
 		configuracion_UMV.algoritmo = config_get_int_value(config,
 					"Algoritmo de seleccion de ubicacion de segmento");
-		configuracion_UMV.algoritmo=firstfit;
 
 }
 
@@ -303,7 +302,7 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 	printf("Tamanio de memoria Principal: %d\n", configuracion_UMV.memSize);
 	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
 	printf("Puerto para conexiones con Kernel: %d\n", configuracion_UMV.puerto_kernel);
-	printf("IP del Kernel: %d\n", configuracion_UMV.ip_kernel);
+	printf("IP del Kernel: %s\n", configuracion_UMV.ip_kernel);
 	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
 }
 
@@ -323,67 +322,35 @@ void inicializarConfiguracion(void){
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	int sock_cpu;		//El socket de conexion
-	int n_sock_cpu;		//El socket de datos
-	t_nipc* paquete;	//El paquete que recibe el socket
+	int sock_cpu=socket_crearServidor(configuracion_UMV.ip_kernel, configuracion_UMV.puerto_cpus);
 
-	if ((sock_cpu = nipc_abrirConexion(configuracion_UMV.puerto_cpus))<0){
-			log_error_socket();	//Error con el close
-			abort();
-	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
-
-
-	while(1){
-			printf("Esperando conexion de CPU...\n");
-			n_sock_cpu = nipc_aceptarConexion(sock_cpu);
-			memset(paquete, 0, sizeof(paquete));
-			if (nipc_recibir(n_sock_cpu,paquete)<0){
-				//No se recibieron datos
-			} else {
-				//Se recibieron datos
-				crear_hilo_por_cpu(paquete);
-			}
-			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
-		}
+	if(socket_cerrarConexion(sock_cpu)<1){
+	//Error cerrando el socket
+	}
+	return;
 }
 
-void crear_hilo_por_cpu(t_nipc* paquete){
+void crear_hilo_por_cpu(void){
 	pthread_t atender_pedido;
 	pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, paquete);	//Crea un hilo para atender cada conexion de cpu
 	pthread_join(atender_pedido, NULL);	//Espera a que termine de ejecutarse la atencion del pedido
 }
 
-void atender_cpu(t_nipc* paquete){
+void atender_cpu(void){
 	//Aca habria que atender el pedido de una cpu
 }
 
 
 void core_conexion_kernel(void){
-	int sock_kernel;		//El socket de conexion
-	int n_sock_kernel;		//El socket de datos
-	t_nipc* paquete;	//El paquete que recibe el socket
+	int sock_kernel=socket_crearCliente();
 
-	if ((sock_kernel = nipc_abrirConexion(configuracion_UMV.puerto_kernel))<0){
-		log_error_socket();	//Error con el close
-		abort();
-	}//El socket esta creado y listo para escuchar a los clientes por el puerto_cpus
-
-
-	while(1){
-			printf("Esperando conexion de Kernel...\n");
-			n_sock_kernel = nipc_aceptarConexion(sock_kernel);
-			memset(paquete, 0, sizeof(paquete));
-			if (nipc_recibir(n_sock_kernel,paquete)<0){
-				//No se recibieron datos
-			} else {
-				//Se recibieron datos
-				atender_kernel(paquete);
-			}
-			break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
-		}
+	if(socket_cerrarConexion(sock_kernel)<1){
+	//Error cerrando el socket
+	}
+	return;
 }
 
-void atender_kernel(t_nipc* paquete){
+void atender_kernel(void){
 	//Aca habria que atender el pedido del kernel
 }
 
