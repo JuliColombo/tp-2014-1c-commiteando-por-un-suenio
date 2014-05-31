@@ -11,10 +11,7 @@
 #include <stdint.h>
 
 typedef enum {
-	PUSH_SIZE_CHECK,
 	POP,
-	POP_DESREFERENCIAR,
-	POP_RETORNAR,
 	ACTUALIZAR_TOP_INDEX, //??
 	RECIBIR_INST, //??
 	OBTENER_COMPARTIDA,
@@ -23,17 +20,12 @@ typedef enum {
 	IMPRIMIR_TEXTO,
 	WAIT,
 	SIGNAL,
-}tipo_operacion;
+}tipo_operacion_signal;
 
 typedef struct {
 	uint32_t posicion;
 	int id;
 }__attribute__((packed)) struct_push;
-
-
-typedef struct {
-
-} __attribute__((packed)) struct_pop;
 
 
 typedef struct {
@@ -63,6 +55,10 @@ typedef struct {
 typedef struct {
 	uint32_t signal;
 }__attribute__((packed)) struct_signal;
+
+typedef struct {
+	uint32_t numero;
+}__attribute__((packed)) struct_numero;
 
 
 struct_push* crear_struct_push(uint32_t posicion, int id);

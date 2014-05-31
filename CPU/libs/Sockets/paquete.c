@@ -24,17 +24,20 @@ void nipc_destruirPaquete(t_stream* paquete) {
 t_stream* serializar(int type, void* estructura) {
 	t_stream* stream = NULL;
 	switch(type) {
-	case PUSH_SIZE_CHECK:
+	case STRUCT_PUSH:
 		stream = paquetePush((struct_push*) estructura);
 		break;
-	case POP:
-		stream = paquetePop((struct_pop*) estructura);
-		break;
-	case POP_DESREFERENCIAR:
+	case STRUCT_POP_DESREFERENCIAR:
 		stream = paquetePopDesreferenciar((struct_pop_desreferenciar*) estructura);
 		break;
-	case POP_RETORNAR:
+	case STRUCT_POP_RETORNAR:
 		stream = paquetePopRetornar((struct_pop_retornar*) estructura);
+		break;
+	case STRUCT_NUMERO:
+		stream = paqueteNumero((struct_numero*) estructura);
+		break;
+	case STRUCT_SIGNAL:
+		stream = paqueteSignal((struct_signal*) estructura);
 		break;
 	}
 	return stream;
@@ -80,14 +83,6 @@ t_stream* paquetePush(struct_push* estructura) {
 	return paquete;
 }
 
-t_stream* paquetePop(struct_pop* estructura) {
-	t_stream* paquete =NULL;
-
-	//Aca me las tengo que ingeniar para decirle a la UMV que popee, pero no le mando nada :(
-
-	return paquete;
-}
-
 t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
 	t_stream* paquete;
 
@@ -118,6 +113,36 @@ t_stream* paquetePopRetornar(struct_pop_retornar* estructura) {
 	return paquete;
 }
 
+t_stream * paqueteSignal(struct_signal * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(struct_signal);
+
+	char * data = crearData(STRUCT_SIGNAL, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(struct_signal));	//copio a data la estructura.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
+t_stream * paqueteNumero(struct_numero * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearData(STRUCT_NUMERO, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(struct_numero));		//copio a data el numero.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
@@ -132,17 +157,9 @@ struct_push* sacarPaquetePush(char* data, uint32_t length) {
 
 }
 
-struct_push* sacarPaquetePop(char* data, uint32_t length) {
-	struct_push* estructuraDestino = malloc(sizeof(struct_push));
 
-	//Ver que pongo aca
-
-	return estructuraDestino;
-
-}
-
-struct_push* sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
-	struct_push* estructuraDestino = malloc(sizeof(struct_push));
+struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
+	struct_pop_desreferenciar* estructuraDestino = malloc(sizeof(struct_pop_desreferenciar));
 
 	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
 
@@ -150,8 +167,8 @@ struct_push* sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
 
 }
 
-struct_push* sacarPaquetePopRetornar(char* data, uint32_t length) {
-	struct_push* estructuraDestino = malloc(sizeof(struct_push));
+struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length) {
+	struct_pop_retornar* estructuraDestino = malloc(sizeof(struct_pop_retornar));
 
 	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
 
@@ -159,23 +176,41 @@ struct_push* sacarPaquetePopRetornar(char* data, uint32_t length) {
 
 }
 
+struct_signal * sacarPaqueteSignal(char * dataPaquete, uint32_t length){
+	struct_signal * estructuraDestino = malloc(sizeof(struct_signal));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(struct_signal)); //copio el data del paquete a la estructura
+
+	return estructuraDestino;
+}
+
+struct_numero * sacarPaqueteNumero(char * dataPaquete, uint32_t length){
+	struct_numero * estructuraDestino = malloc(sizeof(struct_numero));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
 
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
 void *deserializar(int type, char* data, uint32_t length) {
 	void* estructuraDestino = NULL;
 
 	switch(type) {
-	case PUSH_SIZE_CHECK:
+	case STRUCT_PUSH:
 		estructuraDestino = sacarPaquetePush(data, length);
 		break;
-	case POP:
-		estructuraDestino = sacarPaquetePop(data,length);
-		break;
-	case POP_DESREFERENCIAR:
+	case STRUCT_POP_DESREFERENCIAR:
 		estructuraDestino = sacarPaquetePopDesreferenciar(data,length);
 		break;
-	case POP_RETORNAR:
+	case STRUCT_POP_RETORNAR:
 		estructuraDestino = sacarPaquetePopRetornar(data,length);
+		break;
+	case STRUCT_NUMERO:
+		estructuraDestino = sacarPaqueteNumero(data,length);
+		break;
+	case STRUCT_SIGNAL:
+		estructuraDestino = sacarPaqueteSignal(data,length);
 		break;
 	}
 return estructuraDestino;
