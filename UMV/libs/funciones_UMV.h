@@ -16,7 +16,6 @@
 #include "estructuras_umv.h"
 #include <string.h>
 #include "parser/metadata_program.h"
-#include "estructuras_umv.h"
 #include "funciones_UMV.h"
 #include "commons/config.h"
 #include "commons/collections/list.h"
@@ -36,6 +35,9 @@ extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;
 extern pthread_mutex_t* mutex;
 extern char* PATH;
+extern int tamanioMP;
+extern int programaEnUso;
+extern tablaSeg tablaDeSegmentos;
 
 /*Prototipos de funciones auxiliares*/
 
@@ -45,7 +47,8 @@ _Bool solicitarMemoria(t_programa prgrama);
 //_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
 //_Bool segmentationFault(uint32_t base,uint32_t offset);
 _Bool validarSolicitud(uint32_t longitud);
-
+_Bool hayEspacioEnMemoriaPara(uint32_t longitud);
+_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
 
 int escogerUbicacionF(int tamanio);
 int escogerUbicacionW(int tamanio);
@@ -58,7 +61,8 @@ void algoritmo(void);
 void retardo(int valorRetardoEnMilisegundos);
 void compactar(void);
 void dump();
-void solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
+t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
+t_buffer* obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
 void crearSegmentoPrograma(int id_prog, int tamanio);
 
