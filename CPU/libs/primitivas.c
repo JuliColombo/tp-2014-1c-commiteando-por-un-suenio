@@ -212,9 +212,12 @@ void finalizar() {
 void retornar(t_valor_variable retorno){
 	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	//Socket de UMV para actualizar mi top_index
-
+	uint32_t posicionVariable; //no va
 	t_valor_variable* ret = &retorno;
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(ret,pila,posicionVariable);
+	struct_push* estructura = crear_struct_push(posicionVariable,ret);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
+
 	//Socket de UMV para actualizar mi top_index
 	volverAContextoAnterior();
 	regenerarDiccionario(tamanio_contexto);

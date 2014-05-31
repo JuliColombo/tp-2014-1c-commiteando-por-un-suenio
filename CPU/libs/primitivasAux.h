@@ -10,17 +10,13 @@
 
 #include <parser/metadata_program.h>
 #include <commons/collections/dictionary.h>
+#include "Sockets/socket.h"
 
 typedef struct{
 	char* name;
 	t_puntero pos;
 }t_elemento;
 
-
-
-int comprendidoEntre(int m, int n, int i);
-
-t_valor_variable nombreParametro(int i);
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 

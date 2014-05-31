@@ -16,10 +16,10 @@
 
 #define S_ERROR 0
 #define STRUCT_PUSH 1
-#define STRCUT_POP 2
-#define STRUCT_POP_DESREFERENCIAR 3
-#define STRUCT_POP_RETORNAR 4
-#define STRUCT_SIGNAL 5
+#define STRUCT_POP_DESREFERENCIAR 2
+#define STRUCT_POP_RETORNAR 3
+#define STRUCT_SIGNAL 4
+#define STRUCT_NUMERO 5
 
 typedef uint8_t t_estructura;
 
@@ -44,13 +44,16 @@ t_header cargarData(t_estructura estructura, uint32_t length);
 char* crearData(t_estructura estructura, uint32_t length);
 t_stream* paquetePopRetornar(struct_pop_retornar* estructura);
 t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura);
-t_stream* paquetePop(struct_pop* estructura);
 t_stream* paquetePush(struct_push* estructura);
+t_stream* paqueteSignal(struct_signal* estructura);
+t_stream* paqueteNumero(struct_numero* estructura);
 
 struct_push* sacarPaquetePush(char* data, uint32_t length);
 struct_push* sacarPaquetePop(char* data, uint32_t length);
-struct_push* sacarPaquetePopDesreferenciar(char* data, uint32_t length);
-struct_push* sacarPaquetePopRetornar(char* data, uint32_t length);
+struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t length);
+struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length);
+struct_signal* sacarPaqueteSignal(char* data, uint32_t length);
+struct_numero* sacarPaqueteNumero(char* data, uint32_t length);
 void *deserializar(int type, char* data, uint32_t length);
 t_header despaquetizarHeader(char * header);
 

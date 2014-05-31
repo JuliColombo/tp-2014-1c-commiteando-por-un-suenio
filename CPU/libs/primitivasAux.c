@@ -10,6 +10,7 @@
 //Esto de aca es para probar. Despues se pasan por sockets y esas cosas.
 t_dictionary *diccionario;
 int sockfd;
+int sockAjeno;
 int top_index;
 
 //t_pcb pcb:
@@ -20,25 +21,6 @@ int program_counter;
 int tamanio_contexto;
 char* etiquetas;
 t_size etiquetas_size;
-
-
-
-int comprendidoEntre(int m, int n, int i) {
-	int menor = (i>=m);
-	int mayor = (i<=n);
-	return (menor && mayor);
-}
-
-
-t_valor_variable nombreParametro(int i) {
-	t_valor_variable nombre=0;
-	if(comprendidoEntre(0,9,i)) {
-		nombre = i;
-	} else {
-		nombre = -1;
-	}
-	return nombre;
-}
 
 
 t_puntero calcularPosicionAsignacionCPU(int top_index) {
@@ -76,13 +58,19 @@ void reservarContextoSinRetorno() {
 	posicionContextoViejo = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
+	struct_push* estructura1 = crear_struct_push(posicionContextoViejo,*cursor);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura1);
+
 
 	//Pushear Program Counter de proxima instruccion:
 	int posicionPC;
 	program_counter +=1;
 	int pc = program_counter;
 	posicionPC = calcularPosicionAsignacionCPU(top_index);
+
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
+	struct_push* estructura2 = crear_struct_push(posicionPC,pc);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura2);
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -98,7 +86,8 @@ void reservarContextoConRetorno(){
 	posicionAVariable = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-
+	struct_push* estructura = crear_struct_push(posicionAVariable,posicionVar);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
 }
 
 
@@ -134,11 +123,24 @@ void regenerarDiccionario(int tamanio_contexto) {
 
 void volverAContextoAnterior() {
 	//en realidad usaria pcb->tamanio_contexto
-	//Usaria pcb->c_stack. O sea, que vaya a donde comienza mi contexto, para empezar a popear.
+	//Usaria pcb->c_stack. Osea, que vaya a donde comienza mi contexto, para empezar a popear.
 
 	//Socket a UMV para que haga: t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
+	t_estructura tipo; //Que onda esto?
+	struct_pop_retornar* estructura = crear_struct_pop_retornar(c_stack);
+	socket_enviar(sockAjeno,STRUCT_POP_RETORNAR,estructura);
+
 	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
-	//Socket a UMV para que haga: t_puntero cursor_stack_viejo = POP(pila);
+	struct_numero** estructura2;
+	socket_enviarSignal(sockAjeno, POP);
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	t_puntero program_counter = (*estructura2)->numero;
+
+	//Socket a UMV para quehaga: t_puntero cursor_stack_viejo = POP(pila);
+	struct_numero** estructura3;
+	socket_enviarSignal(sockAjeno, POP);
+	socket_recibir(sockAjeno,&tipo, *estructura3);
+	t_puntero cursor_stack_viejo = (*estructura3)->numero;
 
 	//Socket de UMV para que yo actualice el top_index
 
