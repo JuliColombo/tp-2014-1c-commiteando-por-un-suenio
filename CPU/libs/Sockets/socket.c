@@ -217,10 +217,10 @@ int socket_aceptarCliente(int socketEscucha){
  *
  * Funcion: paquetiza y envia la estructura, convierte la estructura a un buffer transferible y la envia
  */
-int socket_enviar(int socketReceptor, uint8_t type, void* estructura){
+int socket_enviar(int socketReceptor, t_estructura tipoEstructura, void* estructura){
 	int cantBytesEnviados;
 
-	t_stream * paquete = nipc_serializar2(type, estructura);
+	t_stream * paquete = serializar(tipoEstructura, estructura);
 
 	cantBytesEnviados = send(socketReceptor, paquete->buffer, paquete->length, 0);
 	free(paquete->buffer);
@@ -249,15 +249,15 @@ int socket_enviar(int socketReceptor, uint8_t type, void* estructura){
  *
  * Funcion: recibir y despaquetizar, convierte el paquete recibido a la estructura que corresponda.
  */
-int socket_recibir(int socketEmisor, uint8_t * type, void** estructura){
+int socket_recibir(int socketEmisor, t_estructura * tipoEstructura, void** estructura){
 	int cantBytesRecibidos;
-	t_nipc header;
+	t_header header;
 	char* buffer;
 	char* bufferHeader;
 
-	bufferHeader = malloc(sizeof(t_nipc));
+	bufferHeader = malloc(sizeof(t_header));
 
-	cantBytesRecibidos = recv(socketEmisor, bufferHeader, sizeof(t_nipc), MSG_WAITALL);	//Recibo por partes, primero el header.
+	cantBytesRecibidos = recv(socketEmisor, bufferHeader, sizeof(t_header), MSG_WAITALL);	//Recivo por partes, primero el header.
 	if(cantBytesRecibidos == -1){
 		free(bufferHeader);
 		perror("Error al recibir datos\n");
@@ -267,8 +267,8 @@ int socket_recibir(int socketEmisor, uint8_t * type, void** estructura){
 	header = despaquetizarHeader(bufferHeader);
 	free(bufferHeader);
 
-	if (type != NULL) {
-		*type = header.Type;
+	if (tipoEstructura != NULL) {
+		*tipoEstructura = header.Type;
 	}
 
 	if(header.Lenght == 0){	//Si recivo mensaje con length 0 retorno 1 y *estructura NULL.
@@ -287,7 +287,7 @@ int socket_recibir(int socketEmisor, uint8_t * type, void** estructura){
 	}
 
 	if(estructura != NULL) {
-		*estructura = nipc_deserializar2(header.Type, buffer, header.Lenght);
+		*estructura = deserializar(header.Type, buffer, header.Lenght);
 	}
 
 	free(buffer);
@@ -331,7 +331,7 @@ int socket_enviarSignal(int socketReceptor, t_signal signal){
 
 int socket_recibirSignal(int socketEmisor, t_signal *signal){
 	void * estructuraRecibida;
-	uint8_t tipoRecibido;
+	t_estructura tipoRecibido;
 
 	int recibio = socket_recibir(socketEmisor,&tipoRecibido, &estructuraRecibida);
 	if(!recibio) {

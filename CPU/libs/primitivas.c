@@ -6,7 +6,7 @@
  */
 
 #include "primitivasAux.h"
-#include "socket.h"
+#include "Sockets/socket.h"
 #include "primitivas.h"
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
@@ -27,6 +27,7 @@
 
 t_dictionary *diccionario;
 int sockfd;
+int sockAjeno;
 int top_index;
 
 //t_pcb pcb:
@@ -42,12 +43,12 @@ t_intructions* index_codigo;
 
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
-
 	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket enviando posicion e id para que la UMV pushee
 	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
-
+	struct_push* estructura = crear_struct_push(posicion,id);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
 
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
 
@@ -79,6 +80,8 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	//Socket enviando direccion_variable a UMV para que haga pop
 	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
+	struct_pop_desreferenciar* estructura = crear_struct_pop_desreferenciar(direccion_variable);
+	socket_enviar(sockAjeno,STRUCT_POP_DESREFERENCIAR,estructura);
 
 	//Socket recibiendo t_valor_variable id
 	//return id;
@@ -91,6 +94,8 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Socket enviando direccion_variable y valor a UMV
 	//En UMV PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
+	struct_push* estructura = crear_struct_push(direccion_variable,valor);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
 
 	if(top_index < direccion_variable) {
 		top_index = direccion_variable;
