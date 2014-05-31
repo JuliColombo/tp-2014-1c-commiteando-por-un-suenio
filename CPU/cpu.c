@@ -24,7 +24,7 @@ int main (int argc, char **argv){
 	//Con el top_index voy a poder calcular la posicion a pushear
 
 
-	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
+	int thread_kernel = pthread_create(&conexion_kernel, NULL, socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel), NULL);
 	return 0;
 }
 
@@ -57,31 +57,6 @@ void log_error_socket(void){
 }
 
 
-void* core_conexion_kernel(void){
-	int sock;		//El socket de conexion
-	int n_sock;		//El socket de datos
-	t_stream* paquete;	//El paquete que recibe el socket
+void core_conexion_kernel(void){
 
-	if ((sock = socket_crearServidor(configuracion_cpu.puerto_kernel))<0){
-		log_error_socket();
-	}//El socket esta creado y listo para escuchar a los clientes por el puerto_programas
-
-	while(1){
-		printf("Esperando conexion de programas...\n");
-		n_sock = nipc_aceptarConexion(sock);
-		memset(paquete, 0, sizeof(paquete));
-		if (nipc_recibir(n_sock,paquete)<0){
-			//No se recibieron datos
-		} else {
-			//Se recibieron datos
-			//Acá va la lógica de qué hacer cuando llega un programa nuevo
-		}
-		break; //Esto va a hacer que salga del bucle y solo se corra una vez, despues hay que sacarlo
-	}
-	//Esto nunca se ejecutaria, al salir del bucle deberia terminar el proceso. Esta para que el eclipse no se queje
-	if (close(sock)<0){
-		//Error con el close
-	}
-
-	return 0;
 }

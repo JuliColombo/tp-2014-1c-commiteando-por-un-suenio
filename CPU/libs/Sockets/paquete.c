@@ -21,37 +21,37 @@ void nipc_destruirPaquete(t_stream* paquete) {
 
 //DESTRUIR PAQUETE DESPUES DE SERIALIZAR
 
-t_stream* nipc_serializar2(int type, void* estructura) {
+t_stream* serializar(int type, void* estructura) {
 	t_stream* stream = NULL;
 	switch(type) {
 	case PUSH_SIZE_CHECK:
-		stream = nipc_paquetePush((struct_push*) estructura);
+		stream = paquetePush((struct_push*) estructura);
 		break;
 	case POP:
-		stream = nipc_paquetePop((struct_pop*) estructura);
+		stream = paquetePop((struct_pop*) estructura);
 		break;
 	case POP_DESREFERENCIAR:
-		stream = nipc_paquetePopDesreferenciar((struct_pop_desreferenciar*) estructura);
+		stream = paquetePopDesreferenciar((struct_pop_desreferenciar*) estructura);
 		break;
 	case POP_RETORNAR:
-		stream = nipc_paquetePopRetornar((struct_pop_retornar*) estructura);
+		stream = paquetePopRetornar((struct_pop_retornar*) estructura);
 		break;
 	}
 	return stream;
 }
 
-t_nipc cargarData(uint8_t estructura, uint32_t length) {
-	t_nipc package;
+t_header cargarData(t_estructura estructura, uint32_t length) {
+	t_header package;
 	package.Type = estructura;
 	package.Lenght = length;
 	return package;
 
 }
 
-char* crearData(uint8_t estructura, uint32_t length) {
+char* crearData(t_estructura estructura, uint32_t length) {
 	char* data = malloc(length);
-	uint32_t lengthDatos = length - sizeof(t_nipc);
-	t_nipc package = cargarData(estructura, lengthDatos);
+	uint32_t lengthDatos = length - sizeof(t_header);
+	t_header package = cargarData(estructura, lengthDatos);
 
 	uint32_t tamanioDato=0;
 
@@ -62,11 +62,11 @@ char* crearData(uint8_t estructura, uint32_t length) {
 
 }
 
-t_stream* nipc_paquetePush(struct_push* estructura) {
+t_stream* paquetePush(struct_push* estructura) {
 	t_stream* paquete;
 
 	paquete = malloc(sizeof(t_stream));
-	paquete->length = sizeof(t_nipc) + sizeof(estructura->id) + sizeof(estructura->posicion);
+	paquete->length = sizeof(t_header) + sizeof(estructura->id) + sizeof(estructura->posicion);
 
 	char* data = crearData(STRUCT_PUSH,paquete->length);
 
@@ -80,7 +80,7 @@ t_stream* nipc_paquetePush(struct_push* estructura) {
 	return paquete;
 }
 
-t_stream* nipc_paquetePop(struct_pop* estructura) {
+t_stream* paquetePop(struct_pop* estructura) {
 	t_stream* paquete =NULL;
 
 	//Aca me las tengo que ingeniar para decirle a la UMV que popee, pero no le mando nada :(
@@ -88,11 +88,11 @@ t_stream* nipc_paquetePop(struct_pop* estructura) {
 	return paquete;
 }
 
-t_stream* nipc_paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
+t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
 	t_stream* paquete;
 
 	paquete = malloc(sizeof(t_stream));
-	paquete->length = sizeof(t_nipc) + sizeof(estructura->posicion);
+	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
 
 	char* data = crearData(STRUCT_POP_DESREFERENCIAR,paquete->length);
 
@@ -103,11 +103,11 @@ t_stream* nipc_paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
 	return paquete;
 }
 
-t_stream* nipc_paquetePopRetornar(struct_pop_retornar* estructura) {
+t_stream* paquetePopRetornar(struct_pop_retornar* estructura) {
 	t_stream* paquete;
 
 	paquete = malloc(sizeof(t_stream));
-	paquete->length = sizeof(t_nipc) + sizeof(estructura->posicion);
+	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
 
 	char* data = crearData(STRUCT_POP_RETORNAR,paquete->length);
 
@@ -121,7 +121,7 @@ t_stream* nipc_paquetePopRetornar(struct_pop_retornar* estructura) {
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
-struct_push* nipc_sacarPaquetePush(char* data, uint32_t length) {
+struct_push* sacarPaquetePush(char* data, uint32_t length) {
 	struct_push* estructuraDestino = malloc(sizeof(struct_push));
 
 	int tamanioDato = 0;
@@ -132,7 +132,7 @@ struct_push* nipc_sacarPaquetePush(char* data, uint32_t length) {
 
 }
 
-struct_push* nipc_sacarPaquetePop(char* data, uint32_t length) {
+struct_push* sacarPaquetePop(char* data, uint32_t length) {
 	struct_push* estructuraDestino = malloc(sizeof(struct_push));
 
 	//Ver que pongo aca
@@ -141,7 +141,7 @@ struct_push* nipc_sacarPaquetePop(char* data, uint32_t length) {
 
 }
 
-struct_push* nipc_sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
+struct_push* sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
 	struct_push* estructuraDestino = malloc(sizeof(struct_push));
 
 	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
@@ -150,7 +150,7 @@ struct_push* nipc_sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
 
 }
 
-struct_push* nipc_sacarPaquetePopRetornar(char* data, uint32_t length) {
+struct_push* sacarPaquetePopRetornar(char* data, uint32_t length) {
 	struct_push* estructuraDestino = malloc(sizeof(struct_push));
 
 	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
@@ -161,28 +161,28 @@ struct_push* nipc_sacarPaquetePopRetornar(char* data, uint32_t length) {
 
 
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
-void *nipc_deserializar2(int type, char* data, uint32_t length) {
+void *deserializar(int type, char* data, uint32_t length) {
 	void* estructuraDestino = NULL;
 
 	switch(type) {
 	case PUSH_SIZE_CHECK:
-		estructuraDestino = nipc_sacarPaquetePush(data, length);
+		estructuraDestino = sacarPaquetePush(data, length);
 		break;
 	case POP:
-		estructuraDestino = nipc_sacarPaquetePop(data,length);
+		estructuraDestino = sacarPaquetePop(data,length);
 		break;
 	case POP_DESREFERENCIAR:
-		estructuraDestino = nipc_sacarPaquetePopDesreferenciar(data,length);
+		estructuraDestino = sacarPaquetePopDesreferenciar(data,length);
 		break;
 	case POP_RETORNAR:
-		estructuraDestino = nipc_sacarPaquetePopRetornar(data,length);
+		estructuraDestino = sacarPaquetePopRetornar(data,length);
 		break;
 	}
 return estructuraDestino;
 }
 
-t_nipc despaquetizarHeader(char * header){
-	t_nipc estructuraHeader;
+t_header despaquetizarHeader(char * header){
+	t_header estructuraHeader;
 
 	int tamanoTotal = 0, tamanoDato = 0;
 	memcpy(&estructuraHeader.Type, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
