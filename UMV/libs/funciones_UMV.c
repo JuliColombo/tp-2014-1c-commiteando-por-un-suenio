@@ -241,18 +241,21 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 
 int escogerUbicacionF(int tamanio){
 	int posicionDeDestino;
-		//Obtengo primer posicion libre en MP
-			int i=0;
+	int i=0;
+			//Recorro la memoria principal
 		while(i<tamanioMP){
 			int aux=0;
-			while (MP[i]!=NULL) i++;
+			//Obtengo primer posicion libre en MP
+			while (MP[i]!=NULL && i<tamanioMP) i++;
 			posicionDeDestino= i;
-			//Checkeo si todas las posiciones hasta la
-			//la ultima posicion del segmento esta libre, si no, busca de nuevo
-			while(MP[i] != NULL){
+			//Checkeo la cantidad de posiciones libres hasta llegar a
+			//una posicion ocupada, o el final de la memoria
+			while(MP[i] != NULL && i<tamanioMP){
 				aux++;
 				i++;
 			}
+			//Checkeo si la cantidad de posiciones es mayor o igual al tamanio
+			//solicitado
 			if(aux>=tamanio){
 			//Devuelve la posicion de ubicacion del segmento
 			return posicionDeDestino;
@@ -262,14 +265,41 @@ int escogerUbicacionF(int tamanio){
 			//Le pongo que retorne -1 para mostrar este error
 			return -1;
 }
+
 int escogerUbicacionW(int tamanio){
 	int posicionDeDestino;
-	/*TODO: acá habría que recorrer la MP buscando la posición más grande en la
-que entraría el segmento del programa*/
+	int max=0;
+	//La inicializo en -1, para que al final, si no se encontro una posicion libre
+	//retorne este valor de error
+	int posicionFinal=-1;
+	int i=0;
+	//Recorro la memoria principal
+	while(i<tamanioMP){
+				int aux=0;
+			//Obtengo primer posicion libre en MP
+				while (MP[i]!=NULL && i<tamanioMP) i++;
+				posicionDeDestino= i;
+			//Checkeo la cantidad de posiciones libres hasta llegar a
+			//una posicion ocupada, o el final de la memoria
+				while(MP[i] != NULL && i<tamanioMP){
+					aux++;
+					i++;
+				}
+			//Checkeo si la cantidad de posiciones es mayor o igual al tamanio
+			//solicitado
+				if(aux>=tamanio){
+			//Checkeo si esta cantidad es mayor que el maximo numero de posiciones
+			//libres encontradas
+						if(max>aux){
+			//Reasigno el maximo y la posicionFinal
+							max=aux;
+							posicionFinal=posicionDeDestino;
+						}
+				}
+		}
 
-
-	//Devuelve la posicion
-		return posicionDeDestino;
+	//Devuelve la posicionFinal, que valdrá -1 de no encontrar espacio
+		return posicionFinal;
 }
 
 
