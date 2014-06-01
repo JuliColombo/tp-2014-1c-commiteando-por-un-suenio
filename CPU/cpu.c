@@ -48,7 +48,7 @@ void leerConfiguracion(void){
 
 	configuracion_cpu.ip_kernel=config_get_string_value(config,"Direccion IP para conectarse al Kernel");
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
-	configuracion_cpu.ip_umv=config_get_int_value(config,"Direccion IP para conectarse a la UMV");
+	configuracion_cpu.ip_umv=config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_cpu.puerto_umv=config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 }
 

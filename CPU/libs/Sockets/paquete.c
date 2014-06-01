@@ -36,6 +36,15 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_NUMERO:
 		stream = paqueteNumero((struct_numero*) estructura);
 		break;
+	case STRUCT_CHAR:
+		stream = paqueteChar((struct_char*) estructura);
+		break;
+	case STRUCT_STRING:
+		stream = paqueteString((struct_string*) estructura);
+		break;
+	case STRUCT_ASIGNAR_COMPARTIDA:
+		stream = paqueteAsignarCompartida((struct_asignar_compartida*) estructura);
+		break;
 	case STRUCT_SIGNAL:
 		stream = paqueteSignal((struct_signal*) estructura);
 		break;
@@ -143,6 +152,60 @@ t_stream * paqueteNumero(struct_numero * estructuraOrigen){
 	return paquete;
 }
 
+t_stream * paqueteChar(struct_char * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearData(STRUCT_CHAR, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), &estructuraOrigen->letra, sizeof(char));		//copio a data el char.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
+t_stream * paqueteString(struct_string * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->string) + 1;
+
+	char * data = crearData(STRUCT_STRING, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->string, strlen(estructuraOrigen->string)+1);		//copio a data el string.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
+t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructuraOrigen){
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->id) + 1 + sizeof(estructuraOrigen->valor);
+
+	char * data = crearData(STRUCT_ASIGNAR_COMPARTIDA, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+	int tamanoDato = 0;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->id, tamanoDato = strlen(estructuraOrigen->id)+1);		//copio a data el id.
+
+	tamanoDato += tamanoTotal; //No se si esta bien esto :(
+
+	memcpy(data + tamanoDato, &estructuraOrigen->valor, sizeof(estructuraOrigen->valor));
+
+	paquete->buffer = data;
+
+	return paquete;
+
+}
+
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
@@ -192,6 +255,47 @@ struct_numero * sacarPaqueteNumero(char * dataPaquete, uint32_t length){
 	return estructuraDestino;
 }
 
+struct_char * sacarPaqueteChar(char * dataPaquete, uint32_t length){
+	struct_char * estructuraDestino = malloc(sizeof(struct_char));
+
+	memcpy(&estructuraDestino->letra, dataPaquete, sizeof(char)); //copio la letra a la estructura
+
+	return estructuraDestino;
+}
+
+struct_string * sacarPaqueteString(char * dataPaquete, uint32_t length){
+	struct_string * estructuraDestino = malloc(sizeof(struct_string));
+
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->string = malloc(tamanoDato);
+	memcpy(estructuraDestino->string, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+
+	return estructuraDestino;
+}
+
+struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* dataPaquete, uint32_t length) {
+	struct_asignar_compartida* estructuraDestino = malloc(sizeof(struct_asignar_compartida));
+
+	int tamanoTotal=0;
+	int tamanoDato = 0;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->id = malloc(tamanoDato);
+	memcpy(estructuraDestino->id, dataPaquete + tamanoTotal, tamanoDato); //copio el id a la estructura
+
+	tamanoTotal += tamanoDato; //No se si esta bien esto
+
+	memcpy(&estructuraDestino->valor, dataPaquete + tamanoTotal, sizeof(estructuraDestino->valor));
+
+	return estructuraDestino;
+}
+
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
 void *deserializar(int type, char* data, uint32_t length) {
 	void* estructuraDestino = NULL;
@@ -208,6 +312,15 @@ void *deserializar(int type, char* data, uint32_t length) {
 		break;
 	case STRUCT_NUMERO:
 		estructuraDestino = sacarPaqueteNumero(data,length);
+		break;
+	case STRUCT_CHAR:
+		estructuraDestino = sacarPaqueteChar(data,length);
+		break;
+	case STRUCT_STRING:
+		estructuraDestino = sacarPaqueteString(data,length);
+		break;
+	case STRUCT_ASIGNAR_COMPARTIDA:
+		estructuraDestino = sacarPaqueteAsignarCompartida(data,length);
 		break;
 	case STRUCT_SIGNAL:
 		estructuraDestino = sacarPaqueteSignal(data,length);

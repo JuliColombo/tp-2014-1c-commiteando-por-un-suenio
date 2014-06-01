@@ -84,8 +84,11 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_enviar(sockAjeno,STRUCT_POP_DESREFERENCIAR,estructura);
 
 	//Socket recibiendo t_valor_variable id
-	//return id;
-	return 0; //no va
+	t_estructura tipo;
+	struct_char** estructura2;
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	t_valor_variable id = (*estructura2)->letra;
+	return id;
 }
 
 
@@ -103,24 +106,36 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Le digo a UMV que actualice su top_index del stack
 	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
+	struct_numero* estructura2 = crear_struct_numero(top_index);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura2);
+
 	program_counter += 1;
 }
 
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
+	//Socket mandando a Kernel el nombre de la variable de la que quiero saber el valor
+	struct_string* estructura = crear_struct_string(variable);
+	socket_enviar(sockAjeno,STRUCT_STRING,estructura);
 
-	//Socket recibiendo la copia (no puntero) del valor de la "variable"
+	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
+	t_estructura tipo = STRUCT_NUMERO;
+	struct_numero** estructura2;
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	t_valor_variable valor = (*estructura2)->numero;
 
-	return 0;
+	return valor;
 }
 
 
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
 
-	//Socket enviando Kernel para que asigne el "valor" a "variable"
+	//Socket enviando Kernel para que asignNe el "valor" a "variable"
+	struct_asignar_compartida* estructura = crear_struct_asignar_compartida(variable, valor);
+	socket_enviar(sockAjeno, STRUCT_ASIGNAR_COMPARTIDA,estructura);
 
 	program_counter += 1;
-	return 0;
+	return valor;
 }
 
 
@@ -213,12 +228,14 @@ void retornar(t_valor_variable retorno){
 	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	//Socket de UMV para actualizar mi top_index
 	uint32_t posicionVariable; //no va
-	t_valor_variable* ret = &retorno;
+
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(ret,pila,posicionVariable);
-	struct_push* estructura = crear_struct_push(posicionVariable,ret);
+	//en UMV t_valor_variable* ret = &retorno;
+	struct_push* estructura = crear_struct_push(posicionVariable,retorno);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
 
 	//Socket de UMV para actualizar mi top_index
+
 	volverAContextoAnterior();
 	regenerarDiccionario(tamanio_contexto);
 
@@ -228,6 +245,8 @@ int imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
 	//Socket a Kernel enviandole el valor a mostrar
+	struct_numero* estructura = crear_struct_numero(valor_mostrar);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
 
 	return 0;
 }
@@ -236,11 +255,16 @@ int imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
 	//Socket a Kernel enviandole texto
+	struct_string* estructura = crear_struct_string(texto);
+	socket_enviar(sockAjeno,STRUCT_STRING,estructura);
+
 	return 0;
 }
 
 int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
+
+	//Socket con mensaje?
 	return 0;
 }
 

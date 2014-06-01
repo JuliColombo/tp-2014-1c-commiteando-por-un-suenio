@@ -136,7 +136,7 @@ void volverAContextoAnterior() {
 	socket_recibir(sockAjeno,&tipo, *estructura2);
 	t_puntero program_counter = (*estructura2)->numero;
 
-	//Socket a UMV para quehaga: t_puntero cursor_stack_viejo = POP(pila);
+	//Socket a UMV para que haga: t_puntero cursor_stack_viejo = POP(pila);
 	struct_numero** estructura3;
 	socket_enviarSignal(sockAjeno, POP);
 	socket_recibir(sockAjeno,&tipo, *estructura3);

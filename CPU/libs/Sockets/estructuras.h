@@ -61,9 +61,27 @@ typedef struct {
 }__attribute__((packed)) struct_numero;
 
 
+typedef struct {
+	char letra;
+}__attribute__((packed)) struct_char;
+
+typedef struct {
+	char * string;
+} __attribute__ ((__packed__)) struct_string;
+
+
+typedef struct {
+	char * id;
+	uint32_t valor;
+} __attribute__ ((__packed__)) struct_asignar_compartida;
+
 struct_push* crear_struct_push(uint32_t posicion, int id);
 struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);
 struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion);
+struct_numero* crear_struct_numero(uint32_t numero);
+struct_char* crear_struct_char(char letra);
+struct_string* crear_struct_string(char* string);
+struct_asignar_compartida* crear_struct_asignar_compartida(char* id, uint32_t valor);
 
 
 #endif /* ESTRUCTURAS_H_ */

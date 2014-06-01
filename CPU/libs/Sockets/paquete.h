@@ -20,6 +20,9 @@
 #define STRUCT_POP_RETORNAR 3
 #define STRUCT_SIGNAL 4
 #define STRUCT_NUMERO 5
+#define STRUCT_CHAR 6
+#define STRUCT_STRING 7
+#define STRUCT_ASIGNAR_COMPARTIDA 8
 
 typedef uint8_t t_estructura;
 
@@ -47,6 +50,9 @@ t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura);
 t_stream* paquetePush(struct_push* estructura);
 t_stream* paqueteSignal(struct_signal* estructura);
 t_stream* paqueteNumero(struct_numero* estructura);
+t_stream* paqueteChar(struct_char* estructura);
+t_stream* paqueteString(struct_string* estructura);
+t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructura);
 
 struct_push* sacarPaquetePush(char* data, uint32_t length);
 struct_push* sacarPaquetePop(char* data, uint32_t length);
@@ -54,6 +60,9 @@ struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t le
 struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length);
 struct_signal* sacarPaqueteSignal(char* data, uint32_t length);
 struct_numero* sacarPaqueteNumero(char* data, uint32_t length);
+struct_char* sacarPaqueteChar(char* data, uint32_t length);
+struct_string* sacarPaqueteString(char* data, uint32_t length);
+struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* data, uint32_t length);
 void *deserializar(int type, char* data, uint32_t length);
 t_header despaquetizarHeader(char * header);
 
