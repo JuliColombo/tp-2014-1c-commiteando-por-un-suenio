@@ -45,7 +45,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
 
-	//Socket enviando posicion e id para que la UMV pushee
+	//Socket enviandoposicion e id para que la UMV pushee
 	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
 	struct_push* estructura = crear_struct_push(posicion,id);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
