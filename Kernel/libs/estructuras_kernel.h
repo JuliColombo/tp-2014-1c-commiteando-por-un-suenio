@@ -10,6 +10,7 @@ typedef uint16_t t_puerto_programa;
 typedef uint16_t t_puerto_cpu;
 typedef uint16_t t_tamanio_mp;
 typedef uint16_t t_puerto_umv;
+typedef int t_tamanio_stack;
 typedef char* t_ip_umv;
 
 typedef uint8_t t_quantum;
@@ -49,7 +50,8 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_id_hio id_hio;						//Identificador de cada dispositivo de entrada/salida
 	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
 	t_ip_umv ip_umv;						//IP de la UMV
-	t_variables_globales var_globales;	//Variables globales del sistema
+	t_variables_globales var_globales;		//Variables globales del sistema
+	t_tamanio_stack tamanio_stack;			//Tamaño del Stack
 } t_config_kernel;
 
 typedef struct{

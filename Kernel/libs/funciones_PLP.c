@@ -83,6 +83,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
+	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
 	}
 
@@ -115,29 +116,44 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	}
 	printf("\n");
 
+	printf("Tamaño del Stack: %d\n", configuracion_kernel.tamanio_stack);
+
 }
 
 
 
-/*Aca intente hacer el crearPcb. La consigna dice "PLP creara PCB y usara la funcionalidad del parser, que
- * recibira todo el codigo del script y devolvera una estrucutra con la info del programa, que contiene:
- * primera instruc, indice etiquetas, indice de codigo etc"
- *
 
-int crearPcb(int primeraInstruc,Pares indiceCod, int tamanioIndEti, int tamanioIndCod, int tamanioContext, int PC) {
-	PCB nuevoPcb;
-	nuevoPcb->ID = getpid();
-	nuevoPcb->indiceEtiquetas = dictionary_create();
-	nuevoPcb->indiceCodigo = indiceCod;
-	nuevoPcb->TamanioContext = tamanioContext;
-	nuevoPcb->ProgramCounter = PCB;
-	//No se que hacer con CODE, STACK y CursorSTACK
+t_pcb crearPcb(char* codigo) {
+	t_pcb nuevoPCB;
+	t_medatada_program *pcbAux;
+	pcbAux=metadatada_desde_literal(codigo);
+	nuevoPCB.program_counter=pcbAux->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+
+	/*Esto es lo falta cargarle al PCB
+	nuevoPCB.pid;				//Identificador único del Programa en el sistema
+	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
+	nuevoPCB.stack;				//Dirección del primer byte en la UMV del segmento de stack
+	nuevoPCB.c_stack;			//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
+	nuevoPCB.index_codigo;		//Dirección del primer byte en la UMV del Índice de Código
+	nuevoPCB.index_etiquetas;	//Dirección del primer byte en la UMV del Índice de Etiquetas
+	nuevoPCB.tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
+	nuevoPCB.tamanio_indice;
+	*/
+
+	/*Esto es lo que devuelve el parser
+	*pcbAux.instrucciones_size;				// Cantidad de instrucciones
+	*pcbAux.instrucciones_serializado; 		// Instrucciones del programa
+	*pcbAux.etiquetas_size;					// Tamaño del mapa serializado de etiquetas
+	*pcbAux.etiquetas;						// La serializacion de las etiquetas
+	*pcbAux.cantidad_de_funciones;
+	*pcbAux.cantidad_de_etiquetas;
+	*/
 	//Creo que aca podria venir el solicitarMemoria. No use el tamanioIndEti ni tamanioIndCod que son cosas que
 	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
 
-	return 0;
+	return nuevoPCB;
 	}
-*/
+
 
 
 
@@ -150,7 +166,7 @@ void* core_plp(void){
 	//int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
 	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
-	// deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
+	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
 
 	/*while (1){
@@ -186,7 +202,7 @@ void* core_conexion_plp_programas(void){
 	}
 
 	while (1){
-
+		break;
 	}
 
 	if(socket_cerrarConexion(sock_programas)<0){
