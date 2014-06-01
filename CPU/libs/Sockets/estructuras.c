@@ -50,3 +50,9 @@ struct_asignar_compartida* crear_struct_asignar_compartida(char* id, uint32_t va
 	estructura->valor = valor;
 	return estructura;
 }
+
+struct_tipo_instruccion* crear_struct_tipo_instruccion(t_intructions instruccion) {
+	struct_tipo_instruccion* estructura;
+	estructura->instruccion = instruccion;
+	return estructura;
+}

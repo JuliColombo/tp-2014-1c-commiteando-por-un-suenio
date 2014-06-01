@@ -17,7 +17,7 @@
 	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
 	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
 	t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
-	t_index_codigo index_codigo;			//Dirección del primer byte en la UMV del Índice de Código
+	t_intructions* index_codigo;		    //Dirección del primer byte en la UMV del Índice de Código
 	t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
 	t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 	t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
@@ -158,8 +158,6 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 
 void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
-	//definir variables si hay parametros
-	//Asignar a parametros
 	//HACER ALGO CON TAMAÑO DE CONTEXTO
 
 	reservarContextoSinRetorno();
@@ -172,14 +170,22 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 	program_counter = instruccion;
-	t_intructions inst = index_codigo[instruccion];
 
 	//Busco en indice de codigo qué le pido a UMV
+	t_intructions inst = index_codigo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
+	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
+	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
+	t_estructura tipo = STRUCT_STRING;
+	struct_string** estructura2;
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	const char* string = (*estructura2)->string;
+
 	//Meto eso en analizador_de_linea... para invocar al parser
+	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
 }
 
 
@@ -198,14 +204,22 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
 	program_counter = instruccion;
-	t_intructions inst = index_codigo[instruccion];
 
 	//Busco en indice de codigo qué le pido a UMV
+	t_intructions inst = index_codigo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
+	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
+	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
+	t_estructura tipo = STRUCT_STRING;
+	struct_string** estructura2;
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	const char* string = (*estructura2)->string;
+
 	//Meto eso en analizador_de_linea... para invocar al parser
+	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
 
 
 }

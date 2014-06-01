@@ -98,12 +98,21 @@ void reservarContextoConRetorno(){
 void guardarAlternado () {
 	top_index -=2;
 	//Socket a UMV para que haga: pila->top_index = top_index;
+	struct_numero* estructura = crear_struct_numero(top_index);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+
+	//Socket a UMV para que haga TOP(pila)
+	socket_enviarSignal(sockAjeno, TOP);
 
 	//Socket de UMV para que me pase lo ultimo que hay pusheado en la pila, y yo hacer: t_nombre_variable identificador_variable = TOP(pila);
+	t_estructura tipo = STRUCT_CHAR;
+	struct_char** estructura1;
+	socket_recibir(sockAjeno,&tipo, *estructura1);
+	t_valor_variable identificador_variable = (*estructura1)->letra;
 
-	//const char* str=convertirAString(identificador_variable);
-	//t_elemento* elem = elemento_create(str,top_index);
-	//dictionary_put(diccionario,elem->name,elem);
+	const char* str=convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str,top_index);
+	dictionary_put(diccionario,elem->name,elem);
 
 }
 
@@ -119,6 +128,8 @@ void regenerarDiccionario(int tamanio_contexto) {
 	}
 
 	//Socket a UMV para que haga: pila->top_index = top;
+	struct_numero* estructura = crear_struct_numero(top);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
 }
 
 void volverAContextoAnterior() {
@@ -149,5 +160,4 @@ void volverAContextoAnterior() {
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 }
-
 

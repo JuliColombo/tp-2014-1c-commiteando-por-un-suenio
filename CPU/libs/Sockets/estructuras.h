@@ -9,15 +9,13 @@
 #define ESTRUCTURAS_H_
 
 #include <stdint.h>
+#include <parser/metadata_program.h>
 
 typedef enum {
 	POP,
+	TOP,
 	ACTUALIZAR_TOP_INDEX, //??
 	RECIBIR_INST, //??
-	OBTENER_COMPARTIDA,
-	ASIGNAR_COMPARTIDA,
-	IMPRIMIR,
-	IMPRIMIR_TEXTO,
 	WAIT,
 	SIGNAL,
 }tipo_operacion_signal;
@@ -74,6 +72,11 @@ typedef struct {
 	char * id;
 	uint32_t valor;
 } __attribute__ ((__packed__)) struct_asignar_compartida;
+
+
+typedef struct {
+	t_intructions instruccion;
+}__attribute__ ((__packed__)) struct_tipo_instruccion;
 
 struct_push* crear_struct_push(uint32_t posicion, int id);
 struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);

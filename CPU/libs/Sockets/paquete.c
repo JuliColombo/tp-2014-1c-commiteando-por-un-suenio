@@ -48,6 +48,9 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_SIGNAL:
 		stream = paqueteSignal((struct_signal*) estructura);
 		break;
+	case STRUCT_TIPO_INSTRUCCION:
+		stream = paqueteTipoInstruccion((struct_tipo_instruccion*) estructura);
+		break;
 	}
 	return stream;
 }
@@ -206,6 +209,21 @@ t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructuraOrigen){
 
 }
 
+t_stream * paqueteTipoInstruccion(struct_tipo_instruccion * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->instruccion);
+
+	char * data = crearData(STRUCT_TIPO_INSTRUCCION, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), &estructuraOrigen->instruccion, sizeof(estructuraOrigen->instruccion));		//copio a data el char.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
@@ -296,6 +314,15 @@ struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* dataPaquete, uint
 	return estructuraDestino;
 }
 
+struct_tipo_instruccion * sacarPaqueteTipoInstruccion(char * dataPaquete, uint32_t length){
+	struct_tipo_instruccion * estructuraDestino = malloc(sizeof(struct_tipo_instruccion));
+
+	memcpy(&estructuraDestino->instruccion, dataPaquete, sizeof(estructuraDestino->instruccion)); //copio la letra a la estructura
+
+	return estructuraDestino;
+}
+
+
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
 void *deserializar(int type, char* data, uint32_t length) {
 	void* estructuraDestino = NULL;
@@ -324,6 +351,9 @@ void *deserializar(int type, char* data, uint32_t length) {
 		break;
 	case STRUCT_SIGNAL:
 		estructuraDestino = sacarPaqueteSignal(data,length);
+		break;
+	case STRUCT_TIPO_INSTRUCCION:
+		estructuraDestino = sacarPaqueteTipoInstruccion(data,length);
 		break;
 	}
 return estructuraDestino;

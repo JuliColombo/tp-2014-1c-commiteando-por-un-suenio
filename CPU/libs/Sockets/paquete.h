@@ -23,6 +23,7 @@
 #define STRUCT_CHAR 6
 #define STRUCT_STRING 7
 #define STRUCT_ASIGNAR_COMPARTIDA 8
+#define STRUCT_TIPO_INSTRUCCION 9
 
 typedef uint8_t t_estructura;
 
@@ -53,6 +54,7 @@ t_stream* paqueteNumero(struct_numero* estructura);
 t_stream* paqueteChar(struct_char* estructura);
 t_stream* paqueteString(struct_string* estructura);
 t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructura);
+t_stream * paqueteTipoInstruccion(struct_tipo_instruccion * estructuraOrigen);
 
 struct_push* sacarPaquetePush(char* data, uint32_t length);
 struct_push* sacarPaquetePop(char* data, uint32_t length);
@@ -63,6 +65,7 @@ struct_numero* sacarPaqueteNumero(char* data, uint32_t length);
 struct_char* sacarPaqueteChar(char* data, uint32_t length);
 struct_string* sacarPaqueteString(char* data, uint32_t length);
 struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* data, uint32_t length);
+struct_tipo_instruccion * sacarPaqueteTipoInstruccion(char * dataPaquete, uint32_t length);
 void *deserializar(int type, char* data, uint32_t length);
 t_header despaquetizarHeader(char * header);
 
