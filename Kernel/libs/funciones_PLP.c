@@ -204,6 +204,10 @@ void* core_conexion_plp_programas(void){
 	while (1){
 		break;
 	}
+	int i;
+	for (i=0; i<20; i++){
+		printf("Conexion programas n [%d]\n", i);
+	}
 
 	if(socket_cerrarConexion(sock_programas)<0){
 		printf("Error cerrando socket programas\n");
@@ -233,6 +237,11 @@ void* core_conexion_plp_cpu(void){
 	int sock_cpu;
 	if ((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus))>0){
 		printf("Escuchando CPUs\n");
+	}
+
+	int i;
+	for (i=0; i<20; i++){
+		printf("Conexion CPU n [%d]\n", i);
 	}
 
 	if(socket_cerrarConexion(sock_cpu)<0){
