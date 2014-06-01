@@ -83,7 +83,6 @@ typedef struct {
 	int peso;
 	t_medatada_program metadata;
 	t_pcb* pcb;
-	t_quantum quantum;
 	int flag_terminado;
 	int flag_bloqueado;
 } t_programa;

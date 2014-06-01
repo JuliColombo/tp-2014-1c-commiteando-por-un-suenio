@@ -240,7 +240,7 @@ void* core_pcp(void){
 	t_programa programa = (t_programa)list_remove(cola.ready,0);
 
 
-			while(programa.quantum < configuracion_kernel.quantum && programa.flag_terminado==0){
+			while(programa.flag_terminado==0){
 
 
 			//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó

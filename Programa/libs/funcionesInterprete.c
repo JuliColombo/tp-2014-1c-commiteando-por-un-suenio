@@ -62,3 +62,18 @@ void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente
 
 }
 
+int abrirSocket(void){
+	int sock;
+	if((sock=socket_crearYConectarCliente(configuracion_programa.ip_kernel,configuracion_programa.puerto_kernel))==-1){
+			log_escribir(archLog, "Conexion", ERROR, "No se pudo conectar al Kernel");
+			abort();
+		}
+	return sock;
+}
+
+void cerrarSocket(int sock){
+	int socket_cerrado;
+	if((socket_cerrado=socket_cerrarConexion(sock))==-1){
+		log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar la conexion con el Kernel");
+	}
+}

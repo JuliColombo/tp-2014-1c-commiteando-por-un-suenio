@@ -18,22 +18,16 @@ int main (int argc, char **argv){
 	inicializarConfiguracion();
 	off_t fileSize=0;
 	char* buffer = leerScript(&fileSize,argv[1]);
-
-
-
-
-
-
 	if (buffer == NULL) {
-			log_escribir(archLog,"No se pudo leer el script",ERROR,"El path del script es inválido");
 			abort();
 	}
 
-	if((socket_crearYConectarCliente(configuracion_programa.ip_kernel,configuracion_programa.puerto_kernel))==-1){
-		log_escribir(archLog, "Conexion", ERROR, "No se pudo conectar al Kernel");
-		abort();
+	int sock=abrirSocket();
+	if(sock!=-1){
+		printf("Se conecto bien \n");
 	}
 
+	cerrarSocket(sock);
 
 
 

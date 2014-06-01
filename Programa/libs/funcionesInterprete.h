@@ -12,6 +12,7 @@
 #include "log.h"
 #include "commons/config.h"
 #include "estructuras_programa.h"
+#include "Sockets/socket.h"
 #define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Programa/configuracion_programa.cfg"
 
 
@@ -28,5 +29,7 @@ char* leerScript(off_t* fileSize,char* path); //lee el script
 void inicializarConfiguracion(void);
 void leerConfiguracion(void);
 void imprimirConfiguracion(void);
+int abrirSocket(void);
+void cerrarSocket(int);
 
 #endif /* FUNCIONESINTERPRETE_H_ */
