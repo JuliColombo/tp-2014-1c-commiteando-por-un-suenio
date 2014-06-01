@@ -25,7 +25,7 @@ extern char* Archivo_Ansisop;
 
 /************** FUNCIONES **************/
 
-char* leerScript(off_t* fileSize,char* path); //lee el script
+char* leerScript(off_t* ,char*); //lee el script
 void inicializarConfiguracion(void);
 void leerConfiguracion(void);
 void imprimirConfiguracion(void);

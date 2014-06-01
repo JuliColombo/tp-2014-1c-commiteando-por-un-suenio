@@ -23,9 +23,7 @@ int main (int argc, char **argv){
 	}
 
 	int sock=abrirSocket();
-	if(sock!=-1){
-		printf("Se conecto bien \n");
-	}
+
 
 	cerrarSocket(sock);
 

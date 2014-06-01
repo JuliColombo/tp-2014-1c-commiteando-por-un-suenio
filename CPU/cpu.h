@@ -35,6 +35,5 @@ extern char* PATH;
 void inicializarConfiguracion(void);
 void leerConfiguracion();
 void log_error_socket(void);
-void* core_conexion_plp_programas(void);
-void core_conexion_kernel(void);
+void* core_conexion_kernel(void);
 #endif /* CPU_H_ */

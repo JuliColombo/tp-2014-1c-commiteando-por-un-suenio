@@ -24,7 +24,9 @@ int main (int argc, char **argv){
 	//Con el top_index voy a poder calcular la posicion a pushear
 
 
-	int thread_kernel = pthread_create(&conexion_kernel, NULL, socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel), NULL);
+	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
+
+	pthread_join(thread_kernel,NULL);
 	return 0;
 }
 
@@ -33,14 +35,14 @@ int main (int argc, char **argv){
 
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
-			struct stat file_info;
-			int control = lstat(PATH, &file_info);
-			if (control == -1){
-				log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-				}
-			else{
-				leerConfiguracion(PATH);
-			}
+	struct stat file_info;
+	int control = lstat(PATH, &file_info);
+	if (control == -1){
+		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
+	}
+	else{
+	leerConfiguracion(PATH);
+	}
 }
 
 void leerConfiguracion(void){
@@ -57,6 +59,16 @@ void log_error_socket(void){
 }
 
 
-void core_conexion_kernel(void){
+void* core_conexion_kernel(void){
+	int sock;
+	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
+		log_error_socket();
+	}
+	while(1){
 
+	}
+	if(socket_cerrarConexion(sock)==-1){
+		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+	}
+	return NULL;
 }
