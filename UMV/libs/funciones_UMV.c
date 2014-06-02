@@ -76,17 +76,16 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 
 t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
 	t_buffer* buffer;
-	uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+	uint32_t posicionReal;
+	posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
 	buffer = obtenerBytesDesdeHasta(posicionReal,longitud);
 	return buffer;
 }
-t_buffer* obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
-	uint32_t* buffer;
+t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
+	t_buffer buffer;
 
 	return buffer;
 }
-
-//Cambie los int por uint32_t , esta ok?
 
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
