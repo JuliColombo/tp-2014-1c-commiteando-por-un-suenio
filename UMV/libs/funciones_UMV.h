@@ -37,11 +37,11 @@ extern pthread_mutex_t* mutex;
 extern char* PATH;
 extern int tamanioMP;
 extern int programaEnUso;
-extern tablaSeg tablaDeSegmentos;
+extern tablasSegProgramas tablaDeSegmentos;
 
 /*Prototipos de funciones auxiliares*/
 
-
+int asignarFisicamente();
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
 //_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
@@ -62,7 +62,7 @@ void retardo(int valorRetardoEnMilisegundos);
 void compactar(void);
 void dump();
 t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
-t_buffer* obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
+t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
 void crearSegmentoPrograma(int id_prog, int tamanio);
 

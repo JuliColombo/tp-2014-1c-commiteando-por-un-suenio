@@ -77,7 +77,7 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
 	t_buffer* buffer;
 	uint32_t posicionReal;
-	posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+	//posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
 	buffer = obtenerBytesDesdeHasta(posicionReal,longitud);
 	return buffer;
 }
@@ -89,9 +89,9 @@ t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
-		uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
-		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
-		tablaDeSegmentos[programaEnUso][base].ubicacionMP = posicionReal;
+//		uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
+//		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
+//		tablaDeSegmentos[programaEnUso][base].ubicacionMP = posicionReal;
 		puts("resultadodelaasignacion");
 		} else {
 			puts("No se pudo realizar la asignacion");
@@ -172,7 +172,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 //****************************************Compactacion*****************************************
 
 void compactar(){
-	int sigSegmento;
+/*	int sigSegmento;
 	int posicionDeDestino;
 	typedef struct aux{
 		int programa;
@@ -214,7 +214,7 @@ void compactar(){
 			//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo?
 
 			return datos;
-			}
+			}*/
 }
 
 
@@ -227,6 +227,9 @@ void dump(){
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
+	segmentDescriptor aux;
+	int i;
+	//tipoSegmento segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(configuracion_UMV.algoritmo == firstfit){
 		ubicacion = escogerUbicacionF(tamanio);
@@ -234,7 +237,25 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	if(configuracion_UMV.algoritmo == worstfit){
 		ubicacion = escogerUbicacionW(tamanio);
 	}
-	//TODO: Crear el segmento en sí
+
+	if(ubicacion==-1){
+		printf("No hay espacio en memoria");
+		return;
+	}
+
+	//segmento=malloc(sizeof(tamanio));
+
+	i=rand();
+//	while(tablaDeSegmentos[id_prog][i]!=NULL){
+//		i=rand();
+//	}
+	//aux.segmento=segmento;
+	aux.ubicacionMP=ubicacion;
+	aux.inicio=i;
+	aux.tamanio=tamanio;
+
+	//tablaDeSegmentos[id_prog][i]=aux;
+
 
 }
 
@@ -431,9 +452,9 @@ void *consola (void){
 				puts("Ingrese el processID de programa a usar");
 				int nuevoPrograma;
 				gets(nuevoPrograma);
-				if(nuevoPrograma != programaEnUso){
-					cambioDeProcesoActivo(nuevoPrograma);
-				}else{}
+//				if(nuevoPrograma != programaEnUso){
+//					cambioDeProcesoActivo(nuevoPrograma);
+//				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				gets(tipoOperacion);

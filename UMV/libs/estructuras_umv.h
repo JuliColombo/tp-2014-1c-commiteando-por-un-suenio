@@ -41,10 +41,12 @@ enum tipoAlgoritmo{
 };
 
 typedef struct segmentDescriptor{
+	//tipo segmento segmento; No iría algo de esto???
 	int inicio;
 	int tamanio;
 	int ubicacionMP;
 } segmentDescriptor;
+
 
 typedef segmentDescriptor* tablaSeg;
 
