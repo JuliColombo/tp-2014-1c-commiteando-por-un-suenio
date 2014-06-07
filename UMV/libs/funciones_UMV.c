@@ -322,6 +322,56 @@ int escogerUbicacionW(int tamanio){
 		return posicionFinal;
 }
 
+void destruirSegmentos(int id_prog){
+	liberarMP(id_prog);
+	eliminarSegmentos(id_prog);
+	return;
+
+}
+
+void liberarMP(int id_prog){
+	/*int i,j,tam;
+	i=0;
+	while(i<tamanioMP){
+		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
+		//ubicacionMP y tamanio
+		while(tablaDeSegmentos[id_prog][i]!=NULL && i<tamanioMP){
+			j=tablaDeSegmentos[id_prog][i].ubicacionMP;
+			tam=tablaDeSegmentos[id_prog][i].tamanio;
+		//Recorro las posiciones de MP en base a ubicacionMP y tamanio
+		// y las igualo a NULL
+			while(tam!=0){
+				MP[j]=NULL;
+				j++;
+				tam--;
+			}
+			i++;
+		}
+		//Recorro la tabla de segmentos buscando una posicion ocupada
+		while(tablaDeSegmentos[id_prog][i]==NULL && i<tamanioMP){
+			i++;
+		}
+	}*/
+}
+
+void eliminarSegmentos(int id_prog){
+	/*int i,ultimaPos;
+	i=0;
+	//ultimaPos=ultimoSeg(id_prog);
+	//Recorro la tabla de segmentos del id_prog
+	while(i<ultimaPos){
+		//Por cada posicion ocupada, libero el espacio de memoria
+		while(tablaDeSegmentos[id_prog][i]!=NULL && i<ultimaPos){
+			free(tablaDeSegmentos[id_prog][i]);
+			i++;
+			}
+		//Sigo recorriendo la tabla hasta encontrar otra posicion ocupada
+		while(tablaDeSegmentos[id_prog][i]==NULL && i<ultimaPos){
+			i++;
+			}
+	}*/
+}
+
 
 //Funciones para lectura del archivo config y una funcion que imprime dichos campos para testear la lectura
 

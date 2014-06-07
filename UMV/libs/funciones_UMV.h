@@ -25,7 +25,7 @@
 
 /*Macros del archivo config*/
 
-#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
+#define PATHCONFIG "/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 
@@ -50,6 +50,8 @@ _Bool validarSolicitud(uint32_t longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
 
+void liberarMP(int id_prog);
+void eliminarSegmentos(int id_prog);
 int escogerUbicacionF(int tamanio);
 int escogerUbicacionW(int tamanio);
 int* crearMP();
@@ -65,6 +67,7 @@ t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_
 t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
 void crearSegmentoPrograma(int id_prog, int tamanio);
+void destruirSegmentos(int id_prog);
 
 /*Funciones del archivo Config*/
 void leerConfiguracion(void);				  				 			 // Lee en la macro del archivo de configuracion ubicado en la ruta PATH
