@@ -15,12 +15,12 @@ pthread_t pcp, plp;
 t_thread_io io;
 char* PATH;
 cola_procesos cola;
-pthread_mutex_t* cola_ready;
-pthread_mutex_t* cola_new;
-pthread_mutex_t* cola_exec;
-pthread_mutex_t* cola_block;
-pthread_mutex_t* cola_exit;
-
+pthread_mutex_t* mutex_cola_ready;
+pthread_mutex_t* mutex_cola_new;
+pthread_mutex_t* mutex_cola_exec;
+pthread_mutex_t* mutex_cola_block;
+pthread_mutex_t* mutex_cola_exit;
+int sock_programas, sock_umv, sock_cpu;
 
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
@@ -37,7 +37,7 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 	int i;
 	for(i=0;i < cant_identificadores(configuracion_kernel.id_hio); i++){
-		// ******  HAY QUE MODIFICAR LOS HILOS ACÁ ADENTRO ******
+		/************************* HAY QUE MODIFICAR LOS HILOS ACÁ ADENTRO *************************/
 
 		//thread_io[i] = pthread_create(&io.thread[i].tid, NULL, core_io(configuracion_kernel.retardo_hio[i]), NULL); //La estructura io.thread[i].tid no la entendi, hice lo que me parecio para que funcione pero hay que cambiarla
 		//printf("Thread %d para IO\n", i);

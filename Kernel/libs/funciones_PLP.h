@@ -28,11 +28,14 @@ extern char* PATH;
 extern t_thread_io io;
 extern pthread_t pcp, plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 extern cola_procesos cola;
-extern pthread_mutex_t* cola_ready;
-extern pthread_mutex_t* cola_new;
-extern pthread_mutex_t* cola_exec;
-extern pthread_mutex_t* cola_block;
-extern pthread_mutex_t* cola_exit;
+extern pthread_mutex_t* mutex_cola_new;
+extern pthread_mutex_t* mutex_cola_ready;
+extern pthread_mutex_t* mutex_cola_exec;
+extern pthread_mutex_t* mutex_cola_block;
+extern pthread_mutex_t* mutex_cola_exit;
+extern int sock_programas;
+extern int sock_cpu;
+extern int sock_umv;
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
