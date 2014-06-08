@@ -52,7 +52,7 @@ void* core_plp(void);
 void* core_pcp(void);
 void* core_io(int);
 void* core_conexion_plp_programas(void);
-void* core_conexion_plp_umv(void);
+void* core_conexion_umv(void);
 void* core_conexion_pcp_cpu(void);
 
 
