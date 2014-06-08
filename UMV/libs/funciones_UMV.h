@@ -34,6 +34,7 @@ extern int* MP;
 extern pthread_t CONSOLA,KERNEL,CPU;
 extern log_t* archLog;
 extern pthread_mutex_t* mutex;
+extern pthread_mutex_t* mutex_log;
 extern char* PATH;
 extern int tamanioMP;
 extern int programaEnUso;
