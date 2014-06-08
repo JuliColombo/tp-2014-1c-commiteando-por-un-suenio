@@ -46,7 +46,9 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 }
 
 void log_error_socket(void){
+	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
+	pthread_mutex_unlock(mutex_log);
 }
 
 /*_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
@@ -160,12 +162,13 @@ void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
-							//printf("%d\n", *algor); para checkear el cambio del valor
+		printf("El algoritmo se cambio a: firstfit\n");
 	}
 	else{
 		configuracion_UMV.algoritmo=worstfit;
-							//printf("%d\n", *algor); para checkear el cambio del valor
+		printf("El algoritmo se cambio a: worstfit\n");
 	}
+
 
 }
 
@@ -412,8 +415,10 @@ void inicializarConfiguracion(void){
 	struct stat file_info;
 	int control = lstat(PATH, &file_info);
 	if (control == -1){
+		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-		}
+		pthread_mutex_unlock(mutex_log);
+	}
 	else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
@@ -461,7 +466,9 @@ void atender_kernel(void){
 
 void inicializarSemaforos(void){
 	mutex=malloc(sizeof(pthread_mutex_t));
+	mutex_log=malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(mutex,NULL);
+	pthread_mutex_init(mutex_log, NULL);
 }
 
 //***********************************************Inicializacion y espera de hilos************************************
@@ -570,6 +577,13 @@ void *consola (void){
 				gets(comando);
 			}
 		}
+	if(strcmp(comando,"exit")){
+		destruirTodosLosSegmentos();
+		matarHilos();
+		free(MP);
+		abort;
+	}
+
 
 	return EXIT_SUCCESS;
 }

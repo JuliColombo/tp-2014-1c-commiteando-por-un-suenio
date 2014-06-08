@@ -16,6 +16,7 @@ t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;
 pthread_mutex_t* mutex;
+pthread_mutex_t* mutex_log;
 
 int main (int argc, char **argv){
 	inicializarConfiguracion();

@@ -48,7 +48,10 @@ typedef struct segmentDescriptor{
 } segmentDescriptor;
 
 
-typedef segmentDescriptor* tablaSeg;
+typedef struct tablaSeg{
+	int id_prog;
+	segmentDescriptor* segmentos;
+}tablaSeg;
 
 typedef tablaSeg* tablasSegProgramas;
 
