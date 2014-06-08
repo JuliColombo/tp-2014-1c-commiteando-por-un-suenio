@@ -38,13 +38,21 @@ int cantidadProgramasEnEjecucion(void){
 }
 
 void completarGradoMultip(void){
-	void* aux=list_remove(cola.new,0);
-
-	while(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion && aux!=NULL){
-		list_add(cola.ready,aux);
-		aux=list_remove(cola.new,0);
+	if(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion){
+		pthread_mutex_lock(cola_new);
+		void* aux=list_remove(cola.new,0);
+		pthread_mutex_unlock(cola_new);
+		while(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion && aux!=NULL){
+			pthread_mutex_lock(cola_ready);
+			list_add(cola.ready,aux);
+			pthread_mutex_unlock(cola_ready);
+			if(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion){
+				pthread_mutex_lock(cola_new);
+				aux=list_remove(cola.new,0);
+				pthread_mutex_unlock(cola_new);
+			}
+		}
 	}
-
 }
 
 void inicializarColas(void){
@@ -128,6 +136,7 @@ t_pcb crearPcb(char* codigo) {
 	t_medatada_program *pcbAux;
 	pcbAux=metadatada_desde_literal(codigo);
 	nuevoPCB.program_counter=pcbAux->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+	nuevoPCB.pid=getpid();
 
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.pid;				//Identificador único del Programa en el sistema
@@ -164,32 +173,33 @@ void* core_plp(void){
 	//mostrarNodosPorPantalla(cola.new);
 	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
 	//int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_plp_umv(), NULL);
-	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
+	//int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_plp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
 
 	/*while (1){
-		//socket de programas escucha
+		completarGradoMultip();
+
 
 		t_programa programa; //Este programa llega por los sockets
 		//crearPCB(programa);
-		//programa.pcb.pid=getpid();
-		programa.quantum=0;
 		programa.flag_terminado=0;
 		calcularPeso(programa);
 
-
+		while(
+			pthread_mutex_lock(cola_ready);
+			t_programa programa = (t_programa)list_remove(cola.ready,0);
+			pthread_mutex_unlock(cola_ready);
 
 	}
 
 
 	*/
-	//Logica del PLP
 
 	pthread_join(thread_conexion_plp_programas, NULL);
 	//pthread_join(thread_conexion_plp_umv, NULL);
-	pthread_join(thread_conexion_plp_cpu, NULL);
+	//pthread_join(thread_conexion_plp_cpu, NULL);
 
 	return EXIT_SUCCESS;
 }
@@ -197,17 +207,17 @@ void* core_plp(void){
 
 void* core_conexion_plp_programas(void){
 	int sock_programas;
-	if ((sock_programas=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_programas))>0){
-		printf("Escuchando programas\n");
+	if ((sock_programas=epoll_crear())>0){
+		int sock_cliente=socket_crearCliente();
+
+		epoll_agregarSocketServidor(sock_cliente,sock_programas);
+
 	}
 
 	while (1){
 		break;
 	}
-	int i;
-	for (i=0; i<20; i++){
-		printf("Conexion programas n [%d]\n", i);
-	}
+
 
 	if(socket_cerrarConexion(sock_programas)<0){
 		printf("Error cerrando socket programas\n");
@@ -233,7 +243,7 @@ void* core_conexion_plp_umv(void){
 	return EXIT_SUCCESS;
 }
 
-void* core_conexion_plp_cpu(void){
+void* core_conexion_pcp_cpu(void){
 	int sock_cpu;
 	if ((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus))>0){
 		printf("Escuchando CPUs\n");
@@ -262,8 +272,6 @@ void* core_pcp(void){
 
 
 
-	t_programa programa = (t_programa)list_remove(cola.ready,0);
-
 
 			while(programa.flag_terminado==0){
 
@@ -277,7 +285,9 @@ void* core_pcp(void){
 				if(programa.flag_bloqueado==0){
 				//Sacar al programa por el pid de la cola exec y ponerlo en ready
 				}else{
+					pthread_mutex_lock(cola_block);
 					list_add(cola.block,programa);
+					pthread_mutex_unlock(cola_block);
 				}
 
 
@@ -285,7 +295,11 @@ void* core_pcp(void){
 
 
 			if(programa.flag_terminado==1){ //Esto va al final,
+				pthread_mutex_lock(cola_exec);
+				pthread_mutex_lock(cola_exit);
 				list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
+				pthread_mutex_unlock(cola_exit);
+				pthread_mutex_unlock(cola_exec);
 				completarGradoMultip();
 			}
 	}

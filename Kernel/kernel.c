@@ -15,6 +15,11 @@ pthread_t pcp, plp;
 t_thread_io io;
 char* PATH;
 cola_procesos cola;
+pthread_mutex_t* cola_ready;
+pthread_mutex_t* cola_new;
+pthread_mutex_t* cola_exec;
+pthread_mutex_t* cola_block;
+pthread_mutex_t* cola_exit;
 
 
 

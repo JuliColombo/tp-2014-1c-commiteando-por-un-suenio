@@ -28,7 +28,11 @@ extern char* PATH;
 extern t_thread_io io;
 extern pthread_t pcp, plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 extern cola_procesos cola;
-
+extern pthread_mutex_t* cola_ready;
+extern pthread_mutex_t* cola_new;
+extern pthread_mutex_t* cola_exec;
+extern pthread_mutex_t* cola_block;
+extern pthread_mutex_t* cola_exit;
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
@@ -49,7 +53,7 @@ void* core_pcp(void);
 void* core_io(int);
 void* core_conexion_plp_programas(void);
 void* core_conexion_plp_umv(void);
-void* core_conexion_plp_cpu(void);
+void* core_conexion_pcp_cpu(void);
 
 
 #endif /* FUNCIONESPLP_H_ */
