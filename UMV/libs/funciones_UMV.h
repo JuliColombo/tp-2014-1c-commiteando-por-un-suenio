@@ -39,6 +39,9 @@ extern char* PATH;
 extern int tamanioMP;
 extern int programaEnUso;
 extern tablasSegProgramas tablaDeSegmentos;
+extern int sock_kernel;
+extern int sock_cpu;
+
 
 /*Prototipos de funciones auxiliares*/
 
@@ -51,6 +54,8 @@ _Bool validarSolicitud(uint32_t longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
 
+void destruirTodosLosSegmentos(void);
+void matarHilos(void);
 void liberarMP(int id_prog);
 void eliminarSegmentos(int id_prog);
 int escogerUbicacionF(int tamanio);

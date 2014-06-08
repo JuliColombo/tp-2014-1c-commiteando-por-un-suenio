@@ -172,6 +172,8 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 }
 
+
+
 //****************************************Compactacion*****************************************
 
 void compactar(){
@@ -428,8 +430,11 @@ void inicializarConfiguracion(void){
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	int sock_cpu=socket_crearServidor(configuracion_UMV.ip_kernel, configuracion_UMV.puerto_cpus);
+	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus);
+	printf("Hilo de CPU \n");
+	while(1){
 
+	}
 	if(socket_cerrarConexion(sock_cpu)<1){
 	//Error cerrando el socket
 	}
@@ -448,11 +453,15 @@ void atender_cpu(void){
 
 
 void core_conexion_kernel(void){
-	int sock_kernel=socket_crearCliente();
+	sock_kernel=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel);
+	printf("Hilo de Kernel\n");
+		while(1){
 
+		}
 	if(socket_cerrarConexion(sock_kernel)<1){
 	//Error cerrando el socket
 	}
+
 	return;
 }
 
@@ -480,9 +489,7 @@ void inicializarHilos(void){
 }
 
 void esperarHilos(void){
-	pthread_join(CPU,NULL);
 	pthread_join(CONSOLA,NULL);
-	pthread_join(KERNEL,NULL);
 }
 
 //***********************************************Consola************************************
@@ -504,11 +511,12 @@ void *consola (void){
 		puts("\nOperacion erronea, escriba la operacion de nuevo");
 		gets(comando);
 	}
+
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
 				puts("Ingrese el processID de programa a usar");
-				int nuevoPrograma;
-				gets(nuevoPrograma);
+//				int nuevoPrograma;
+//				gets(nuevoPrograma);
 //				if(nuevoPrograma != programaEnUso){
 //					cambioDeProcesoActivo(nuevoPrograma);
 //				}else{}
@@ -576,15 +584,33 @@ void *consola (void){
 				puts("\nOperacion erronea, escriba la operacion de nuevo");
 				gets(comando);
 			}
+
 		}
-	if(strcmp(comando,"exit")){
-		destruirTodosLosSegmentos();
-		matarHilos();
-		free(MP);
-		abort;
-	}
+	if(strcmp(comando,"exit") ==0){
+									  	destruirTodosLosSegmentos();
+									   	free(MP);
 
+									   	socket_cerrarConexion(sock_kernel);
+									   	socket_cerrarConexion(sock_cpu);
+									   	matarHilos();
+									   	if(pthread_kill(CPU,0)==0){
+									   		printf("Muere el hilo cpu\n");
+									   	}
+									   	if(pthread_kill(KERNEL,0)==0){
+									   		printf("Muere el hilo Kernel\n");
+									   	}
+						   }
 
-	return EXIT_SUCCESS;
 }
+
+void matarHilos(void){
+	pthread_cancel(CPU);
+	pthread_cancel(KERNEL);
+
+}
+
+void destruirTodosLosSegmentos(void){
+	return;
+}
+
 
