@@ -37,8 +37,7 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
-extern int thread_conexion_plp_programas;
-extern int thread_conexion_plp_cpu;
+
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
@@ -55,12 +54,12 @@ void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexion(void); //Espera a que terminen las conexiones y cierra sus hilos
 
 /************************* HILOS *************************/
-void* core_plp(void);
-void* core_pcp(void);
+void core_plp(void);
+void core_pcp(void);
 void* core_io(int);
-void* core_conexion_plp_programas(void);
+void core_conexion_plp_programas(void);
 void* core_conexion_umv(void);
-void* core_conexion_pcp_cpu(void);
+void core_conexion_pcp_cpu(void);
 
 
 #endif /* FUNCIONESPLP_H_ */
