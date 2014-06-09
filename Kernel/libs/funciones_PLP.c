@@ -170,9 +170,9 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void core_plp(void){
 
-	pthread_create (&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
-	//pthread_create (&conexion_plp_umv, NULL, core_conexion_umv(), NULL);
-	pthread_create (&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
+	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
+	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
+	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 	//mostrarNodosPorPantalla(cola.new);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
@@ -236,15 +236,13 @@ void core_conexion_plp_programas(void){
 	return;
 }
 
-void* core_conexion_umv(void){
-	//Si este método está invocado, tira seg fault aca siempre. Pero sino lo ponemos, tira seg fault cada 5 o 6 veces que ejecutas
-	//LA MAGIA DEL ECLIPSE (╯°□°）╯︵ ┻━┻
+void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
 		printf("Conectado a la UMV\n");
 	}
 
 
-	return EXIT_SUCCESS;
+	return;
 }
 
 void core_conexion_pcp_cpu(void){
@@ -314,9 +312,9 @@ void core_pcp(void){
 }
 
 
-void* core_io(int retardo){
+void core_io(int retardo){
 	sleep(0.1);
-	return EXIT_SUCCESS;
+	return;
 }
 
 
