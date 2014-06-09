@@ -50,6 +50,8 @@ void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
 //_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
 //_Bool segmentationFault(uint32_t base,uint32_t offset);
+_Bool memoryOverload(uint32_t longitud);
+_Bool segmentationFault(uint32_t longitud);
 _Bool validarSolicitud(uint32_t longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);

@@ -42,6 +42,10 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 	tamanioMP = configuracion_UMV.memSize;
 	int* MP;
 	MP = malloc(tamanioMP);
+	if(MP==NULL){
+		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
+		abort();
+	}
 	return MP;
 }
 
@@ -125,11 +129,14 @@ _Bool validarSolicitud(uint32_t longitud){
 		return true;
 	} else{
 		printf("No alcanza el espacio en memoria:");
-		if(segmentationFault(longitud))return false;
-		else { if(memoryOverload(longitud)) return false;
-				 else {
-					//printf("Excepcion Desconocida"); ???
-					return false;
+		if(segmentationFault(longitud)){
+			return false;
+		}else{
+			if(memoryOverload(longitud)){
+				return false;
+			}else{
+				//printf("Excepcion Desconocida"); ???
+				return false;
 				}
 			}
 		}
@@ -187,26 +194,26 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 //****************************************Compactacion*****************************************
 
 void compactar(){
-	int sigSegmento;
-	int posicionDeDestino;
-	typedef struct aux{
+	int sigSegmento=0;
+	int posicionDeDestino=0;
+	typedef struct{
 		int posicion;
 		int numSegDesc;
 	}aux;
 
 	//Obtengo primer posicion libre en MP
 		int i=0;
-		while (MP[i]!=NULL) i++;
+		while(MP[i]!=NULL){
+		i++;
 		posicionDeDestino= i;
 		sigSegmento=i;
-
+		}
 	while (sigSegmento != tamanioMP){
-		if (MP[sigSegmento] == NULL){
+		if(MP[sigSegmento] == NULL){
 			sigSegmento++;
-		} else{
-			aux datos;
-			datos = getDatosSegmentDescriptorDe(sigSegmento);
-			int tamanio= tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].tamanio;
+		}else{
+			aux* datos = getDatosSegmentDescriptorDe(sigSegmento);
+			int tamanio= tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].tamanio;
 
 			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
 			int a = 0;
@@ -216,7 +223,7 @@ void compactar(){
 				a++;
 			}
 
-			tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].ubicacionMP = posicionDeDestino;
+			tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
 			sigSegmento= sigSegmento+tamanio+1;
 			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
 		}
@@ -224,14 +231,16 @@ void compactar(){
 
 		aux getDatosSegmentDescriptorDe(int ubicacion){//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo
 			aux datos;
-			int i,j;
+			int i,j=0;
 			while(tablaDeSegmentos[i]!= NULL){//Recorro los programas
 				while(tablaDeSegmentos[i].segmentos[j]!= NULL){ //Recorro sus segmentos
-					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == ubicacion){ //Cargo en el de datos y return eso si es asi
+					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP== ubicacion){ //Cargo en el de datos y return eso si es asi
 						datos.posicion= i;
 						datos.numSegDesc= j;
 						return datos;
-					}else j++;
+					}else{
+						j++;
+					}
 				}
 				j=0;
 			}
@@ -283,7 +292,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	aux.inicio=i;
 	aux.tamanio=tamanio;
 
-	tablaDeSegmentos[pos][i]=aux;
+	tablaDeSegmentos[pos].segmentos[i]=aux;
 
 
 }
@@ -338,7 +347,7 @@ int escogerUbicacionW(int tamanio){
 				posicionDeDestino= i;
 			//Checkeo la cantidad de posiciones libres hasta llegar a
 			//una posicion ocupada, o el final de la memoria
-				while(MP[i] != NULL && i<tamanioMP){
+				while(MP[i]!= NULL && i<tamanioMP){
 					aux++;
 					i++;
 				}
@@ -645,5 +654,7 @@ void matarHilos(void){
 void destruirTodosLosSegmentos(void){
 	return;
 }
+
+
 
 
