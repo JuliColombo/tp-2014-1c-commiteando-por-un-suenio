@@ -89,11 +89,20 @@ t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 	return buffer;
 }
 
+/*void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
+	if (validarSolicitud(longitud)){
+		uint32_t posicionReal = tablaDeSegmentos[procesoEnUso][base].ubicacionMP + offset;
+		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); //va a retornar la direccion fisica segun WF o FF - necesita solo buffer?
+		tablaDeSegmentos[procesoEnUso][base].ubicacionMP = posicionReal;
+		puts("resultadodelaasignacion");
+		} else {
+			puts("No se pudo realizar la asignacion");
+	    }
+}*/
+
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
-//		uint32_t posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
-//		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); /*va a retornar la direccion fisica segun WF o FF - necesita solo buffer?*/
-//		tablaDeSegmentos[programaEnUso][base].ubicacionMP = posicionReal;
+		/*Me parece que estaba mal encarado el enviar bytes, por eso agrego este nuevo para terminar y dejo el otro comentado*/
 		puts("resultadodelaasignacion");
 		} else {
 			puts("No se pudo realizar la asignacion");
@@ -115,17 +124,15 @@ _Bool validarSolicitud(uint32_t longitud){
 	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
-		puts("No alcanza el espacio en memoria:");
-		if(/*segmentationFault(longitud)*/ 1){
-			return false;
-		} else { if(/*memoryOverload(longitud)*/ 1){
-							return false;
-				} else {
-							//puts("Excepcion Desconocida"); ???
-							return false;
-					}
+		printf("No alcanza el espacio en memoria:");
+		if(segmentationFault(longitud))return false;
+		else { if(memoryOverload(longitud)) return false;
+				 else {
+					//printf("Excepcion Desconocida"); ???
+					return false;
 				}
 			}
+		}
 }
 
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud){
@@ -145,7 +152,7 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 			if (MP[aux] != NULL){
 				aux++;
 			} else{
-				while (aux == NULL && contador < longitud){
+				while (MP[aux] == NULL && contador < longitud){
 					contador++;
 					aux++;
 				}
@@ -156,6 +163,12 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 	return false;
 }
 
+_Bool segmentationFault(uint32_t longitud){
+	return false;
+}
+_Bool memoryOverload(uint32_t longitud){
+	return false;
+}
 
 //Comandos de consola:
 
@@ -244,17 +257,17 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	int i;
 	//tipoSegmento segmento;
 	//Escoge la ubicacion en base al algoritmo de config
-	if(configuracion_UMV.algoritmo == firstfit){
-		ubicacion = escogerUbicacionF(tamanio);
-	}
-	if(configuracion_UMV.algoritmo == worstfit){
-		ubicacion = escogerUbicacionW(tamanio);
-	}
-
-	if(ubicacion==-1){
-		printf("No hay espacio en memoria");
-		return;
-	}
+	if(validarSolicitud(tamanio)){
+		if(configuracion_UMV.algoritmo == firstfit){
+			ubicacion = escogerUbicacionF(tamanio);
+		}
+		if(configuracion_UMV.algoritmo == worstfit){
+			ubicacion = escogerUbicacionW(tamanio);
+		}
+		}else{
+			printf("No hay espacio disponible para %d",id_prog);
+			return;
+		}
 
 	//segmento=malloc(sizeof(tamanio));
 	int pos=getPosTablaSeg(id_prog);
@@ -262,7 +275,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
 		}
 	i=rand();
-	while(tablaDeSegmentos[pos][i]!=NULL){
+	while(tablaDeSegmentos[pos].segmentos[i]!= NULL){
 		i=rand();
 	}
 	//aux.segmento=segmento;
