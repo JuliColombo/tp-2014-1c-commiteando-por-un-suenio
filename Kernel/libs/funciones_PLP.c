@@ -168,19 +168,18 @@ t_pcb crearPcb(char* codigo) {
 
 pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
-void* core_plp(void){
+void core_plp(void){
 
-	pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
+	pthread_create (&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	//pthread_create (&conexion_plp_umv, NULL, core_conexion_umv(), NULL);
-	pthread_create (&conexion_plp_cpu, NULL, core_conexion_pcp_cpu(), NULL);
+	pthread_create (&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 	//mostrarNodosPorPantalla(cola.new);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
-	int i;
-	for(i=0;i<10;i++){
-		printf("\n");
+
+	while(1){
+
 	}
-	printf("plp\n");
 
 	/*while (1){
 
@@ -207,11 +206,11 @@ void* core_plp(void){
 
 
 
-	return EXIT_SUCCESS;
+	return;
 }
 
 
-void* core_conexion_plp_programas(void){
+void core_conexion_plp_programas(void){
 
 	struct epoll_event event;
 	struct epoll_event* events;
@@ -234,7 +233,7 @@ void* core_conexion_plp_programas(void){
 
 
 
-	return EXIT_SUCCESS;
+	return;
 }
 
 void* core_conexion_umv(void){
@@ -248,7 +247,7 @@ void* core_conexion_umv(void){
 	return EXIT_SUCCESS;
 }
 
-void* core_conexion_pcp_cpu(void){
+void core_conexion_pcp_cpu(void){
 
 	struct epoll_event event;
 	struct epoll_event* events;
@@ -264,13 +263,13 @@ void* core_conexion_pcp_cpu(void){
 
 
 
-	return EXIT_SUCCESS;
+	return;
 }
 
-void* core_pcp(void){
+void core_pcp(void){
 
 
-	printf("el pcp corre\n");
+
 /*
 	while(1){
 
@@ -311,7 +310,7 @@ void* core_pcp(void){
 
 
 */
-	return EXIT_SUCCESS;
+	return;
 }
 
 
