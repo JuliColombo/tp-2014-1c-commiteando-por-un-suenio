@@ -13,7 +13,7 @@
 #include "commons/config.h"
 #include "estructuras_programa.h"
 #include "Sockets/socket.h"
-#define PATHCONFIG "/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/Programa/configuracion_programa.cfg"
+#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Programa/configuracion_programa.cfg"
 
 
 /************** VARIABLES GLOBALES ***************/
