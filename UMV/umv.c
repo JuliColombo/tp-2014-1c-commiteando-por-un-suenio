@@ -9,7 +9,7 @@
 
 int* MP;
 int tamanioMP;
-int programaEnUso;
+int procesoEnUso;
 char* PATH=PATHCONFIG;
 tablasSegProgramas tablaDeSegmentos;
 t_config_UMV configuracion_UMV;

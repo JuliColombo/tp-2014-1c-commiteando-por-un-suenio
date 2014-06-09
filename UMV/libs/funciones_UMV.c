@@ -76,8 +76,8 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_buffer* solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
-	t_buffer* buffer;
+t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
+	t_buffer buffer;
 	uint32_t posicionReal;
 	//posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
 	buffer = obtenerBytesDesdeHasta(posicionReal,longitud);
@@ -103,6 +103,10 @@ void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffe
 int asignarFisicamente(){
 
 	return 0; //ojo que va a retornar la dir fisica
+}
+
+void cambioDeProcesoActivo(int id_prog){
+ procesoEnUso = id_prog;
 }
 
 /*************************    Logica de validacion de solicitudes ***************************/
