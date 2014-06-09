@@ -170,16 +170,17 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void* core_plp(void){
 
-
+	pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
+	//pthread_create (&conexion_plp_umv, NULL, core_conexion_umv(), NULL);
+	pthread_create (&conexion_plp_cpu, NULL, core_conexion_pcp_cpu(), NULL);
 	//mostrarNodosPorPantalla(cola.new);
-	int thread_conexion_plp_programas = pthread_create (&conexion_plp_programas, NULL, core_conexion_plp_programas(), NULL);
-	//int thread_conexion_plp_umv = pthread_create (&conexion_plp_umv, NULL, core_conexion_umv(), NULL);
-	int thread_conexion_plp_cpu = pthread_create (&conexion_plp_cpu, NULL, core_conexion_pcp_cpu(), NULL);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
-
-
-
+	int i;
+	for(i=0;i<10;i++){
+		printf("\n");
+	}
+	printf("plp\n");
 
 	/*while (1){
 
@@ -204,22 +205,30 @@ void* core_plp(void){
 
 	*/
 
-	pthread_join(thread_conexion_plp_programas, NULL);
-	//pthread_join(thread_conexion_plp_umv, NULL);
-	pthread_join(thread_conexion_plp_cpu, NULL);
-	socket_cerrarConexion(sock_programas);
-	socket_cerrarConexion(sock_umv);
-	socket_cerrarConexion(sock_cpu);
+
+
 	return EXIT_SUCCESS;
 }
 
 
 void* core_conexion_plp_programas(void){
 
-	sock_programas=socket_crearCliente();
+	struct epoll_event event;
+	struct epoll_event* events;
+
+
+	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
-	int i = epoll_agregarSocketServidor(efd_programas,sock_programas);
+	epoll_agregarSocketServidor(efd_programas,sock_programas);
+	event.events=EPOLLIN;
+	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
+	int i = epoll_escucharBloqueante(efd_programas,events);
+	//int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
 	printf("epoll programas = %d\n", i);
+
+
+	event.data.fd=sock_programas;
+
 
 
 
@@ -240,9 +249,17 @@ void* core_conexion_umv(void){
 }
 
 void* core_conexion_pcp_cpu(void){
-	sock_cpu=socket_crearCliente();
+
+	struct epoll_event event;
+	struct epoll_event* events;
+
+
+	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
-	int i = epoll_agregarSocketServidor(efd_cpu,sock_cpu);
+	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
+	event.events=EPOLLIN;
+	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
+	int i = epoll_escucharBloqueante(efd_cpu,events);
 	printf("epoll cpu = %d \n", i);
 
 
@@ -253,7 +270,7 @@ void* core_conexion_pcp_cpu(void){
 void* core_pcp(void){
 
 
-
+	printf("el pcp corre\n");
 /*
 	while(1){
 
@@ -301,4 +318,16 @@ void* core_pcp(void){
 void* core_io(int retardo){
 	sleep(0.1);
 	return EXIT_SUCCESS;
+}
+
+
+
+void esperarYCerrarConexiones(void){
+	pthread_join(conexion_plp_programas, NULL);
+	//pthread_join(conexion_plp_umv, NULL);
+	pthread_join(conexion_plp_cpu, NULL);
+	socket_cerrarConexion(sock_programas);
+	socket_cerrarConexion(sock_umv);
+	socket_cerrarConexion(sock_cpu);
+	return;
 }

@@ -21,6 +21,8 @@ pthread_mutex_t* mutex_cola_exec;
 pthread_mutex_t* mutex_cola_block;
 pthread_mutex_t* mutex_cola_exit;
 int sock_programas, sock_umv, sock_cpu;
+int thread_conexion_plp_programas;
+int thread_conexion_plp_cpu;
 
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
@@ -28,9 +30,9 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 	inicializarColas();
 
 	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
+	pthread_create (&plp, NULL, core_plp(), NULL);
+	pthread_create (&pcp, NULL, core_pcp(), NULL);
 
-	int thread_plp = pthread_create (&plp, NULL, core_plp(), NULL);
-	int thread_pcp = pthread_create (&pcp, NULL, core_pcp(), NULL);
 
 
 	//int thread_io[cant_identificadores(configuracion_kernel.id_hio)];
@@ -47,9 +49,9 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 	}
 
 
-
-	pthread_join(thread_pcp, NULL);
-	pthread_join(thread_plp, NULL);
+	esperarYCerrarConexiones();
+	pthread_join(plp, NULL);
+	pthread_join(pcp, NULL);
 
 	return EXIT_SUCCESS;
 }

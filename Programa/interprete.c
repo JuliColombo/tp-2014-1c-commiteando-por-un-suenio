@@ -23,7 +23,9 @@ int main (int argc, char **argv){
 	}
 
 	int sock=abrirSocket();
+	while(1){
 
+	}
 
 	cerrarSocket(sock);
 

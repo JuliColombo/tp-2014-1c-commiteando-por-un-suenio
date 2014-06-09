@@ -20,6 +20,7 @@
 #include "Sockets/socket.h"
 #include "funciones_aux.h"
 #include <semaphore.h>
+#include <sys/epoll.h>
 
 /************************* VARIABLES GLOBALES *************************/
 extern t_config_kernel configuracion_kernel;
@@ -36,6 +37,8 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
+extern int thread_conexion_plp_programas;
+extern int thread_conexion_plp_cpu;
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
@@ -49,6 +52,7 @@ int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que e
 void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
+void esperarYCerrarConexion(void); //Espera a que terminen las conexiones y cierra sus hilos
 
 /************************* HILOS *************************/
 void* core_plp(void);
