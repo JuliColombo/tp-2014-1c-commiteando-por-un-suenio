@@ -175,19 +175,16 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 
 //****************************************Compactacion*****************************************
-
+/*
 void compactar(){
-/*	int sigSegmento;
+	int sigSegmento;
 	int posicionDeDestino;
 	typedef struct aux{
-		int programa;
+		int posicion;
 		int numSegDesc;
-		int inicio;
-		int tamanio;
-		int ubicacionMP;
 	}aux;
 
-	aux getDatosSegmentDescriptorDe(int segmento);
+	aux getDatosSegmentDescriptorDe(int ubicacion);
 
 	//Obtengo primer posicion libre en MP
 		int i=0;
@@ -196,32 +193,38 @@ void compactar(){
 		sigSegmento=i;
 
 	while (sigSegmento != tamanioMP){
-		if (sigSegmento == NULL){
+		if (MP[sigSegmento] == NULL){
 			sigSegmento++;
 		} else{
 			aux datos=getDatosSegmentDescriptorDe(sigSegmento);
-			int programaDuenio = datos.programa;
-			int numSegDescDelProgramaDuenio = datos.numSegDesc;
-			int tamanio= tablaDeSegmentos[programaDuenio][numSegDescDelProgramaDuenio].tamanio; //o datos.tamanio si va a quedar asi
+			int tamanio= tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].tamanio;
 
 			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
 
-			tablaDeSegmentos[programaDuenio][numSegDescDelProgramaDuenio].ubicacionMP = posicionDeDestino;
-
+			tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].ubicacionMP = posicionDeDestino;
 			sigSegmento= sigSegmento+tamanio+1;
 			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
 		}
 	}
 
-		aux getDatosSegmentDescriptorDe(int unSegmento){
+		aux getDatosSegmentDescriptorDe(int ubicacion){//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo
 			aux datos;
-
-			//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo?
-
-			return datos;
-			}*/
+			int i,j;
+			while(tablaDeSegmentos[i]!= NULL){//Recorro los programas
+				while(tablaDeSegmentos[i].segmentos[j]!= NULL){ //Recorro sus segmentos
+					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == ubicacion){ //Cargo en el de datos y return eso si es asi
+						datos.posicion= i;
+						datos.numSegDesc= j;
+						return datos;
+					}else j++;
+				}
+				j=0;
+			}
+			//Excepcion::: no se encuentra el segmento
+			return 0;
+		}
 }
-
+*/
 
 
 
