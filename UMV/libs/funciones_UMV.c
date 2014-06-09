@@ -102,7 +102,7 @@ t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 
 void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
 	if (validarSolicitud(longitud)){
-		/*Me parece que estaba mal encarado el enviar bytes, por eso agrego este nuevo para terminar y dejo el otro comentado*/
+		/*Me parece que estaba mal encarado el enviar bytes, por eso agrego este para terminar y dejo el otro comentado*/
 		puts("resultadodelaasignacion");
 		} else {
 			puts("No se pudo realizar la asignacion");
@@ -163,13 +163,6 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 	return false;
 }
 
-_Bool segmentationFault(uint32_t longitud){
-	return false;
-}
-_Bool memoryOverload(uint32_t longitud){
-	return false;
-}
-
 //Comandos de consola:
 
 void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
@@ -192,7 +185,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 
 //****************************************Compactacion*****************************************
-/*
+
 void compactar(){
 	int sigSegmento;
 	int posicionDeDestino;
@@ -200,8 +193,6 @@ void compactar(){
 		int posicion;
 		int numSegDesc;
 	}aux;
-
-	aux getDatosSegmentDescriptorDe(int ubicacion);
 
 	//Obtengo primer posicion libre en MP
 		int i=0;
@@ -213,10 +204,17 @@ void compactar(){
 		if (MP[sigSegmento] == NULL){
 			sigSegmento++;
 		} else{
-			aux datos=getDatosSegmentDescriptorDe(sigSegmento);
+			aux datos;
+			datos = getDatosSegmentDescriptorDe(sigSegmento);
 			int tamanio= tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].tamanio;
 
 			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
+			int a = 0;
+			while (a <= tamanio){
+				MP[posicionDeDestino] = MP[sigSegmento+a];
+				MP[sigSegmento+a] = NULL;
+				a++;
+			}
 
 			tablaDeSegmentos[datos.posicion].segmentos[datos.numSegDesc].ubicacionMP = posicionDeDestino;
 			sigSegmento= sigSegmento+tamanio+1;
@@ -238,10 +236,12 @@ void compactar(){
 				j=0;
 			}
 			//Excepcion::: no se encuentra el segmento
-			return 0;
+			datos.numSegDesc=-1;
+			datos.posicion=-1;
+			return datos;
 		}
 }
-*/
+
 
 
 
