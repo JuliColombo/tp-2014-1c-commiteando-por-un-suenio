@@ -230,6 +230,8 @@ void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
 }
 
+
+
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
@@ -249,9 +251,12 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	}
 
 	//segmento=malloc(sizeof(tamanio));
-
+	int pos=getPosTablaSeg(id_prog);
+		if (pos==-1){
+			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
+		}
 	i=rand();
-//	while(tablaDeSegmentos[id_prog][i]!=NULL){
+//	while(tablaDeSegmentos[pos][i]!=NULL){
 //		i=rand();
 //	}
 	//aux.segmento=segmento;
@@ -259,9 +264,18 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	aux.inicio=i;
 	aux.tamanio=tamanio;
 
-	//tablaDeSegmentos[id_prog][i]=aux;
+	//tablaDeSegmentos[pos][i]=aux;
 
 
+}
+
+int getPosTablaSeg(int id_prog){
+	int i;
+	int posFinalTablaSeg; //Hay que ver como conseguirla, o validar que ya se recorrieron todos los segmentos de otra forma
+	while (tablaDeSegmentos[i].id_prog != id_prog && i<= posFinalTablaSeg) i++;
+	if (tablaDeSegmentos[i].id_prog != id_prog){
+		return i;
+	} else return -1;
 }
 
 int escogerUbicacionF(int tamanio){
@@ -269,8 +283,7 @@ int escogerUbicacionF(int tamanio){
 	int i=0;
 			//Recorro la memoria principal
 		while(i<tamanioMP){
-			int aux=0;
-			//Obtengo primer posicion libre en MP
+			int aux=0;			//Obtengo primer posicion libre en MP
 			while (MP[i]!=NULL && i<tamanioMP) i++;
 			posicionDeDestino= i;
 			//Checkeo la cantidad de posiciones libres hasta llegar a
