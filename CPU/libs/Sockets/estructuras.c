@@ -56,3 +56,10 @@ struct_tipo_instruccion* crear_struct_tipo_instruccion(t_intructions instruccion
 	estructura->instruccion = instruccion;
 	return estructura;
 }
+
+struct_semaforo* crear_struct_semaforo(t_nombre_semaforo semaforo, uint32_t operacion) {
+	struct_semaforo* estructura;
+	estructura->semaforo= semaforo;
+	estructura->operacion= operacion;
+	return estructura;
+}

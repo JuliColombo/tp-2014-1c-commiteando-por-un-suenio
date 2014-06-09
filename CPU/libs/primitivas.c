@@ -288,11 +288,19 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
+
+	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,WAIT);
+	socket_enviar(sockAjeno,STRUCT_SEMAFORO,estructura);
+
 	return 0;
 }
 
 int signal(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función signal para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si desbloquear otros procesos o no.
+
+	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,SIGNAL);
+	socket_enviar(sockAjeno,STRUCT_SEMAFORO,estructura);
+
 	return 0;
 }

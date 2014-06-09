@@ -46,13 +46,9 @@ typedef struct {
 
 
 typedef struct {
-
-}__attribute__((packed)) struct_wait;
-
-
-typedef struct {
 	uint32_t signal;
 }__attribute__((packed)) struct_signal;
+
 
 typedef struct {
 	uint32_t numero;
@@ -62,6 +58,7 @@ typedef struct {
 typedef struct {
 	char letra;
 }__attribute__((packed)) struct_char;
+
 
 typedef struct {
 	char * string;
@@ -78,6 +75,12 @@ typedef struct {
 	t_intructions instruccion;
 }__attribute__ ((__packed__)) struct_tipo_instruccion;
 
+
+typedef struct {
+	t_nombre_semaforo semaforo;
+	uint32_t operacion;
+}__attribute__ ((__packed__)) struct_semaforo;
+
 struct_push* crear_struct_push(uint32_t posicion, int id);
 struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);
 struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion);
@@ -85,6 +88,7 @@ struct_numero* crear_struct_numero(uint32_t numero);
 struct_char* crear_struct_char(char letra);
 struct_string* crear_struct_string(char* string);
 struct_asignar_compartida* crear_struct_asignar_compartida(char* id, uint32_t valor);
+struct_semaforo* crear_struct_semaforo(t_nombre_semaforo semaforo, uint32_t operacion);
 
 
 #endif /* ESTRUCTURAS_H_ */

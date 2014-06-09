@@ -51,6 +51,9 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_TIPO_INSTRUCCION:
 		stream = paqueteTipoInstruccion((struct_tipo_instruccion*) estructura);
 		break;
+	case STRUCT_SEMAFORO:
+		stream = paqueteSemaforo((struct_semaforo*) estructura);
+		break;
 	}
 	return stream;
 }
@@ -70,7 +73,8 @@ char* crearData(t_estructura estructura, uint32_t length) {
 
 	uint32_t tamanioDato=0;
 
-	memcpy(data,&package.Type,tamanioDato = sizeof(package.Type));
+	memcpy(data + sizeof(t_header),&package.Type,tamanioDato = sizeof(package.Type));
+	tamanioDato += sizeof(t_header);
 	memcpy(data+tamanioDato, &package.Lenght, sizeof(package.Lenght));
 
 	return data;
@@ -87,7 +91,8 @@ t_stream* paquetePush(struct_push* estructura) {
 
 	int tamanioDato = 0;
 
-	memcpy(data, &estructura->id, tamanioDato = sizeof(estructura->id));
+	memcpy(data + sizeof(t_header), &estructura->id, tamanioDato = sizeof(estructura->id));
+	tamanioDato += sizeof(t_header);
 	memcpy(data + tamanioDato, &estructura->posicion, sizeof(estructura->posicion));
 
 	paquete->buffer = data;
@@ -103,7 +108,7 @@ t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
 
 	char* data = crearData(STRUCT_POP_DESREFERENCIAR,paquete->length);
 
-	memcpy(data, &estructura->posicion, sizeof(estructura->posicion));
+	memcpy(data +  sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
 
 	paquete->buffer = data;
 	free(data); //??
@@ -118,7 +123,7 @@ t_stream* paquetePopRetornar(struct_pop_retornar* estructura) {
 
 	char* data = crearData(STRUCT_POP_RETORNAR,paquete->length);
 
-	memcpy(data, &estructura->posicion, sizeof(estructura->posicion));
+	memcpy(data + sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
 
 	paquete->buffer = data;
 	free(data); //??
@@ -224,6 +229,26 @@ t_stream * paqueteTipoInstruccion(struct_tipo_instruccion * estructuraOrigen){
 	return paquete;
 }
 
+t_stream* paqueteSemaforo(struct_semaforo* estructuraOrigen) {
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->semaforo) + 1 + sizeof(estructuraOrigen->operacion);
+
+	char * data = crearData(STRUCT_SEMAFORO, paquete->length); //creo el data
+
+	uint32_t tamanioDato = 0;
+
+	memcpy(data + sizeof(t_header), estructuraOrigen->semaforo, tamanioDato = (sizeof(estructuraOrigen->semaforo)+1));//copio a data el char.
+
+	tamanioDato += sizeof(t_header);
+
+	memcpy(data+tamanioDato , estructuraOrigen->operacion, sizeof(estructuraOrigen->operacion));
+	paquete->buffer = data;
+
+	return paquete;
+}
+
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
@@ -322,6 +347,22 @@ struct_tipo_instruccion * sacarPaqueteTipoInstruccion(char * dataPaquete, uint32
 	return estructuraDestino;
 }
 
+struct_semaforo * sacarPaqueteSemaforo(char * dataPaquete, uint32_t length){
+	struct_semaforo * estructuraDestino = malloc(sizeof(struct_semaforo));
+
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->semaforo = malloc(tamanoDato);
+	memcpy(estructuraDestino->semaforo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+	memcpy(estructuraDestino->operacion,dataPaquete + tamanoTotal + 1,sizeof(estructuraDestino->operacion));
+
+	return estructuraDestino;
+}
+
 
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
 void *deserializar(int type, char* data, uint32_t length) {
@@ -354,6 +395,9 @@ void *deserializar(int type, char* data, uint32_t length) {
 		break;
 	case STRUCT_TIPO_INSTRUCCION:
 		estructuraDestino = sacarPaqueteTipoInstruccion(data,length);
+		break;
+	case STRUCT_SEMAFORO:
+		estructuraDestino = sacarPaqueteSemaforo(data,length);
 		break;
 	}
 return estructuraDestino;
