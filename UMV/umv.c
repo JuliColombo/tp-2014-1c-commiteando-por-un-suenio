@@ -11,7 +11,7 @@ int* MP;
 int tamanioMP;
 int procesoEnUso;
 char* PATH=PATHCONFIG;
-tablasSegProgramas tablaDeSegmentos;
+tablaSeg* tablaDeSegmentos;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;

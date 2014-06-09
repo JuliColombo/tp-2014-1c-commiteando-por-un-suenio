@@ -38,7 +38,7 @@ extern pthread_mutex_t* mutex_log;
 extern char* PATH;
 extern int tamanioMP;
 extern int procesoEnUso;
-extern tablasSegProgramas tablaDeSegmentos;
+extern tablaSeg* tablaDeSegmentos;
 extern int sock_kernel;
 extern int sock_cpu;
 
