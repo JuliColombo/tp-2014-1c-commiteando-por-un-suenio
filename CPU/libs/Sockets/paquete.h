@@ -23,8 +23,9 @@
 #define STRUCT_CHAR 6
 #define STRUCT_STRING 7
 #define STRUCT_ASIGNAR_COMPARTIDA 8
-#define STRUCT_TIPO_INSTRUCCION 9
-#define STRUCT_SEMAFORO 10
+#define STRUCT_OBTENER_COMPARTIDA 9
+#define STRUCT_TIPO_INSTRUCCION 10
+#define STRUCT_SEMAFORO 11
 
 typedef uint8_t t_estructura;
 
@@ -43,7 +44,7 @@ typedef struct {
 
 /****************************************************FUNCIONES******************************************************/
 
-void nipc_destruirPaquete(t_stream* paquete);
+void destruirPaquete(t_stream* paquete);
 t_stream* serializar(int type, void* estructura);
 t_header cargarData(t_estructura estructura, uint32_t length);
 char* crearData(t_estructura estructura, uint32_t length);
@@ -57,9 +58,9 @@ t_stream* paqueteString(struct_string* estructura);
 t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructura);
 t_stream* paqueteTipoInstruccion(struct_tipo_instruccion * estructura);
 t_stream* paqueteSemaforo(struct_semaforo* estructura);
+t_stream* paqueteObtenerCompartida(struct_string* estructura);
 
 struct_push* sacarPaquetePush(char* data, uint32_t length);
-struct_push* sacarPaquetePop(char* data, uint32_t length);
 struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t length);
 struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length);
 struct_signal* sacarPaqueteSignal(char* data, uint32_t length);

@@ -26,7 +26,10 @@ int main (int argc, char **argv){
 
 	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
 
+
+
 	pthread_join(thread_kernel,NULL);
+
 	return 0;
 }
 
@@ -69,6 +72,20 @@ void* core_conexion_kernel(void){
 	}
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+	}
+	return NULL;
+}
+
+void* core_conexion_umv(void){
+	int sock;
+	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_umv,configuracion_cpu.puerto_umv))==-1){
+		log_error_socket();
+	}
+	while(1){
+
+	}
+	if(socket_cerrarConexion(sock)==-1){
+		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
 	}
 	return NULL;
 }
