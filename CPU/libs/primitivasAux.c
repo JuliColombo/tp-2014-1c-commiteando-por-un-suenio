@@ -60,7 +60,7 @@ void reservarContextoSinRetorno() {
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
 	struct_push* estructura1 = crear_struct_push(posicionContextoViejo,*cursor);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura1);
-
+	free(estructura1);
 
 	//Pushear Program Counter de proxima instruccion:
 	int posicionPC;
@@ -71,6 +71,7 @@ void reservarContextoSinRetorno() {
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
 	struct_push* estructura2 = crear_struct_push(posicionPC,pc);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura2);
+	free(estructura2);
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -88,6 +89,7 @@ void reservarContextoConRetorno(){
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
 	struct_push* estructura = crear_struct_push(posicionAVariable,posicionVar);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
+	free(estructura);
 }
 
 
@@ -100,6 +102,7 @@ void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_numero* estructura = crear_struct_numero(top_index);
 	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	free(estructura);
 
 	//Socket a UMV para que haga TOP(pila)
 	socket_enviarSignal(sockAjeno, TOP);
@@ -109,6 +112,7 @@ void guardarAlternado () {
 	struct_char** estructura1;
 	socket_recibir(sockAjeno,&tipo, *estructura1);
 	t_valor_variable identificador_variable = (*estructura1)->letra;
+	free(estructura1);
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,top_index);
@@ -130,6 +134,7 @@ void regenerarDiccionario(int tamanio_contexto) {
 	//Socket a UMV para que haga: pila->top_index = top;
 	struct_numero* estructura = crear_struct_numero(top);
 	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	free(estructura);
 }
 
 void volverAContextoAnterior() {
@@ -140,18 +145,21 @@ void volverAContextoAnterior() {
 	t_estructura tipo; //Que onda esto?
 	struct_pop_retornar* estructura = crear_struct_pop_retornar(c_stack);
 	socket_enviar(sockAjeno,STRUCT_POP_RETORNAR,estructura);
+	free(estructura);
 
 	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
 	struct_numero** estructura2;
 	socket_enviarSignal(sockAjeno, POP);
 	socket_recibir(sockAjeno,&tipo, *estructura2);
 	t_puntero program_counter = (*estructura2)->numero;
+	free(estructura2);
 
 	//Socket a UMV para que haga: t_puntero cursor_stack_viejo = POP(pila);
 	struct_numero** estructura3;
 	socket_enviarSignal(sockAjeno, POP);
 	socket_recibir(sockAjeno,&tipo, *estructura3);
 	t_puntero cursor_stack_viejo = (*estructura3)->numero;
+	free(estructura3);
 
 	//Socket de UMV para que yo actualice el top_index
 

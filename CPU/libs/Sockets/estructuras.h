@@ -81,6 +81,7 @@ typedef struct {
 	uint32_t operacion;
 }__attribute__ ((__packed__)) struct_semaforo;
 
+
 struct_push* crear_struct_push(uint32_t posicion, int id);
 struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);
 struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion);

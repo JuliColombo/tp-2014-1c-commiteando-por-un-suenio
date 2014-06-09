@@ -9,7 +9,7 @@
 
 /***********************************************************************SERIALIZACIONES**************************************************/
 
-void nipc_destruirPaquete(t_stream* paquete) {
+void destruirPaquete(t_stream* paquete) {
 
 	if(paquete->length > 0) {
 
@@ -44,6 +44,9 @@ t_stream* serializar(int type, void* estructura) {
 		break;
 	case STRUCT_ASIGNAR_COMPARTIDA:
 		stream = paqueteAsignarCompartida((struct_asignar_compartida*) estructura);
+		break;
+	case STRUCT_OBTENER_COMPARTIDA:
+		stream = paqueteObtenerCompartida((struct_string*) estructura);
 		break;
 	case STRUCT_SIGNAL:
 		stream = paqueteSignal((struct_signal*) estructura);
@@ -192,6 +195,22 @@ t_stream * paqueteString(struct_string * estructuraOrigen){
 	return paquete;
 }
 
+t_stream * paqueteObtenerCompartida(struct_string * estructuraOrigen){
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->string) + 1;
+
+	char * data = crearData(STRUCT_OBTENER_COMPARTIDA, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->string, strlen(estructuraOrigen->string)+1);		//copio a data el string.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
 t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructuraOrigen){
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
@@ -243,7 +262,7 @@ t_stream* paqueteSemaforo(struct_semaforo* estructuraOrigen) {
 
 	tamanioDato += sizeof(t_header);
 
-	memcpy(data+tamanioDato , estructuraOrigen->operacion, sizeof(estructuraOrigen->operacion));
+	memcpy(data+tamanioDato , &estructuraOrigen->operacion, sizeof(estructuraOrigen->operacion));
 	paquete->buffer = data;
 
 	return paquete;
@@ -321,6 +340,10 @@ struct_string * sacarPaqueteString(char * dataPaquete, uint32_t length){
 	return estructuraDestino;
 }
 
+struct_string* sacarPaqueteObtenerCompartida(char* dataPaquete, uint32_t length) {
+	return sacarPaqueteString(dataPaquete,length);
+}
+
 struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* dataPaquete, uint32_t length) {
 	struct_asignar_compartida* estructuraDestino = malloc(sizeof(struct_asignar_compartida));
 
@@ -358,7 +381,7 @@ struct_semaforo * sacarPaqueteSemaforo(char * dataPaquete, uint32_t length){
 
 	estructuraDestino->semaforo = malloc(tamanoDato);
 	memcpy(estructuraDestino->semaforo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
-	memcpy(estructuraDestino->operacion,dataPaquete + tamanoTotal + 1,sizeof(estructuraDestino->operacion));
+	memcpy(&estructuraDestino->operacion,dataPaquete + tamanoTotal + 1,sizeof(estructuraDestino->operacion));
 
 	return estructuraDestino;
 }
