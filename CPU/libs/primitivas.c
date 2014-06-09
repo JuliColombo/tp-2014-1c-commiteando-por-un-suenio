@@ -35,9 +35,11 @@ int stack_base;
 int c_stack;
 t_puntero_instruccion program_counter;
 int tamanio_contexto;
-t_puntero etiquetas;
+//t_puntero etiquetas;
+char* etiquetas;
 t_size etiquetas_size;
-t_puntero_instruccion index_codigo;
+//t_puntero_instruccion index_codigo;
+t_intructions* index_codigo;
 t_puntero segmento_codigo;
 
 

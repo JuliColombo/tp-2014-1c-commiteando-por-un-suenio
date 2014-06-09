@@ -13,7 +13,6 @@ int top_index = -1;
 config_cpu configuracion_cpu;
 char* PATH;
 pthread_t conexion_kernel;
-pthread_t conexion_umv;
 log_t* archLog;
 
 int main (int argc, char **argv){
@@ -26,12 +25,11 @@ int main (int argc, char **argv){
 
 
 	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
-	int thread_umv = pthread_create(&conexion_umv, NULL, core_conexion_umv(), NULL);
 
 
 
 	pthread_join(thread_kernel,NULL);
-	pthread_join(thread_umv,NULL);
+
 	return 0;
 }
 
