@@ -231,7 +231,6 @@ void dump(){
 }
 
 
-
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
@@ -349,14 +348,14 @@ void destruirSegmentos(int id_prog){
 }
 
 void liberarMP(int pos){
-	/*int i,j,tam;
+	int i,j,tam;
 	i=0;
 	while(i<tamanioMP){
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
-		while(tablaDeSegmentos[pos][i]!=NULL && i<tamanioMP){
-			j=tablaDeSegmentos[pos][i].ubicacionMP;
-			tam=tablaDeSegmentos[pos][i].tamanio;
+		while(tablaDeSegmentos[pos].segmentos[i]!=NULL && i<tamanioMP){
+			j=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
+			tam=tablaDeSegmentos[pos].segmentos[i].tamanio;
 		//Recorro las posiciones de MP en base a ubicacionMP y tamanio
 		// y las igualo a NULL
 			while(tam!=0){
@@ -367,28 +366,28 @@ void liberarMP(int pos){
 			i++;
 		}
 		//Recorro la tabla de segmentos buscando una posicion ocupada
-		while(tablaDeSegmentos[pos][i]==NULL && i<tamanioMP){
+		while(tablaDeSegmentos[pos].segmentos[i]==NULL && i<tamanioMP){
 			i++;
 		}
 	}
-}*/
+}
 
 void eliminarSegmentos(int pos){
-	/*int i,ultimaPos;
+	int i,ultimaPos;
 	i=0;
 	//ultimaPos=ultimoSeg(id_prog);
 	//Recorro la tabla de segmentos del id_prog
 	while(i<ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
-		while(tablaDeSegmentos[pos][i]!=NULL && i<ultimaPos){
-			free(tablaDeSegmentos[pos][i]);
+		while(tablaDeSegmentos[pos].segmentos[i]!=NULL && i<ultimaPos){
+			free(tablaDeSegmentos[pos].segmentos[i]);
 			i++;
 			}
 		//Sigo recorriendo la tabla hasta encontrar otra posicion ocupada
-		while(tablaDeSegmentos[pos][i]==NULL && i<ultimaPos){
+		while(tablaDeSegmentos[pos].segmentos[i]==NULL && i<ultimaPos){
 			i++;
 			}
-	}*/
+	}
 }
 
 
