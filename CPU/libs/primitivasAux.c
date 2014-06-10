@@ -13,16 +13,6 @@ int sockfd;
 int sockAjeno;
 int top_index;
 
-//t_pcb pcb:
-
-int stack_base;
-int c_stack;
-int program_counter;
-int tamanio_contexto;
-char* etiquetas;
-t_size etiquetas_size;
-t_puntero index_etiquetas;
-
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice = malloc(etiquetas_size+1);
 	//tendria que aclararle a la umv que es para generar el indice
@@ -65,7 +55,7 @@ void elemento_delete(t_elemento* elemento) {
 
 void reservarContextoSinRetorno() {
 	t_puntero posicionContextoViejo;
-	int* cursor = &c_stack;
+	int* cursor = &pcb.c_stack;
 
 	posicionContextoViejo = calcularPosicionAsignacionCPU(top_index);
 
@@ -76,8 +66,8 @@ void reservarContextoSinRetorno() {
 
 	//Pushear Program Counter de proxima instruccion:
 	int posicionPC;
-	program_counter +=1;
-	int pc = program_counter;
+	pcb.program_counter +=1;
+	int pc = pcb.program_counter;
 	posicionPC = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
@@ -155,7 +145,7 @@ void volverAContextoAnterior() {
 
 	//Socket a UMV para que haga: t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	t_estructura tipo; //Que onda esto?
-	struct_pop_retornar* estructura = crear_struct_pop_retornar(c_stack);
+	struct_pop_retornar* estructura = crear_struct_pop_retornar(pcb.c_stack);
 	socket_enviar(sockAjeno,STRUCT_POP_RETORNAR,estructura);
 	free(estructura);
 
