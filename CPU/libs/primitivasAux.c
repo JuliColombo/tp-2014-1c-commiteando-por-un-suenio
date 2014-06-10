@@ -21,6 +21,18 @@ int program_counter;
 int tamanio_contexto;
 char* etiquetas;
 t_size etiquetas_size;
+t_puntero index_etiquetas;
+
+char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
+	char* indice = malloc(etiquetas_size+1);
+	//tendria que aclararle a la umv que es para generar el indice
+	t_estructura tipo = STRUCT_STRING;
+	struct_string** estructura2;
+	socket_recibir(sockAjeno,&tipo, *estructura2);
+	indice = (*estructura2)->string;
+
+	return indice;
+}
 
 
 t_puntero calcularPosicionAsignacionCPU(int top_index) {

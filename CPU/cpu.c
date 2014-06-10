@@ -76,16 +76,3 @@ void* core_conexion_kernel(void){
 	return NULL;
 }
 
-void* core_conexion_umv(void){
-	int sock;
-	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_umv,configuracion_cpu.puerto_umv))==-1){
-		log_error_socket();
-	}
-	while(1){
-
-	}
-	if(socket_cerrarConexion(sock)==-1){
-		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
-	}
-	return NULL;
-}
