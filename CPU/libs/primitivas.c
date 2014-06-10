@@ -11,42 +11,14 @@
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
 
-
-/*typedef struct{
-	t_pid pid;								//Identificador único del Programa en el sistema
-
-	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
-	t_puntero index_codigo;		    		//Dirección del primer byte en la UMV del Índice de Código
-
-	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
-	t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
-
-	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
-	t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
-
-	t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
-	t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
-} t_pcb;*/
-
-
-/*t_dictionary *diccionario;
+t_dictionary *diccionario;
 int sockfd;
 int sockAjeno;
 int top_index;
 
-//t_pcb pcb:
-int stack_base;
-int c_stack;
-t_puntero_instruccion program_counter;
-int tamanio_contexto;
-
 char* etiquetas;
-t_size etiquetas_size;
-t_puntero index_etiquetas;
-
-t_intructions* codigo;
-t_puntero index_codigo;
-t_puntero segmento_codigo;
+t_pcb pcb;
+t_intructions* codigoo;
 
 
 
@@ -66,8 +38,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_elemento* elem = elemento_create(str,posicion);
 	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
 
-	program_counter +=1;
-	tamanio_contexto += 1;
+	pcb.program_counter +=1;
+	pcb.tamanio_contexto += 1;
 
 	return posicion;
 }
@@ -121,7 +93,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura2);
 	free(estructura2);
 
-	program_counter += 1;
+	pcb.program_counter += 1;
 }
 
 
@@ -149,7 +121,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 	socket_enviar(sockAjeno, STRUCT_ASIGNAR_COMPARTIDA,estructura);
 	free(estructura);
 
-	program_counter += 1;
+	pcb.program_counter += 1;
 	return valor;
 }
 
@@ -157,9 +129,9 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
+	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
 
-	program_counter = instruccion;
+	pcb.program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV -----> creo que esto es asi
 
@@ -167,7 +139,6 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	//Meto eso en analizador_de_linea... para invocar al parser
-
 
 }
 
@@ -181,11 +152,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
 
 	int posicionAPushear =  top_index +1;
-	c_stack = posicionAPushear;
+	pcb.c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
-	program_counter = instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
+	pcb.program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV
 	t_intructions inst = codigo[instruccion];
@@ -216,14 +187,14 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
 
 	int posicionAPushear = top_index +1;
-	c_stack = posicionAPushear;
+	pcb.c_stack = posicionAPushear;
 
 	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
-	program_counter = instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
+	pcb.program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = index_codigo[instruccion];
+	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
@@ -242,15 +213,15 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 }
 
 void finalizar() {
-
-	if(c_stack /= stack_base) {
+	//POR QUE REPETI CODIGO ASI?
+	if(pcb.c_stack /= pcb.stack) {
 
 	volverAContextoAnterior();
-	regenerarDiccionario(tamanio_contexto);
+	regenerarDiccionario(pcb.tamanio_contexto);
 	} else {
 
 		volverAContextoAnterior();
-		regenerarDiccionario(tamanio_contexto);
+		regenerarDiccionario(pcb.tamanio_contexto);
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 	}
 }
@@ -269,7 +240,7 @@ void retornar(t_valor_variable retorno){
 	//Socket de UMV para actualizar mi top_index
 
 	volverAContextoAnterior();
-	regenerarDiccionario(tamanio_contexto);
+	regenerarDiccionario(pcb.tamanio_contexto);
 
 }
 
@@ -300,12 +271,12 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 	//Socket con mensaje?
 	return 0;
-}*/
+}
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
-/*int wait(t_nombre_semaforo identificador_semaforo) {
+int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 
@@ -325,4 +296,4 @@ int signal(t_nombre_semaforo identificador_semaforo) {
 	free(estructura);
 
 	return 0;
-}*/
+}
