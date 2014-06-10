@@ -89,7 +89,10 @@ t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t
 }
 t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 	t_buffer buffer;
-
+	int i=0;
+	while(MP[posicionReal + i] != NULL && i<longitud){
+		buffer[i]= MP[posicionReal+i];
+	}
 	return buffer;
 }
 
@@ -173,7 +176,7 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 //Comandos de consola:
 
 void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
-
+ retardo= valorRetardoEnMilisegundos;
 }
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
@@ -185,8 +188,6 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
 	}
-
-
 }
 
 
@@ -595,8 +596,11 @@ void *consola (void){
 			}
 
 		else { if (strcmp(comando, "retardo") == 0){
+				  puts("\n Ingrese el nuevo valor de retardo");
+				  int valorRetardoEnMilisegundos;
+				  scanf("%d",valorRetardoEnMilisegundos);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				//retardo(int valorRetardoEnMilisegundos);
+				  retardo(valorRetardoEnMilisegundos);
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
