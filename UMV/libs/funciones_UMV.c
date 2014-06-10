@@ -259,11 +259,20 @@ void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
 }
 
+void validarSegmentoDisponibleEn(int pos, int j) {
+	/*int ultimoSegmentoDelProg;	//hay que ver como conseguirlo!!!
+	while (j < ultimoSegmentoDelProg){
+	if (tablaDeSegmentos[pos].segmentos[j].inicio == i) {
+		break;
+	}
+	}*/
+}
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
 	int i;
+	int j=0;
 	//tipoSegmento segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(validarSolicitud(tamanio)){
@@ -284,9 +293,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
 		}
 	i=rand();
-	while(tablaDeSegmentos[pos].segmentos[i]!= NULL){
-		i=rand();
-	}
+	while(!validarSegmentoDisponibleEn(pos,i)) rand(i);//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//aux.segmento=segmento;
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
@@ -382,7 +389,6 @@ void liberarMP(int pos){
 	while(i<tamanioMP){
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
-		while(tablaDeSegmentos[pos].segmentos[i]!=NULL && i<tamanioMP){
 			j=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
 			tam=tablaDeSegmentos[pos].segmentos[i].tamanio;
 		//Recorro las posiciones de MP en base a ubicacionMP y tamanio
@@ -393,29 +399,19 @@ void liberarMP(int pos){
 				tam--;
 			}
 			i++;
-		}
-		//Recorro la tabla de segmentos buscando una posicion ocupada
-		while(tablaDeSegmentos[pos].segmentos[i]==NULL && i<tamanioMP){
-			i++;
-		}
 	}
+
 }
 
 void eliminarSegmentos(int pos){
 	int i,ultimaPos;
 	i=0;
-	//ultimaPos=ultimoSeg(id_prog);
+	//ultimaPos=ultimoSeg(pos);
 	//Recorro la tabla de segmentos del id_prog
 	while(i<ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
-		while(tablaDeSegmentos[pos].segmentos[i]!=NULL && i<ultimaPos){
-			free(tablaDeSegmentos[pos].segmentos[i]);
-			i++;
-			}
-		//Sigo recorriendo la tabla hasta encontrar otra posicion ocupada
-		while(tablaDeSegmentos[pos].segmentos[i]==NULL && i<ultimaPos){
-			i++;
-			}
+		free(tablaDeSegmentos[pos].segmentos[i]);
+		i++;
 	}
 }
 
