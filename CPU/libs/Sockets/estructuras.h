@@ -90,6 +90,7 @@ struct_char* crear_struct_char(char letra);
 struct_string* crear_struct_string(char* string);
 struct_asignar_compartida* crear_struct_asignar_compartida(char* id, uint32_t valor);
 struct_semaforo* crear_struct_semaforo(t_nombre_semaforo semaforo, uint32_t operacion);
+struct_tipo_instruccion* crear_struct_tipo_instruccion(t_intructions instruccion);
 
 
 #endif /* ESTRUCTURAS_H_ */

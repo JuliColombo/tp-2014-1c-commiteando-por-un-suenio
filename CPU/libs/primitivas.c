@@ -14,18 +14,22 @@
 
 /*typedef struct{
 	t_pid pid;								//Identificador único del Programa en el sistema
+
 	t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
+	t_puntero index_codigo;		    		//Dirección del primer byte en la UMV del Índice de Código
+
 	t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
 	t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
-	t_intructions* index_codigo;		    //Dirección del primer byte en la UMV del Índice de Código
+
+	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 	t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
+
 	t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 	t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
-	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;*/
 
 
-t_dictionary *diccionario;
+/*t_dictionary *diccionario;
 int sockfd;
 int sockAjeno;
 int top_index;
@@ -35,11 +39,13 @@ int stack_base;
 int c_stack;
 t_puntero_instruccion program_counter;
 int tamanio_contexto;
-//t_puntero etiquetas;
+
 char* etiquetas;
 t_size etiquetas_size;
-//t_puntero_instruccion index_codigo;
-t_intructions* index_codigo;
+t_puntero index_etiquetas;
+
+t_intructions* codigo;
+t_puntero index_codigo;
 t_puntero segmento_codigo;
 
 
@@ -150,21 +156,10 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
 
-	/*t_puntero_instruccion instruccion;
+	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,etiquetas_size);
-	NO ESTOY SEGURA SI TENGO QUE HACER ESTO*/
 
-	struct_string* estructura = crear_struct_string(etiqueta);
-	socket_enviar(sockAjeno,STRUCT_STRING,estructura);
-	free(estructura);
-
-	//Aca le tendria que mandar a la umv que tiene que usar metadata_buscar_etiqueta
-	t_estructura tipo = STRUCT_NUMERO;
-	struct_numero** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	free(estructura2);
-
-	program_counter = (*estructura2)->numero;
+	program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV -----> creo que esto es asi
 
@@ -193,7 +188,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = index_codigo[instruccion];
+	t_intructions inst = codigo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
@@ -305,12 +300,12 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 	//Socket con mensaje?
 	return 0;
-}
+}*/
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
-int wait(t_nombre_semaforo identificador_semaforo) {
+/*int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 
@@ -330,4 +325,4 @@ int signal(t_nombre_semaforo identificador_semaforo) {
 	free(estructura);
 
 	return 0;
-}
+}*/
