@@ -171,7 +171,7 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 void core_plp(void){
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
-	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
+	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 	//mostrarNodosPorPantalla(cola.new);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
@@ -321,7 +321,7 @@ void core_io(int retardo){
 
 void esperarYCerrarConexiones(void){
 	pthread_join(conexion_plp_programas, NULL);
-	//pthread_join(conexion_plp_umv, NULL);
+	pthread_join(conexion_plp_umv, NULL);
 	pthread_join(conexion_plp_cpu, NULL);
 	socket_cerrarConexion(sock_programas);
 	socket_cerrarConexion(sock_umv);
