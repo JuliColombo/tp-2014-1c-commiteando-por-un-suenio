@@ -173,36 +173,36 @@ void core_plp(void){
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-	//mostrarNodosPorPantalla(cola.new);
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
-	while(1){
 
-	}
-
-	/*while (1){
+	while (1){
 
 
 
 
-		completarGradoMultip();
+	/*	completarGradoMultip();
+		mostrarNodosPorPantalla(cola.new);
 
 
 		t_programa programa; //Este programa llega por los sockets
-		//crearPCB(programa);
+		t_pcb pcb=crearPcb("Aca va el codigo fuente");
+		programa.pcb = &pcb;
 		programa.flag_terminado=0;
 		calcularPeso(programa);
+		agregarAColaSegunPeso(programa, cola.new);
 
-		while(
-			pthread_mutex_lock(cola_ready);
-			t_programa programa = (t_programa)list_remove(cola.ready,0);
-			pthread_mutex_unlock(cola_ready);
 
+		while(1){
+			pthread_mutex_lock(mutex_cola_ready);
+			t_programa* programa = list_remove(cola.ready,0);
+			pthread_mutex_unlock(mutex_cola_ready);
+		}*/
 	}
 
 
-	*/
+
 
 
 
@@ -221,8 +221,8 @@ void core_conexion_plp_programas(void){
 	epoll_agregarSocketServidor(efd_programas,sock_programas);
 	event.events=EPOLLIN;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	int i = epoll_escucharBloqueante(efd_programas,events);
-	//int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
+	//int i = epoll_escucharBloqueante(efd_programas,events);
+	int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
 	printf("epoll programas = %d\n", i);
 
 
@@ -279,17 +279,17 @@ void core_pcp(void){
 
 
 			//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
-				pthread_mutex_lock(cola_exec);
+				pthread_mutex_lock(mutex_cola_exec);
 				list_add(cola.exec,programa); //Agrego el programa a la lista exec porque está en la cpu, cuando vuelva se vé si vuelve a ready o pasa a block
-				pthread_mutex_unlock(cola_exec);
+				pthread_mutex_unlock(mutex_cola_exec);
 
 			//Aca deberia esperar a que la cpu lo devuelva, de todas formas no estoy seguro
 				if(programa.flag_bloqueado==0){
 				//Sacar al programa por el pid de la cola exec y ponerlo en ready
 				}else{
-					pthread_mutex_lock(cola_block);
+					pthread_mutex_lock(mutex_cola_block);
 					list_add(cola.block,programa);
-					pthread_mutex_unlock(cola_block);
+					pthread_mutex_unlock(mutex_cola_block);
 				}
 
 
@@ -297,11 +297,11 @@ void core_pcp(void){
 
 
 			if(programa.flag_terminado==1){ //Esto va al final,
-				pthread_mutex_lock(cola_exec);
-				pthread_mutex_lock(cola_exit);
+				pthread_mutex_lock(mutex_cola_exec);
+				pthread_mutex_lock(mutex_cola_exit);
 				list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
-				pthread_mutex_unlock(cola_exit);
-				pthread_mutex_unlock(cola_exec);
+				pthread_mutex_unlock(mutex_cola_exit);
+				pthread_mutex_unlock(mutex_cola_exec);
 
 			}
 	}
@@ -313,7 +313,7 @@ void core_pcp(void){
 
 
 void core_io(int retardo){
-	sleep(0.1);
+
 	return;
 }
 
