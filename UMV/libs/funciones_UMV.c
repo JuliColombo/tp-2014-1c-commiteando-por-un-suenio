@@ -5,6 +5,7 @@
  *      Author: utnso
  */
 
+
 #include "funciones_UMV.h"
 
 //#include "FuncionesPLP.h"
@@ -55,23 +56,25 @@ void log_error_socket(void){
 	pthread_mutex_unlock(mutex_log);
 }
 
-/*_Bool segmentationFault(uint32_t base,uint32_t offset){// TODO Revisar bien esto y el memOverload de abajo
+_Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien esto y el memOverload de abajo
 	if ( > tamanioMP) {
 	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
 		return true;
 	} else{
 		return false;
-	}
+	}*/
+	return false; //pongo esto para que no se queje
 }
 
-_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){
+_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){/*
 	if (> tamanioMP) {
 		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
 			return true;
 		} else{
 			return false;
-		}
-}*/
+		}*/
+	return false; //pongo esto para que no se queje
+}
 
 //Funcion que recibe el programa del PLP y le reserva memoria (si puede)
 /*_Bool solicitarMemoria(t_programa programa){
@@ -89,10 +92,7 @@ t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t
 }
 t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 	t_buffer buffer;
-	int i=0;
-	while(MP[posicionReal + i] != NULL && i<longitud){
-		buffer[i]= MP[posicionReal+i];
-	}
+
 	return buffer;
 }
 
@@ -132,7 +132,7 @@ _Bool validarSolicitud(uint32_t longitud){
 		return true;
 	} else{
 		printf("No alcanza el espacio en memoria:");
-		if(segmentationFault(longitud)){
+		/*if(segmentationFault(longitud)){
 			return false;
 		}else{
 			if(memoryOverload(longitud)){
@@ -141,7 +141,8 @@ _Bool validarSolicitud(uint32_t longitud){
 				//printf("Excepcion Desconocida"); ???
 				return false;
 				}
-			}
+			}*/
+		return false; //pongo esto para que no joda
 		}
 }
 
@@ -175,8 +176,8 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 
 //Comandos de consola:
 
-void retardo(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
- retardo= valorRetardoEnMilisegundos;
+void retardoFunc(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
+	retardo= valorRetardoEnMilisegundos;
 }
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
@@ -188,13 +189,15 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
 	}
+
+
 }
 
 
 
 //****************************************Compactacion*****************************************
 
-void compactar(){
+void compactar(){/*
 	int sigSegmento=0;
 	int posicionDeDestino=0;
 	typedef struct{
@@ -224,7 +227,7 @@ void compactar(){
 				a++;
 			}
 
-			tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
+			//tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
 			sigSegmento= sigSegmento+tamanio+1;
 			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
 		}
@@ -249,7 +252,7 @@ void compactar(){
 			datos.numSegDesc=-1;
 			datos.posicion=-1;
 			return datos;
-		}
+		}*/
 }
 
 
@@ -260,20 +263,20 @@ void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
 }
 
-void validarSegmentoDisponibleEn(int pos, int j) {
+int validarSegmentoDisponibleEn(int pos, int j) {
 	/*int ultimoSegmentoDelProg;	//hay que ver como conseguirlo!!!
 	while (j < ultimoSegmentoDelProg){
 	if (tablaDeSegmentos[pos].segmentos[j].inicio == i) {
 		break;
 	}
 	}*/
+	return 1; //pongo esto para que no se queje
 }
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
 	int i;
-	int j=0;
 	//tipoSegmento segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(validarSolicitud(tamanio)){
@@ -294,7 +297,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
 		}
 	i=rand();
-	while(!validarSegmentoDisponibleEn(pos,i)) rand(i);//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//aux.segmento=segmento;
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
@@ -411,7 +414,7 @@ void eliminarSegmentos(int pos){
 	//Recorro la tabla de segmentos del id_prog
 	while(i<ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
-		free(tablaDeSegmentos[pos].segmentos[i]);
+		//free(tablaDeSegmentos[pos].segmentos[i]);
 		i++;
 	}
 }
@@ -469,8 +472,14 @@ void inicializarConfiguracion(void){
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus);
+	int algo;
+	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
+	}
+	if((algo=socket_aceptarCliente(sock_cpu))>0){
+			printf("Acepta conexion");
+		}
+
 	while(1){
 
 	}
@@ -492,8 +501,13 @@ void atender_cpu(void){
 
 
 void core_conexion_kernel(void){
-	sock_kernel=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel);
+	if((sock_kernel=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
 	printf("Hilo de Kernel\n");
+	}
+	if((socket_aceptarCliente(sock_kernel))>0){
+				printf("Acepta conexion");
+			}
+
 		while(1){
 
 		}
@@ -596,11 +610,8 @@ void *consola (void){
 			}
 
 		else { if (strcmp(comando, "retardo") == 0){
-				  puts("\n Ingrese el nuevo valor de retardo");
-				  int valorRetardoEnMilisegundos;
-				  scanf("%d",valorRetardoEnMilisegundos);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				  retardo(valorRetardoEnMilisegundos);
+				//retardo(int valorRetardoEnMilisegundos);
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
@@ -654,6 +665,7 @@ void matarHilos(void){
 void destruirTodosLosSegmentos(void){
 	return;
 }
+
 
 
 

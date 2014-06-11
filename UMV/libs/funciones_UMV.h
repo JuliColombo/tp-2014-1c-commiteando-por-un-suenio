@@ -41,6 +41,7 @@ extern int procesoEnUso;
 extern tablaSeg* tablaDeSegmentos;
 extern int sock_kernel;
 extern int sock_cpu;
+extern int retardo;
 
 
 /*Prototipos de funciones auxiliares*/
@@ -48,10 +49,8 @@ extern int sock_cpu;
 int asignarFisicamente();
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
-//_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
-//_Bool segmentationFault(uint32_t base,uint32_t offset);
-_Bool memoryOverload(uint32_t longitud);
-_Bool segmentationFault(uint32_t longitud);
+_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
+_Bool segmentationFault(uint32_t base,uint32_t offset);
 _Bool validarSolicitud(uint32_t longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
@@ -68,7 +67,7 @@ int estaEnDicTOP(char palabra[]);
 
 /*Operaciones de Consola*/
 void algoritmo(void);
-void retardo(int valorRetardoEnMilisegundos);
+void retardoFunc(int valorRetardoEnMilisegundos);
 void compactar(void);
 void dump();
 t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
