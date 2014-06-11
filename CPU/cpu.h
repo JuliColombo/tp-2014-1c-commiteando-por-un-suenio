@@ -17,7 +17,7 @@
 #include "libs/log.h"
 #include <pthread.h>
 #include "libs/Sockets/socket.h"
-#define PATHLOG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio"
+#define PATHCONFIG "/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/CPU/configuracion_CPU.cfg"
 
 typedef struct{
 	char* ip_kernel;
@@ -34,6 +34,8 @@ extern char* PATH;
 /*************  PROTOTIPO FUNCIONES  *************/
 void inicializarConfiguracion(void);
 void leerConfiguracion();
+void imprimirConfiguracion(void);
 void log_error_socket(void);
 void* core_conexion_kernel(void);
+void* core_conexion_umv(void);
 #endif /* CPU_H_ */

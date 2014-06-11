@@ -8,15 +8,12 @@
 
 t_dictionary* diccionario;
 int top_index = -1;
-
-
 config_cpu configuracion_cpu;
-char* PATH;
-pthread_t conexion_kernel;
+char* PATH=PATHCONFIG;
+pthread_t conexion_kernel,conexion_umv;
 log_t* archLog;
 
 int main (int argc, char **argv){
-	PATH=argv[1];
 
 	inicializarConfiguracion();
 
@@ -24,10 +21,11 @@ int main (int argc, char **argv){
 	//Con el top_index voy a poder calcular la posicion a pushear
 
 
+
+	int thread_umv = pthread_create(&conexion_umv, NULL, core_conexion_umv(), NULL);
 	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
 
-
-
+	pthread_join(thread_umv, NULL);
 	pthread_join(thread_kernel,NULL);
 
 	return 0;
@@ -45,6 +43,7 @@ void inicializarConfiguracion(void){
 	}
 	else{
 	leerConfiguracion(PATH);
+	imprimirConfiguracion();
 	}
 }
 
@@ -55,6 +54,13 @@ void leerConfiguracion(void){
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
 	configuracion_cpu.ip_umv=config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_cpu.puerto_umv=config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
+}
+
+void imprimirConfiguracion(void){
+	printf("Direccion IP para conectarse al Kernel: %s\n", configuracion_cpu.ip_kernel);
+	printf("Puerto para conexiones con Kernel: %d\n", configuracion_cpu.puerto_kernel);
+	printf("Direccion IP para conectarse a la UMV: %s\n", configuracion_cpu.ip_umv);
+	printf("Puerto para conexiones con UMV: %d\n", configuracion_cpu.puerto_umv);
 }
 
 void log_error_socket(void){
@@ -76,3 +82,17 @@ void* core_conexion_kernel(void){
 	return NULL;
 }
 
+void* core_conexion_umv(void){
+	int sock;
+	if ((sock=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))>0){
+			printf("Conectado a la UMV\n");
+		}
+
+	while(1){
+
+	}
+	if(socket_cerrarConexion(sock)==-1){
+		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+	}
+	return NULL;
+}

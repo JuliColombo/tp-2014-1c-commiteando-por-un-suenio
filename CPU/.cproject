@@ -34,8 +34,9 @@
 									<listOptionValue builtIn="false" value="/home/utnso/SisOp/tp-2014-1c-commiteando-por-un-suenio/CPU/libs"/>
 								</option>
 								<option id="gnu.c.link.option.libs.712291239" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="commons"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="parser-ansisop"/>
+									<listOptionValue builtIn="false" value="commons"/>
+									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" value="parser-ansisop"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2073222483" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

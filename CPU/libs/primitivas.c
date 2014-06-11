@@ -58,7 +58,7 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 }
 
 
-t_valor_variable dereferenciar(t_puntero direccion_variable) {
+t_valor_variable dereferenciar(t_puntero direccion_variable) {/*
 	//Socket enviando direccion_variable a UMV para que haga pop
 	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
 	struct_pop_desreferenciar* estructura = crear_struct_pop_desreferenciar(direccion_variable);
@@ -71,6 +71,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	t_valor_variable id = (*estructura2)->letra;
 	free(estructura2);
 	return id;
+	*/
 }
 
 
@@ -97,7 +98,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 }
 
 
-t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
+t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {/*
 	//Socket mandando a Kernel el nombre de la variable de la que quiero saber el valor
 	struct_string* estructura = crear_struct_string(variable);
 	socket_enviar(sockAjeno,STRUCT_OBTENER_COMPARTIDA,estructura);
@@ -111,6 +112,7 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 	free(estructura2);
 
 	return valor;
+	*/
 }
 
 
@@ -127,7 +129,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-
+/*
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
 
@@ -139,11 +141,11 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	//Meto eso en analizador_de_linea... para invocar al parser
-
+*/
 }
 
 
-void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
+void llamarSinRetorno(t_nombre_etiqueta etiqueta) {/*
 	//HACER ALGO CON TAMAÑO DE CONTEXTO
 	//HACER LOS FREE
 
@@ -173,11 +175,12 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
+*/
 }
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-
+/*
 	//definir variables si hay parametros
 	//Asignar a parametros
 	//HACER ALGO CON TAMAÑO DE CONTEXTO
@@ -209,7 +212,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Meto eso en analizador_de_linea... para invocar al parser
 	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
 
-
+*/
 }
 
 void finalizar() {
