@@ -16,6 +16,11 @@
 int* vector_num(char**, char**);
 int cant_identificadores(char**);
 void log_error_socket(void);
+int posicion_Variable_Global(char*);
+
+/************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
+void manejar_ConexionNueva_CPU (void);
+void manejar_ConexionNueva_Programas(void);
 
 
 #endif /* FUNCIONES_AUX_H_ */

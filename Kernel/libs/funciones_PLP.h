@@ -51,7 +51,8 @@ int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que e
 void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
-void esperarYCerrarConexion(void); //Espera a que terminen las conexiones y cierra sus hilos
+void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos
+t_pcb crearPcb(char*);
 
 /************************* HILOS *************************/
 void core_plp(void);
