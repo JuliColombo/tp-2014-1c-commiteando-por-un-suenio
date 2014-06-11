@@ -475,16 +475,29 @@ void core_conexion_cpu(void){
 	int algo;
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
+	pthread_mutex_unlock(mutex_log);
 	}
 	if((algo=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
+			pthread_mutex_unlock(mutex_log);
 		}
 
 	while(1){
 
 	}
-	if(socket_cerrarConexion(sock_cpu)<1){
-	//Error cerrando el socket
+	if(socket_cerrarConexion(sock_cpu)==0){
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
+		pthread_mutex_unlock(mutex_log);
+		//Error cerrando el socket
+	} else {
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
+		pthread_mutex_unlock(mutex_log);
 	}
 	return;
 }
@@ -500,19 +513,33 @@ void atender_cpu(void){
 }
 
 
+
 void core_conexion_kernel(void){
 	if((sock_kernel=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
 	printf("Hilo de Kernel\n");
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Escuchando en el socket de Kernel", INFO, "");
+	pthread_mutex_unlock(mutex_log);
 	}
 	if((socket_aceptarCliente(sock_kernel))>0){
-				printf("Acepta conexion");
-			}
+			printf("Acepta conexion");
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se acepta la conexion del Kernel", INFO, "");
+			pthread_mutex_unlock(mutex_log);
+		}
 
 		while(1){
 
 		}
-	if(socket_cerrarConexion(sock_kernel)<1){
-	//Error cerrando el socket
+	if(socket_cerrarConexion(sock_kernel)==0){
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
+		pthread_mutex_unlock(mutex_log);
+		//Error cerrando el socket
+	} else {
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se cierra el socket de Kernel", INFO, "No hay problemas para cerrar el socket");
+		pthread_mutex_unlock(mutex_log);
 	}
 
 	return;
@@ -568,11 +595,11 @@ void *consola (void){
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
 				puts("Ingrese el processID de programa a usar");
-//				int nuevoPrograma;
-//				gets(nuevoPrograma);
-//				if(nuevoPrograma != programaEnUso){
-//					cambioDeProcesoActivo(nuevoPrograma);
-//				}else{}
+				int nuevoPrograma;
+				gets(nuevoPrograma);
+				if(nuevoPrograma != procesoEnUso){
+					cambioDeProcesoActivo(nuevoPrograma);
+				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				gets(tipoOperacion);

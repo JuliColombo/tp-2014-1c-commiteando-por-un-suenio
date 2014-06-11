@@ -25,7 +25,7 @@
 
 /*Macros del archivo config*/
 
-#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
+#define PATHCONFIG "/home/utnso/workspace/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 
