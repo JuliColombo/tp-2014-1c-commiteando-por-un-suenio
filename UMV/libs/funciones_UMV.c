@@ -200,6 +200,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 void compactar(){/*
 	int sigSegmento=0;
 	int posicionDeDestino=0;
+	//Estructura auxiliar para obtener los datos de cada segmento en MP
 	typedef struct{
 		int posicion;
 		int numSegDesc;
@@ -235,9 +236,25 @@ void compactar(){/*
 
 		aux getDatosSegmentDescriptorDe(int ubicacion){//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo
 			aux datos;
+
+			//Creo la estructura auxiliar para que list_size me devuelva el tamaño de la tablaDeSegmentos
+			t_list listaAux;
+			int contador;
+			listaAux.head= tablaDeSegmentos;
+			listaAux.elements_count= contador;
 			int i,j=0;
-			while(tablaDeSegmentos[i]!= NULL){//Recorro los programas
-				while(tablaDeSegmentos[i].segmentos[j]!= NULL){ //Recorro sus segmentos
+			int tamanioTablaS = list_size(listaAux);
+
+			while(i < tamanioTablaS){//Recorro los programas
+
+				//Hago lo mismo pero para los segmentos de ese programa
+				t_list listaAux2;
+				int contador2;
+				listaAux2.head= tablaDeSegmentos[i].segmentos;
+				listaAux2.elements_count= contador2;
+				int tamanioSegmentosi = list_size(listaAux2);
+
+				while(j < tamanioDeSegmentosi){ //Recorro sus segmentos
 					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP== ubicacion){ //Cargo en el de datos y return eso si es asi
 						datos.posicion= i;
 						datos.numSegDesc= j;
