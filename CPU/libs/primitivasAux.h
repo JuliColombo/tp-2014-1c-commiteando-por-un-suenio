@@ -53,7 +53,7 @@ void guardarAlternado ();
 
 void volverAContextoAnterior();
 
-uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_nuevo);
+uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_actual);
 
 t_puntero recuperarDireccionRetorno();
 

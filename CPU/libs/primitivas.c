@@ -227,8 +227,8 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 void finalizar() {
 	t_puntero c_stack = pcb.c_stack;
 	t_puntero stack = pcb.stack;
-	t_puntero contexto_anterior;
 
+	recuperarPosicionDeDirecciones();
 	volverAContextoAnterior();
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack);
@@ -253,15 +253,23 @@ void retornarrr(t_valor_variable retorno){
 
 	//Socket de UMV para actualizar mi top_index
 
+	recuperarPosicionDeDirecciones();
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
 
 }
 
 void retornar(t_valor_variable retorno) {
+
+	recuperarPosicionDeDirecciones();
+	t_puntero direccionRetorno = recuperarDireccionRetorno();
+
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
 
+	struct_push* estructura = crear_struct_push(direccionRetorno+1,retorno);
+	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
+	free(estructura);
 
 }
 

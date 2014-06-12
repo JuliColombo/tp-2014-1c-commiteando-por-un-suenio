@@ -135,8 +135,8 @@ void guardarAlternado () {
 
 }
 
-uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_nuevo) {
-	uint32_t diferencia = direccion_contexto_nuevo - pcb.c_stack;
+uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_actual) {
+	uint32_t diferencia = direccion_contexto_actual - pcb.c_stack;
 	return (diferencia/5); //Divido esa cantidad de bytes por 5 (1 byte de id de variable, y 4 bytes del valor) para saber cuantas variables habia.
 }
 
@@ -211,7 +211,6 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 void volverAContextoAnterior() {
 	t_puntero program_counter, cursor_stack_viejo;
 
-	recuperarPosicionDeDirecciones();
 	recuperarProgramCounter(&program_counter);
 	recuperarCursorAnterior(&cursor_stack_viejo);
 
