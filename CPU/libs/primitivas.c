@@ -225,15 +225,13 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 }
 
 void finalizar() {
-	//POR QUE REPETI CODIGO ASI?
-	if(pcb.c_stack /= pcb.stack) {
+	t_puntero c_stack = pcb.c_stack;
+	t_puntero stack = pcb.stack;
 
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
-	} else {
 
-		volverAContextoAnterior();
-		regenerarDiccionario(pcb.tamanio_contexto);
+	if(c_stack == stack) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 	}
 }

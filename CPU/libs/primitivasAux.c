@@ -103,11 +103,13 @@ void reservarContextoConRetorno(){
 
 
 /*Lo que hago con esta funcion es:
- * estoy en la posicion de cursor contexto. Asi que disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor)
- * Pongo en el diccionario el id y su posicion. Lo hago tantas veces como el tamaño del contexto sea.
+ * estoy en la posicion de cursor contexto.
+ * Pongo en el diccionario el id y su posicion.
+ * Disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor) la proxima vez que la use.
+ * Invoco esta funcion tantas veces como el tamaño del contexto sea.
  */
+
 void guardarAlternado () {
-	top_index -=2;
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_numero* estructura = crear_struct_numero(top_index);
 	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
@@ -128,6 +130,8 @@ void guardarAlternado () {
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,top_index);
 	dictionary_put(diccionario,elem->name,elem);
+
+	top_index -=2;
 
 }
 
