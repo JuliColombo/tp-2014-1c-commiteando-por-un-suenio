@@ -57,6 +57,9 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_SEMAFORO:
 		stream = paqueteSemaforo((struct_semaforo*) estructura);
 		break;
+	case STRUCT_MODIFICAR_TOP_INDEX:
+		stream = paqueteModificarTopIndex((struct_modificar_top_index*) estructura);
+		break;
 	}
 	return stream;
 }
@@ -268,6 +271,21 @@ t_stream* paqueteSemaforo(struct_semaforo* estructuraOrigen) {
 	return paquete;
 }
 
+t_stream * paqueteModificarTopIndex(struct_modificar_top_index * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearData(STRUCT_MODIFICAR_TOP_INDEX, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(struct_modificar_top_index));		//copio a data el numero.
+
+	paquete->buffer = data;
+
+	return paquete;
+}
+
 /***********************************************************************DESERIALIZACIONES**************************************************/
 
 
@@ -386,6 +404,14 @@ struct_semaforo * sacarPaqueteSemaforo(char * dataPaquete, uint32_t length){
 	return estructuraDestino;
 }
 
+struct_modificar_top_index * sacarPaqueteModificarTopIndex(char * dataPaquete, uint32_t length){
+	struct_modificar_top_index * estructuraDestino = malloc(sizeof(struct_modificar_top_index));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
 
 //HACER FREE DE ESTRUCTURA DESTINO DESPUES DE USAR LA FUNCION
 void *deserializar(int type, char* data, uint32_t length) {
@@ -421,6 +447,9 @@ void *deserializar(int type, char* data, uint32_t length) {
 		break;
 	case STRUCT_SEMAFORO:
 		estructuraDestino = sacarPaqueteSemaforo(data,length);
+		break;
+	case STRUCT_MODIFICAR_TOP_INDEX:
+		estructuraDestino = sacarPaqueteModificarTopIndex(data,length);
 		break;
 	}
 return estructuraDestino;

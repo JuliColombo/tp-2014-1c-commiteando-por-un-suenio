@@ -40,5 +40,6 @@ int signal(t_nombre_semaforo identificador_semaforo);
 
 int wait(t_nombre_semaforo identificador_semaforo);
 
+void retornarrr(t_valor_variable retorno); //SACAR ESTO !
 
 #endif /* PRIMITIVAS_H_ */

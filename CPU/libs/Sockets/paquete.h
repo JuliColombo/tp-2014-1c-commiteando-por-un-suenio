@@ -26,6 +26,7 @@
 #define STRUCT_OBTENER_COMPARTIDA 9
 #define STRUCT_TIPO_INSTRUCCION 10
 #define STRUCT_SEMAFORO 11
+#define STRUCT_MODIFICAR_TOP_INDEX 12
 
 typedef uint8_t t_estructura;
 
@@ -59,6 +60,7 @@ t_stream* paqueteAsignarCompartida(struct_asignar_compartida* estructura);
 t_stream* paqueteTipoInstruccion(struct_tipo_instruccion * estructura);
 t_stream* paqueteSemaforo(struct_semaforo* estructura);
 t_stream* paqueteObtenerCompartida(struct_string* estructura);
+t_stream* paqueteModificarTopIndex(struct_modificar_top_index* estructura);
 
 struct_push* sacarPaquetePush(char* data, uint32_t length);
 struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t length);
@@ -70,6 +72,7 @@ struct_string* sacarPaqueteString(char* data, uint32_t length);
 struct_asignar_compartida* sacarPaqueteAsignarCompartida(char* data, uint32_t length);
 struct_tipo_instruccion * sacarPaqueteTipoInstruccion(char * dataPaquete, uint32_t length);
 struct_semaforo* sacarPaqueteSemaforo(char* dataPaquete, uint32_t length);
+struct_modificar_top_index* sacarPaqueteModificarTopIndex(char* dataPaquete, uint32_t length);
 void *deserializar(int type, char* data, uint32_t length);
 t_header despaquetizarHeader(char * header);
 
