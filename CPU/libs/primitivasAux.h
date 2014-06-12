@@ -33,6 +33,8 @@ typedef struct{
 	t_size tamanio_contexto;							//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 } t_pcb;
 
+t_pcb pcb;
+
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 
 void reservarContextoSinRetorno();

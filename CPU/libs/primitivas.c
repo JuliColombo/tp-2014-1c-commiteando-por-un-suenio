@@ -17,7 +17,6 @@ int sockAjeno;
 int top_index;
 
 char* etiquetas;
-t_pcb pcb;
 t_intructions* codigoo;
 
 
@@ -26,7 +25,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
 
-	//Socket enviandoposicion e id para que la UMV pushee
+	//Socket enviando posicion e id para que la UMV pushee
 	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
 	struct_push* estructura = crear_struct_push(posicion,id);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
@@ -55,23 +54,27 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 		posicion = -1;
 	}
 	return posicion;
+
 }
 
 
-t_valor_variable dereferenciar(t_puntero direccion_variable) {/*
+t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	//Socket enviando direccion_variable a UMV para que haga pop
 	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
 	struct_pop_desreferenciar* estructura = crear_struct_pop_desreferenciar(direccion_variable);
 	socket_enviar(sockAjeno,STRUCT_POP_DESREFERENCIAR,estructura);
 	free(estructura);
+
 	//Socket recibiendo t_valor_variable id
 	t_estructura tipo;
-	struct_char** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	t_valor_variable id = (*estructura2)->letra;
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_char** estructuraAux = (struct_char**)estructura;
+	t_valor_variable id = (*estructuraAux)->letra;
 	free(estructura2);
+	free(estructuraAux);
 	return id;
-	*/
+
 }
 
 
@@ -98,7 +101,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 }
 
 
-t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {/*
+t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 	//Socket mandando a Kernel el nombre de la variable de la que quiero saber el valor
 	struct_string* estructura = crear_struct_string(variable);
 	socket_enviar(sockAjeno,STRUCT_OBTENER_COMPARTIDA,estructura);
@@ -106,13 +109,15 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {/*
 
 	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
 	t_estructura tipo = STRUCT_NUMERO;
-	struct_numero** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	t_valor_variable valor = (*estructura2)->numero;
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_numero** estructuraAux = (struct_numero**)estructura2;
+	t_valor_variable valor = (*estructuraAux)->numero;
+	free(estructuraAux);
 	free(estructura2);
 
 	return valor;
-	*/
+
 }
 
 
@@ -129,7 +134,6 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-/*
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
 
@@ -141,13 +145,11 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	//Meto eso en analizador_de_linea... para invocar al parser
-*/
 }
 
 
-void llamarSinRetorno(t_nombre_etiqueta etiqueta) {/*
+void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	//HACER ALGO CON TAMAÑO DE CONTEXTO
-	//HACER LOS FREE
 
 	reservarContextoSinRetorno();
 
@@ -161,30 +163,33 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {/*
 	pcb.program_counter = instruccion;
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = codigo[instruccion];
+	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
 	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
+	free(estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	t_estructura tipo = STRUCT_STRING;
-	struct_string** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	const char* string = (*estructura2)->string;
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_string** estructuraAux = (struct_string**)estructura2;
+	const char* string = (*estructuraAux)->string;
+	free(estructuraAux);
+	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
-*/
+
 }
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-/*
+
 	//definir variables si hay parametros
 	//Asignar a parametros
 	//HACER ALGO CON TAMAÑO DE CONTEXTO
-	//HACER LOS FREE
 
 	reservarContextoConRetorno();
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
@@ -202,17 +207,21 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
 	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
+	free(estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	t_estructura tipo = STRUCT_STRING;
-	struct_string** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	const char* string = (*estructura2)->string;
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_string** estructuraAux = (struct_string**)estructura2;
+	const char* string = (*estructuraAux)->string;
+	free(estructuraAux);
+	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
 
-*/
+
 }
 
 void finalizar() {
