@@ -219,11 +219,13 @@ void core_conexion_plp_programas(void){
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketServidor(efd_programas,sock_programas);
-	event.events=EPOLLIN;
+	event.events=EPOLLIN|EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	//int i = epoll_escucharBloqueante(efd_programas,events);
-	int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
+
+	int i = epoll_escucharBloqueante(efd_programas,events);
+	//int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
 	printf("epoll programas = %d\n", i);
+
 
 
 	event.data.fd=sock_programas;
@@ -254,7 +256,7 @@ void core_conexion_pcp_cpu(void){
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
-	event.events=EPOLLIN;
+	event.events=EPOLLIN | EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	int i = epoll_escucharBloqueante(efd_cpu,events);
 	printf("epoll cpu = %d \n", i);

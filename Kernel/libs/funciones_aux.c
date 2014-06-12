@@ -68,7 +68,7 @@ void log_error_socket(void){
 int posicion_Variable_Global(char* variable){
 	int pos=0;
 	for(pos=0;configuracion_kernel.var_globales[pos]!=NULL;pos++){
-		if(strcmp(variable,configuracion_kernel.var_globales)==0){
+		if(strcmp(variable,configuracion_kernel.var_globales[pos])==0){
 			return pos;
 		}
 	}
@@ -78,14 +78,13 @@ int posicion_Variable_Global(char* variable){
 
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
-void manejar_ConexionNueva_CPU(void){
-
+void manejar_ConexionNueva_CPU(struct epoll_event event){
 
 }
 
 
 
-void manejar_ConexionNueva_Programas(void){
+void manejar_ConexionNueva_Programas(struct epoll_event event){
 
 }
 

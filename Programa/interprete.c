@@ -23,8 +23,9 @@ int main (int argc, char **argv){
 	}
 
 	int sock=abrirSocket();
-	while(1){
-
+	int efd=epoll_crear();
+	if((epoll_agregarSocketCliente(efd,sock))==0){
+		printf("se agregó el socketCliente epoll");
 	}
 
 	cerrarSocket(sock);
