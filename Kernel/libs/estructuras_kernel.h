@@ -87,6 +87,7 @@ typedef struct {
 	t_pcb* pcb;
 	int flag_terminado;
 	int flag_bloqueado;
+	int socket_descriptor_conexion;
 } t_programa;
 
 typedef struct{

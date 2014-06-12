@@ -22,8 +22,14 @@
 int* vector_num(char** vector_string_num, char** config_ids){
 	int n,*vector;
 	vector=malloc(sizeof(int)*cant_identificadores(config_ids));
-	for(n=0;vector_string_num[n]!=NULL;n++){
-	vector[n]=atoi(vector_string_num[n]);
+	if(vector_string_num !=NULL){
+		for(n=0;vector_string_num[n]!=NULL;n++){
+			vector[n]=atoi(vector_string_num[n]);
+		}
+	}else{
+		for(n=0;config_ids[n]!=NULL; n++){
+			vector[n]=0;
+		}
 	}
 
 	return vector;
@@ -78,13 +84,13 @@ int posicion_Variable_Global(char* variable){
 
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
-void manejar_ConexionNueva_CPU(struct epoll_event event){
+void aceptarConexionEntrante(struct epoll_event event){
 
 }
 
 
 
 void manejar_ConexionNueva_Programas(struct epoll_event event){
-
+	socket_aceptarCliente(event.data.fd);
 }
 

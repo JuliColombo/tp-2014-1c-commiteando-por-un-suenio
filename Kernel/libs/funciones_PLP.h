@@ -24,6 +24,7 @@
 
 /************************* VARIABLES GLOBALES *************************/
 extern t_config_kernel configuracion_kernel;
+extern int* valor_var_globales;
 extern log_t* archLog;
 extern char* PATH;
 extern t_thread_io io;

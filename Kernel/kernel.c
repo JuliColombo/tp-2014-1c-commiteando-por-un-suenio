@@ -10,6 +10,7 @@
 /* Variables Globales */
 
 t_config_kernel configuracion_kernel;
+int* valor_var_globales;
 log_t* archLog;
 pthread_t pcp, plp;
 t_thread_io io;
