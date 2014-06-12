@@ -13,16 +13,22 @@ int sockfd;
 int sockAjeno;
 int top_index;
 
-char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){/*
+char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice = malloc(etiquetas_size+1);
 	//tendria que aclararle a la umv que es para generar el indice
+
 	t_estructura tipo = STRUCT_STRING;
-	struct_string** estructura2;
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	indice = (*estructura2)->string;
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_string** estructuraAux = (struct_string**)estructura2;
+
+	indice = (*estructuraAux)->string;
+
+	free(estructura2);
+	free(estructuraAux);
 
 	return indice;
-	*/
+
 }
 
 
@@ -54,7 +60,7 @@ void elemento_delete(t_elemento* elemento) {
 	free(elemento);
 }
 
-void reservarContextoSinRetorno() {/*
+void reservarContextoSinRetorno() {
 	t_puntero posicionContextoViejo;
 	int* cursor = &pcb.c_stack;
 
@@ -78,7 +84,7 @@ void reservarContextoSinRetorno() {/*
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
-*/
+
 }
 
 void reservarContextoConRetorno(){
@@ -100,7 +106,7 @@ void reservarContextoConRetorno(){
  * estoy en la posicion de cursor contexto. Asi que disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor)
  * Pongo en el diccionario el id y su posicion. Lo hago tantas veces como el tamaño del contexto sea.
  */
-void guardarAlternado () {/*
+void guardarAlternado () {
 	top_index -=2;
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_numero* estructura = crear_struct_numero(top_index);
@@ -112,15 +118,17 @@ void guardarAlternado () {/*
 
 	//Socket de UMV para que me pase lo ultimo que hay pusheado en la pila, y yo hacer: t_nombre_variable identificador_variable = TOP(pila);
 	t_estructura tipo = STRUCT_CHAR;
-	struct_char** estructura1;
-	socket_recibir(sockAjeno,&tipo, *estructura1);
-	t_valor_variable identificador_variable = (*estructura1)->letra;
+	void** estructura1;
+	socket_recibir(sockAjeno,&tipo, estructura1);
+	struct_char** estructuraAux= (struct_char**)estructura1;
+	t_valor_variable identificador_variable = (*estructuraAux)->letra;
 	free(estructura1);
+	free(estructuraAux);
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,top_index);
 	dictionary_put(diccionario,elem->name,elem);
-*/
+
 }
 
 
@@ -140,7 +148,7 @@ void regenerarDiccionario(int tamanio_contexto) {
 	free(estructura);
 }
 
-void volverAContextoAnterior() {/*
+void volverAContextoAnterior() {
 	//en realidad usaria pcb->tamanio_contexto
 	//Usaria pcb->c_stack. Osea, que vaya a donde comienza mi contexto, para empezar a popear.
 
@@ -151,18 +159,24 @@ void volverAContextoAnterior() {/*
 	free(estructura);
 
 	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
-	struct_numero** estructura2;
 	socket_enviarSignal(sockAjeno, POP);
-	socket_recibir(sockAjeno,&tipo, *estructura2);
-	t_puntero program_counter = (*estructura2)->numero;
+
+	void** estructura2;
+	socket_recibir(sockAjeno,&tipo, estructura2);
+	struct_numero** estructuraAux = (struct_numero**)estructura2;
+	t_puntero program_counter = (*estructuraAux)->numero;
 	free(estructura2);
+	free(estructuraAux);
 
 	//Socket a UMV para que haga: t_puntero cursor_stack_viejo = POP(pila);
-	struct_numero** estructura3;
 	socket_enviarSignal(sockAjeno, POP);
-	socket_recibir(sockAjeno,&tipo, *estructura3);
-	t_puntero cursor_stack_viejo = (*estructura3)->numero;
+
+	void** estructura3;
+	socket_recibir(sockAjeno,&tipo, estructura3);
+	struct_numero** estructuraAux1 = (struct_numero**)estructura3;
+	t_puntero cursor_stack_viejo = (*estructuraAux1)->numero;
 	free(estructura3);
+	free(estructuraAux1);
 
 	//Socket de UMV para que yo actualice el top_index
 
@@ -170,6 +184,6 @@ void volverAContextoAnterior() {/*
 	//pcb->c_stack = c_stack;
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
-	*/
+
 }
 
