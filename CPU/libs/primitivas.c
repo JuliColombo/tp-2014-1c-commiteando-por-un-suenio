@@ -27,9 +27,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	//Socket enviando posicion e id para que la UMV pushee
 	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
-	struct_push* estructura = crear_struct_push(posicion,id);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockAjeno,posicion,id);
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
 
 
@@ -61,15 +59,13 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	//Socket enviando direccion_variable a UMV para que haga pop
 	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
-	struct_pop_desreferenciar* estructura = crear_struct_pop_desreferenciar(direccion_variable);
-	socket_enviar(sockAjeno,STRUCT_POP_DESREFERENCIAR,estructura);
-	free(estructura);
+	socket_and_pop_position(sockAjeno,direccion_variable+1); //sumo uno porque era desreferenciar
 
 	//Socket recibiendo t_valor_variable id
 	t_estructura tipo;
 	void** estructura2;
 	socket_recibir(sockAjeno,&tipo, estructura2);
-	struct_char** estructuraAux = (struct_char**)estructura;
+	struct_char** estructuraAux = (struct_char**)estructura2;
 	t_valor_variable id = (*estructuraAux)->letra;
 	free(estructura2);
 	free(estructuraAux);
@@ -83,9 +79,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Socket enviando direccion_variable y valor a UMV
 	//En UMV PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
-	struct_push* estructura = crear_struct_push(direccion_variable,valor);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockAjeno,direccion_variable,valor);
 
 	if(top_index < direccion_variable) {
 		top_index = direccion_variable;
@@ -93,9 +87,9 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Le digo a UMV que actualice su top_index del stack
 	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
-	struct_numero* estructura2 = crear_struct_numero(top_index);
-	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura2);
-	free(estructura2);
+	struct_numero* estructura = crear_struct_numero(top_index);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	free(estructura);
 
 	pcb.program_counter += 1;
 }
@@ -240,24 +234,6 @@ void finalizar() {
 	}
 }
 
-void retornarrr(t_valor_variable retorno){
-	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
-	//Socket de UMV para actualizar mi top_index
-	uint32_t posicionVariable; //no va
-
-	//Socket a UMV para que haga: PUSH_SIZE_CHECK(ret,pila,posicionVariable);
-	//en UMV t_valor_variable* ret = &retorno;
-	struct_push* estructura = crear_struct_push(posicionVariable,retorno);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
-
-	//Socket de UMV para actualizar mi top_index
-
-	recuperarPosicionDeDirecciones();
-	volverAContextoAnterior();
-	regenerarDiccionario(pcb.tamanio_contexto);
-
-}
 
 void retornar(t_valor_variable retorno) {
 
@@ -267,9 +243,7 @@ void retornar(t_valor_variable retorno) {
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
 
-	struct_push* estructura = crear_struct_push(direccionRetorno+1,retorno);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockAjeno,direccionRetorno+1,retorno);
 
 }
 
