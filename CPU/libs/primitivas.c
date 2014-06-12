@@ -227,16 +227,20 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 void finalizar() {
 	t_puntero c_stack = pcb.c_stack;
 	t_puntero stack = pcb.stack;
+	t_puntero contexto_anterior;
 
 	volverAContextoAnterior();
-	regenerarDiccionario(pcb.tamanio_contexto);
+
+	int tamanio = calcularTamanioContextoAnterior(c_stack);
+
+	regenerarDiccionario(tamanio);
 
 	if(c_stack == stack) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 	}
 }
 
-void retornar(t_valor_variable retorno){
+void retornarrr(t_valor_variable retorno){
 	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
 	//Socket de UMV para actualizar mi top_index
 	uint32_t posicionVariable; //no va
@@ -251,6 +255,13 @@ void retornar(t_valor_variable retorno){
 
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
+
+}
+
+void retornar(t_valor_variable retorno) {
+	volverAContextoAnterior();
+	regenerarDiccionario(pcb.tamanio_contexto);
+
 
 }
 

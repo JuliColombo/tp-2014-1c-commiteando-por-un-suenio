@@ -88,4 +88,7 @@ t_valor_variable POP_SIZE_CHECK(t_stack* pila) {
 	}
 }
 
+void MODIFICAR_TOP_INDEX(t_stack* pila, int nueva_pos) {
+	pila->top_index = nueva_pos;
+}
 

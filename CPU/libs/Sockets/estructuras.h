@@ -82,6 +82,11 @@ typedef struct {
 }__attribute__ ((__packed__)) struct_semaforo;
 
 
+typedef struct {
+	t_puntero top;
+}__attribute__((__packed__)) struct_modificar_top_index;
+
+
 struct_push* crear_struct_push(uint32_t posicion, int id);
 struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);
 struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion);
@@ -91,6 +96,7 @@ struct_string* crear_struct_string(char* string);
 struct_asignar_compartida* crear_struct_asignar_compartida(char* id, uint32_t valor);
 struct_semaforo* crear_struct_semaforo(t_nombre_semaforo semaforo, uint32_t operacion);
 struct_tipo_instruccion* crear_struct_tipo_instruccion(t_intructions instruccion);
+struct_modificar_top_index* crear_struct_modificar_top_index(t_puntero top);
 
 
 #endif /* ESTRUCTURAS_H_ */

@@ -53,5 +53,15 @@ void guardarAlternado ();
 
 void volverAContextoAnterior();
 
+uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_nuevo);
+
+t_puntero recuperarDireccionRetorno();
+
+void recuperarPosicionDeDirecciones();
+
+void recuperarProgramCounter(t_puntero* program_counter);
+
+void recuperarCursorAnterior(t_puntero* cursor_stack_viejo);
+
 
 #endif /* PRIMITIVASAUX_H_ */

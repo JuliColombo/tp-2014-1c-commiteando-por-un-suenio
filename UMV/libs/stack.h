@@ -41,6 +41,6 @@ typedef struct {
 
  t_valor_variable POP_SIZE_CHECK(t_stack* pila);
 
- void IR_A_POSICON(t_stack* pila, int pos);
+ void MODIFICAR_TOP_INDEX(t_stack* pila, int nueva_pos);
 
 #endif /* STACK_H_ */

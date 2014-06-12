@@ -63,3 +63,9 @@ struct_semaforo* crear_struct_semaforo(t_nombre_semaforo semaforo, uint32_t oper
 	estructura->operacion= operacion;
 	return estructura;
 }
+
+struct_modificar_top_index* crear_struct_modificar_top_index(t_puntero top){
+	struct_modificar_top_index* estructura;
+	estructura->top = top;
+	return estructura;
+}
