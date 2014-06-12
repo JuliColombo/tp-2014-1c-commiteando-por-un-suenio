@@ -67,9 +67,7 @@ void reservarContextoSinRetorno() {
 	posicionContextoViejo = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
-	struct_push* estructura1 = crear_struct_push(posicionContextoViejo,*cursor);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura1);
-	free(estructura1);
+	socket_and_push(sockAjeno,posicionContextoViejo,*cursor);
 
 	//Pushear Program Counter de proxima instruccion:
 	int posicionPC;
@@ -78,10 +76,7 @@ void reservarContextoSinRetorno() {
 	posicionPC = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
-	struct_push* estructura2 = crear_struct_push(posicionPC,pc);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura2);
-	free(estructura2);
-
+	socket_and_push(sockAjeno,posicionPC,pc);
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
@@ -96,9 +91,7 @@ void reservarContextoConRetorno(){
 	posicionAVariable = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-	struct_push* estructura = crear_struct_push(posicionAVariable,posicionVar);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockAjeno,posicionAVariable,posicionVar);
 }
 
 
@@ -158,9 +151,7 @@ void regenerarDiccionario(int tamanio_contexto) {
 }
 
 t_puntero recuperarDireccionRetorno() {
-	struct_pop_retornar* estructura = crear_struct_pop_retornar(pcb.c_stack);
-	socket_enviar(sockAjeno,STRUCT_POP_RETORNAR,estructura);
-	free(estructura);
+	socket_and_pop_position(sockAjeno,pcb.stack - 1); //resto uno porque era retornar
 
 	//QUIERO LO DE ABAJO¡???
 	t_puntero* retorno;
