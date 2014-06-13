@@ -33,6 +33,9 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_POP_RETORNAR:
 		stream = paquetePopRetornar((struct_pop_retornar*) estructura);
 		break;
+	case STRUCT_POP_POSITION:
+		stream = paquetePopPosition((struct_pop_position*) estructura);
+		break;
 	case STRUCT_NUMERO:
 		stream = paqueteNumero((struct_numero*) estructura);
 		break;
@@ -128,6 +131,21 @@ t_stream* paquetePopRetornar(struct_pop_retornar* estructura) {
 	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
 
 	char* data = crearData(STRUCT_POP_RETORNAR,paquete->length);
+
+	memcpy(data + sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
+
+	paquete->buffer = data;
+	free(data); //??
+	return paquete;
+}
+
+t_stream* paquetePopPosition(struct_pop_position* estructura) {
+	t_stream* paquete;
+
+	paquete = malloc(sizeof(t_stream));
+	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
+
+	char* data = crearData(STRUCT_POP_POSITION,paquete->length);
 
 	memcpy(data + sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
 
@@ -319,6 +337,15 @@ struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length) {
 
 }
 
+struct_pop_position* sacarPaquetePopPosition(char* data, uint32_t length) {
+	struct_pop_retornar* estructuraDestino = malloc(sizeof(struct_pop_position));
+
+	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
+
+	return estructuraDestino;
+
+}
+
 struct_signal * sacarPaqueteSignal(char * dataPaquete, uint32_t length){
 	struct_signal * estructuraDestino = malloc(sizeof(struct_signal));
 
@@ -426,6 +453,9 @@ void *deserializar(int type, char* data, uint32_t length) {
 		break;
 	case STRUCT_POP_RETORNAR:
 		estructuraDestino = sacarPaquetePopRetornar(data,length);
+		break;
+	case STRUCT_POP_POSITION:
+		estructuraDestino = sacarPaquetePopPosition(data,length);
 		break;
 	case STRUCT_NUMERO:
 		estructuraDestino = sacarPaqueteNumero(data,length);

@@ -26,6 +26,12 @@ struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion) {
 	return estructura;
 }
 
+struct_pop_position* crear_struct_pop_position(uint32_t posicion) {
+	struct_pop_position* estructura;
+	estructura->posicion = posicion;
+	return estructura;
+}
+
 struct_numero* crear_struct_numero(uint32_t numero) {
 	struct_numero* estructura;
 	estructura->numero = numero;

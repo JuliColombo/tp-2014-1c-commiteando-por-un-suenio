@@ -13,7 +13,8 @@
 
 t_dictionary *diccionario;
 int sockfd;
-int sockAjeno;
+int sockUMV;
+int sockKernel;
 int top_index;
 
 char* etiquetas;
@@ -25,11 +26,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
 
-	//Socket enviando posicion e id para que la UMV pushee
-	//En UMV: PUSH_SIZE_CHECK(&id,pila,posicion);
-	struct_push* estructura = crear_struct_push(posicion,id);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockUMV,posicion,id);
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
 
 
@@ -59,17 +56,13 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
-	//Socket enviando direccion_variable a UMV para que haga pop
-	//En UMV POP_DESREFERENCIAR(pila, direccion_variable)
-	struct_pop_desreferenciar* estructura = crear_struct_pop_desreferenciar(direccion_variable);
-	socket_enviar(sockAjeno,STRUCT_POP_DESREFERENCIAR,estructura);
-	free(estructura);
+	socket_and_pop_position(sockUMV,direccion_variable+1); //sumo uno porque era desreferenciar
 
 	//Socket recibiendo t_valor_variable id
 	t_estructura tipo;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
-	struct_char** estructuraAux = (struct_char**)estructura;
+	socket_recibir(sockUMV,&tipo, estructura2);
+	struct_char** estructuraAux = (struct_char**)estructura2;
 	t_valor_variable id = (*estructuraAux)->letra;
 	free(estructura2);
 	free(estructuraAux);
@@ -81,11 +74,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	//top_index que se actualiza cada vez que UMV pushea o popea
 
-	//Socket enviando direccion_variable y valor a UMV
-	//En UMV PUSH_SIZE_CHECK(&valor,pila,direccion_variable);
-	struct_push* estructura = crear_struct_push(direccion_variable,valor);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockUMV,direccion_variable,valor);
 
 	if(top_index < direccion_variable) {
 		top_index = direccion_variable;
@@ -93,24 +82,23 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Le digo a UMV que actualice su top_index del stack
 	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
-	struct_numero* estructura2 = crear_struct_numero(top_index);
-	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura2);
-	free(estructura2);
+	struct_numero* estructura = crear_struct_numero(top_index);
+	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
+	free(estructura);
 
 	pcb.program_counter += 1;
 }
 
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
-	//Socket mandando a Kernel el nombre de la variable de la que quiero saber el valor
 	struct_string* estructura = crear_struct_string(variable);
-	socket_enviar(sockAjeno,STRUCT_OBTENER_COMPARTIDA,estructura);
+	socket_enviar(sockKernel,STRUCT_OBTENER_COMPARTIDA,estructura);
 	free(estructura);
 
 	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
 	t_estructura tipo = STRUCT_NUMERO;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockKernel,&tipo, estructura2);
 	struct_numero** estructuraAux = (struct_numero**)estructura2;
 	t_valor_variable valor = (*estructuraAux)->numero;
 	free(estructuraAux);
@@ -125,7 +113,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"
 	struct_asignar_compartida* estructura = crear_struct_asignar_compartida(variable, valor);
-	socket_enviar(sockAjeno, STRUCT_ASIGNAR_COMPARTIDA,estructura);
+	socket_enviar(sockKernel, STRUCT_ASIGNAR_COMPARTIDA,estructura);
 	free(estructura);
 
 	pcb.program_counter += 1;
@@ -167,13 +155,13 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
-	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
+	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
 	free(estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	t_estructura tipo = STRUCT_STRING;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
 	const char* string = (*estructuraAux)->string;
 	free(estructuraAux);
@@ -206,13 +194,13 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
-	socket_enviar(sockAjeno, STRUCT_TIPO_INSTRUCCION,estructura);
+	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
 	free(estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
 	t_estructura tipo = STRUCT_STRING;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
 	const char* string = (*estructuraAux)->string;
 	free(estructuraAux);
@@ -240,24 +228,6 @@ void finalizar() {
 	}
 }
 
-void retornarrr(t_valor_variable retorno){
-	//Socket de UMV para yo darle un valor a posicionVariable --> t_puntero posicionVariable = POP_RETORNAR(pila, c_stack);
-	//Socket de UMV para actualizar mi top_index
-	uint32_t posicionVariable; //no va
-
-	//Socket a UMV para que haga: PUSH_SIZE_CHECK(ret,pila,posicionVariable);
-	//en UMV t_valor_variable* ret = &retorno;
-	struct_push* estructura = crear_struct_push(posicionVariable,retorno);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
-
-	//Socket de UMV para actualizar mi top_index
-
-	recuperarPosicionDeDirecciones();
-	volverAContextoAnterior();
-	regenerarDiccionario(pcb.tamanio_contexto);
-
-}
 
 void retornar(t_valor_variable retorno) {
 
@@ -267,9 +237,7 @@ void retornar(t_valor_variable retorno) {
 	volverAContextoAnterior();
 	regenerarDiccionario(pcb.tamanio_contexto);
 
-	struct_push* estructura = crear_struct_push(direccionRetorno+1,retorno);
-	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
-	free(estructura);
+	socket_and_push(sockUMV,direccionRetorno+1,retorno);
 
 }
 
@@ -278,7 +246,7 @@ int imprimir(t_valor_variable valor_mostrar) {
 
 	//Socket a Kernel enviandole el valor a mostrar
 	struct_numero* estructura = crear_struct_numero(valor_mostrar);
-	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	socket_enviar(sockKernel,STRUCT_NUMERO,estructura);
 	free(estructura);
 
 	return 0;
@@ -289,7 +257,7 @@ int imprimirTexto(char* texto) {
 
 	//Socket a Kernel enviandole texto
 	struct_string* estructura = crear_struct_string(texto);
-	socket_enviar(sockAjeno,STRUCT_STRING,estructura);
+	socket_enviar(sockKernel,STRUCT_STRING,estructura);
 	free(estructura);
 
 	return 0;
@@ -310,7 +278,7 @@ int wait(t_nombre_semaforo identificador_semaforo) {
 	//El kernel deberá decidir si bloquearlo o no.
 
 	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,WAIT);
-	socket_enviar(sockAjeno,STRUCT_SEMAFORO,estructura);
+	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
 	free(estructura);
 
 	return 0;
@@ -321,7 +289,7 @@ int signal(t_nombre_semaforo identificador_semaforo) {
 	//El kernel deberá decidir si desbloquear otros procesos o no.
 
 	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,SIGNAL);
-	socket_enviar(sockAjeno,STRUCT_SEMAFORO,estructura);
+	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
 	free(estructura);
 
 	return 0;
