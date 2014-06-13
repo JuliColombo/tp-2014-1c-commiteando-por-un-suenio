@@ -22,6 +22,7 @@ pthread_mutex_t* mutex_cola_exec;
 pthread_mutex_t* mutex_cola_block;
 pthread_mutex_t* mutex_cola_exit;
 int sock_programas, sock_umv, sock_cpu;
+int* fds_conectados;
 
 
 

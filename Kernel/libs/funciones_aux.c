@@ -91,6 +91,14 @@ void aceptarConexionEntrante(struct epoll_event event){
 
 
 void* manejar_ConexionNueva_Programas(struct epoll_event event){
-	socket_aceptarCliente(event.data.fd);
+	int n;
+	for(n=0;fds_conectados[n]!=NULL;n++){
+		if(n<60){
+			fds_conectados[n]=socket_aceptarCliente(event.data.fd);
+		}else{
+			perror("No se pueden conectar más programas");
+		}
+
+	}
 }
 

@@ -38,6 +38,7 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
+extern int* fds_conectados;
 
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
