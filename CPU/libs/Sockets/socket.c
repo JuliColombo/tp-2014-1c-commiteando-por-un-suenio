@@ -367,12 +367,14 @@ int socket_cerrarConexion(int socket){
 /****************************** SOCKETS DE CPU ******************************************/
 
 void socket_and_push(int sockAjeno,t_puntero posicionEnPila, int valorAPushear) {
+	//En UMV PUSH_SIZE_CHECK(&valorAPushear,pila,posicionEnPila)
 	struct_push* estructura = crear_struct_push(posicionEnPila,valorAPushear);
 	socket_enviar(sockAjeno,STRUCT_PUSH,estructura);
 	free(estructura);
 }
 
 void socket_and_pop_position(int sockAjeno, t_puntero posicionDePila) {
+	//En UMV POP_SIZE_CHECK(pila, posicionDePila)
 	struct_pop_position* estructura = crear_struct_pop_position(posicionDePila);
 	socket_enviar(sockAjeno,STRUCT_POP_POSITION,estructura);
 	free(estructura);

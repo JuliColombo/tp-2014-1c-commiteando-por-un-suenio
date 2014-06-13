@@ -10,7 +10,7 @@
 //Esto de aca es para probar. Despues se pasan por sockets y esas cosas.
 t_dictionary *diccionario;
 int sockfd;
-int sockAjeno;
+int sockUMV;
 int top_index;
 
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
@@ -19,7 +19,7 @@ char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 
 	t_estructura tipo = STRUCT_STRING;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
 
 	indice = (*estructuraAux)->string;
@@ -67,7 +67,7 @@ void reservarContextoSinRetorno() {
 	posicionContextoViejo = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
-	socket_and_push(sockAjeno,posicionContextoViejo,*cursor);
+	socket_and_push(sockUMV,posicionContextoViejo,*cursor);
 
 	//Pushear Program Counter de proxima instruccion:
 	int posicionPC;
@@ -76,7 +76,7 @@ void reservarContextoSinRetorno() {
 	posicionPC = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
-	socket_and_push(sockAjeno,posicionPC,pc);
+	socket_and_push(sockUMV,posicionPC,pc);
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
@@ -91,7 +91,7 @@ void reservarContextoConRetorno(){
 	posicionAVariable = calcularPosicionAsignacionCPU(top_index);
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-	socket_and_push(sockAjeno,posicionAVariable,posicionVar);
+	socket_and_push(sockUMV,posicionAVariable,posicionVar);
 }
 
 
@@ -105,16 +105,16 @@ void reservarContextoConRetorno(){
 void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_numero* estructura = crear_struct_numero(top_index);
-	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
 	free(estructura);
 
 	//Socket a UMV para que haga TOP(pila)
-	socket_enviarSignal(sockAjeno, TOP);
+	socket_enviarSignal(sockUMV, TOP);
 
 	//Socket de UMV para que me pase lo ultimo que hay pusheado en la pila, y yo hacer: t_nombre_variable identificador_variable = TOP(pila);
 	t_estructura tipo = STRUCT_CHAR;
 	void** estructura1;
-	socket_recibir(sockAjeno,&tipo, estructura1);
+	socket_recibir(sockUMV,&tipo, estructura1);
 	struct_char** estructuraAux= (struct_char**)estructura1;
 	t_valor_variable identificador_variable = (*estructuraAux)->letra;
 	free(estructura1);
@@ -146,18 +146,18 @@ void regenerarDiccionario(int tamanio_contexto) {
 
 	//Socket a UMV para que haga: pila->top_index = top;
 	struct_numero* estructura = crear_struct_numero(top);
-	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
 	free(estructura);
 }
 
 t_puntero recuperarDireccionRetorno() {
-	socket_and_pop_position(sockAjeno,pcb.stack - 1); //resto uno porque era retornar
+	socket_and_pop_position(sockUMV,pcb.stack - 1); //resto uno porque era retornar
 
 	//QUIERO LO DE ABAJO¡???
 	t_puntero* retorno;
 	t_estructura tipo = STRUCT_NUMERO;
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_numero** estructuraAux = (struct_numero**)estructura2;
 	*retorno = (*estructuraAux)->numero;
 	free(estructura2);
@@ -168,17 +168,17 @@ t_puntero recuperarDireccionRetorno() {
 
 void recuperarPosicionDeDirecciones() {
 	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(pcb.c_stack-1);
-	socket_enviar(sockAjeno,STRUCT_MODIFICAR_TOP_INDEX,estructura);
+	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
 	free(estructura);
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
 	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
 	t_estructura tipo = STRUCT_NUMERO;
-	socket_enviarSignal(sockAjeno, POP);
+	socket_enviarSignal(sockUMV, POP);
 
 	void** estructura2;
-	socket_recibir(sockAjeno,&tipo, estructura2);
+	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_numero** estructuraAux = (struct_numero**)estructura2;
 	*program_counter = (*estructuraAux)->numero;
 	free(estructura2);
@@ -188,10 +188,10 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 	//Socket a UMV para que haga: t_puntero cursor_stack_viejo = POP(pila);
 	t_estructura tipo = STRUCT_NUMERO;
-	socket_enviarSignal(sockAjeno, POP);
+	socket_enviarSignal(sockUMV, POP);
 
 	void** estructura3;
-	socket_recibir(sockAjeno,&tipo, estructura3);
+	socket_recibir(sockUMV,&tipo, estructura3);
 	struct_numero** estructuraAux1 = (struct_numero**)estructura3;
 	*cursor_stack_viejo = (*estructuraAux1)->numero;
 	free(estructura3);
