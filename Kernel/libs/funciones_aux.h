@@ -23,7 +23,7 @@ int posicion_Variable_Global(char*);
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
 void aceptarConexionEntrante (struct epoll_event);
-void manejar_ConexionNueva_Programas(struct epoll_event);
+void* manejar_ConexionNueva_Programas(struct epoll_event);
 
 
 #endif /* FUNCIONES_AUX_H_ */

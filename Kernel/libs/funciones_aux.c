@@ -90,7 +90,7 @@ void aceptarConexionEntrante(struct epoll_event event){
 
 
 
-void manejar_ConexionNueva_Programas(struct epoll_event event){
+void* manejar_ConexionNueva_Programas(struct epoll_event event){
 	socket_aceptarCliente(event.data.fd);
 }
 

@@ -222,14 +222,14 @@ void core_conexion_plp_programas(void){
 	epoll_agregarSocketServidor(efd_programas,sock_programas);
 	event.events=EPOLLIN|EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
+	event.data.fd=sock_programas;
 
-	int i = epoll_escucharBloqueante(efd_programas,events);
-	//int i = epoll_escucharGeneral(efd_programas,sock_programas, NULL, NULL, NULL);
+	//int i = epoll_escucharBloqueante(efd_programas,events);
+	int i = epoll_escucharGeneral(efd_programas,sock_programas, manejar_ConexionNueva_Programas(event), NULL, NULL);
 	printf("epoll programas = %d\n", i);
 
 
 
-	event.data.fd=sock_programas;
 
 
 
