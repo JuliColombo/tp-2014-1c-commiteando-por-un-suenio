@@ -24,7 +24,7 @@ t_stream* paquetizarStruct_numero(t_struct_numero* estructuraOrigen);//ESTRUCTUR
 t_stream* paquetizarStruct_char(t_struct_char* estructuraOrigen); //E
 t_stream* paquetizarStruct_string(t_struct_string* estructuraOrigen); //D
 t_stream* paquetizarStruct_signal(t_struct_signal* estructuraOrigen); //E
-t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen)//E
+t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen);//E
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
