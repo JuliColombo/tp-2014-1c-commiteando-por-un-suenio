@@ -4,16 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../libs/funciones_CPU.c \
 ../libs/log.c \
 ../libs/primitivas.c \
 ../libs/primitivasAux.c 
 
 OBJS += \
+./libs/funciones_CPU.o \
 ./libs/log.o \
 ./libs/primitivas.o \
 ./libs/primitivasAux.o 
 
 C_DEPS += \
+./libs/funciones_CPU.d \
 ./libs/log.d \
 ./libs/primitivas.d \
 ./libs/primitivasAux.d 

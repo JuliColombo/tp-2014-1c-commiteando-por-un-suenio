@@ -379,3 +379,10 @@ void socket_and_pop_position(int sockAjeno, t_puntero posicionDePila) {
 	socket_enviar(sockAjeno,STRUCT_POP_POSITION,estructura);
 	free(estructura);
 }
+
+void socket_and_number(int sockAjeno, int numero) {
+	struct_numero* estructura = crear_struct_numero(numero);
+	socket_enviar(sockAjeno,STRUCT_NUMERO,estructura);
+	free(estructura);
+}
+

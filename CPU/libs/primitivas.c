@@ -56,17 +56,17 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
-	socket_and_pop_position(sockUMV,direccion_variable+1); //sumo uno porque era desreferenciar
+	socket_and_pop_position(sockUMV,direccion_variable);
 
 	//Socket recibiendo t_valor_variable id
 	t_estructura tipo;
 	void** estructura2;
 	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_char** estructuraAux = (struct_char**)estructura2;
-	t_valor_variable id = (*estructuraAux)->letra;
+	struct_numero** estructuraAux = (struct_numero**)estructura2;
+	t_valor_variable valor_variable = (*estructuraAux)->numero;
 	free(estructura2);
 	free(estructuraAux);
-	return id;
+	return valor_variable;
 
 }
 
@@ -82,8 +82,8 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Le digo a UMV que actualice su top_index del stack
 	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
-	struct_numero* estructura = crear_struct_numero(top_index);
-	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
+	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
+	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
 	free(estructura);
 
 	pcb.program_counter += 1;
@@ -127,17 +127,29 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	pcb.program_counter = instruccion;
 
-	//Busco en indice de codigo qué le pido a UMV -----> creo que esto es asi
+	//Busco en indice de codigo qué le pido a UMV
+	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
+	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
+	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
+	free(estructura);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
+	t_estructura tipo = STRUCT_STRING;
+	void** estructura2;
+	socket_recibir(sockUMV,&tipo, estructura2);
+	struct_string** estructuraAux = (struct_string**)estructura2;
+	char* const string = (*estructuraAux)->string;
+	free(estructuraAux);
+	free(estructura2);
+
 	//Meto eso en analizador_de_linea... para invocar al parser
+	//analizadorLinea(string, (AnSISOP_funciones*)AnSISOP_funciones, (AnSISOP_kernel*)AnSISOP_kernel);
 }
 
 
 void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
-	//HACER ALGO CON TAMAÑO DE CONTEXTO
 
 	reservarContextoSinRetorno();
 
@@ -163,21 +175,17 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	void** estructura2;
 	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
-	const char* string = (*estructuraAux)->string;
+	char* const string = (*estructuraAux)->string;
 	free(estructuraAux);
 	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
+	//analizadorLinea(string, (AnSISOP_funciones *)AnSISOP_funciones, (AnSISOP_kernel *)AnSISOP_kernel);
 
 }
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-
-	//definir variables si hay parametros
-	//Asignar a parametros
-	//HACER ALGO CON TAMAÑO DE CONTEXTO
 
 	reservarContextoConRetorno();
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
@@ -202,12 +210,12 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	void** estructura2;
 	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
-	const char* string = (*estructuraAux)->string;
+	char* const string = (*estructuraAux)->string;
 	free(estructuraAux);
 	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//void analizadorLinea(string, AnSISOP_funciones* AnSISOP_funciones, AnSISOP_kernel* AnSISOP_funciones_kernel);
+	//analizadorLinea(string, (AnSISOP_funciones *)AnSISOP_funciones, (AnSISOP_kernel *)AnSISOP_kernel);
 
 
 }
@@ -245,9 +253,7 @@ int imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
 	//Socket a Kernel enviandole el valor a mostrar
-	struct_numero* estructura = crear_struct_numero(valor_mostrar);
-	socket_enviar(sockKernel,STRUCT_NUMERO,estructura);
-	free(estructura);
+	socket_and_number(sockKernel, valor_mostrar);
 
 	return 0;
 }

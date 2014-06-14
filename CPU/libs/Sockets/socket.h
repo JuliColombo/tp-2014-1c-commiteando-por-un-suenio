@@ -60,8 +60,9 @@ int socket_puerto(char* direccionCompleta);
 
 char* socket_unirDireccion(char* ip, int puerto);
 
-/************************* FUNCIONES PARA EL MANEJO DE STACK *******************************************/
+/************************* FUNCIONES PARA EL MANEJO DE OṔERACIONES **************************************/
 void socket_and_push(int sockAjeno,t_puntero posicionEnPila, int valorAPushear);
 void socket_and_pop_position(int sockAjeno, t_puntero posicionDePila);
+void socket_and_number(int sockAjeno, int numero);
 
 #endif /* SOCKET_H_ */
