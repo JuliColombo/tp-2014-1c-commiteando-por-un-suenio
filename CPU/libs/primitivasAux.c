@@ -104,10 +104,9 @@ void reservarContextoConRetorno(){
 
 void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
-	struct_numero* estructura = crear_struct_numero(top_index);
-	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
+	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
+	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
 	free(estructura);
-
 	//Socket a UMV para que haga TOP(pila)
 	socket_enviarSignal(sockUMV, TOP);
 
@@ -145,9 +144,10 @@ void regenerarDiccionario(int tamanio_contexto) {
 	}
 
 	//Socket a UMV para que haga: pila->top_index = top;
-	struct_numero* estructura = crear_struct_numero(top);
-	socket_enviar(sockUMV,STRUCT_NUMERO,estructura);
-	free(estructura);
+	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top);
+		socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
+		free(estructura);
+
 }
 
 t_puntero recuperarDireccionRetorno() {

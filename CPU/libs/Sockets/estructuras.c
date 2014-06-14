@@ -14,18 +14,6 @@ struct_push* crear_struct_push(uint32_t posicion, int id) {
 	return estructura;
 }
 
-struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion) {
-	struct_pop_desreferenciar* estructura;
-	estructura->posicion = posicion;
-	return estructura;
-}
-
-struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion) {
-	struct_pop_retornar* estructura;
-	estructura->posicion = posicion;
-	return estructura;
-}
-
 struct_pop_position* crear_struct_pop_position(uint32_t posicion) {
 	struct_pop_position* estructura;
 	estructura->posicion = posicion;

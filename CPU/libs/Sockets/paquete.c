@@ -27,12 +27,6 @@ t_stream* serializar(int type, void* estructura) {
 	case STRUCT_PUSH:
 		stream = paquetePush((struct_push*) estructura);
 		break;
-	case STRUCT_POP_DESREFERENCIAR:
-		stream = paquetePopDesreferenciar((struct_pop_desreferenciar*) estructura);
-		break;
-	case STRUCT_POP_RETORNAR:
-		stream = paquetePopRetornar((struct_pop_retornar*) estructura);
-		break;
 	case STRUCT_POP_POSITION:
 		stream = paquetePopPosition((struct_pop_position*) estructura);
 		break;
@@ -103,36 +97,6 @@ t_stream* paquetePush(struct_push* estructura) {
 	memcpy(data + sizeof(t_header), &estructura->id, tamanioDato = sizeof(estructura->id));
 	tamanioDato += sizeof(t_header);
 	memcpy(data + tamanioDato, &estructura->posicion, sizeof(estructura->posicion));
-
-	paquete->buffer = data;
-	free(data); //??
-	return paquete;
-}
-
-t_stream* paquetePopDesreferenciar(struct_pop_desreferenciar* estructura) {
-	t_stream* paquete;
-
-	paquete = malloc(sizeof(t_stream));
-	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
-
-	char* data = crearData(STRUCT_POP_DESREFERENCIAR,paquete->length);
-
-	memcpy(data +  sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
-
-	paquete->buffer = data;
-	free(data); //??
-	return paquete;
-}
-
-t_stream* paquetePopRetornar(struct_pop_retornar* estructura) {
-	t_stream* paquete;
-
-	paquete = malloc(sizeof(t_stream));
-	paquete->length = sizeof(t_header) + sizeof(estructura->posicion);
-
-	char* data = crearData(STRUCT_POP_RETORNAR,paquete->length);
-
-	memcpy(data + sizeof(t_header), &estructura->posicion, sizeof(estructura->posicion));
 
 	paquete->buffer = data;
 	free(data); //??
@@ -318,27 +282,8 @@ struct_push* sacarPaquetePush(char* data, uint32_t length) {
 
 }
 
-
-struct_pop_desreferenciar* sacarPaquetePopDesreferenciar(char* data, uint32_t length) {
-	struct_pop_desreferenciar* estructuraDestino = malloc(sizeof(struct_pop_desreferenciar));
-
-	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
-
-	return estructuraDestino;
-
-}
-
-struct_pop_retornar* sacarPaquetePopRetornar(char* data, uint32_t length) {
-	struct_pop_retornar* estructuraDestino = malloc(sizeof(struct_pop_retornar));
-
-	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
-
-	return estructuraDestino;
-
-}
-
 struct_pop_position* sacarPaquetePopPosition(char* data, uint32_t length) {
-	struct_pop_retornar* estructuraDestino = malloc(sizeof(struct_pop_position));
+	struct_pop_position* estructuraDestino = malloc(sizeof(struct_pop_position));
 
 	memcpy(&estructuraDestino->posicion, data, sizeof(estructuraDestino->posicion));
 
@@ -447,12 +392,6 @@ void *deserializar(int type, char* data, uint32_t length) {
 	switch(type) {
 	case STRUCT_PUSH:
 		estructuraDestino = sacarPaquetePush(data, length);
-		break;
-	case STRUCT_POP_DESREFERENCIAR:
-		estructuraDestino = sacarPaquetePopDesreferenciar(data,length);
-		break;
-	case STRUCT_POP_RETORNAR:
-		estructuraDestino = sacarPaquetePopRetornar(data,length);
 		break;
 	case STRUCT_POP_POSITION:
 		estructuraDestino = sacarPaquetePopPosition(data,length);

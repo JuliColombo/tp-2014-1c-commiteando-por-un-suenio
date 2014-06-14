@@ -28,15 +28,6 @@ typedef struct {
 
 typedef struct {
 	uint32_t posicion;
-} __attribute__((packed)) struct_pop_desreferenciar;
-
-
-typedef struct {
-	uint32_t posicion;
-} __attribute__((packed)) struct_pop_retornar;
-
-typedef struct {
-	uint32_t posicion;
 } __attribute__((packed)) struct_pop_position;
 
 
@@ -92,8 +83,6 @@ typedef struct {
 
 
 struct_push* crear_struct_push(uint32_t posicion, int id);
-struct_pop_desreferenciar* crear_struct_pop_desreferenciar(uint32_t posicion);
-struct_pop_retornar* crear_struct_pop_retornar(uint32_t posicion);
 struct_pop_position* crear_struct_pop_position(uint32_t posicion);
 struct_numero* crear_struct_numero(uint32_t numero);
 struct_char* crear_struct_char(char letra);
