@@ -136,11 +136,10 @@ t_pcb crearPcb(char* codigo) {
 	t_pcb nuevoPCB;
 	t_medatada_program *pcbAux;
 	pcbAux=metadatada_desde_literal(codigo);
-	nuevoPCB.program_counter=pcbAux->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
 	nuevoPCB.pid=getpid();
+	nuevoPCB.program_counter=pcbAux->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
 
 	/*Esto es lo falta cargarle al PCB
-	nuevoPCB.pid;				//Identificador único del Programa en el sistema
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
 	nuevoPCB.stack;				//Dirección del primer byte en la UMV del segmento de stack
 	nuevoPCB.c_stack;			//Dirección del primer byte en la UMV del Contexto de Ejecución Actual

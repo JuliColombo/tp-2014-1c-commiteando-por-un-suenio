@@ -19,7 +19,6 @@ typedef uint8_t t_grado_multip;
 
 typedef unsigned int t_pid;
 typedef int t_program_counter;
-typedef int tamanio_indice;
 typedef int t_tamanio_contexto;
 typedef int t_tamanio_indice;
 typedef int* t_segmento_codigo;
