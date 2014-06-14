@@ -35,6 +35,9 @@ typedef struct{
 
 t_pcb pcb;
 
+AnSISOP_kernel (*funciones_kernel) (const char* string);
+AnSISOP_funciones (*funciones_parser) (const char* string);
+
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 
 void reservarContextoSinRetorno();

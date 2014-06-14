@@ -145,7 +145,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string, (AnSISOP_funciones*)AnSISOP_funciones, (AnSISOP_kernel*)AnSISOP_kernel);
+	analizadorLinea(string,funciones_parser, funciones_kernel);
 }
 
 
@@ -180,7 +180,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string, (AnSISOP_funciones *)AnSISOP_funciones, (AnSISOP_kernel *)AnSISOP_kernel);
+	analizadorLinea(string,funciones_parser, funciones_kernel);
 
 }
 
@@ -215,7 +215,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	free(estructura2);
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string, (AnSISOP_funciones *)AnSISOP_funciones, (AnSISOP_kernel *)AnSISOP_kernel);
+	analizadorLinea(string,funciones_parser, funciones_kernel);
 
 
 }
