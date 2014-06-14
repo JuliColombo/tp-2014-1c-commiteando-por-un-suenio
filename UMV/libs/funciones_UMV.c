@@ -83,16 +83,39 @@ _Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){/*
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud){
-	t_buffer buffer;
-	uint32_t posicionReal;
-	//posicionReal = tablaDeSegmentos[programaEnUso][base].ubicacionMP + offset;
-	buffer = obtenerBytesDesdeHasta(posicionReal,longitud);
-	return buffer;
+int ubicarEnTabla(int inicio){
+	int i=0;
+	int procesoDelHilo=0; // Donde lo declaramos??
+	while(i < sizeof(tablaDeSegmentos[procesoDelHilo].segmentos)){
+		if (tablaDeSegmentos[procesoDelHilo].segmentos[i].inicio==inicio) return i;
+		else i++;
+	}
+	//Si llega aca no se encontro un segmento que inicie en: inicio
+	printf("La posicion de base no se encuentra en la tabla de segmentos");
+	return -1;
 }
-t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
-	t_buffer buffer;
 
+t_buffer solicitarBytes(int base,int offset, int longitud){
+	t_buffer buffer;
+	int i=0;
+	int procesoDelHilo=0; // Donde lo declaramos?
+	int segmentoBase = ubicarEnTabla(base);
+	int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP + offset;
+	while (i < longitud){
+		t_buffer[i]= MP[posicionReal];
+		posicionReal++;
+		i++;
+	}
+	if (sizeof(buffer) != i){
+		printf("El buffer no se obtuvo completamente. Rechazarlo? S/N");//No se si es necesario, pero capaz ayuda
+		char respuesta;
+		gets(respuesta);
+		if (respuesta=='N') return buffer;
+		else{
+			buffer=NULL;
+			return buffer;
+		}
+	}
 	return buffer;
 }
 
@@ -107,21 +130,10 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 	}
 	if (sizeof(buffer) != i) printf("El buffer no se envio completamente"); //No se si es necesario, pero capaz ayuda
 }
-int ubicarEnTabla(int inicio){
-	int i=0;
-	int procesoDelHilo;
-	while(i < sizeof(tablaDeSegmentos[procesoDelHilo].segmentos)){
-		if (tablaDeSegmentos[procesoDelHilo].segmentos[i].inicio==inicio) return i;
-		else i++;
-	}
-	//Si llega aca no se encontro un segmento que inicie en: inicio
-	printf("La posicion de base no se encuentra en la tabla de segmentos");
-	return -1;
-}
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int procesoDelHilo; //Donde lo declaramos??
-	int segmentoBase= ubicarEnTabla (base);
+	int segmentoBase= ubicarEnTabla(base);
 	if (segmentoBase!= -1){
 		if (validarSolicitud(longitud)){
 			int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
