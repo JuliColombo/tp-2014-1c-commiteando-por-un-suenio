@@ -8,8 +8,7 @@
 
 #include "funciones_UMV.h"
 
-//#include "FuncionesPLP.h"
-//#include <Estructuras.h>
+
 
 
 
@@ -308,14 +307,13 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 			return;
 		}
 
-	//segmento=malloc(sizeof(tamanio));
+
 	int pos=getPosTablaSeg(id_prog);
 		if (pos==-1){
 			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
 		}
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
-	//aux.segmento=segmento;
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
@@ -425,6 +423,7 @@ void liberarMP(int pos){
 }
 
 void eliminarSegmentos(int pos){
+	//FIXME
 	int i,ultimaPos;
 	i=0;
 	//ultimaPos=ultimoSeg(pos);
@@ -489,23 +488,23 @@ void inicializarConfiguracion(void){
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	int algo;
+	int sock;
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
 	pthread_mutex_unlock(mutex_log);
 	}
-	if((algo=socket_aceptarCliente(sock_cpu))>0){
+
+	while(1){
+	if((sock=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 		}
-
-	while(1){
-
 	}
+
 	if(socket_cerrarConexion(sock_cpu)==0){
 		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
@@ -526,6 +525,14 @@ void crear_hilo_por_cpu(void){
 }
 
 void atender_cpu(void){
+	/*TODO:
+	 * int id_prog_cpu;
+	 * recv(mierdaDeCPU);
+	 * desserealizar();
+	 *handshake(); ???
+	 *ejecutar(); <--- validaría el tipo y ejecutaría acordemente
+	 *
+	 */
 	//Aca habria que atender el pedido de una cpu
 }
 
@@ -563,6 +570,12 @@ void core_conexion_kernel(void){
 }
 
 void atender_kernel(void){
+	/*TODO:
+	 * recv(cosasDeKernel);
+	 * desserealizar();
+	 * handshake();
+	 * ejecutar(); <-- acorde a la operacion pedida
+	 */
 	//Aca habria que atender el pedido del kernel
 }
 
