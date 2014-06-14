@@ -8,7 +8,8 @@
 
 #include "funciones_UMV.h"
 
-
+//#include "FuncionesPLP.h"
+//#include <Estructuras.h>
 
 
 
@@ -95,33 +96,44 @@ t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud){
 	return buffer;
 }
 
-/*void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
-	if (validarSolicitud(longitud)){
-		uint32_t posicionReal = tablaDeSegmentos[procesoEnUso][base].ubicacionMP + offset;
-		uint32_t nuevaPosicionReal = asignarFisicamente(posicionReal,buffer); //va a retornar la direccion fisica segun WF o FF - necesita solo buffer?
-		tablaDeSegmentos[procesoEnUso][base].ubicacionMP = posicionReal;
-		puts("resultadodelaasignacion");
-		} else {
-			puts("No se pudo realizar la asignacion");
-	    }
-}*/
+//****************************************enviarBytes*************************************
 
-void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer){
-	if (validarSolicitud(longitud)){
-		/*Me parece que estaba mal encarado el enviar bytes, por eso agrego este para terminar y dejo el otro comentado*/
-		puts("resultadodelaasignacion");
-		} else {
-			puts("No se pudo realizar la asignacion");
-	    }
+void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
+	int i=0;
+	while (i<longitud){
+		MP[posicionReal]=buffer[0];
+		i++;
+		posicionReal++;
+	}
+	if (sizeof(buffer) != i) printf("El buffer no se envio completamente"); //No se si es necesario, pero capaz ayuda
+}
+int ubicarEnTabla(int inicio){
+	int i=0;
+	int procesoDelHilo;
+	while(i < sizeof(tablaDeSegmentos[procesoDelHilo].segmentos)){
+		if (tablaDeSegmentos[procesoDelHilo].segmentos[i].inicio==inicio) return i;
+		else i++;
+	}
+	//Si llega aca no se encontro un segmento que inicie en: inicio
+	printf("La posicion de base no se encuentra en la tabla de segmentos");
+	return -1;
 }
 
-int asignarFisicamente(){
-
-	return 0; //ojo que va a retornar la dir fisica
+void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
+	int procesoDelHilo; //Donde lo declaramos??
+	int segmentoBase= ubicarEnTabla (base);
+	if (segmentoBase!= -1){
+		if (validarSolicitud(longitud)){
+			int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
+			asignarFisicamenteDesde(posicionReal,longitud,buffer);
+			puts("resultadodelaasignacion");
+			} else puts("No se pudo realizar la asignacion");
+		}
 }
 
-void cambioDeProcesoActivo(int id_prog){
- procesoEnUso = id_prog;
+
+void cambioDeProcesoEnElHilo(int id_prog){
+ //TODO
 }
 
 /*************************    Logica de validacion de solicitudes ***************************/
@@ -307,13 +319,14 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 			return;
 		}
 
-
+	//segmento=malloc(sizeof(tamanio));
 	int pos=getPosTablaSeg(id_prog);
 		if (pos==-1){
 			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
 		}
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	//aux.segmento=segmento;
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
@@ -423,7 +436,6 @@ void liberarMP(int pos){
 }
 
 void eliminarSegmentos(int pos){
-	//FIXME
 	int i,ultimaPos;
 	i=0;
 	//ultimaPos=ultimoSeg(pos);
@@ -482,29 +494,30 @@ void inicializarConfiguracion(void){
 	else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
+	procesosActivos = malloc(gradoDeMultiprogramacion);
 	}
 }
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	int sock;
+	int algo;
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
 	pthread_mutex_unlock(mutex_log);
 	}
-
-	while(1){
-	if((sock=socket_aceptarCliente(sock_cpu))>0){
+	if((algo=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 		}
-	}
 
+	while(1){
+
+	}
 	if(socket_cerrarConexion(sock_cpu)==0){
 		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
@@ -525,14 +538,6 @@ void crear_hilo_por_cpu(void){
 }
 
 void atender_cpu(void){
-	/*TODO:
-	 * int id_prog_cpu;
-	 * recv(mierdaDeCPU);
-	 * desserealizar();
-	 *handshake(); ???
-	 *ejecutar(); <--- validaría el tipo y ejecutaría acordemente
-	 *
-	 */
 	//Aca habria que atender el pedido de una cpu
 }
 
@@ -570,12 +575,6 @@ void core_conexion_kernel(void){
 }
 
 void atender_kernel(void){
-	/*TODO:
-	 * recv(cosasDeKernel);
-	 * desserealizar();
-	 * handshake();
-	 * ejecutar(); <-- acorde a la operacion pedida
-	 */
 	//Aca habria que atender el pedido del kernel
 }
 

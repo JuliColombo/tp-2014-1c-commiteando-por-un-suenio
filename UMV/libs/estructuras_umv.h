@@ -53,5 +53,4 @@ typedef struct tablaSeg{
 	segmentDescriptor* segmentos;
 }tablaSeg;
 
-
 #endif /* ESTRUCTURAS_UMV_H_ */

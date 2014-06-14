@@ -71,7 +71,7 @@ void compactar(void);
 void dump();
 t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
 t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
-void enviarBytes(uint32_t base,uint32_t offset, uint32_t longitud,t_buffer buffer);
+void enviarBytes(int base,int offset,int longitud,t_buffer buffer);
 void crearSegmentoPrograma(int id_prog, int tamanio);
 void destruirSegmentos(int id_prog);
 
