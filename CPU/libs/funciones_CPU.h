@@ -7,7 +7,7 @@
 
 #ifndef FUNCIONES_CPU_H_
 #define FUNCIONES_CPU_H_
-#define PATHCONFIG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio/CPU/configuracion_CPU.cfg"
+
 
 #include <commons/collections/dictionary.h>
 #include "parser/metadata_program.h"

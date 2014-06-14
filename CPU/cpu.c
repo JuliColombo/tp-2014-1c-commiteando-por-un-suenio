@@ -9,12 +9,12 @@
 t_dictionary* diccionario;
 int top_index = -1;
 config_cpu configuracion_cpu;
-char* PATH=PATHCONFIG;
+char* PATH;
 pthread_t conexion_kernel,conexion_umv;
 log_t* archLog;
 
 int main (int argc, char **argv){
-
+	PATH=argv[1];
 	inicializarConfiguracion();
 
 	//Cuando me conecto a UMV, que me diga si la pila esta vacia y me guardo su valor de top_index. Si esta vacia, es -1, sino lo que corresponda.

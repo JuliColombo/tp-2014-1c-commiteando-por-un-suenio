@@ -10,7 +10,7 @@
 int* MP;
 int tamanioMP;
 int procesoEnUso;
-char* PATH=PATHCONFIG;
+char* PATH;
 int retardo;
 tablaSeg* tablaDeSegmentos;
 t_config_UMV configuracion_UMV;
@@ -22,6 +22,7 @@ int sock_kernel;
 int sock_cpu;
 
 int main (int argc, char **argv){
+	PATH=argv[1];
 	inicializarConfiguracion();
 	//Acceder a archConfig y obtener datos
 	MP=crearMP();
