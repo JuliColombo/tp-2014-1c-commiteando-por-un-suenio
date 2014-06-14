@@ -22,11 +22,11 @@ int main (int argc, char **argv){
 
 
 
-	int thread_umv = pthread_create(&conexion_umv, NULL, core_conexion_umv(), NULL);
-	int thread_kernel = pthread_create(&conexion_kernel, NULL, core_conexion_kernel(), NULL);
+	pthread_create(&conexion_umv, NULL, (void*) &core_conexion_umv, NULL);
+	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
 
-	pthread_join(thread_umv, NULL);
-	pthread_join(thread_kernel,NULL);
+	pthread_join(conexion_umv, NULL);
+	pthread_join(conexion_kernel,NULL);
 
 	return 0;
 }

@@ -20,6 +20,7 @@ pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
 int sock_kernel;
 int sock_cpu;
+int procesoEnUso;
 
 int main (int argc, char **argv){
 
