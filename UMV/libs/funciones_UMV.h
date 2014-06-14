@@ -23,7 +23,8 @@
 #include <semaphore.h>
 #include "Sockets/socket.h"
 
-
+/*Pathcongif*/
+#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 
