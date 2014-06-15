@@ -32,27 +32,12 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
 	pthread_create(&plp, NULL, (void*) &core_plp, NULL);
-	pthread_create(&pcp, NULL, (void*) &core_pcp, NULL);
-
-
-
-	//int thread_io[cant_identificadores(configuracion_kernel.id_hio)];
-
-	int i;
-	for(i=0;i < cant_identificadores(configuracion_kernel.id_hio); i++){
-		/************************* HAY QUE MODIFICAR LOS HILOS ACÁ ADENTRO *************************/
-
-		//thread_io[i] = pthread_create(&io.thread[i].tid, NULL, core_io(configuracion_kernel.retardo_hio[i]), NULL); //La estructura io.thread[i].tid no la entendi, hice lo que me parecio para que funcione pero hay que cambiarla
-		//printf("Thread %d para IO\n", i);
-		/*pthread_mutex_lock(io.mutex);
-		agregarHilo(io.thread[i].tid);
-		pthread_mutex_unlock(io.mutex);*/
-	}
+	//pthread_create(&pcp, NULL, (void*) &core_pcp, NULL);
 
 
 	esperarYCerrarConexiones();
 	pthread_join(plp, NULL);
-	pthread_join(pcp, NULL);
+	//pthread_join(pcp, NULL);
 
 	return EXIT_SUCCESS;
 }

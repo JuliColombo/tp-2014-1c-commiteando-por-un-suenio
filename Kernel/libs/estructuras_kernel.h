@@ -80,8 +80,15 @@ typedef struct{
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
+typedef enum {
+	NUEVO,
+	BLOQUEADO,
+	RAFAGA
+} t_prioridad_rr;
+
 typedef struct {
 	int peso;
+	t_prioridad_rr prioridad_rr;
 	t_medatada_program metadata;
 	t_pcb* pcb;
 	int flag_terminado;

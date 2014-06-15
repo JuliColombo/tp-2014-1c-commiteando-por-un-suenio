@@ -11,6 +11,7 @@ int* MP;
 int tamanioMP;
 char* PATH=PATHCONFIG;
 int retardo;
+int procesoEnUso;
 tablaSeg* tablaDeSegmentos;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
