@@ -40,7 +40,7 @@ extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
 extern int* fds_conectados;
-extern sem_t *sem_new_programas, *sem_new_multip, *sem_ready, *sem_cpu;
+extern sem_t sem_new_programas, sem_new_multip, sem_ready, sem_cpu;
 
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/

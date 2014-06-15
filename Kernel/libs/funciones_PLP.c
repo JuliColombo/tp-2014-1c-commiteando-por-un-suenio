@@ -167,17 +167,17 @@ t_pcb crearPcb(char* codigo) {
 
 
 pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
-sem_t *sem_new_programas, *sem_new_programas, *sem_new_multip, *sem_ready;
+sem_t sem_new_programas, sem_new_programas, sem_new_multip, sem_ready;
 
 void core_plp(void){
 
-	if((sem_init(sem_new_programas, 1, 0))==-1){
+	if((sem_init(&sem_new_programas, 1, 0))==-1){
 		perror("No se puede crear el semáforo"); exit(1);
 	}
-	if((sem_init(sem_new_multip, 1, 0))==-1){
+	if((sem_init(&sem_new_multip, 1, 0))==-1){
 		perror("No se puede crear el semáforo"); exit(1);
 	}
-	if((sem_init(sem_ready, 1, 0))==-1){
+	if((sem_init(&sem_ready, 1, 0))==-1){
 		perror("No se puede crear el semáforo"); exit(1);
 	}
 
@@ -187,9 +187,10 @@ void core_plp(void){
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
-	while (1){
+	/*
+	 * while (1){
 
-	/*	completarGradoMultip();
+		completarGradoMultip();
 		mostrarNodosPorPantalla(cola.new);
 
 
@@ -205,20 +206,20 @@ void core_plp(void){
 			pthread_mutex_lock(mutex_cola_ready);
 			t_programa* programa = list_remove(cola.ready,0);
 			pthread_mutex_unlock(mutex_cola_ready);
-		}*/
-	}
+		}
+	}*/
 
 	int sem_cerrado=-1;
 	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(sem_new_programas);
+		sem_cerrado=sem_destroy(&sem_new_programas);
 	}
 	sem_cerrado=-1;
 	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(sem_new_multip);
+		sem_cerrado=sem_destroy(&sem_new_multip);
 	}
 	sem_cerrado=-1;
 	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(sem_ready);
+		sem_cerrado=sem_destroy(&sem_ready);
 	}
 
 	return;
@@ -285,14 +286,14 @@ void core_pcp_new(void){
 	t_programa *programa;
 
 	while(1){
-		sem_wait(sem_new_programas);
+		sem_wait(&sem_new_programas);
 		pthread_mutex_lock(mutex_cola_new);
 		pthread_mutex_lock(mutex_cola_ready);
 		programa=(t_programa*)list_remove(cola.new, 0);
 		pthread_mutex_unlock(mutex_cola_new);
 		list_add(cola.ready, (void*)programa);
 		pthread_mutex_unlock(mutex_cola_ready);
-		sem_post(sem_new_programas);
+		sem_post(&sem_new_programas);
 	}
 	return;
 }
