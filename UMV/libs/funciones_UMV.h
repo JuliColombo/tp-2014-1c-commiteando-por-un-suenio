@@ -41,7 +41,8 @@ extern tablaSeg* tablaDeSegmentos;
 extern int sock_kernel;
 extern int sock_cpu;
 extern int retardo;
-
+extern int* procesosActivos;
+extern int gradoDeMultiprogramacion;
 
 /*Prototipos de funciones auxiliares*/
 

@@ -97,9 +97,9 @@ void* manejar_ConexionNueva_Programas(struct epoll_event event){
 	for(n=0;fds_conectados[n]!=NULL;n++){
 		if(n<60){
 			i=fds_conectados[n]=socket_aceptarCliente(event.data.fd);
-			j=socket_recibir(i,&buffer, &buff);
+			j=socket_recibir(i,NULL, &buff);
 			if(j==1){
-				printf("%d \n", j);
+				printf("%s \n", buff);
 			}
 		}else{
 			perror("No se pueden conectar más programas");

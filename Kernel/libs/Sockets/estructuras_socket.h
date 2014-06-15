@@ -38,12 +38,16 @@
  * 		No olvidarse de crear la estructura y su paquetizador y despaquetizador asociado!
  */
 
-#define D_STRUCT_NOMBREMENSAJE 0
-#define D_STRUCT_NUMERO 1
-#define D_STRUCT_CHAR 2
-#define D_STRUCT_STRING 3
-#define D_STRUCT_SIGNAL 4
-#define D_STRUCT_PCB 5
+enum{
+	D_STRUCT_NOMBREMENSAJE=0,
+	D_STRUCT_NUMERO=1,
+	D_STRUCT_CHAR=2,
+	D_STRUCT_STRING=3,
+	D_STRUCT_SIGNAL=4,
+	D_STRUCT_PCB=5,
+	D_STRUCT_GRADOMP=6
+};
+
 
 
 //Estructura auxiliar de stream

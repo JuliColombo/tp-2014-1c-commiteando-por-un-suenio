@@ -22,7 +22,7 @@
  * Funcion: Según el tipo de estructura, va a distintas funciones que las paquetizan.
  */
 t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
-	t_stream * paquete;
+	t_stream * paquete=NULL;
 
 	switch (tipoEstructura){
 			case D_STRUCT_NOMBREMENSAJE:
@@ -42,6 +42,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				break;
 			case D_STRUCT_PCB:
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
+				break;
+			case D_STRUCT_GRADOMP:
+				paquete = paquetizarStruct_numero((t_struct_numero*) estructuraOrigen);
 		}
 
 

@@ -187,6 +187,9 @@ void core_plp(void){
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
+	while(1){
+
+	}
 	/*
 	 * while (1){
 
