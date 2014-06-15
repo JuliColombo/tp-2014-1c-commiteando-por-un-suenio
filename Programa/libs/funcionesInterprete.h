@@ -21,7 +21,7 @@
 extern t_config_programa configuracion_programa;
 extern char* PATH;
 extern char* Archivo_Ansisop;
-
+extern int sock_kernel;
 
 /************** FUNCIONES **************/
 

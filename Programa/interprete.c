@@ -11,6 +11,7 @@ log_t* archLog;
 t_config_programa configuracion_programa;
 char* PATH=PATHCONFIG;
 char* Archivo_Ansisop;
+int sock_kernel;
 
 
 int main (int argc, char **argv){
@@ -21,12 +22,14 @@ int main (int argc, char **argv){
 	if (buffer == NULL) {
 			abort();
 	}
+	while(1){
 
-	int sock=abrirSocket();
-	int efd=epoll_crear();
-	if((epoll_agregarSocketCliente(efd,sock))==0){
-		printf("se agregó el socketCliente epoll");
 	}
+	int sock=abrirSocket();
+
+
+
+
 
 	cerrarSocket(sock);
 
