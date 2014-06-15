@@ -167,8 +167,19 @@ t_pcb crearPcb(char* codigo) {
 
 
 pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
+sem_t *sem_new_programas, *sem_new_programas, *sem_new_multip, *sem_ready;
 
 void core_plp(void){
+
+	if((sem_init(sem_new_programas, 1, 0))==-1){
+		perror("No se puede crear el semáforo"); exit(1);
+	}
+	if((sem_init(sem_new_multip, 1, 0))==-1){
+		perror("No se puede crear el semáforo"); exit(1);
+	}
+	if((sem_init(sem_ready, 1, 0))==-1){
+		perror("No se puede crear el semáforo"); exit(1);
+	}
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
@@ -176,11 +187,7 @@ void core_plp(void){
 	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
 	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
-
 	while (1){
-
-
-
 
 	/*	completarGradoMultip();
 		mostrarNodosPorPantalla(cola.new);
@@ -201,10 +208,18 @@ void core_plp(void){
 		}*/
 	}
 
-
-
-
-
+	int sem_cerrado=-1;
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(sem_new_programas);
+	}
+	sem_cerrado=-1;
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(sem_new_multip);
+	}
+	sem_cerrado=-1;
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(sem_ready);
+	}
 
 	return;
 }
@@ -226,14 +241,6 @@ void core_conexion_plp_programas(void){
 	int i = epoll_escucharGeneral(efd_programas,sock_programas, manejar_ConexionNueva_Programas(event), NULL, NULL);
 	printf("epoll programas = %d\n", i);
 
-
-
-
-
-
-
-
-
 	return;
 }
 
@@ -251,7 +258,6 @@ void core_conexion_pcp_cpu(void){
 	struct epoll_event event;
 	struct epoll_event* events;
 
-
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
@@ -260,58 +266,41 @@ void core_conexion_pcp_cpu(void){
 	int i = epoll_escucharBloqueante(efd_cpu,events);
 	printf("epoll cpu = %d \n", i);
 
-
-
 	return;
 }
+
+pthread_t hilo_pcp_new, hilo_pcp_ready;
 
 void core_pcp(void){
 
+	pthread_create(&hilo_pcp_new, NULL, (void*) &core_pcp_new, NULL);
+	pthread_create(&hilo_pcp_ready, NULL, (void*) &core_pcp_ready, NULL);
 
-
-/*
-	while(1){
-
-
-
-
-
-			while(programa.flag_terminado==0){
-
-
-			//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
-				pthread_mutex_lock(mutex_cola_exec);
-				list_add(cola.exec,programa); //Agrego el programa a la lista exec porque está en la cpu, cuando vuelva se vé si vuelve a ready o pasa a block
-				pthread_mutex_unlock(mutex_cola_exec);
-
-			//Aca deberia esperar a que la cpu lo devuelva, de todas formas no estoy seguro
-				if(programa.flag_bloqueado==0){
-				//Sacar al programa por el pid de la cola exec y ponerlo en ready
-				}else{
-					pthread_mutex_lock(mutex_cola_block);
-					list_add(cola.block,programa);
-					pthread_mutex_unlock(mutex_cola_block);
-				}
-
-
-			}
-
-
-			if(programa.flag_terminado==1){ //Esto va al final,
-				pthread_mutex_lock(mutex_cola_exec);
-				pthread_mutex_lock(mutex_cola_exit);
-				list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
-				pthread_mutex_unlock(mutex_cola_exit);
-				pthread_mutex_unlock(mutex_cola_exec);
-
-			}
-	}
-
-
-*/
+	pthread_join(hilo_pcp_ready, NULL);
+	pthread_join(hilo_pcp_new, NULL);
 	return;
 }
 
+void core_pcp_new(void){
+	t_programa *programa;
+
+	while(1){
+		sem_wait(sem_new_programas);
+		pthread_mutex_lock(mutex_cola_new);
+		pthread_mutex_lock(mutex_cola_ready);
+		programa=(t_programa*)list_remove(cola.new, 0);
+		pthread_mutex_unlock(mutex_cola_new);
+		list_add(cola.ready, (void*)programa);
+		pthread_mutex_unlock(mutex_cola_ready);
+		sem_post(sem_new_programas);
+	}
+	return;
+}
+
+void core_pcp_ready(void){
+
+	return;
+}
 
 void core_io(int retardo){
 
@@ -329,3 +318,35 @@ void esperarYCerrarConexiones(void){
 	socket_cerrarConexion(sock_cpu);
 	return;
 }
+
+
+/*
+ * lo del PCP
+while(1){
+		while(programa.flag_terminado==0){
+
+		//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
+			pthread_mutex_lock(mutex_cola_exec);
+			list_add(cola.exec,programa); //Agrego el programa a la lista exec porque está en la cpu, cuando vuelva se vé si vuelve a ready o pasa a block
+			pthread_mutex_unlock(mutex_cola_exec);
+
+		//Aca deberia esperar a que la cpu lo devuelva, de todas formas no estoy seguro
+			if(programa.flag_bloqueado==0){
+			//Sacar al programa por el pid de la cola exec y ponerlo en ready
+			}else{
+				pthread_mutex_lock(mutex_cola_block);
+				list_add(cola.block,programa);
+				pthread_mutex_unlock(mutex_cola_block);
+			}
+		}
+
+		if(programa.flag_terminado==1){ //Esto va al final,
+			pthread_mutex_lock(mutex_cola_exec);
+			pthread_mutex_lock(mutex_cola_exit);
+			list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
+			pthread_mutex_unlock(mutex_cola_exit);
+			pthread_mutex_unlock(mutex_cola_exec);
+
+		}
+}
+*/

@@ -28,7 +28,8 @@ extern int* valor_var_globales;
 extern log_t* archLog;
 extern char* PATH;
 extern t_thread_io io;
-extern pthread_t pcp, plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
+extern pthread_t plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
+extern pthread_t pcp, conexion_pcp_cpu, hilo_pcp_ready, hilo_pcp_new;
 extern cola_procesos cola;
 extern pthread_mutex_t* mutex_cola_new;
 extern pthread_mutex_t* mutex_cola_ready;
@@ -39,6 +40,7 @@ extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
 extern int* fds_conectados;
+extern sem_t *sem_new_programas, *sem_new_multip, *sem_ready, *sem_cpu;
 
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
@@ -63,6 +65,8 @@ void core_io(int);
 void core_conexion_plp_programas(void);
 void core_conexion_umv(void);
 void core_conexion_pcp_cpu(void);
+void core_pcp_ready(void);
+void core_pcp_new(void);
 
 
 #endif /* FUNCIONESPLP_H_ */
