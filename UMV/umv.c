@@ -11,6 +11,7 @@ int* MP;
 int tamanioMP;
 char* PATH=PATHCONFIG;
 int retardo;
+int procesoEnUso;
 tablaSeg* tablaDeSegmentos;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
@@ -19,7 +20,6 @@ pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
 int sock_kernel;
 int sock_cpu;
-int procesoEnUso;
 
 int main (int argc, char **argv){
 
