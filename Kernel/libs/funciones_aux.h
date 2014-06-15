@@ -22,8 +22,8 @@ void log_error_socket(void);
 int posicion_Variable_Global(char*);
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
-void aceptarConexionEntrante (struct epoll_event);
-void* manejar_ConexionNueva_Programas(struct epoll_event);
+void aceptarConexionEntrante (epoll_data_t);
+void manejar_ConexionNueva_Programas(epoll_data_t);
 
 
 #endif /* FUNCIONES_AUX_H_ */

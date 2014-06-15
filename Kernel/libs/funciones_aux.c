@@ -84,22 +84,23 @@ int posicion_Variable_Global(char* variable){
 
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
-void aceptarConexionEntrante(struct epoll_event event){
+void aceptarConexionEntrante(epoll_data_t data){
 
 }
 
 
 
-void* manejar_ConexionNueva_Programas(struct epoll_event event){
+void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int n,i,j;
 	char* buffer;
 	void** buff;
-	for(n=0;fds_conectados[n]!=NULL;n++){
-		if(n<60){
-			i=fds_conectados[n]=socket_aceptarCliente(event.data.fd);
-			j=socket_recibir(i,NULL, &buff);
+	for(n=0;n<60;n++){
+		if(fds_conectados_programas[n]!=NULL){
+			i=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
+			j=socket_recibir(i,(void*)&buffer, (void*)&buff);
 			if(j==1){
-				printf("%s \n", buff);
+				printf("%d \n", j);
+				return;
 			}
 		}else{
 			perror("No se pueden conectar más programas");

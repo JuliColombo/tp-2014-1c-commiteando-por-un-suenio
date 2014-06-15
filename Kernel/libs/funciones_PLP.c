@@ -1,5 +1,6 @@
 #include "funciones_PLP.h"
 
+pthread_t hilo_pcp_new, hilo_pcp_ready;
 
 void calcularPeso(t_programa programa){ //Calcula peso del programa
 	programa.peso=(5*programa.metadata.cantidad_de_etiquetas + 3* programa.metadata.cantidad_de_funciones + programa.metadata.instrucciones_size);
@@ -234,7 +235,7 @@ void core_conexion_plp_programas(void){
 	struct epoll_event event;
 	struct epoll_event* events;
 
-	fds_conectados = malloc(MAX_EVENTS_EPOLL*sizeof(int));
+	fds_conectados_programas = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketServidor(efd_programas,sock_programas);
@@ -242,9 +243,10 @@ void core_conexion_plp_programas(void){
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_programas;
 
-	int i = epoll_escucharGeneral(efd_programas,sock_programas, manejar_ConexionNueva_Programas(event), NULL, NULL);
-	printf("epoll programas = %d\n", i);
-
+	while(1){
+		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
+		printf("epoll programas = %d\n", i);
+	}
 	return;
 }
 
@@ -262,18 +264,24 @@ void core_conexion_pcp_cpu(void){
 	struct epoll_event event;
 	struct epoll_event* events;
 
+
+	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
 	event.events=EPOLLIN | EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	int i = epoll_escucharBloqueante(efd_cpu,events);
-	printf("epoll cpu = %d \n", i);
+	event.data.fd=sock_programas;
+	while(1){
+//		int i = epoll_escucharBloqueante(efd_cpu,events);
+//		printf("epoll cpu = %d \n", i);
+		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
+		printf("epoll cpu= %d \n", i);
+	}
 
 	return;
 }
 
-pthread_t hilo_pcp_new, hilo_pcp_ready;
 
 void core_pcp(void){
 
