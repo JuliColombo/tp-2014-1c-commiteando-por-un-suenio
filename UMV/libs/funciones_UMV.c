@@ -501,23 +501,26 @@ void inicializarConfiguracion(void){
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
-	int algo;
+	int sock;
+	pthread_t atender_pedido;
+
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
 	pthread_mutex_unlock(mutex_log);
 	}
-	if((algo=socket_aceptarCliente(sock_cpu))>0){
+
+	while(1){
+	if((sock=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
+			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
 		}
-
-	while(1){
-
 	}
+
 	if(socket_cerrarConexion(sock_cpu)==0){
 		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
@@ -531,14 +534,16 @@ void core_conexion_cpu(void){
 	return;
 }
 
-void crear_hilo_por_cpu(void){
-	pthread_t atender_pedido;
-	pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
-	pthread_join(atender_pedido, NULL);	//Espera a que termine de ejecutarse la atencion del pedido
-}
 
 void atender_cpu(void){
-	//Aca habria que atender el pedido de una cpu
+	/*UNSOLVED:
+	 * int programaEnHilo;
+	 * void* estructura;
+	 * t_tipoEstructura tipo_estructura;
+	 * socket_recibir(sock, &tipo_estructura, &estructura);
+	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
+	 * send(sock, &tipo_estructura, &estructura);
+	 */
 }
 
 
@@ -575,7 +580,14 @@ void core_conexion_kernel(void){
 }
 
 void atender_kernel(void){
-	//Aca habria que atender el pedido del kernel
+	/*UNSOLVED:
+	 * int programaEnHilo;
+	 * void* estructura;
+	 * t_tipoEstructura tipo_estructura;
+	 * socket_recibir(sock, &tipo_estructura, &estructura);
+	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
+	 * send(sock, &tipo_estructura, &estructura);
+	 */
 }
 
 
@@ -627,7 +639,7 @@ void *consola (void){
 				int nuevoPrograma;
 				gets(nuevoPrograma);
 				if(nuevoPrograma != procesoEnUso){
-					cambioDeProcesoActivo(nuevoPrograma);
+					//cambioDeProcesoActivo(nuevoPrograma);
 				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
