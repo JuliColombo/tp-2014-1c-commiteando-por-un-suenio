@@ -16,6 +16,8 @@ int sock_kernel_servidor;
 
 int main (int argc, char **argv){
 	Archivo_Ansisop = argv[1];
+	PATH =getenv("ANSISOP_CONFIG");
+	printf("%s\n",PATH);
 	inicializarConfiguracion();
 	off_t fileSize=0;
 	char* buffer = leerScript(&fileSize,argv[1]);

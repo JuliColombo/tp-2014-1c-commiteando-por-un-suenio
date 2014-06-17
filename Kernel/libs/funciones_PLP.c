@@ -91,8 +91,8 @@ void leerConfiguracion(void){
 	configuracion_kernel.retardo_hio = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.id_hio);
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
-	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
-	valor_var_globales = vector_num(NULL, configuracion_kernel.var_globales);
+	configuracion_kernel.var_globales.identificador = config_get_array_value(config,"Variables globales");
+	configuracion_kernel.var_globales.valor = vector_num(NULL, configuracion_kernel.var_globales.identificador);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
 	}
@@ -121,8 +121,8 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	printf("Puerto UMV: %d\n", configuracion_kernel.puerto_umv);
 	
 	printf("Variables globales: ");
-	for(i=0;configuracion_kernel.var_globales[i]!=NULL;i++){
-		printf("\n%s (%d) ", configuracion_kernel.var_globales[i], valor_var_globales[i]);
+	for(i=0;configuracion_kernel.var_globales.identificador[i]!=NULL;i++){
+		printf("\n%s (%d) ", configuracion_kernel.var_globales.identificador[i], configuracion_kernel.var_globales.valor[i]);
 	}
 
 

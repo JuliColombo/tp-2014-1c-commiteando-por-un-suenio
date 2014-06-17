@@ -31,11 +31,14 @@ typedef char** t_id_semaforos;
 typedef char** t_id_hio;
 typedef int* t_valor_semaforos;
 typedef int* t_retardo_hio;
-typedef char** t_variables_globales;
 
 typedef int8_t* t_prioridad;
 typedef int8_t* t_nombre_cola;
 
+typedef struct{
+	char** identificador;
+	int* valor;
+}t_variables_globales;
 
 typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener mas de un array de longitud variable
 	t_puerto_programa puerto_programas;		//Puerto TCP utilizado para recibir las conexiones de los Programas

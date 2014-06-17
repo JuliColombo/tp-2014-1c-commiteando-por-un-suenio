@@ -73,8 +73,8 @@ void log_error_socket(void){
 */
 int posicion_Variable_Global(char* variable){
 	int pos=0;
-	for(pos=0;configuracion_kernel.var_globales[pos]!=NULL;pos++){
-		if(strcmp(variable,configuracion_kernel.var_globales[pos])==0){
+	for(pos=0;configuracion_kernel.var_globales.identificador[pos]!=NULL;pos++){
+		if(strcmp(variable,configuracion_kernel.var_globales.identificador[pos])==0){
 			return pos;
 		}
 	}
