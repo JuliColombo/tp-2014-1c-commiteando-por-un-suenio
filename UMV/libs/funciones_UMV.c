@@ -549,23 +549,30 @@ void atender_cpu(void){
 
 
 void core_conexion_kernel(void){
-	if((sock_kernel=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
+	if((sock_kernel_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
 	printf("Hilo de Kernel\n");
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Escuchando en el socket de Kernel", INFO, "");
 	pthread_mutex_unlock(mutex_log);
 	}
-	if((socket_aceptarCliente(sock_kernel))>0){
+	int sock_aceptado;
+	if((sock_aceptado=socket_aceptarCliente(sock_kernel_servidor))>0){
 			printf("Acepta conexion");
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Se acepta la conexion del Kernel", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 		}
-
-		while(1){
-
+		int* tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sock_aceptado,&tipoRecibido,&structRecibida);
+		if(j==1){
+		printf("Se recibio envio bien el paquete\n");
+		int* k = ((int*)structRecibida);
+		printf("%d\n", *k);
 		}
-	if(socket_cerrarConexion(sock_kernel)==0){
+		while(1){
+		}
+	if(socket_cerrarConexion(sock_kernel_servidor)==0){
 		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
 		pthread_mutex_unlock(mutex_log);
@@ -711,7 +718,7 @@ void *consola (void){
 									  	destruirTodosLosSegmentos();
 									   	free(MP);
 
-									   	socket_cerrarConexion(sock_kernel);
+									   	socket_cerrarConexion(sock_kernel_servidor);
 									   	socket_cerrarConexion(sock_cpu);
 									   	matarHilos();
 									   	if(pthread_kill(CPU,0)==0){

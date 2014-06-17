@@ -21,13 +21,13 @@ char* leerScript(off_t* fileSize,char* path) {
 	}
 
 	else {
-		sock_kernel = abrirSocket();
+		sock_kernel_servidor = abrirSocket();
 		int i;
 		*fileSize = file_info.st_size;
 		FILE* script = fopen(path, "r");
 		buffer = malloc(*fileSize);
 		if((i=fread(buffer, *fileSize, sizeof(char), script))!=0){
-			int j=socket_enviar(sock_kernel, D_STRUCT_CHAR, buffer);
+			int j=socket_enviar(sock_kernel_servidor, D_STRUCT_CHAR, buffer);
 			if(j==1){
 				printf("ANDUVO\n");
 			}

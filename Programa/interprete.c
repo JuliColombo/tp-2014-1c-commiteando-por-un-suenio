@@ -11,7 +11,7 @@ log_t* archLog;
 t_config_programa configuracion_programa;
 char* PATH=PATHCONFIG;
 char* Archivo_Ansisop;
-int sock_kernel;
+int sock_kernel_servidor;
 
 
 int main (int argc, char **argv){

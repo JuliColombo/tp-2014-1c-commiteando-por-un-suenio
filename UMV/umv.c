@@ -18,7 +18,7 @@ pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;
 pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
-int sock_kernel;
+int sock_kernel_servidor;
 int sock_cpu;
 int* procesosActivos;
 int gradoDeMultiprogramacion;

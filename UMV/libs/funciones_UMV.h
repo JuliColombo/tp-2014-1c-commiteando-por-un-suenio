@@ -38,7 +38,7 @@ extern char* PATH;
 extern int tamanioMP;
 extern int procesoEnUso;
 extern tablaSeg* tablaDeSegmentos;
-extern int sock_kernel;
+extern int sock_kernel_servidor;
 extern int sock_cpu;
 extern int retardo;
 extern int* procesosActivos;

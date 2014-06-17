@@ -254,8 +254,14 @@ void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
 		printf("Conectado a la UMV\n");
 	}
-
-
+	int* i;
+	int k=5;
+	i=&k;
+	printf("el valor que se manda es %d\n", k);
+	int j=socket_enviar(sock_umv, D_STRUCT_NUMERO, i);
+	if(j==1){
+		printf("Se envio bien el paquete\n");
+	}
 	return;
 }
 
