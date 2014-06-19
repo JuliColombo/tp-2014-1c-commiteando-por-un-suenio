@@ -25,7 +25,7 @@
 /************************* VARIABLES GLOBALES *************************/
 extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
-extern char* PATH;
+extern char* PATH_config;
 extern t_thread_io io;
 extern pthread_t plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 extern pthread_t pcp, conexion_pcp_cpu, hilo_pcp_ready, hilo_pcp_new;
@@ -38,7 +38,7 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
-extern int* fds_conectados_programas;
+extern t_programa* fds_conectados_programas;
 extern int* fds_conectados_cpu;
 extern sem_t sem_new_programas, sem_new_multip, sem_ready, sem_cpu;
 

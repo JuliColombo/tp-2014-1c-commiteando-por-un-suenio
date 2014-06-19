@@ -67,7 +67,7 @@ void inicializarColas(void){
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
-	int control = lstat(PATH, &file_info);
+	int control = lstat(PATH_config, &file_info);
 	if (control == -1){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
@@ -78,7 +78,7 @@ void inicializarConfiguracion(void){
 }
 
 void leerConfiguracion(void){
-	t_config* config=config_create(PATH);
+	t_config* config=config_create(PATH_config);
 
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
 	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de los CPUs");

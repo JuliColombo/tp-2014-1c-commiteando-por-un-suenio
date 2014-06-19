@@ -13,19 +13,21 @@
 #include "commons/config.h"
 #include "estructuras_programa.h"
 #include "Sockets/socket.h"
-#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Programa/configuracion_programa.cfg"
+#define pathconfig "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/Programa/ANSISOP_CONFIG"
 
 
 /************** VARIABLES GLOBALES ***************/
 
 extern t_config_programa configuracion_programa;
-extern char* PATH;
-extern char* Archivo_Ansisop;
+extern char* PATH_config;
+extern char* archivo_ansisop;
 extern int sock_kernel_servidor;
+extern FILE* script;
 
 /************** FUNCIONES **************/
 
 char* leerScript(off_t* ,char*); //lee el script
+int validarScript(void);
 void inicializarConfiguracion(void);
 void leerConfiguracion(void);
 void imprimirConfiguracion(void);

@@ -103,7 +103,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 				return;
 			}
 		}else{
-			perror("No se pueden conectar más programas");
+			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");
 		}
 
 	}
