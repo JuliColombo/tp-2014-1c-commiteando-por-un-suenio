@@ -93,11 +93,11 @@ void aceptarConexionEntrante(epoll_data_t data){
 void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int n,i,j;
 	char* buffer;
-	void** buff;
+	void* buff;
 	for(n=0;n<60;n++){
 		if(fds_conectados_programas[n]!=NULL){
 			i=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(i,(void*)&buffer, (void*)&buff);
+			j=socket_recibir(i,&buffer, &buff);
 			if(j==1){
 				printf("%d \n", j);
 				return;

@@ -44,7 +44,7 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
 			case D_STRUCT_GRADOMP:
-				paquete = paquetizarStruct_numero((t_struct_numero*) estructuraOrigen);
+				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
 		}
 
 

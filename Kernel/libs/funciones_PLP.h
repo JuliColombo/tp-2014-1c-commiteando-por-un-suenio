@@ -38,7 +38,7 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
-extern t_programa* fds_conectados_programas;
+extern int* fds_conectados_programas;
 extern int* fds_conectados_cpu;
 extern sem_t sem_new_programas, sem_new_multip, sem_ready, sem_cpu;
 

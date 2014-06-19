@@ -98,6 +98,11 @@ typedef struct struct_signal {
 	t_signal signal;
 } __attribute__ ((__packed__)) t_struct_signal;
 
+/* Estructura tipo STRUCT_PCB (5)
+ * se usa para enviar una pcb
+ *
+ */
+
 typedef unsigned int t_pid;
 typedef int* t_segmento_codigo;
 typedef int* t_segmento_stack;
@@ -120,6 +125,18 @@ typedef struct struct_pcb{
 		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } __attribute__ ((__packed__)) t_struct_pcb;
+
+/* Estructura tipo STRUCT_GRADOMP
+ * envia el grado de multiprogramacion del sistema
+ *
+ */
+
+typedef int t_gradoMP;
+
+typedef struct grado_MP{
+	t_gradoMP gradoMP;
+}__attribute__ ((__packed__)) t_struct_gradoMP;
+
 
 
 #endif /* ESTRUCTURASPACKAGE_H_ */
