@@ -20,7 +20,7 @@ int top_index;
 char* etiquetas;
 t_intructions* codigoo;
 
-
+/*
 
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
@@ -274,12 +274,12 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 	//Socket con mensaje?
 	return 0;
-}
+}*/
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
-int wait(t_nombre_semaforo identificador_semaforo) {
+/*int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 
@@ -299,4 +299,4 @@ int signal(t_nombre_semaforo identificador_semaforo) {
 	free(estructura);
 
 	return 0;
-}
+}*/

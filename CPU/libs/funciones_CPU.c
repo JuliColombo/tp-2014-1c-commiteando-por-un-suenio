@@ -5,6 +5,7 @@
  *      Author: utnso
  */
 #include "funciones_CPU.h"
+#include "Sockets/estructuras_socket.h"
 config_cpu configuracion_cpu;
 
 void inicializarConfiguracion(void){
@@ -61,9 +62,35 @@ void* core_conexion_umv(void){
 			printf("Conectado a la UMV\n");
 		}
 
-	while(1){
+	/*t_struct_numero* i = malloc(sizeof(t_struct_numero));
+	 uint32_t k=5;
+	 i->numero=k;
+	 printf("el valor que se manda es %d\n", k);
+	 int j=socket_enviar(sock, D_STRUCT_NUMERO, i);
+	 if(j==1){
+	 printf("Se envio bien el paquete\n");
+	 free(i);*/
 
-	}
+	t_struct_string* i = malloc(sizeof(t_struct_string));
+		 char* k = "argentina";
+		 i->string=k;
+		 printf("el valor que se manda es %s\n", i->string);
+		 int j=socket_enviar(sock, D_STRUCT_STRING, i);
+		 if(j==1){
+		 printf("Se envio bien el paquete\n");
+		 free(i);
+
+	/*t_struct_char* i = malloc(sizeof(t_struct_char));
+		 char k = 'j';
+		 i->letra=k;
+		 printf("el valor que se manda es %c\n", k);
+		 int j=socket_enviar(sock, D_STRUCT_CHAR, i);
+		 if(j==1){
+		 printf("Se envio bien el paquete\n");
+		 free(i);*/
+
+
+}
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
 	}

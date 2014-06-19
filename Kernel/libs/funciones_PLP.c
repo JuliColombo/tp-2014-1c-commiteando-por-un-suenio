@@ -285,6 +285,16 @@ void core_conexion_pcp_cpu(void){
 		printf("epoll cpu= %d \n", i);
 	}
 
+	//int* tipoRecibido;
+	t_tipoEstructura tipoRecibido = D_STRUCT_NUMERO;
+	void* structRecibida;
+	int j=socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
+	if(j==1){
+	printf("Se recibio envio bien el paquete\n");
+	int* k = ((int*)structRecibida);
+	printf("%d\n", *k);
+	}
+
 	return;
 }
 

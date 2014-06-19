@@ -509,7 +509,9 @@ void core_conexion_cpu(void){
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
 	pthread_mutex_unlock(mutex_log);
+
 	}
+
 
 	while(1){
 	if((sock=socket_aceptarCliente(sock_cpu))>0){
@@ -518,8 +520,37 @@ void core_conexion_cpu(void){
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
-		}
+
+			/*t_tipoEstructura tipoRecibido;
+					void* structRecibida;
+					int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+					if(j==1){
+					printf("Se recibio envio bien el paquete\n");
+					t_struct_numero* k = ((t_struct_numero*)structRecibida);
+					printf("%d\n", k->numero);
+					}*/
+
+			t_tipoEstructura tipoRecibido;
+				void* structRecibida;
+				int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+				if(j==1){
+				printf("Se recibio envio bien el paquete\n");
+				t_struct_string* k = ((t_struct_string*)structRecibida);
+				printf("%s\n", k->string);
+				}
+
+				/*t_tipoEstructura tipoRecibido;
+				void* structRecibida;
+				int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+				if(j==1){
+				printf("Se recibio envio bien el paquete\n");
+				t_struct_char* k = ((t_struct_char*)structRecibida);
+				printf("%c\n", k->letra);
+				}*/
 	}
+
+	}
+
 
 	if(socket_cerrarConexion(sock_cpu)==0){
 		pthread_mutex_lock(mutex_log);
@@ -544,6 +575,7 @@ void atender_cpu(void){
 	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
 	 * send(sock, &tipo_estructura, &estructura);
 	 */
+
 }
 
 
