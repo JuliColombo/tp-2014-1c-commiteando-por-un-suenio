@@ -24,7 +24,7 @@
 #include "Sockets/socket.h"
 
 /*Pathcongif*/
-#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
+#define PATHCONFIG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 

@@ -19,9 +19,8 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <sys/ioctl.h>
-#include "paquete.h"
+#include "package.h"
 #include "commons/string.h"
-
 
 
 #define MAX_EVENTS_EPOLL 60
@@ -33,6 +32,7 @@ typedef struct {
 	uint16_t length;
 } t_socketHeader;
 
+typedef uint8_t t_tipoEstructura;
 typedef unsigned int t_signal;
 
 /************************* FUNCIONES PARA EL CLIENTE *************************/
@@ -45,9 +45,19 @@ int socket_crearServidor(char *ip, int port);
 int socket_crearServidorPuertoRandom(char *ip, int * port);
 int socket_aceptarCliente(int socketEscucha);
 
+/************************* FUNCIONES EPOLL *************************/
+int epoll_crear(void);
+int epoll_agregarSocketServidor(int epollfd, int socketCliente);
+int epoll_agregarSocketCliente(int epollfd, int socketCliente);
+int epoll_agregarFdInotify(int epollfd, int fdInotify);
+int epoll_escucharBloqueante(int epollfd, struct epoll_event * events);
+int epoll_escucharTimeOut(int epollfd, struct epoll_event * events, int timeout);
+int epoll_escucharGeneral(int epollfd, int uniqueSocket, void(*uniqueHandler)(epoll_data_t), void(*normalHandler)(epoll_data_t), void(*closeHandler)(epoll_data_t));
+int epoll_escucharGeneralTimeOut(int epollfd, int uniqueSocket, void(*uniqueHandler)(epoll_data_t), void(*normalHandler)(epoll_data_t), void(*closeHandler)(epoll_data_t), int timeOut);
+
 /************************* FUNCIONES COMUNES *************************/
-int socket_enviar(int socketReceptor, t_estructura tipoEstructura, void* estructura);
-int socket_recibir(int socketEmisor, t_estructura * tipoEstructura, void** estructura);
+int socket_enviar(int socketReceptor, t_tipoEstructura tipoEstructura, void* estructura);
+int socket_recibir(int socketEmisor, t_tipoEstructura * tipoEstructura, void** estructura);
 
 int socket_enviarSignal(int socketReceptor, t_signal signal);
 int socket_recibirSignal(int socketEmisor, t_signal *signal);
@@ -60,9 +70,5 @@ int socket_puerto(char* direccionCompleta);
 
 char* socket_unirDireccion(char* ip, int puerto);
 
-/************************* FUNCIONES PARA EL MANEJO DE OṔERACIONES **************************************/
-void socket_and_push(int sockAjeno,t_puntero posicionEnPila, int valorAPushear);
-void socket_and_pop_position(int sockAjeno, t_puntero posicionDePila);
-void socket_and_number(int sockAjeno, int numero);
 
 #endif /* SOCKET_H_ */

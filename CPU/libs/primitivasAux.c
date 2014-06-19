@@ -13,7 +13,7 @@ int sockfd;
 int sockUMV;
 int top_index;
 
-char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
+/*char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice = malloc(etiquetas_size+1);
 	//tendria que aclararle a la umv que es para generar el indice
 
@@ -93,7 +93,7 @@ void reservarContextoConRetorno(){
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
 	socket_and_push(sockUMV,posicionAVariable,posicionVar);
 }
-
+*/
 
 /*Lo que hago con esta funcion es:
  * estoy en la posicion de cursor contexto.
@@ -102,7 +102,7 @@ void reservarContextoConRetorno(){
  * Invoco esta funcion tantas veces como el tamaño del contexto sea.
  */
 
-void guardarAlternado () {
+/*void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
 	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
@@ -212,5 +212,5 @@ void volverAContextoAnterior() {
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
-}
+}*/
 
