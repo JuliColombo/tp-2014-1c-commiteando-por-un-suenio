@@ -9,6 +9,8 @@
 #define ESTRUCTURASPACKAGE_H_
 
 #include "commons/collections/list.h"
+#include <stdint.h>
+#include "parser/metadata_program.h"
 
 /* Defino los tipos de señales que se pueden mandar
  *
@@ -38,6 +40,7 @@
  * 		No olvidarse de crear la estructura y su paquetizador y despaquetizador asociado!
  */
 
+
 enum{
 	D_STRUCT_NOMBREMENSAJE=0,
 	D_STRUCT_NUMERO=1,
@@ -49,7 +52,9 @@ enum{
 	D_STRUCT_PIDYCODIGO=7,
 	D_STRUCT_PUSH=8,
 	D_STRUCT_POP=9, //Del tipo t_struct_numero
-	D_STRUCT_MODIFICARTOPINDEX=10 //Del tipo t_struct_numero
+	D_STRUCT_MODIFICARTOPINDEX=10, //Del tipo t_struct_numero
+	D_STRUCT_ASIGNARCOMPARTIDA=11,
+	D_STRUCT_INSTRUCCION=12,
 };
 
 
@@ -183,6 +188,26 @@ typedef struct struct_pop{
 typedef struct struct_modificar_top_index{
 	t_posicion posicion;
 }__attribute__ ((__packed__)) t_struct_modificar_top_index;
+
+
+/* Estructura tipo STRUCT_ASIGNAR_COMPARTIDA
+ *
+ */
+
+typedef char* t_nombre_compartida;
+
+typedef struct struct_asignar_compartida{
+	t_nombre_compartida nombre;
+	t_valor valor;
+}__attribute__ ((__packed__)) t_struct_asignar_compartida;
+
+/* Estructura tipo STRUCT_INSTRUCCION
+ *
+ */
+
+typedef struct struct_instruccion{
+	t_intructions inst;
+}__attribute__ ((__packed__)) t_struct_instruccion;
 
 
 

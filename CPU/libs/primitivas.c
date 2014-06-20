@@ -58,7 +58,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_and_pop_position(sockUMV,direccion_variable);
 
 	//Socket recibiendo t_valor_variable id
-	t_struct_numero* estructura =socket_recibir_estructura(sockUMV);
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	t_valor_variable valor_variable = estructura->numero;
 
 	return valor_variable;
@@ -89,26 +89,24 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
 	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
 
-	t_struct_numero* estructura =socket_recibir_estructura(sockUMV);
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	t_valor_variable valor = estructura->numero;
 
 	return valor;
 
 }
 
-/*
+
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
 
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"
-	struct_asignar_compartida* estructura = crear_struct_asignar_compartida(variable, valor);
-	socket_enviar(sockKernel, STRUCT_ASIGNAR_COMPARTIDA,estructura);
-	free(estructura);
+	socket_and_asignar_compartida(sockKernel,variable,valor);
 
 	pcb.program_counter += 1;
 	return valor;
 }
 
-
+/*
 void irAlLabel(t_nombre_etiqueta etiqueta) {
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);

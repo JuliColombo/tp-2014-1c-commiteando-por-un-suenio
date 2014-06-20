@@ -7,15 +7,15 @@
 
 #include "crear_estructuras.h"
 
-t_struct_pushear* crear_struct_pushear(uint32_t posicion, int32_t valor) {
-	t_struct_pushear* estructura = malloc(sizeof(t_struct_pushear));
+t_struct_push* crear_struct_pushear(uint32_t posicion, int32_t valor) {
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion=posicion;
 	estructura->valor = valor;
 	return estructura;
 }
 
 void socket_and_push(int sockAjeno, int posicion, int id) {
-	t_struct_pushear* estructura = crear_struct_pushear(posicion,id);
+	t_struct_push* estructura = crear_struct_pushear(posicion,id);
 	socket_enviar(sockAjeno, D_STRUCT_PUSH, estructura);
 	free(estructura);
 }
@@ -56,15 +56,23 @@ void socket_and_string(int sockAjeno,char* string){
 	free(estructura);
 }
 
+t_struct_asignar_compartida* crear_struct_asignar_compartida(char* string, int32_t valor){
+	t_struct_asignar_compartida* estructura = malloc(sizeof(t_struct_asignar_compartida));
+	estructura->nombre = string;
+	estructura->valor = valor;
+	return estructura;
+}
+
+void socket_and_asignar_compartida(int sockAjeno,char* string, int valor){
+	t_struct_asignar_compartida* estructura = crear_struct_asignar_compartida(string, valor);
+	socket_enviar(sockAjeno, D_STRUCT_ASIGNARCOMPARTIDA, estructura);
+	free(estructura);
+}
+
 void* socket_recibir_estructura(int sockAjeno){
 	void* estructura;
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	int j=socket_recibir(sockAjeno,&tipoRecibido,&structRecibida);
-	if(j==1){
-	estructura = ((t_struct_pushear*)structRecibida);}
-	else {
-		perror("No se pudo recibir");
-	}
+	socket_recibir(sockAjeno,&tipoRecibido,&structRecibida);
 	return estructura;
 }
