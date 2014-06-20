@@ -71,24 +71,47 @@ void* core_conexion_umv(void){
 	 printf("Se envio bien el paquete\n");
 	 free(i);*/
 
-	t_struct_string* i = malloc(sizeof(t_struct_string));
+	/*t_struct_string* i = malloc(sizeof(t_struct_string));
 		 char* k = "argentina";
 		 i->string=k;
 		 printf("el valor que se manda es %s\n", i->string);
 		 int j=socket_enviar(sock, D_STRUCT_STRING, i);
 		 if(j==1){
 		 printf("Se envio bien el paquete\n");
-		 free(i);
+		 free(i);*/
 
 	/*t_struct_char* i = malloc(sizeof(t_struct_char));
-		 char k = 'j';
+		 char k = 'a';
 		 i->letra=k;
-		 printf("el valor que se manda es %c\n", k);
+		 printf("el valor que se manda es %c\n", i->letra);
 		 int j=socket_enviar(sock, D_STRUCT_CHAR, i);
 		 if(j==1){
 		 printf("Se envio bien el paquete\n");
 		 free(i);*/
 
+	t_struct_push* i = malloc(sizeof(t_struct_push));
+	uint32_t pos = 14;
+	int32_t val = -9;
+	i->posicion = pos;
+	i->valor = val;
+	printf("el valor que se manda es %d y %d\n",i->posicion,i->valor);
+	int j= socket_enviar(sock,D_STRUCT_PUSH,i);
+	if(j==1){
+		printf("se envio bien el paquete\n");
+		free(i);
+
+	/*t_struct_instruccion* i = malloc(sizeof(t_struct_instruccion));
+		uint32_t st = 9;
+		uint32_t off = 32;
+		t_intructions juji;
+		juji.start= st;
+		juji.offset=off;
+		i->inst=juji;
+		printf("el valor que se manda es %s y %d\n",i->inst.start,i->inst.offset);
+		int j= socket_enviar(sock,D_STRUCT_ASIGNARCOMPARTIDA,i);
+		if(j==1){
+			printf("se envio bien el paquete\n");
+			free(i);*/
 
 }
 	if(socket_cerrarConexion(sock)==-1){
