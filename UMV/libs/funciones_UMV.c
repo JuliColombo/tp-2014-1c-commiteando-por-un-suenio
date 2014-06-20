@@ -314,20 +314,14 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
 	int i;
-	//tipoSegmento segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(validarSolicitud(tamanio)){
-		if(configuracion_UMV.algoritmo == firstfit){
-			ubicacion = escogerUbicacionF(tamanio);
-		}
-		if(configuracion_UMV.algoritmo == worstfit){
-			ubicacion = escogerUbicacionW(tamanio);
-		}
+		if(configuracion_UMV.algoritmo == firstfit){ubicacion = escogerUbicacionF(tamanio);}
+		if(configuracion_UMV.algoritmo == worstfit){ubicacion = escogerUbicacionW(tamanio);}
 		}else{
 			printf("No hay espacio disponible para %d",id_prog);
 			return;
-		}
-
+		 }
 	//segmento=malloc(sizeof(tamanio));
 	int pos=getPosTablaSeg(id_prog);
 		if (pos==-1){
@@ -341,8 +335,6 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	aux.tamanio=tamanio;
 
 	tablaDeSegmentos[pos].segmentos[i]=aux;
-
-
 }
 
 int getPosTablaSeg(int id_prog){
@@ -740,8 +732,11 @@ void *consola (void){
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
+					  puts("Ingrese el tamaño del segmento");
+					  int tamanio;
+					  gets("%d",tamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  //crearSegmentoPrograma(t_programa Programa);  acordarse que la ubicacion virtual es aleatoria
+					  crearSegmentoPrograma(procesoDelHilo,tamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
