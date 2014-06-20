@@ -408,7 +408,7 @@ int escogerUbicacionW(int tamanio){
 		return posicionFinal;
 }
 
-void destruirSegmentos(int id_prog){
+void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTablaSeg(id_prog);
 	liberarMP(pos);
 	eliminarSegmentos(pos);
@@ -439,7 +439,7 @@ void liberarMP(int pos){
 void eliminarSegmentos(int pos){
 	int i,ultimaPos;
 	i=0;
-	//ultimaPos=ultimoSeg(pos);
+	ultimaPos= sizeof(tablaDeSegmentos[pos].segmentos);
 	//Recorro la tabla de segmentos del id_prog
 	while(i<ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
@@ -741,7 +741,7 @@ void *consola (void){
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  //destruirSegmentoPrograma(t_programa Programa);
+					  destruirSegmentosPrograma(procesoDelHilo);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 			}
