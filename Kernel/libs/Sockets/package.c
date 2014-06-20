@@ -57,6 +57,13 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				break;
 			case D_STRUCT_MODIFICARTOPINDEX:
 				paquete = paquetizarStruct_modificarTopIndex((t_struct_modificar_top_index*) estructuraOrigen);
+				break;
+			case D_STRUCT_ASIGNARCOMPARTIDA:
+				paquete = paquetizarStruct_asignarCompartida((t_struct_asignar_compartida*) estructuraOrigen);
+				break;
+			case D_STRUCT_INSTRUCCION:
+				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
+				break;
 		}
 
 
@@ -343,6 +350,63 @@ t_stream * paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index * est
 }
 
 /*
+ * Nombre: paquetizarStruct_asignarCompartida/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(11, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->nombre) + 1 + sizeof(int32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_ASIGNARCOMPARTIDA, paquete->length); //creo el data.
+
+	int tamanoTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->nombre, tamanioDato = strlen(estructuraOrigen->nombre)+1);		//copio a data el nombre de la variable.
+
+	tamanoTotal += tamanioDato;
+
+	memcpy(data + tamanoTotal, &estructuraOrigen->valor, sizeof(int32_t));  //copio a data el valor de la variable.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_instruccion/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete .
+ *
+ * Funcion: crearDataConHeader(12, length)
+ */
+t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));	//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_instruccion);
+
+	char * data = crearDataConHeader(D_STRUCT_INSTRUCCION, paquete->length); 	//creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_instruccion));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: crearDataConHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -413,7 +477,12 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_NUMERO:
 				estructuraDestino = despaquetizarStruct_numero(dataPaquete, length);
 				break;
+			case D_STRUCT_CHAR:
+				estructuraDestino = despaquetizarStruct_char(dataPaquete,length);
+				break;
 			case D_STRUCT_STRING:
+				estructuraDestino = despaquetizarStruct_string(dataPaquete,length);
+				break;
 			case D_STRUCT_SIGNAL:
 				estructuraDestino = despaquetizarStruct_signal(dataPaquete, length);
 				break;
@@ -431,6 +500,13 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_MODIFICARTOPINDEX:
 				estructuraDestino = despaquetizarStruct_modificarTopIndex(dataPaquete, length);
+				break;
+			case D_STRUCT_ASIGNARCOMPARTIDA:
+				estructuraDestino = despaquetizarStruct_asignarCompartida(dataPaquete, length);
+				break;
+			case D_STRUCT_INSTRUCCION:
+				estructuraDestino = despaquetizarStruct_instruccion(dataPaquete, length);
+				break;
 		}
 
 	return estructuraDestino;
@@ -655,7 +731,54 @@ t_struct_modificar_top_index * despaquetizarStruct_modificarTopIndex(char * data
 	return estructuraDestino;
 }
 
+/*
+ * Nombre: despaquetizarStruct_asignarCompartida/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_ASIGNARCOMPARTIDA.
+ *
+ */
+t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataPaquete, uint16_t length){
+	t_struct_asignar_compartida * estructuraDestino = malloc(sizeof(t_struct_asignar_compartida));
 
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->nombre = malloc(tamanoDato);
+	memcpy(estructuraDestino->nombre, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura
+
+	tamanoTotal += tamanoDato;
+
+	memcpy(&estructuraDestino->valor, dataPaquete + tamanoTotal, sizeof(int32_t));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_instruccion/2
+ * EJEMPLO DESPAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_INSTRUCCION.
+ *
+ */
+
+t_struct_instruccion * despaquetizarStruct_instruccion(char * dataPaquete, uint16_t length){
+	t_struct_instruccion * estructuraDestino = malloc(sizeof(t_struct_instruccion));
+
+	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(t_struct_instruccion)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
 
 /*
  * Nombre: despaquetizarHeader/1
