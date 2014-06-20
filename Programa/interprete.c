@@ -37,7 +37,10 @@ int main (int argc, char **argv){
 
 
 	int sock_kernel_servidor=abrirSocket();
-	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, archivo_ansisop);
+	t_struct_pidycodigo* data;
+	data->pid=getpid();
+	data->codigo=archivo_ansisop;
+	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_PIDYCODIGO, &data);
 	if(j==1){
 		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
 	}else{

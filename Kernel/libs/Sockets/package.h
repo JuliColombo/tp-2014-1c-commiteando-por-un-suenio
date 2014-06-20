@@ -25,6 +25,11 @@ t_stream* paquetizarStruct_char(t_struct_char* estructuraOrigen); //E
 t_stream* paquetizarStruct_string(t_struct_string* estructuraOrigen); //D
 t_stream* paquetizarStruct_signal(t_struct_signal* estructuraOrigen); //E
 t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen);//E
+t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen);//D
+t_stream* paquetizarStruct_push(t_struct_push* estructuraOrigen);//E
+t_stream* paquetizarStruct_pop(t_struct_pop* estructuraOrigen);
+t_stream* paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index* estructuraOrigen);
+
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -39,6 +44,10 @@ t_struct_char* despaquetizarStruct_char(char * dataPaquete, uint16_t length);
 t_struct_string* despaquetizarStruct_string(char * dataPaquete, uint16_t length);
 t_struct_signal* despaquetizarStruct_signal(char * dataPaquete, uint16_t length);
 t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t length);
+t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length);
+t_struct_push* despaquetizarStruct_push(char* dataPaquete, uint16_t length);
+t_struct_pop* despaquetizarStruct_pop(char* dataPaquete, uint16_t length);
+t_struct_modificar_top_index* despaquetizarStruct_modificarTopIndex(char* dataPaquete, uint16_t length);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR
 t_header despaquetizarHeader(char * header);

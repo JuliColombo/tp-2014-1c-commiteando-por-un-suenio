@@ -234,6 +234,7 @@ void core_conexion_plp_programas(void){
 
 	struct epoll_event event;
 	struct epoll_event* events;
+	programas = malloc(MAX_EVENTS_EPOLL*sizeof(t_programa));
 
 	fds_conectados_programas = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
@@ -242,7 +243,6 @@ void core_conexion_plp_programas(void){
 	event.events=EPOLLIN|EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_programas;
-
 	while(1){
 		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		printf("epoll programas = %d\n", i);

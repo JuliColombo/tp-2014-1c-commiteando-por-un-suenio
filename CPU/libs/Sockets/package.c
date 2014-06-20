@@ -1,12 +1,11 @@
 /*
  * package.c
  *
- *  Created on: 24/04/2013
+ *  Created on: 28/05/2014
  *      Author: utnso
  */
 
 #include "package.h"
-#include "estructuras_socket.h"
 
 /******************** PAQUETIZAR *************************/
 
@@ -23,7 +22,7 @@
  * Funcion: Según el tipo de estructura, va a distintas funciones que las paquetizan.
  */
 t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
-	t_stream * paquete;
+	t_stream * paquete=NULL;
 
 	switch (tipoEstructura){
 			case D_STRUCT_NOMBREMENSAJE:
@@ -38,42 +37,26 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_STRING:
 				paquete = paquetizarStruct_string((t_struct_string *) estructuraOrigen);
 				break;
-			case D_STRUCT_NOMBRENIVEL:
-				paquete = paquetizarStruct_nombreNivel((t_struct_nombreNivel *) estructuraOrigen);
-				break;
-			case D_STRUCT_PERSONAJESINTERBLOQUEADOS:
-				paquete = paquetizarStruct_personajesInterbloqueados((t_struct_personajesInterbloqueados *) estructuraOrigen);
-				break;
-			case D_STRUCT_POSXPOSY:
-				paquete = paquetizarStruct_posxposy((t_struct_posxposy *) estructuraOrigen);
-				break;
 			case D_STRUCT_SIGNAL:
 				paquete = paquetizarStruct_signal((t_struct_signal *) estructuraOrigen);
 				break;
-			case D_STRUCT_DIRECCIONES:
-				paquete = paquetizarStruct_direcciones((t_struct_direcciones *) estructuraOrigen);
+			case D_STRUCT_PCB:
+				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
-			case D_STRUCT_PEDIRPOSICIONRECURSO:
-				paquete = paquetizarStruct_charPedirPosicionRecurso((t_struct_pedirPosicionRecurso *) estructuraOrigen);
+			case D_STRUCT_GRADOMP:
+				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
 				break;
-			case D_STRUCT_PEDIRRECURSO:
-				paquete = paquetizarStruct_charPedirRecurso((t_struct_pedirRecurso *) estructuraOrigen);
+			case D_STRUCT_PIDYCODIGO:
+				paquete = paquetizarStruct_pidycodigo((t_struct_pidycodigo*) estructuraOrigen);
 				break;
-			case D_STRUCT_DATOSNIVEL:
-				paquete = paquetizarStruct_datosNivel((t_struct_datosNivel *) estructuraOrigen);
+			case D_STRUCT_PUSH:
+				paquete = paquetizarStruct_push((t_struct_push*) estructuraOrigen);
 				break;
-			case D_STRUCT_SIMBOLOPERSONAJE:
-				paquete = paquetizarStruct_simboloPersonaje((t_struct_simboloPersonaje *) estructuraOrigen);
+			case D_STRUCT_POP:
+				paquete = paquetizarStruct_pop((t_struct_pop*) estructuraOrigen);
 				break;
-			case D_STRUCT_RECURSOBLOQUEANTE:
-				paquete = paquetizarStruct_charRecursoBloqueante((t_struct_recursoBloqueante *) estructuraOrigen);
-				break;
-			case D_STRUCT_RECURSOSASIGNADOSYSOBRANTES:
-				paquete = paquetizarStruct_recursosAsignadosYSobrantes((t_struct_recursosAsignadosYSobrantes *) estructuraOrigen);
-				break;
-			case D_STRUCT_RECURSOSLIBERADOS:
-				paquete = paquetizarStruct_recursosLiberados((t_struct_recursosLiberados *) estructuraOrigen);
-				break;
+			case D_STRUCT_MODIFICARTOPINDEX:
+				paquete = paquetizarStruct_modificarTopIndex((t_struct_modificar_top_index*) estructuraOrigen);
 		}
 
 
@@ -167,106 +150,6 @@ t_stream * paquetizarStruct_char(t_struct_char * estructuraOrigen){
 }
 
 /*
- * Nombre: paquetizarStruct_charPedirPosicionRecurso/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(2, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_charPedirPosicionRecurso(t_struct_pedirPosicionRecurso * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + sizeof(unsigned int);
-
-	char * data = crearDataConHeader(D_STRUCT_PEDIRPOSICIONRECURSO, paquete->length); //creo el data
-
-	memcpy(data + sizeof(t_header), &estructuraOrigen->letra, sizeof(char));		//copio a data el char.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-/*
- * Nombre: paquetizarStruct_charPedirRecurso/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(2, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_charPedirRecurso(t_struct_pedirRecurso * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + sizeof(unsigned int);
-
-	char * data = crearDataConHeader(D_STRUCT_PEDIRRECURSO, paquete->length); //creo el data
-
-	memcpy(data + sizeof(t_header), &estructuraOrigen->letra, sizeof(char));		//copio a data el char.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-/*
- * Nombre: paquetizarStruct_charRecursoBloqueante/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(2, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_charRecursoBloqueante(t_struct_recursoBloqueante * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + sizeof(unsigned int);
-
-	char * data = crearDataConHeader(D_STRUCT_RECURSOBLOQUEANTE, paquete->length); //creo el data
-
-	memcpy(data + sizeof(t_header), &estructuraOrigen->recurso, sizeof(char));		//copio a data el char.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-/*
- * Nombre: paquetizarStruct_simboloPersonaje/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(2, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_simboloPersonaje(t_struct_simboloPersonaje * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + sizeof(unsigned int);
-
-	char * data = crearDataConHeader(D_STRUCT_SIMBOLOPERSONAJE, paquete->length); //creo el data
-
-	memcpy(data + sizeof(t_header), &estructuraOrigen->simbolo, sizeof(char));		//copio a data el char.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-/*
  * Nombre: paquetizarStruct_string/1
  * Argumentos:
  * 		- estructuraOrigen
@@ -293,116 +176,6 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen){
 	return paquete;
 }
 
-
-/*
- * Nombre: paquetizarStruct_string/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_recursosLiberados(t_struct_recursosLiberados * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->recursosLiberados) + 1;
-
-	char * data = crearDataConHeader(D_STRUCT_RECURSOSLIBERADOS, paquete->length); //creo el data
-
-	int tamanoTotal = sizeof(t_header);
-
-	memcpy(data + tamanoTotal, estructuraOrigen->recursosLiberados, strlen(estructuraOrigen->recursosLiberados)+1);		//copio a data el string.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-
-/*
- * Nombre: paquetizarStruct_nombreNivel/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_nombreNivel(t_struct_nombreNivel * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->nombre) + 1;
-
-	char * data = crearDataConHeader(D_STRUCT_NOMBRENIVEL, paquete->length); //creo el data
-
-	int tamanoTotal = sizeof(t_header);
-
-	memcpy(data + tamanoTotal, estructuraOrigen->nombre, strlen(estructuraOrigen->nombre)+1);		//copio a data el string del nombre.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-
-/*
- * Nombre: paquetizarStruct_personajesInterbloqueados/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_personajesInterbloqueados(t_struct_personajesInterbloqueados * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->simbolosPersonajes) + 1;
-
-	char * data = crearDataConHeader(D_STRUCT_PERSONAJESINTERBLOQUEADOS, paquete->length); //creo el data
-
-	int tamanoTotal = sizeof(t_header);
-
-	memcpy(data + tamanoTotal, estructuraOrigen->simbolosPersonajes, strlen(estructuraOrigen->simbolosPersonajes)+1);		//copio a data el string de los personajes interbloqueados.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-
-/*
- * Nombre: paquetizarStruct_posxposy/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(4, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_posxposy(t_struct_posxposy * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + sizeof(t_struct_posxposy);
-
-	char * data = crearDataConHeader(D_STRUCT_POSXPOSY, paquete->length); //creo el data
-
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_posxposy));	//copio a data la estructura.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
 /*
  * Nombre: paquetizarStruct_signal/1
  * Argumentos:
@@ -411,7 +184,7 @@ t_stream * paquetizarStruct_posxposy(t_struct_posxposy * estructuraOrigen){
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(5, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(4, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream * paquetizarStruct_signal(t_struct_signal * estructuraOrigen){
 
@@ -430,32 +203,24 @@ t_stream * paquetizarStruct_signal(t_struct_signal * estructuraOrigen){
 
 
 /*
- * Nombre: paquetizarStruct_direcciones/1
+ * Nombre: paquetizarStruct_pcb/1
  * Argumentos:
- * 		- estructuraOrigen
+ * 		- estructura de tipo pcb
  *
  * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
+ * 		paquete
  *
- * Funcion: crearDataConHeader(0, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(5, length)
  */
-t_stream * paquetizarStruct_direcciones(t_struct_direcciones * estructuraOrigen){
+t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
 
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->direccionNivel) + strlen(estructuraOrigen->direccionPlanificador) + 2;
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb);
 
-	char * data = crearDataConHeader(D_STRUCT_DIRECCIONES, paquete->length); //creo el data
+	char* data = crearDataConHeader(D_STRUCT_PCB, paquete->length);
 
-	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
-
-	memcpy(data + tamanoTotal, estructuraOrigen->direccionNivel, tamanoDato = strlen(estructuraOrigen->direccionNivel)+1);		//copio a data la direccion del nivel.
-
-	tamanoTotal += tamanoDato;
-
-	memcpy(data + tamanoTotal, estructuraOrigen->direccionPlanificador, tamanoDato = strlen(estructuraOrigen->direccionPlanificador)+1);		//copio a data la direccion del planificador.
-
-	tamanoTotal += tamanoDato;
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb));
 
 	paquete->data = data;
 
@@ -463,36 +228,115 @@ t_stream * paquetizarStruct_direcciones(t_struct_direcciones * estructuraOrigen)
 }
 
 /*
- * Nombre: paquetizarStruct_datosNivel/1
+ * Nombre: paquetizarStruct_pidycodigo/1
+ * Argumentos:
+ * 		-estructura tipo pidycodigo
+ *
+ * Devuelve:
+ *		paquete
+ *
+ * Funcion: crearDataConHeader(6,length)
+ */
+
+t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
+
+	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->pid, sizeof(t_pid));
+
+	memcpy(data + tamanoTotal, estructuraOrigen->codigo, strlen(estructuraOrigen->codigo)+1);
+
+	paquete->data = data;
+
+
+	return paquete;
+}
+
+
+/*
+ * Nombre: paquetizarStruct_push/1
  * Argumentos:
  * 		- estructuraOrigen
  *
  * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
+ * 		paquete
  *
- * Funcion: crearDataConHeader(9, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(8, length)
  */
-t_stream * paquetizarStruct_datosNivel(t_struct_datosNivel * estructuraOrigen){
+t_stream * paquetizarStruct_push(t_struct_push * estructuraOrigen){
 
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+	t_stream * paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->nombre) + 1 + strlen(estructuraOrigen->direccion) + 1 + strlen(estructuraOrigen->recursos)+1;
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(int32_t);
 
-	char * data = crearDataConHeader(D_STRUCT_DATOSNIVEL, paquete->length); //creo el data
+	char * data = crearDataConHeader(D_STRUCT_PUSH, paquete->length);
 
-	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
+	int tamanioTotal = sizeof(t_header);
+	int tamanioDato = 0;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->nombre, tamanoDato = strlen(estructuraOrigen->nombre)+1);		//copio a data el nombre del nivel.
+	memcpy(data + tamanioTotal, &estructuraOrigen->posicion,tamanioDato = sizeof(uint32_t));
 
-	tamanoTotal += tamanoDato;
+	tamanioTotal += tamanioDato;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->direccion, tamanoDato = strlen(estructuraOrigen->direccion)+1);		//copio a data la direccion del nivel.
+	memcpy(data + tamanioTotal, &estructuraOrigen->valor, sizeof(int32_t));
 
-	tamanoTotal += tamanoDato;
+	paquete->data = data;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->recursos, tamanoDato = strlen(estructuraOrigen->recursos)+1);		//copio a data los recursos (char *).
+	return paquete;
+}
 
-	tamanoTotal += tamanoDato;
+
+/*
+ * Nombre: paquetizarStruct_pop/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(9, length)
+ */
+t_stream * paquetizarStruct_pop(t_struct_pop * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_POP, paquete->length);
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pop));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
+ * Nombre: paquetizarStruct_modificarTopIndex/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete .
+ *
+ * Funcion: crearDataConHeader(10, length)
+ */
+t_stream * paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));	//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_MODIFICARTOPINDEX, paquete->length); 	//creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_modificar_top_index));		//copio a data el numero.
+
 	paquete->data = data;
 
 	return paquete;
@@ -525,39 +369,6 @@ char * crearDataConHeader(uint8_t tipoEstructura, int length){
 	return data;
 }
 
-
-/*
- * Nombre: paquetizarStruct_recursosAsignadosYSobrantes/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(15, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_recursosAsignadosYSobrantes(t_struct_recursosAsignadosYSobrantes * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->recursosSobrantes) + strlen(estructuraOrigen->personajeRecurso) + 2;
-
-	char * data = crearDataConHeader(D_STRUCT_RECURSOSASIGNADOSYSOBRANTES, paquete->length); //creo el data
-
-	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
-
-	memcpy(data + tamanoTotal, estructuraOrigen->recursosSobrantes, tamanoDato = strlen(estructuraOrigen->recursosSobrantes)+1);		//copio a data el nombre.
-
-	tamanoTotal += tamanoDato;
-
-	memcpy(data + tamanoTotal, estructuraOrigen->personajeRecurso, tamanoDato = strlen(estructuraOrigen->personajeRecurso)+1);		//copio a data el mensaje.
-
-	tamanoTotal += tamanoDato;
-
-	paquete->data = data;
-
-	return paquete;
-}
 
 /*
  * Nombre: crearHeader/2
@@ -603,37 +414,23 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				estructuraDestino = despaquetizarStruct_numero(dataPaquete, length);
 				break;
 			case D_STRUCT_STRING:
-			case D_STRUCT_RECURSOSLIBERADOS:
-				estructuraDestino = despaquetizarStruct_string(dataPaquete, length);
-				break;
-			case D_STRUCT_NOMBRENIVEL:
-				estructuraDestino = despaquetizarStruct_nombreNivel(dataPaquete, length);
-				break;
-			case D_STRUCT_PERSONAJESINTERBLOQUEADOS:
-				estructuraDestino = despaquetizarStruct_personajesInterbloqueados(dataPaquete, length);
-				break;
-			case D_STRUCT_POSXPOSY:
-				estructuraDestino = despaquetizarStruct_posxposy(dataPaquete, length);
-				break;
 			case D_STRUCT_SIGNAL:
 				estructuraDestino = despaquetizarStruct_signal(dataPaquete, length);
 				break;
-			case D_STRUCT_DIRECCIONES:
-				estructuraDestino = despaquetizarStruct_direcciones(dataPaquete, length);
+			case D_STRUCT_PCB:
+				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
 				break;
-			case D_STRUCT_CHAR:
-			case D_STRUCT_PEDIRRECURSO:
-			case D_STRUCT_PEDIRPOSICIONRECURSO:
-			case D_STRUCT_SIMBOLOPERSONAJE:
-			case D_STRUCT_RECURSOBLOQUEANTE:
-				estructuraDestino = despaquetizarStruct_char(dataPaquete, length);
+			case D_STRUCT_PIDYCODIGO:
+				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
 				break;
-			case D_STRUCT_DATOSNIVEL:
-				estructuraDestino = despaquetizarStruct_datosNivel(dataPaquete, length);
+			case D_STRUCT_PUSH:
+				estructuraDestino = despaquetizarStruct_push(dataPaquete, length);
 				break;
-			case D_STRUCT_RECURSOSASIGNADOSYSOBRANTES:
-				estructuraDestino = despaquetizarStruct_recursosAsignadosYSobrantes(dataPaquete, length);
+			case D_STRUCT_POP:
+				estructuraDestino = despaquetizarStruct_pop(dataPaquete, length);
 				break;
+			case D_STRUCT_MODIFICARTOPINDEX:
+				estructuraDestino = despaquetizarStruct_modificarTopIndex(dataPaquete, length);
 		}
 
 	return estructuraDestino;
@@ -739,36 +536,6 @@ t_struct_string * despaquetizarStruct_string(char * dataPaquete, uint16_t length
 	return estructuraDestino;
 }
 
-/*
- * Nombre: despaquetizarStruct_posxposy/2
- * Argumentos:
- * 		- char * dataPaquete
- * 		- length
- *
- * Devuelve:
- * 		una estructura de tipo D_STRUCT_POSXPOSY.
- *
- */
-
-t_struct_posxposy * despaquetizarStruct_posxposy(char * dataPaquete, uint16_t length){
-	t_struct_posxposy * estructuraDestino = malloc(sizeof(t_struct_posxposy));
-
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_posxposy)); //copio el data del paquete a la estructura
-
-	return estructuraDestino;
-}
-
-/*
- * Nombre: despaquetizarStruct_posxposy/2
- * Argumentos:
- * 		- char * dataPaquete
- * 		- length
- *
- * Devuelve:
- * 		una estructura de tipo D_STRUCT_POSXPOSY.
- *
- */
-
 t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length){
 	t_struct_signal * estructuraDestino = malloc(sizeof(t_struct_signal));
 
@@ -777,157 +544,113 @@ t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length
 	return estructuraDestino;
 }
 
+
 /*
- * Nombre: despaquetizarStruct_direcciones/2
+ * Nombre: despaquetizarStruct_pcb/1
  * Argumentos:
- * 		- char * dataPaquete
- * 		- length
+ * 		-paquete
+ * 		-length
  *
  * Devuelve:
- * 		una estructura de tipo D_STRUCT_DIRECCIONES.
+ *		estructura de tipo D_STRUCT_PCB
  *
+ * Funcion:
+ * 		recibe el paquete y lo despaquetiza
  */
-t_struct_direcciones * despaquetizarStruct_direcciones(char * dataPaquete, uint16_t length){
-	t_struct_direcciones * estructuraDestino = malloc(sizeof(t_struct_direcciones));
+t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t lenght){
+	t_struct_pcb* estructuraDestino = malloc(sizeof(t_struct_pcb));
 
-	int tamanoTotal = 0, tamanoDato = 0;
-
-	tamanoTotal = tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
-
-	estructuraDestino->direccionNivel = malloc(tamanoDato);
-	memcpy(estructuraDestino->direccionNivel, dataPaquete + tamanoTotal, tamanoDato); //copio la direccion del nivel a la estructura
-
-	tamanoTotal += tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); //incremento tamanoDato, hasta el tamaño del mensaje.
-
-	estructuraDestino->direccionPlanificador = malloc(tamanoDato);
-	memcpy(estructuraDestino->direccionPlanificador, dataPaquete + tamanoTotal, tamanoDato); //copio la direccion del planificador a la estructura
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb));
 
 	return estructuraDestino;
 }
 
 
 /*
- * Nombre: despaquetizarStruct_datosNivel/2
+ * Nombre: despaquetizarStruct_pidycodigo/2
  * Argumentos:
- * 		- char * dataPaquete
- * 		- length
+ * 		-paquete
+ * 		-length
  *
  * Devuelve:
- * 		una estructura de tipo D_STRUCT_DATOSNIVEL.
+ *		estructura de tipo D_STRUCT_PIDYCODIGO
+ *
+ * Funcion:
  *
  */
-t_struct_datosNivel * despaquetizarStruct_datosNivel(char * dataPaquete, uint16_t length){
-	t_struct_datosNivel * estructuraDestino = malloc(sizeof(t_struct_datosNivel));
+t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length){
+	t_struct_pidycodigo* estructuraDestino;
+
 
 	int tamanoTotal = 0, tamanoDato = 0;
 
 	tamanoTotal = tamanoDato;
+	estructuraDestino->pid = malloc(sizeof(int));
+	memcpy(&estructuraDestino->pid, dataPaquete, sizeof(int));
 
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != NULL;tamanoDato++);
 
-	estructuraDestino->nombre = malloc(tamanoDato);
-	memcpy(estructuraDestino->nombre, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre del nivel a la estructura
-
-	tamanoTotal += tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño de la direccion.
-
-	estructuraDestino->direccion = malloc(tamanoDato);
-	memcpy(estructuraDestino->direccion, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre de la direccion del nivel a la estructura
-
-	tamanoTotal += tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); //incremento tamanoDato, hasta el tamaño de la cadena con los símbolos de los recursos.
-
-	estructuraDestino->recursos = malloc(tamanoDato);
-	memcpy(estructuraDestino->recursos, dataPaquete + tamanoTotal, tamanoDato); //copio la direccion del planificador a la estructura
-
-	return estructuraDestino;
-}
-
-/*
- * Nombre: despaquetizarStruct_personajesInterbloqueados/2
- * Argumentos:
- * 		- char * dataPaquete
- * 		- length
- *
- * Devuelve:
- * 		una estructura de tipo D_STRUCT_PERSONAJESINTERBLOQUEADOS.
- *
- */
-t_struct_personajesInterbloqueados * despaquetizarStruct_personajesInterbloqueados(char * dataPaquete, uint16_t length){
-	t_struct_personajesInterbloqueados * estructuraDestino = malloc(sizeof(t_struct_personajesInterbloqueados));
-
-	int tamanoTotal = 0, tamanoDato = 0;
-
-	tamanoTotal = tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del string.
-
-	estructuraDestino->simbolosPersonajes = malloc(tamanoDato);
-	memcpy(estructuraDestino->simbolosPersonajes, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+	estructuraDestino->codigo= malloc(tamanoDato);
+	memcpy(estructuraDestino->codigo, dataPaquete + tamanoTotal, tamanoDato);
 
 	return estructuraDestino;
 }
 
 
 /*
- * Nombre: despaquetizarStruct_nombreNivel/2
+ * Nombre: despaquetizarStruct_push/2
  * Argumentos:
  * 		- char * dataPaquete
  * 		- length
  *
  * Devuelve:
- * 		una estructura de tipo D_STRUCT_NOMBRENIVEL.
+ * 		una estructura de tipo D_STRUCT_PUSH.
  *
  */
-t_struct_nombreNivel * despaquetizarStruct_nombreNivel(char * dataPaquete, uint16_t length){
-	t_struct_nombreNivel * estructuraDestino = malloc(sizeof(t_struct_nombreNivel));
+t_struct_push * despaquetizarStruct_push(char * dataPaquete, uint16_t length){//
+	t_struct_push * estructuraDestino = malloc(sizeof(t_struct_push));
 
-	int tamanoTotal = 0, tamanoDato = 0;
+	memcpy(&estructuraDestino->posicion, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
 
-	tamanoTotal = tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
-
-	estructuraDestino->nombre = malloc(tamanoDato);
-	memcpy(estructuraDestino->nombre, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+	memcpy(&estructuraDestino->valor, dataPaquete+ sizeof(uint32_t), sizeof(int32_t)); //copio el valor del paquete a la estructura.
 
 	return estructuraDestino;
 }
 
+
 /*
- * Nombre: despaquetizarStruct_recursosAsignadosYSobrantes/2
+ * Nombre: despaquetizarStruct_pop/2
  * Argumentos:
  * 		- char * dataPaquete
  * 		- length
  *
  * Devuelve:
- * 		una estructura de tipo D_STRUCT_RECURSOSASIGNADOSYSOBRANTES.
+ * 		una estructura de tipo D_STRUCT_POP.
  *
  */
-t_struct_recursosAsignadosYSobrantes * despaquetizarStruct_recursosAsignadosYSobrantes(char * dataPaquete, uint16_t length){
-	t_struct_recursosAsignadosYSobrantes * estructuraDestino = malloc(sizeof(t_struct_recursosAsignadosYSobrantes));
+t_struct_pop * despaquetizarStruct_pop(char * dataPaquete, uint16_t length){//
+	t_struct_pop * estructuraDestino = malloc(sizeof(t_struct_pop));
 
-	int tamanoTotal = 0, tamanoDato = 0;
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
 
-	tamanoTotal = tamanoDato;
+	return estructuraDestino;
+}
 
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
 
-	estructuraDestino->recursosSobrantes = malloc(tamanoDato);
-	memcpy(estructuraDestino->recursosSobrantes, dataPaquete + tamanoTotal, tamanoDato); //copio el string de recursos sobrantes, a la estructura
+/*
+ * Nombre: despaquetizarStruct_modificarTopIndex/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_MODIFICARTOPINDEX.
+ *
+ */
+t_struct_modificar_top_index * despaquetizarStruct_modificarTopIndex(char * dataPaquete, uint16_t length){
+	t_struct_modificar_top_index * estructuraDestino = malloc(sizeof(t_struct_modificar_top_index));
 
-	tamanoTotal += tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); //incremento tamanoDato, hasta el tamaño del mensaje.
-
-	estructuraDestino->personajeRecurso = malloc(tamanoDato);
-	memcpy(estructuraDestino->personajeRecurso, dataPaquete + tamanoTotal, tamanoDato); //copio el string de personajeRecurso a la estructura
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
 
 	return estructuraDestino;
 }

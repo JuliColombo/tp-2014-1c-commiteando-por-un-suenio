@@ -92,15 +92,15 @@ void aceptarConexionEntrante(epoll_data_t data){
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int n,i,j;
-	char* buffer;
+	t_struct_pidycodigo* buffer;
 	void* buff;
 	for(n=0;n<60;n++){
 		if(fds_conectados_programas[n]!=NULL){
 			i=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
 			j=socket_recibir(i,&buffer, &buff);
 			if(j==1){
-				printf("%d \n", j);
-				return;
+				t_struct_pidycodigo* sarasa = (t_struct_pidycodigo*)buff;
+				printf("Todo bien\n");
 			}
 		}else{
 			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");

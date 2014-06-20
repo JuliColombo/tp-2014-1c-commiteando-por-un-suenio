@@ -1,7 +1,7 @@
 /*
  * estructurasPackage.h
  *
- *  Created on: 11/05/2013
+ *  Created on: 28/05/2014
  *      Author: utnso
  */
 
@@ -23,25 +23,7 @@
  * 		numeroIncrementar un numero mas que la señal anterior
  */
 #define S_ERROR 0	// Utilizada en socket_recibirSeñal, para decir que lo que se recibio no era una señal
-#define S_Personaje_Nivel_MoverIzquierda 1
-#define S_Personaje_Nivel_MoverDerecha 2
-#define S_Personaje_Nivel_MoverArriba 3
-#define S_Personaje_Nivel_MoverAbajo 4
-#define S_Planificador_Personaje_HabilitarMover 5
-#define S_Planificador_Personaje_Matate 6	//Esta la manda el orquestador, pero usando el fd que tiene guardado el planificador, entonces al personaje le va a parecer que lo dijo el planificador.
-#define S_Personaje_Planificador_MeMovi 7
-#define S_Personaje_Orquestador_EmpeceJuego 8
-#define S_Personaje_Planificador_MeMoviYTomeRecurso 9
-#define S_Personaje_Orquestador_TermineJuego 10
-#define S_Personaje_Nivel_PedirPosicionRecurso 11
-#define S_Nivel_Personaje_ConfirmaQueSeMovio 12
-#define S_Personaje_Nivel_PedirRecurso 13
-#define S_Nivel_Personaje_TeAsigneRecurso 14
-#define S_Nivel_Personaje_NoTeAsigneRecurso 15
-#define S_Personaje_Orquestador_DameDireccionDeNivel 16
-#define S_Personaje_Nivel_Reiniciar 17
-#define S_Personaje_Planificador_Reiniciar 18
-#define S_Orquestador_Nivel_Finalizate 19
+
 
 /*Defino las estructuras de los paquetes
  *
@@ -56,22 +38,21 @@
  * 		No olvidarse de crear la estructura y su paquetizador y despaquetizador asociado!
  */
 
-#define D_STRUCT_NOMBREMENSAJE 0
-#define D_STRUCT_NUMERO 1
-#define D_STRUCT_CHAR 2
-#define D_STRUCT_STRING 3
-#define D_STRUCT_POSXPOSY 4
-#define D_STRUCT_SIGNAL 5
-#define D_STRUCT_DIRECCIONES 6
-#define D_STRUCT_PEDIRRECURSO 7
-#define D_STRUCT_PEDIRPOSICIONRECURSO 8
-#define D_STRUCT_DATOSNIVEL 9
-#define D_STRUCT_SIMBOLOPERSONAJE 10
-#define D_STRUCT_NOMBRENIVEL 11 //de tipo t_struct_string
-#define D_STRUCT_PERSONAJESINTERBLOQUEADOS 12 //de tipo t_struct_string (de nivel a orque)
-#define D_STRUCT_RECURSOSLIBERADOS 13 //de tipo t_struct_string
-#define D_STRUCT_RECURSOBLOQUEANTE 14 //se lo manda el personaje al plani;
-#define D_STRUCT_RECURSOSASIGNADOSYSOBRANTES 15 //dos strings
+enum{
+	D_STRUCT_NOMBREMENSAJE=0,
+	D_STRUCT_NUMERO=1,
+	D_STRUCT_CHAR=2,
+	D_STRUCT_STRING=3,
+	D_STRUCT_SIGNAL=4,
+	D_STRUCT_PCB=5,
+	D_STRUCT_GRADOMP=6,
+	D_STRUCT_PIDYCODIGO=7,
+	D_STRUCT_PUSH=8,
+	D_STRUCT_POP=9, //Del tipo t_struct_numero
+	D_STRUCT_MODIFICARTOPINDEX=10 //Del tipo t_struct_numero
+};
+
+
 
 //Estructura auxiliar de stream
 typedef struct {
@@ -111,16 +92,7 @@ typedef struct struct_string {
 	char * string;
 } __attribute__ ((__packed__)) t_struct_string;
 
-/*Estructura tipo STRUCT_POSXPOSY(4)
- * Va a enviar la posicion en x y en y (dos unsigned int) en la que se encuentra el personaje o el recurso.
- */
-typedef struct struct_posxposy {
-	unsigned int posX;
-	unsigned int posY;
-} __attribute__ ((__packed__)) t_struct_posxposy;
-
-
-/*Estructura tipo STRUCT_SIGNAL(5)
+/*Estructura tipo STRUCT_SIGNAL(4)
  * se va a usar cuando quiera enviar una señal.
  * cada señal va a estar numerada. Entonces aca envio el nro de señal.
  */
@@ -130,85 +102,88 @@ typedef struct struct_signal {
 	t_signal signal;
 } __attribute__ ((__packed__)) t_struct_signal;
 
-
-/*Estructura tipo STRUCT_DIRECCIONES(6)
- * se va a enviar dos string (char*) con la direccion ip y puerto de nivel y planificador.
+/* Estructura tipo STRUCT_PCB (5)
+ * se usa para enviar una pcb
+ *
  */
-typedef struct {
-	char * direccionNivel;
-	char * direccionPlanificador;
-}  __attribute__ ((__packed__)) t_struct_direcciones;
 
-//Estructura tipo STRUCT_PEDIRRECURSO (7)
-typedef struct struct_pedirRecurso {
-	char letra;
-} __attribute__ ((__packed__)) t_struct_pedirRecurso;
-
-
-//Estructura tipo STRUCT_PEDIRPOSICIONRECURSO(8)
-typedef struct struct_pedirPosicionRecurs {
-	char letra;
-} __attribute__ ((__packed__)) t_struct_pedirPosicionRecurso;
+typedef unsigned int t_pid;
+typedef int* t_segmento_codigo;
+typedef int* t_segmento_stack;
+typedef int* t_cursor_stack;
+typedef int* t_index_codigo;
+typedef int* t_index_etiquetas;
+typedef int t_program_counter;
+typedef int t_tamanio_contexto;
+typedef int t_tamanio_indice;
 
 
-/*Estructura tipo STRUCT_DATOSNIVEL(9)
- * Se usa en orquestador, para conectar un nivel.
+typedef struct struct_pcb{
+		t_pid pid;								//Identificador único del Programa en el sistema
+		t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
+		t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
+		t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
+		t_index_codigo index_codigo;			//Dirección del primer byte en la UMV del Índice de Código
+		t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
+		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
+		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
+		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
+} __attribute__ ((__packed__)) t_struct_pcb;
+
+/* Estructura tipo STRUCT_GRADOMP
+ * envia el grado de multiprogramacion del sistema
+ *
  */
-typedef struct {
-	char * nombre;
-	char * direccion;
-	char * recursos;
-}  __attribute__ ((__packed__)) t_struct_datosNivel;
 
-//Estructura tipo STRUCT_SIMBOLOPERSONAJE(10)
-typedef struct struct_simboloPersonaje {
-	char simbolo;
-} __attribute__ ((__packed__)) t_struct_simboloPersonaje;
+typedef int t_gradoMP;
+
+typedef struct struct_grado_MP{
+	t_gradoMP gradoMP;
+}__attribute__ ((__packed__)) t_struct_gradoMP;
 
 
-/*Estructura tipo STRUCT_NOMBRENIVEL(11)
- * La usa el personaje para mandarle al orquestador:
- * señal: "empecé juego", con nombre primer nivel
- * o señal: "me bloquee", con nombre nivel actual (en el que se bloqueó).
-*/
-typedef struct struct_nombreNivel { //personaje le manda esta estructura al orquestador, para que le devuelva la struct direcciones del mismo.
-	char * nombre;
-} __attribute__ ((__packed__)) t_struct_nombreNivel;
+/* Estructura tipo STRUCT_PIDYCODIGO
+ * envia el pid de un programa y su respectivo codigo ansisop
+ */
 
-/*Estructura tipo D_STRUCT_PERSONAJESINTERBLOQUEADOS(12)
- * La usa el nivel para mandarle al orquestador:
- * la cadena de símbolos de los personajes que quedaron interbloqueados
-*/
-typedef struct struct_personajesInterbloqueados{
-	char * simbolosPersonajes;
-} __attribute__ ((__packed__)) t_struct_personajesInterbloqueados;
+typedef int* pid;
+typedef char* t_codigo;
 
-/*Estructura tipo D_STRUCT_RECURSOSLIBERADOS(13)
- * La usa el nivel para mandarle al orquestador:
- * la cadena de símbolos de los recursos liberados por un personaje
-*/
-typedef struct struct_recursosLiberados{
-	char * recursosLiberados;
-} __attribute__ ((__packed__)) t_struct_recursosLiberados;
+typedef struct struct_pidycodigo{
+	t_pid pid;
+	t_codigo codigo;
+}__attribute__ ((__packed__)) t_struct_pidycodigo;
+
+/* Estructura tipo STRUCT_PUSH
+ *
+ */
+
+typedef uint32_t t_posicion;
+typedef int32_t t_valor;
+
+typedef struct struct_push{
+	t_posicion posicion;
+	t_valor valor;
+}__attribute__ ((__packed__)) t_struct_push;
 
 
-/*Estructura tipo D_STRUCT_RECURSOBLOQUEANTE(14)
- * La usa el personaje para mandarle al planificador:
- * El recurso por el cual se bloqueo. Se infiere con esto
- * que el personaje esta bloqueado. No se manda signal antes si esta bloqueadoi o no
-*/
-typedef struct struct_recursoBloqueante {
-	char recurso;
-} __attribute__ ((__packed__)) t_struct_recursoBloqueante;
+/* Estructura tipo STRUCT_POP
+ *
+ */
 
-/*Estructura tipo D_STRUCT_RECURSOSASIGNADOSYSOBRANTES(15)
- * La usa el orquestador para mandarselo al nivel:
- * la cadena de símbolos de los recursos liberados, ej: "MMH"
- * y los recursos asignados y a quien se los asigno, ej: "@M%H"
-*/
-typedef struct struct_recursosAsignadosYSobrantes {
-	char * recursosSobrantes;
-	char * personajeRecurso;	//contiene char pesonaje seguido de char recurso, asi repetido por el string
-} __attribute__ ((__packed__)) t_struct_recursosAsignadosYSobrantes;
+typedef struct struct_pop{
+	t_posicion posicion;
+}__attribute__ ((__packed__)) t_struct_pop;
+
+
+/* Estructura tipo STRUCT_MODIFICAR_TOP_INDEX
+ *
+ */
+
+typedef struct struct_modificar_top_index{
+	t_posicion posicion;
+}__attribute__ ((__packed__)) t_struct_modificar_top_index;
+
+
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

@@ -45,6 +45,18 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				break;
 			case D_STRUCT_GRADOMP:
 				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
+				break;
+			case D_STRUCT_PIDYCODIGO:
+				paquete = paquetizarStruct_pidycodigo((t_struct_pidycodigo*) estructuraOrigen);
+				break;
+			case D_STRUCT_PUSH:
+				paquete = paquetizarStruct_push((t_struct_push*) estructuraOrigen);
+				break;
+			case D_STRUCT_POP:
+				paquete = paquetizarStruct_pop((t_struct_pop*) estructuraOrigen);
+				break;
+			case D_STRUCT_MODIFICARTOPINDEX:
+				paquete = paquetizarStruct_modificarTopIndex((t_struct_modificar_top_index*) estructuraOrigen);
 		}
 
 
@@ -216,6 +228,121 @@ t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_pidycodigo/1
+ * Argumentos:
+ * 		-estructura tipo pidycodigo
+ *
+ * Devuelve:
+ *		paquete
+ *
+ * Funcion: crearDataConHeader(6,length)
+ */
+
+t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
+
+	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->pid, sizeof(t_pid));
+
+	memcpy(data + tamanoTotal, estructuraOrigen->codigo, strlen(estructuraOrigen->codigo)+1);
+
+	paquete->data = data;
+
+
+	return paquete;
+}
+
+
+/*
+ * Nombre: paquetizarStruct_push/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(8, length)
+ */
+t_stream * paquetizarStruct_push(t_struct_push * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(int32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_PUSH, paquete->length);
+
+	int tamanioTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->posicion,tamanioDato = sizeof(uint32_t));
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->valor, sizeof(int32_t));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
+ * Nombre: paquetizarStruct_pop/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(9, length)
+ */
+t_stream * paquetizarStruct_pop(t_struct_pop * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_POP, paquete->length);
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pop));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
+ * Nombre: paquetizarStruct_modificarTopIndex/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete .
+ *
+ * Funcion: crearDataConHeader(10, length)
+ */
+t_stream * paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));	//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_MODIFICARTOPINDEX, paquete->length); 	//creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_modificar_top_index));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: crearDataConHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -292,6 +419,18 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_PCB:
 				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
+				break;
+			case D_STRUCT_PIDYCODIGO:
+				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
+				break;
+			case D_STRUCT_PUSH:
+				estructuraDestino = despaquetizarStruct_push(dataPaquete, length);
+				break;
+			case D_STRUCT_POP:
+				estructuraDestino = despaquetizarStruct_pop(dataPaquete, length);
+				break;
+			case D_STRUCT_MODIFICARTOPINDEX:
+				estructuraDestino = despaquetizarStruct_modificarTopIndex(dataPaquete, length);
 		}
 
 	return estructuraDestino;
@@ -405,6 +544,7 @@ t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length
 	return estructuraDestino;
 }
 
+
 /*
  * Nombre: despaquetizarStruct_pcb/1
  * Argumentos:
@@ -420,11 +560,100 @@ t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length
 t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t lenght){
 	t_struct_pcb* estructuraDestino = malloc(sizeof(t_struct_pcb));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_signal));
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb));
 
 	return estructuraDestino;
 }
 
+
+/*
+ * Nombre: despaquetizarStruct_pidycodigo/2
+ * Argumentos:
+ * 		-paquete
+ * 		-length
+ *
+ * Devuelve:
+ *		estructura de tipo D_STRUCT_PIDYCODIGO
+ *
+ * Funcion:
+ *
+ */
+t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length){
+	t_struct_pidycodigo* estructuraDestino;
+
+
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+	estructuraDestino->pid = malloc(sizeof(int));
+	memcpy(&estructuraDestino->pid, dataPaquete, sizeof(int));
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != NULL;tamanoDato++);
+
+	estructuraDestino->codigo= malloc(tamanoDato);
+	memcpy(estructuraDestino->codigo, dataPaquete + tamanoTotal, tamanoDato);
+
+	return estructuraDestino;
+}
+
+
+/*
+ * Nombre: despaquetizarStruct_push/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_PUSH.
+ *
+ */
+t_struct_push * despaquetizarStruct_push(char * dataPaquete, uint16_t length){//
+	t_struct_push * estructuraDestino = malloc(sizeof(t_struct_push));
+
+	memcpy(&estructuraDestino->posicion, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
+
+	memcpy(&estructuraDestino->valor, dataPaquete+ sizeof(uint32_t), sizeof(int32_t)); //copio el valor del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+
+/*
+ * Nombre: despaquetizarStruct_pop/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_POP.
+ *
+ */
+t_struct_pop * despaquetizarStruct_pop(char * dataPaquete, uint16_t length){//
+	t_struct_pop * estructuraDestino = malloc(sizeof(t_struct_pop));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+
+/*
+ * Nombre: despaquetizarStruct_modificarTopIndex/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_MODIFICARTOPINDEX.
+ *
+ */
+t_struct_modificar_top_index * despaquetizarStruct_modificarTopIndex(char * dataPaquete, uint16_t length){
+	t_struct_modificar_top_index * estructuraDestino = malloc(sizeof(t_struct_modificar_top_index));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
 
 
 

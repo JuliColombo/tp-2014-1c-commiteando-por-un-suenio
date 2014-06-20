@@ -23,6 +23,8 @@ pthread_mutex_t* mutex_cola_exit;
 int sock_programas, sock_umv, sock_cpu;
 int* fds_conectados_programas;
 int* fds_conectados_cpu;
+t_programa* programas;
+
 
 
 

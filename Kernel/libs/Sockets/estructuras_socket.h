@@ -45,7 +45,11 @@ enum{
 	D_STRUCT_STRING=3,
 	D_STRUCT_SIGNAL=4,
 	D_STRUCT_PCB=5,
-	D_STRUCT_GRADOMP=6
+	D_STRUCT_GRADOMP=6,
+	D_STRUCT_PIDYCODIGO=7,
+	D_STRUCT_PUSH=8,
+	D_STRUCT_POP=9, //Del tipo t_struct_numero
+	D_STRUCT_MODIFICARTOPINDEX=10 //Del tipo t_struct_numero
 };
 
 
@@ -133,9 +137,52 @@ typedef struct struct_pcb{
 
 typedef int t_gradoMP;
 
-typedef struct grado_MP{
+typedef struct struct_grado_MP{
 	t_gradoMP gradoMP;
 }__attribute__ ((__packed__)) t_struct_gradoMP;
+
+
+/* Estructura tipo STRUCT_PIDYCODIGO
+ * envia el pid de un programa y su respectivo codigo ansisop
+ */
+
+typedef int* pid;
+typedef char* t_codigo;
+
+typedef struct struct_pidycodigo{
+	t_pid pid;
+	t_codigo codigo;
+}__attribute__ ((__packed__)) t_struct_pidycodigo;
+
+/* Estructura tipo STRUCT_PUSH
+ *
+ */
+
+typedef uint32_t t_posicion;
+typedef int32_t t_valor;
+
+typedef struct struct_push{
+	t_posicion posicion;
+	t_valor valor;
+}__attribute__ ((__packed__)) t_struct_push;
+
+
+/* Estructura tipo STRUCT_POP
+ *
+ */
+
+typedef struct struct_pop{
+	t_posicion posicion;
+}__attribute__ ((__packed__)) t_struct_pop;
+
+
+/* Estructura tipo STRUCT_MODIFICAR_TOP_INDEX
+ *
+ */
+
+typedef struct struct_modificar_top_index{
+	t_posicion posicion;
+}__attribute__ ((__packed__)) t_struct_modificar_top_index;
 
 
 
