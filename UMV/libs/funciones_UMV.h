@@ -24,7 +24,7 @@
 #include "Sockets/socket.h"
 
 /*Pathcongif*/
-#define PATHCONFIG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
+#define PATHCONFIG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio/UMV/configuracion_UMV.cfg"
 
 /*Variables globales*/
 
@@ -43,6 +43,7 @@ extern int sock_cpu;
 extern int retardo;
 extern int* procesosActivos;
 extern int gradoDeMultiprogramacion;
+
 
 /*Prototipos de funciones auxiliares*/
 
@@ -64,6 +65,7 @@ int escogerUbicacionW(int tamanio);
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
+
 
 /*Operaciones de Consola*/
 void algoritmo(void);

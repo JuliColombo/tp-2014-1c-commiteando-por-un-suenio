@@ -200,9 +200,10 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
 	}
-
-
 }
+
+
+
 
 
 
@@ -665,44 +666,52 @@ void *consola (void){
 
 	//system("clear");
 	char comando[32];
+	int procesoDelHilo,unaBase,unOffset,unTamanio,modo;
+	t_buffer buffer;
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
-	gets(comando);
+	scanf("%s",&comando);
 	while(estaEnDicOP(comando)== 0){
 		puts("\nOperacion erronea, escriba la operacion de nuevo");
-		gets(comando);
+		scanf("%s",&comando);
 	}
 
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
 				puts("Ingrese el processID de programa a usar");
-				int nuevoPrograma;
-				gets(nuevoPrograma);
-				if(nuevoPrograma != procesoEnUso){
+				scanf("%d",&procesoDelHilo);
+				if(procesoDelHilo != procesoEnUso){
 					//cambioDeProcesoActivo(nuevoPrograma);
 				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
-				gets(tipoOperacion);
+				scanf("%s",&tipoOperacion);
 				while(estaEnDicTOP(tipoOperacion)== 0){
 						puts("\nTipo de Operacion erronea, escriba el tipo de operacion de nuevo");
-						gets(tipoOperacion);
+						scanf("%s",&tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
-					  puts("\n Ingrese Base, Offset y Tamanio de segmento");
-					  int unaBase,unOffset,unTamanio;
-					  scanf("%d","%d","%d",unaBase,unOffset,unTamanio);
+					  puts("\n Ingrese Base");
+					  scanf("%d",&unaBase);
+					  puts("\n Ingrese Offset");
+					  scanf("%d",&unOffset);
+					  puts("\n Ingrese Tamanio de segmento");
+					  scanf("%d",&unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  solicitarDesdePosicionDeMemoria(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
-					  puts("\n Ingrese Base, Offset, Tamanio de segmento y Buffer a escribir");
-					  int unaBase,unOffset,unTamanio;
-					  t_buffer buffer;
-					  scanf("%d","%d","%d","%s",unaBase,unOffset,unTamanio,buffer);
-					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  enviarBytes(unaBase,unOffset,unTamanio,buffer);
-					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
+					 puts("\n Ingrese Base");
+					 scanf("%d",&unaBase);
+					 puts("\n Ingrese Offset");
+					 scanf("%d",&unOffset);
+					 puts("\n Ingrese Tamanio de segmento");
+					 scanf("%d",&unTamanio);
+					 puts("\n Ingrese Buffer");
+					 scanf("%s",&buffer);
+					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
+					 enviarBytes(unaBase,unOffset,unTamanio,buffer);
+					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
@@ -732,17 +741,19 @@ void *consola (void){
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando,"dump") ==0){
+				   printf("Ingrese modo de dump (1 = enabled, 0 = disabled)\n");
+				   scanf("%d",&modo);
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				 //dump();
+				 //dump(modo);
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
 
 		puts("\nEscriba la siguiente operacion");
-		gets(comando);
+		scanf("%s",&comando);
 		while(estaEnDicOP(comando)== 0){
 				puts("\nOperacion erronea, escriba la operacion de nuevo");
-				gets(comando);
+				scanf("%s",&comando);
 			}
 
 		}

@@ -23,6 +23,7 @@ int sock_cpu;
 int* procesosActivos;
 int gradoDeMultiprogramacion;
 
+
 int main (int argc, char **argv){
 
 	inicializarConfiguracion();
