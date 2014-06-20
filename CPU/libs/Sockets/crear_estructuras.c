@@ -69,6 +69,30 @@ void socket_and_asignar_compartida(int sockAjeno,char* string, int valor){
 	free(estructura);
 }
 
+t_struct_instruccion* crear_struct_instruccion(t_intructions instruccion){
+	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
+	estructura->inst = instruccion;
+	return estructura;
+}
+
+void socket_and_instruccion(int sockAjeno,t_intructions instruccion){
+	t_struct_instruccion* estructura = crear_struct_instruccion(instruccion);
+	socket_enviar(sockAjeno, D_STRUCT_INSTRUCCION, estructura);
+	free(estructura);
+}
+
+t_struct_numero* crear_struct_numero(int32_t num){
+	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+	estructura->numero = num;
+	return estructura;
+}
+
+void socket_and_number(int sockAjeno,int num){
+	t_struct_numero* estructura = crear_struct_numero(num);
+	socket_enviar(sockAjeno, D_STRUCT_NUMERO, estructura);
+	free(estructura);
+}
+
 void* socket_recibir_estructura(int sockAjeno){
 	void* estructura;
 	t_tipoEstructura tipoRecibido;
