@@ -74,6 +74,15 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_RECURSOSLIBERADOS:
 				paquete = paquetizarStruct_recursosLiberados((t_struct_recursosLiberados *) estructuraOrigen);
 				break;
+			case D_STRUCT_PUSH:
+				paquete = paquetizarStruct_push((t_struct_pushear*) estructuraOrigen);
+				break;
+			case D_STRUCT_POP:
+				paquete = paquetizarStruct_pop((t_struct_pop*) estructuraOrigen);
+				break;
+			case D_STRUCT_MODIFICARTOPINDEX:
+				paquete = paquetizarStruct_modificarTopIndex((t_struct_modificar_top_index*) estructuraOrigen);
+				break;
 		}
 
 
@@ -560,6 +569,91 @@ t_stream * paquetizarStruct_recursosAsignadosYSobrantes(t_struct_recursosAsignad
 }
 
 /*
+ * Nombre: paquetizarStruct_push/1
+ * EJEMPLO PAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(16, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_push(t_struct_pushear * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(int32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_PUSH, paquete->length); //creo el data
+
+	int tamanioTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->posicion,tamanioDato = sizeof(uint32_t));		//copio a data la posicion.
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->valor, sizeof(int32_t));  //copio a data el valor.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_pop/1
+ * EJEMPLO PAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(17, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_pop(t_struct_pop * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_POP, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pop));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_modificarTopIndex/1
+ * EJEMPLO PAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(18, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_MODIFICARTOPINDEX, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_modificar_top_index));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: crearHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -599,6 +693,8 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_NOMBREMENSAJE:
 				estructuraDestino = despaquetizarStruct_nombreMensaje(dataPaquete, length);
 				break;
+			case D_STRUCT_POP:
+			case D_STRUCT_MODIFICARTOPINDEX:
 			case D_STRUCT_NUMERO:
 				estructuraDestino = despaquetizarStruct_numero(dataPaquete, length);
 				break;
@@ -633,6 +729,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_RECURSOSASIGNADOSYSOBRANTES:
 				estructuraDestino = despaquetizarStruct_recursosAsignadosYSobrantes(dataPaquete, length);
+				break;
+			case D_STRUCT_PUSH:
+				estructuraDestino = despaquetizarStruct_push(dataPaquete, length);
 				break;
 		}
 
@@ -932,7 +1031,67 @@ t_struct_recursosAsignadosYSobrantes * despaquetizarStruct_recursosAsignadosYSob
 	return estructuraDestino;
 }
 
+/*
+ * Nombre: despaquetizarStruct_push/2
+ * EJEMPLO DESPAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_PUSH.
+ *
+ */
 
+t_struct_pushear * despaquetizarStruct_push(char * dataPaquete, uint16_t length){
+	t_struct_pushear * estructuraDestino = malloc(sizeof(t_struct_pushear));
+
+	memcpy(&estructuraDestino->posicion, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
+
+	memcpy(&estructuraDestino->valor, dataPaquete, sizeof(int32_t)); //copio el valor del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_pop/2
+ * EJEMPLO DESPAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_POP.
+ *
+ */
+
+t_struct_pop * despaquetizarStruct_pop(char * dataPaquete, uint16_t length){
+	t_struct_pop * estructuraDestino = malloc(sizeof(t_struct_pop));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_modificarTopIndex/2
+ * EJEMPLO DESPAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_MODIFICARTOPINDEX.
+ *
+ */
+
+t_struct_modificar_top_index * despaquetizarStruct_modificarTopIndex(char * dataPaquete, uint16_t length){
+	t_struct_modificar_top_index * estructuraDestino = malloc(sizeof(t_struct_modificar_top_index));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
 
 /*
  * Nombre: despaquetizarHeader/1

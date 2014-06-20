@@ -13,8 +13,9 @@ int sockfd;
 int sockUMV;
 int top_index;
 
-/*char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
-	char* indice = malloc(etiquetas_size+1);
+/*
+char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
+	char* indice;
 	//tendria que aclararle a la umv que es para generar el indice
 
 	t_estructura tipo = STRUCT_STRING;
@@ -22,14 +23,12 @@ int top_index;
 	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
 
-	indice = (*estructuraAux)->string;
-
-	free(estructura2);
-	free(estructuraAux);
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	indice = estructura->string
 
 	return indice;
 
-}
+}*/
 
 
 t_puntero calcularPosicionAsignacionCPU(int top_index) {
@@ -93,7 +92,7 @@ void reservarContextoConRetorno(){
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
 	socket_and_push(sockUMV,posicionAVariable,posicionVar);
 }
-*/
+
 
 /*Lo que hago con esta funcion es:
  * estoy en la posicion de cursor contexto.

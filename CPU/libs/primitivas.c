@@ -6,7 +6,7 @@
  */
 
 #include "primitivasAux.h"
-#include "Sockets/socket.h"
+#include "Sockets/crear_estructuras.h"
 #include "primitivas.h"
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
@@ -20,7 +20,7 @@ int top_index;
 char* etiquetas;
 t_intructions* codigoo;
 
-/*
+
 
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
@@ -28,7 +28,6 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	socket_and_push(sockUMV,posicion,id);
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
-
 
 	const char* str=convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str,posicion);
@@ -59,13 +58,9 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_and_pop_position(sockUMV,direccion_variable);
 
 	//Socket recibiendo t_valor_variable id
-	t_estructura tipo;
-	void** estructura2;
-	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_numero** estructuraAux = (struct_numero**)estructura2;
-	t_valor_variable valor_variable = (*estructuraAux)->numero;
-	free(estructura2);
-	free(estructuraAux);
+	t_struct_numero* estructura =socket_recibir_estructura(sockUMV);
+	t_valor_variable valor_variable = estructura->numero;
+
 	return valor_variable;
 
 }
@@ -82,33 +77,26 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	//Le digo a UMV que actualice su top_index del stack
 	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
-	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
-	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
-	free(estructura);
+	socket_and_modificar_top_index(sockUMV,top_index);
 
 	pcb.program_counter += 1;
 }
 
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
-	struct_string* estructura = crear_struct_string(variable);
-	socket_enviar(sockKernel,STRUCT_OBTENER_COMPARTIDA,estructura);
-	free(estructura);
+
+	socket_and_string(sockKernel, variable);
 
 	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
-	t_estructura tipo = STRUCT_NUMERO;
-	void** estructura2;
-	socket_recibir(sockKernel,&tipo, estructura2);
-	struct_numero** estructuraAux = (struct_numero**)estructura2;
-	t_valor_variable valor = (*estructuraAux)->numero;
-	free(estructuraAux);
-	free(estructura2);
+
+	t_struct_numero* estructura =socket_recibir_estructura(sockUMV);
+	t_valor_variable valor = estructura->numero;
 
 	return valor;
 
 }
 
-
+/*
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
 
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"

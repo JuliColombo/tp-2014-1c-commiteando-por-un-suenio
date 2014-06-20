@@ -9,6 +9,7 @@
 #define ESTRUCTURASPACKAGE_H_
 
 #include "commons/collections/list.h"
+#include <stdint.h>
 
 /* Defino los tipos de señales que se pueden mandar
  *
@@ -72,6 +73,9 @@
 #define D_STRUCT_RECURSOSLIBERADOS 13 //de tipo t_struct_string
 #define D_STRUCT_RECURSOBLOQUEANTE 14 //se lo manda el personaje al plani;
 #define D_STRUCT_RECURSOSASIGNADOSYSOBRANTES 15 //dos strings
+#define D_STRUCT_PUSH 16
+#define D_STRUCT_POP 17 //Del tipo t_struct_numero
+#define D_STRUCT_MODIFICARTOPINDEX 18 //Del tipo t_struct_numero
 
 //Estructura auxiliar de stream
 typedef struct {
@@ -210,5 +214,19 @@ typedef struct struct_recursosAsignadosYSobrantes {
 	char * recursosSobrantes;
 	char * personajeRecurso;	//contiene char pesonaje seguido de char recurso, asi repetido por el string
 } __attribute__ ((__packed__)) t_struct_recursosAsignadosYSobrantes;
+
+typedef struct struct_pushear{
+	uint32_t posicion;
+	int32_t valor;
+}__attribute__ ((__packed__)) t_struct_pushear;
+
+typedef struct struct_pop{
+	uint32_t posicion;
+}__attribute__ ((__packed__)) t_struct_pop;
+
+typedef struct struct_modificar_top_index{
+	uint32_t posicion;
+}__attribute__ ((__packed__)) t_struct_modificar_top_index;
+
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

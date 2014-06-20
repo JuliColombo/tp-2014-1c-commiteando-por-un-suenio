@@ -35,6 +35,9 @@ t_stream * paquetizarStruct_datosNivel(t_struct_datosNivel * estructuraOrigen); 
 t_stream * paquetizarStruct_simboloPersonaje(t_struct_simboloPersonaje * estructuraOrigen); //E
 t_stream * paquetizarStruct_charRecursoBloqueante(t_struct_recursoBloqueante * estructuraOrigen); //E
 t_stream * paquetizarStruct_recursosAsignadosYSobrantes(t_struct_recursosAsignadosYSobrantes * estructuraOrigen); //D
+t_stream * paquetizarStruct_push(t_struct_pushear * estructuraOrigen);
+t_stream * paquetizarStruct_modificarTopIndex(t_struct_modificar_top_index * estructuraOrigen);
+t_stream * paquetizarStruct_pop(t_struct_pop * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char * crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -54,6 +57,9 @@ t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length
 t_struct_direcciones * despaquetizarStruct_direcciones(char * dataPaquete, uint16_t length);
 t_struct_datosNivel * despaquetizarStruct_datosNivel(char * dataPaquete, uint16_t length);
 t_struct_recursosAsignadosYSobrantes * despaquetizarStruct_recursosAsignadosYSobrantes(char * dataPaquete, uint16_t length);
+t_struct_pushear * despaquetizarStruct_push(char * dataPaquete, uint16_t length);
+t_struct_modificar_top_index * despaquetizarStruct_modificarTopIndex(char * dataPaquete, uint16_t length);
+t_struct_pop * despaquetizarStruct_pop(char * dataPaquete, uint16_t length);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR
 t_header despaquetizarHeader(char * header);
