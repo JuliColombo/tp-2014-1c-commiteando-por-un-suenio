@@ -199,10 +199,6 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 
 //Comandos de consola:
 
-void retardoFunc(int valorRetardoEnMilisegundos){ //Cantidad de ms que debe esperar UMV para responder una solicitud
-	retardo= valorRetardoEnMilisegundos;
-}
-
 void algoritmo(void){//Cambiar entre Worst fit y First fit
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
@@ -547,7 +543,7 @@ void core_conexion_cpu(void){
 				void* structRecibida;
 				int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
 				if(j==1){
-				printf("Se recibio envio bien el paquete\n");
+				printf("Se recibio bien el paquete\n");
 				t_struct_string* k = ((t_struct_string*)structRecibida);
 				printf("%s\n", k->string);
 				}
@@ -611,7 +607,7 @@ void core_conexion_kernel(void){
 		void* structRecibida;
 		int j=socket_recibir(sock_aceptado,&tipoRecibido,&structRecibida);
 		if(j==1){
-		printf("Se recibio envio bien el paquete\n");
+		printf("Se recibio bien el paquete\n");
 		int* k = ((int*)structRecibida);
 		printf("%d\n", *k);
 		}
@@ -691,9 +687,6 @@ void *consola (void){
 			if(strcmp(comando, "operacion") == 0){
 				puts("Ingrese el processID de programa a usar");
 				scanf("%d",&procesoDelHilo);
-				if(procesoDelHilo != procesoEnUso){
-					//cambioDeProcesoActivo(nuevoPrograma);
-				}else{}
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				scanf("%s",&tipoOperacion);
@@ -737,9 +730,12 @@ void *consola (void){
 				}
 			}
 
-		else { if (strcmp(comando, "retardo") == 0){
+	else { if (strcmp(comando, "retardo") == 0){
+				  puts("Ingrese el valor de retardo en Milisegundos");
+				  int valorRetardo;
+				  scanf("%d", valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				//retardo(int valorRetardoEnMilisegundos);
+				  retardo= valorRetardo;
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
@@ -764,25 +760,24 @@ void *consola (void){
 		puts("\nEscriba la siguiente operacion");
 		scanf("%s",&comando);
 		while(estaEnDicOP(comando)== 0){
-				puts("\nOperacion erronea, escriba la operacion de nuevo");
-				scanf("%s",&comando);
+			puts("\nOperacion erronea, escriba la operacion de nuevo");
+			scanf("%s",&comando);
 			}
 
 		}
-	if(strcmp(comando,"exit") ==0){
-									  	destruirTodosLosSegmentos();
-									   	free(MP);
+		if(strcmp(comando,"exit") ==0){
+			destruirTodosLosSegmentos();
+			free(MP);
+		   	socket_cerrarConexion(sock_kernel_servidor);
+		   	socket_cerrarConexion(sock_cpu);
+		   	matarHilos();
+			if(pthread_kill(CPU,0)==0){
+			printf("Muere el hilo cpu\n");
+			}
+			if(pthread_kill(KERNEL,0)==0){
+			printf("Muere el hilo Kernel\n");
 
-									   	socket_cerrarConexion(sock_kernel_servidor);
-									   	socket_cerrarConexion(sock_cpu);
-									   	matarHilos();
-									   	if(pthread_kill(CPU,0)==0){
-									   		printf("Muere el hilo cpu\n");
-									   	}
-									   	if(pthread_kill(KERNEL,0)==0){
-									   		printf("Muere el hilo Kernel\n");
-									   	}
-						   }
+			}
 
 }
 
