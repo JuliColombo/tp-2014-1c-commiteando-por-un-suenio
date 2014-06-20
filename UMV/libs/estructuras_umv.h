@@ -36,9 +36,11 @@ t_ip_kernel ip_kernel;	//Direccion IP para conectarse al Kernel
 t_algoritmo algoritmo;	//Algoritmo de selección de ubicación de segmento (first-fit o worst-fit)
 } t_config_UMV;
 
-enum tipoAlgoritmo{
+enum tipo_algoritmo{
 					firstfit,worstfit
 };
+
+
 
 typedef struct segmentDescriptor{
 	//tipo segmento segmento; No iría algo de esto???

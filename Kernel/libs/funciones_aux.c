@@ -73,8 +73,8 @@ void log_error_socket(void){
 */
 int posicion_Variable_Global(char* variable){
 	int pos=0;
-	for(pos=0;configuracion_kernel.var_globales[pos]!=NULL;pos++){
-		if(strcmp(variable,configuracion_kernel.var_globales[pos])==0){
+	for(pos=0;configuracion_kernel.var_globales.identificador[pos]!=NULL;pos++){
+		if(strcmp(variable,configuracion_kernel.var_globales.identificador[pos])==0){
 			return pos;
 		}
 	}
@@ -92,18 +92,18 @@ void aceptarConexionEntrante(epoll_data_t data){
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int n,i,j;
-	char* buffer;
-	void** buff;
+	t_struct_pidycodigo* buffer;
+	void* buff;
 	for(n=0;n<60;n++){
 		if(fds_conectados_programas[n]!=NULL){
 			i=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(i,(void*)&buffer, (void*)&buff);
+			j=socket_recibir(i,&buffer, &buff);
 			if(j==1){
-				printf("%d \n", j);
-				return;
+				t_struct_pidycodigo* sarasa = (t_struct_pidycodigo*)buff;
+				printf("Todo bien\n");
 			}
 		}else{
-			perror("No se pueden conectar más programas");
+			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");
 		}
 
 	}

@@ -67,7 +67,7 @@ void inicializarColas(void){
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
-	int control = lstat(PATH, &file_info);
+	int control = lstat(PATH_config, &file_info);
 	if (control == -1){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
@@ -78,7 +78,7 @@ void inicializarConfiguracion(void){
 }
 
 void leerConfiguracion(void){
-	t_config* config=config_create(PATH);
+	t_config* config=config_create(PATH_config);
 
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
 	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de los CPUs");
@@ -91,8 +91,8 @@ void leerConfiguracion(void){
 	configuracion_kernel.retardo_hio = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.id_hio);
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
-	configuracion_kernel.var_globales = config_get_array_value(config,"Variables globales");
-	valor_var_globales = vector_num(NULL, configuracion_kernel.var_globales);
+	configuracion_kernel.var_globales.identificador = config_get_array_value(config,"Variables globales");
+	configuracion_kernel.var_globales.valor = vector_num(NULL, configuracion_kernel.var_globales.identificador);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
 	}
@@ -121,8 +121,8 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	printf("Puerto UMV: %d\n", configuracion_kernel.puerto_umv);
 	
 	printf("Variables globales: ");
-	for(i=0;configuracion_kernel.var_globales[i]!=NULL;i++){
-		printf("\n%s (%d) ", configuracion_kernel.var_globales[i], valor_var_globales[i]);
+	for(i=0;configuracion_kernel.var_globales.identificador[i]!=NULL;i++){
+		printf("\n%s (%d) ", configuracion_kernel.var_globales.identificador[i], configuracion_kernel.var_globales.valor[i]);
 	}
 
 
@@ -234,6 +234,7 @@ void core_conexion_plp_programas(void){
 
 	struct epoll_event event;
 	struct epoll_event* events;
+	programas = malloc(MAX_EVENTS_EPOLL*sizeof(t_programa));
 
 	fds_conectados_programas = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
@@ -242,7 +243,6 @@ void core_conexion_plp_programas(void){
 	event.events=EPOLLIN|EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_programas;
-
 	while(1){
 		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		printf("epoll programas = %d\n", i);
@@ -254,8 +254,14 @@ void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
 		printf("Conectado a la UMV\n");
 	}
-
-
+	int* i;
+	int k=5;
+	i=&k;
+	printf("el valor que se manda es %d\n", k);
+	int j=socket_enviar(sock_umv, D_STRUCT_NUMERO, i);
+	if(j==1){
+		printf("Se envio bien el paquete\n");
+	}
 	return;
 }
 
@@ -277,6 +283,16 @@ void core_conexion_pcp_cpu(void){
 //		printf("epoll cpu = %d \n", i);
 		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		printf("epoll cpu= %d \n", i);
+	}
+
+	//int* tipoRecibido;
+	t_tipoEstructura tipoRecibido = D_STRUCT_NUMERO;
+	void* structRecibida;
+	int j=socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
+	if(j==1){
+	printf("Se recibio envio bien el paquete\n");
+	int* k = ((int*)structRecibida);
+	printf("%d\n", *k);
 	}
 
 	return;

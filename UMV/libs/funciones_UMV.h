@@ -38,11 +38,12 @@ extern char* PATH;
 extern int tamanioMP;
 extern int procesoEnUso;
 extern tablaSeg* tablaDeSegmentos;
-extern int sock_kernel;
+extern int sock_kernel_servidor;
 extern int sock_cpu;
 extern int retardo;
 extern int* procesosActivos;
 extern int gradoDeMultiprogramacion;
+
 
 /*Prototipos de funciones auxiliares*/
 
@@ -64,6 +65,7 @@ int escogerUbicacionW(int tamanio);
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
+
 
 /*Operaciones de Consola*/
 void algoritmo(void);

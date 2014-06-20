@@ -1,0 +1,70 @@
+/*
+ * crear_estructuras.c
+ *
+ *  Created on: 20/06/2014
+ *      Author: utnso
+ */
+
+#include "crear_estructuras.h"
+
+t_struct_pushear* crear_struct_pushear(uint32_t posicion, int32_t valor) {
+	t_struct_pushear* estructura = malloc(sizeof(t_struct_pushear));
+	estructura->posicion=posicion;
+	estructura->valor = valor;
+	return estructura;
+}
+
+void socket_and_push(int sockAjeno, int posicion, int id) {
+	t_struct_pushear* estructura = crear_struct_pushear(posicion,id);
+	socket_enviar(sockAjeno, D_STRUCT_PUSH, estructura);
+	free(estructura);
+}
+
+t_struct_pop* crear_struct_pop(uint32_t posicion){
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion = posicion;
+	return estructura;
+}
+
+void socket_and_pop_position(int sockAjeno,int posicion){
+	t_struct_pop* estructura = crear_struct_pop(posicion);
+	socket_enviar(sockAjeno, D_STRUCT_POP, estructura);
+	free(estructura);
+}
+
+t_struct_modificar_top_index* crear_struct_modificar_top_index(int top_index){
+	t_struct_modificar_top_index* estructura = malloc(sizeof(t_struct_modificar_top_index));
+	estructura->posicion = top_index;
+	return estructura;
+}
+
+void socket_and_modificar_top_index(int sockAjeno,int top_index){
+	t_struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
+	socket_enviar(sockAjeno, D_STRUCT_MODIFICARTOPINDEX, estructura);
+	free(estructura);
+}
+
+t_struct_string* crear_struct_string(char* string){
+	t_struct_string* estructura = malloc(sizeof(t_struct_string));
+	estructura->string = string;
+	return estructura;
+}
+
+void socket_and_string(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_STRING, estructura);
+	free(estructura);
+}
+
+void* socket_recibir_estructura(int sockAjeno){
+	void* estructura;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockAjeno,&tipoRecibido,&structRecibida);
+	if(j==1){
+	estructura = ((t_struct_pushear*)structRecibida);}
+	else {
+		perror("No se pudo recibir");
+	}
+	return estructura;
+}

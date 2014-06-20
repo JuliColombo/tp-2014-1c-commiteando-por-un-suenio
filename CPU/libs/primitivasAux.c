@@ -13,8 +13,9 @@ int sockfd;
 int sockUMV;
 int top_index;
 
+/*
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
-	char* indice = malloc(etiquetas_size+1);
+	char* indice;
 	//tendria que aclararle a la umv que es para generar el indice
 
 	t_estructura tipo = STRUCT_STRING;
@@ -22,14 +23,12 @@ char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	socket_recibir(sockUMV,&tipo, estructura2);
 	struct_string** estructuraAux = (struct_string**)estructura2;
 
-	indice = (*estructuraAux)->string;
-
-	free(estructura2);
-	free(estructuraAux);
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	indice = estructura->string
 
 	return indice;
 
-}
+}*/
 
 
 t_puntero calcularPosicionAsignacionCPU(int top_index) {
@@ -102,7 +101,7 @@ void reservarContextoConRetorno(){
  * Invoco esta funcion tantas veces como el tamaño del contexto sea.
  */
 
-void guardarAlternado () {
+/*void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
 	socket_enviar(sockUMV,STRUCT_MODIFICAR_TOP_INDEX,estructura);
@@ -212,5 +211,5 @@ void volverAContextoAnterior() {
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
-}
+}*/
 
