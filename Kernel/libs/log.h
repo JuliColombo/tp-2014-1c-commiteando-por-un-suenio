@@ -24,7 +24,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/timeb.h>
-#define PATHLOG "/home/utnso/git/tp-2014-1c-commiteando-por-un-suenio"
+#define PATHLOG "/home/utnso/tp-2014-1c-commiteando-por-un-suenio"
 
 
 
