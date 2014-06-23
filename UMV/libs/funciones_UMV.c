@@ -102,7 +102,7 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	int segmentoBase = ubicarEnTabla(base);
 	int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP + offset;
 	while (i < longitud){
-		t_buffer[i]= MP[posicionReal];
+		buffer[i]= MP[posicionReal];
 		posicionReal++;
 		i++;
 	}
@@ -248,7 +248,7 @@ void compactar(){/*
 				a++;
 			}
 
-			//tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
+			tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
 			sigSegmento= sigSegmento+tamanio+1;
 			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
 		}
@@ -274,7 +274,7 @@ void compactar(){/*
 				listaAux2.elements_count= contador2;
 				int tamanioSegmentosi = list_size(listaAux2);
 
-				while(j < tamanioDeSegmentosi){ //Recorro sus segmentos
+				while(j < tamanioSegmentosi){ //Recorro sus segmentos
 					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP== ubicacion){ //Cargo en el de datos y return eso si es asi
 						datos.posicion= i;
 						datos.numSegDesc= j;
@@ -715,7 +715,7 @@ void *consola (void){
 					  puts("\n Ingrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  solicitarDesdePosicionDeMemoria(unaBase,unOffset,unTamanio);
+					  solicitarBytes(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
@@ -734,7 +734,7 @@ void *consola (void){
 				if(strcmp(tipoOperacion, "crear") == 0){
 					  puts("Ingrese el tamaño del segmento");
 					  int tamanio;
-					  gets("%d",tamanio);
+					  scanf("%d",tamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  crearSegmentoPrograma(procesoDelHilo,tamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
@@ -796,17 +796,18 @@ void *consola (void){
 			}
 
 }
-
+}
 void matarHilos(void){
 	pthread_cancel(CPU);
 	pthread_cancel(KERNEL);
 
 }
 
-void destruirTodosLosSegmentos(void){
-	return;
-}
+void destruirTodosLosSegmentos(void){/*
+	int i=sizeof(tablaDeSegmentos);
 
+	return;*/
+}
 
 
 
