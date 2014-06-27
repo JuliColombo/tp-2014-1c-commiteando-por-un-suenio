@@ -4,20 +4,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Test.c \
-../tests-primitivas.c 
+../libs/PrimitivasEnTest.c \
+../libs/funcionesAux.c \
+../libs/stack.c 
 
 OBJS += \
-./Test.o \
-./tests-primitivas.o 
+./libs/PrimitivasEnTest.o \
+./libs/funcionesAux.o \
+./libs/stack.o 
 
 C_DEPS += \
-./Test.d \
-./tests-primitivas.d 
+./libs/PrimitivasEnTest.d \
+./libs/funcionesAux.d \
+./libs/stack.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-%.o: ../%.c
+libs/%.o: ../libs/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"

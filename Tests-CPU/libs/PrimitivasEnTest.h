@@ -11,9 +11,10 @@
 #include "commons/collections/dictionary.h"
 #include "stack.h"
 #include "parser/metadata_program.h"
+#include "funcionesAux.h"
 #include <stdint.h>
 
-typedef unsigned int t_pid;
+/*typedef unsigned int t_pid;
 typedef int* t_segmento_codigo;
 typedef int* t_segmento_stack;
 typedef int* t_cursor_stack;
@@ -33,7 +34,7 @@ typedef struct struct_pcb{
 		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
-} t_struct_pcb;
+} t_struct_pcb;*/
 
 extern int top_index;
 t_stack* pila;
@@ -44,10 +45,10 @@ t_intructions* indiceCodigo;
 char* proximaInstruccion;
 t_struct_pcb pcb;
 
-typedef struct{
+/*typedef struct{
 	char* name;
 	t_puntero pos;
-}t_elemento;
+}t_elemento;*/
 
 void reservarContextoSinRetorno();
 int esPrimerContexto();

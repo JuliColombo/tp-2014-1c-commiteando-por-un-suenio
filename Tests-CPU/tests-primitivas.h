@@ -11,7 +11,7 @@
 #include "CUnit/Basic.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "PrimitivasEnTest.h"
+#include "libs/PrimitivasEnTest.h"
 #include "Test.h"
 
 t_stack* pila;

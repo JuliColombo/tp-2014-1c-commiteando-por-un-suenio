@@ -76,8 +76,6 @@ int limpiarConIndices() {
 	free(indiceEtiquetas);
 	free(indiceCodigo);
 	free(proximaInstruccion);
-	/*free(pcb.c_stack);
-	free(pcb.stack);*/
 
 	return 0;
 }
@@ -92,8 +90,6 @@ void crearPrograma () {
 	memcpy(indiceEtiquetas,datos->etiquetas,datos->etiquetas_size);
 
 	memcpy(indiceCodigo,datos->instrucciones_serializado,300);
-
-	//crearPcb(datos);
 
 	free(datos->etiquetas);
 	free(datos->instrucciones_serializado);
