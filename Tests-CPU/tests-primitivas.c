@@ -35,6 +35,9 @@ void testDefinirVariable(){
 	CU_ASSERT_EQUAL(pila->elementos[4],'c');
 	CU_ASSERT_EQUAL(top_index,4);
 	CU_ASSERT_FALSE(dictionary_is_empty(diccionario));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "b"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "c"));
 }
 
 void testObtenerPosicionVariable(){
@@ -113,8 +116,6 @@ void testLlamarConRetorno() {
 	definirVariable('a');
 	definirVariable('b');
 	asignar(0,5);
-	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 2);
-	CU_ASSERT_EQUAL(*pcb.c_stack, 0);
 
 	llamarConRetorno("doble",obtenerPosicionVariable('b'));
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
@@ -152,6 +153,7 @@ void testFinalizar() {
 
 	llamarSinRetorno("doble");
 	definirVariable('b');
+	asignar(7,2048);
 
 	finalizar();
 
@@ -169,3 +171,38 @@ void testFinalizar() {
 	}
 
 
+void testRetornar() {
+	crearPcb();
+
+	definirVariable('a');
+	asignar(0,5);
+	definirVariable('c');
+	asignar(2,-19);
+	definirVariable('d');
+
+	llamarConRetorno("doble",obtenerPosicionVariable('d'));
+	definirVariable('b');
+	asignar(8,2048);
+
+	retornar(33);
+
+	CU_ASSERT_EQUAL(top_index,5);
+	CU_ASSERT_EQUAL(pila->top_index,top_index);
+
+	CU_ASSERT_EQUAL(dictionary_size(diccionario),3);
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "c"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "d"));
+	CU_ASSERT_FALSE(dictionary_has_key(diccionario, "b"));
+
+	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 3);
+	CU_ASSERT_EQUAL(*pcb.c_stack,0);
+
+	definirVariable('z');
+	asignar(5,1024);
+
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "z"));
+	CU_ASSERT_EQUAL(dictionary_size(diccionario),4);
+	CU_ASSERT_EQUAL(pila->elementos[6],1024);
+
+}

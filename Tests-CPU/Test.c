@@ -32,6 +32,9 @@ int main() {
 	CU_pSuite prueba6 = CU_add_suite("Suite de prueba 6",inicializarConIndices, limpiarConIndices);
 	CU_add_test(prueba6,"finalizar", testFinalizar);
 
+	CU_pSuite prueba7 = CU_add_suite("Suite de prueba 7",inicializarConIndices, limpiarConIndices);
+	CU_add_test(prueba7,"retornar", testRetornar);
+
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();

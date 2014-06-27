@@ -72,7 +72,7 @@ void elemento_delete(t_elemento* elemento) {
 	free(elemento);
 }
 
-/******************** RECUPERAR CONTEXTO ***********************/
+/******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {
 	//socket_and_modificar_top_index (sockUMV,*(pcb.c_stack)-1);
@@ -80,8 +80,6 @@ void recuperarPosicionDeDirecciones() {
 
 	//Esto va
 	top_index = *pcb.c_stack -1;
-
-	printf("empiezo a popear en posicion %d\n",top_index);
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
@@ -93,8 +91,6 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 	top_index -= 1;
 	pila->top_index = top_index;
 
-	printf("el program_counter tiene que valer %d\n", *program_counter);
-	printf("sigo popeando en posicion %d\n",top_index);
 }
 
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
@@ -106,8 +102,6 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 	top_index -= 1;
 	pila->top_index = top_index;
 
-	printf("el cursor_stack_viejo tiene que valer %d\n", *cursor_stack_viejo);
-	printf("dejo de popear y estoy en posicion %d\n",top_index);
 }
 
 void volverAContextoAnterior(t_puntero* c_stack_viejo) {
@@ -116,8 +110,6 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo) {
 	recuperarProgramCounter(&program_counter);
 	recuperarCursorAnterior(c_stack_viejo);
 
-	printf("el pc %d\n", program_counter);
-	printf("el c_stack_viejo %d\n", *c_stack_viejo);
 	//Socket de UMV para que yo actualice el top_index
 
 	pcb.program_counter = program_counter;
@@ -137,7 +129,7 @@ void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	//socket_and_modificar_top_index(sockUMV,top_index);
 	pila->top_index = top_index;
-	printf("en guardarAlternado, el top_index vale = %d\n",pila->top_index);
+
 	//Socket a UMV para que haga TOP(pila)
 	//socket_enviarSignal(sockUMV, TOP);
 
@@ -160,7 +152,7 @@ void guardarAlternado () {
 void regenerarDiccionario(int tamanio_contexto) {
 	int i = 0;
 	int top = top_index;
-	printf("top index vale %d \n",top);
+
 	top_index -=1;
 	while (i < tamanio_contexto) {
 		guardarAlternado();
@@ -173,7 +165,7 @@ void regenerarDiccionario(int tamanio_contexto) {
 	top_index = top;
 	pila->top_index = top;
 
-	printf("despues de regenerar el diccionario, el top index vale %d \n",top_index);
+	pcb.tamanio_contexto = tamanio_contexto;
 
 }
 
@@ -184,6 +176,14 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
 	int enteraDeDif = (int)dif;
 
 	return enteraDeDif; //Divido esa cantidad de bytes por 5 (1 byte de id de variable, y 4 bytes del valor) para saber cuantas variables habia.
+}
+
+
+/******************** RECUPERAR CONTEXTO CON RETORNO***********************/
+void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
+	*direccion_retorno = pila->elementos[top_index];
+	top_index -= 1;
+	pila->top_index = top_index;
 }
 
 
@@ -312,7 +312,6 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	esConRetorno = 0;
 
-	printf("program_counter de la etiqueta llamada vale %d\n",pcb.program_counter);
 	//Meto eso en analizador_de_linea... para invocar al parser
 	//analizadorLinea(string,funciones_parser, funciones_kernel);
 
@@ -367,12 +366,34 @@ void finalizar() {
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
 	*pcb.c_stack = c_stack_viejo;
-	pcb.tamanio_contexto = 3;
 
 	regenerarDiccionario(tamanio);
 
 	if(*pcb.c_stack == *pcb.stack) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
-		printf("llegamos al if! \n");
+		printf("\n\nllegamos al if!\n\n");
 	}
+}
+
+/************************************************** RETORNAR **********************************************************/
+
+void retornar(t_valor_variable retorno) {
+	recuperarPosicionDeDirecciones();
+
+	t_puntero direccionRetorno;
+	recuperarDireccionRetorno(&direccionRetorno);
+
+	t_puntero c_stack_viejo;
+	volverAContextoAnterior(&c_stack_viejo);
+
+	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
+
+	*pcb.c_stack = c_stack_viejo;
+
+	regenerarDiccionario(tamanio);
+
+	//socket_and_push(sockUMV,direccionRetorno+1,retorno);
+	PUSH_POSITION (&retorno,pila,direccionRetorno + 1);
+
+	esConRetorno = 0;
 }

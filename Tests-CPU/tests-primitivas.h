@@ -23,14 +23,16 @@ extern t_struct_pcb pcb;
 void crearPcb();
 void liberarPcb();
 
+void testReservarSinRetorno();
+
 void testDefinirVariable();
 void testObtenerPosicionVariable();
 void testAsignar();
 void testDesreferenciar();
 void testIrALabel();
 void testLlamarSinRetorno();
-void testReservarSinRetorno();
 void testLlamarConRetorno();
 void testFinalizar();
+void testRetornar();
 
 #endif /* TESTS_PRIMITIVAS_H_ */

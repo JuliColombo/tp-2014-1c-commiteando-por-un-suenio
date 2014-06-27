@@ -63,5 +63,6 @@ void irAlLabel(t_nombre_etiqueta etiqueta);
 void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 void finalizar();
+void retornar();
 
 #endif /* PRIMITIVASENTEST_H_ */
