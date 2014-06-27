@@ -6,6 +6,7 @@
  */
 
 #include "tests-primitivas.h"
+int esConRetorno;
 
 void crearPcb() {
 	pcb.pid = 4;
@@ -19,6 +20,8 @@ void crearPcb() {
 	pcb.program_counter = 0;
 	pcb.tamanio_contexto = 0;
 	pcb.tamanio_indice = 50;
+
+	esConRetorno = 0;
 }
 
 
@@ -126,39 +129,43 @@ void testLlamarConRetorno() {
 	definirVariable('a');
 	definirVariable('b');
 	asignar(7,19);
+
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "b"));
 	CU_ASSERT_EQUAL(pila->elementos[7],'a');
 	CU_ASSERT_EQUAL(pila->elementos[9],'b');
 	CU_ASSERT_EQUAL(pila->elementos[8],19);
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 2);
 	CU_ASSERT_EQUAL(*pcb.c_stack,7);
 	CU_ASSERT_EQUAL(pila->top_index,top_index);
+	esConRetorno = 0;
 }
 
 void testFinalizar() {
 	crearPcb();
 	definirVariable('a');
-	definirVariable('b');
 	asignar(0,5);
-	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 2);
-	CU_ASSERT_EQUAL(*pcb.c_stack, 0);
+	definirVariable('c');
+	asignar(2,-19);
+	definirVariable('d');
+	asignar(4,2048);
 
-	llamarConRetorno("doble",obtenerPosicionVariable('b'));
-	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
-	CU_ASSERT_EQUAL(pcb.program_counter, 5);
-	CU_ASSERT_EQUAL(*pcb.c_stack, 7);
-	CU_ASSERT_EQUAL(pila->elementos[4],0);
-	CU_ASSERT_EQUAL(pila->elementos[5],4);
-	CU_ASSERT_EQUAL(pila->elementos[6],2);
-	CU_ASSERT_EQUAL(pila->top_index,6);
-	CU_ASSERT_STRING_EQUAL(proximaInstruccion," variables f \n");
-
-	definirVariable('a');
+	llamarSinRetorno("doble");
 	definirVariable('b');
-	asignar(7,19);
-	CU_ASSERT_EQUAL(pila->elementos[7],'a');
-	CU_ASSERT_EQUAL(pila->elementos[9],'b');
-	CU_ASSERT_EQUAL(pila->elementos[8],19);
-	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 2);
-	CU_ASSERT_EQUAL(*pcb.c_stack,7);
+
+	finalizar();
+
+	CU_ASSERT_EQUAL(top_index,5);
 	CU_ASSERT_EQUAL(pila->top_index,top_index);
-}
+
+	CU_ASSERT_EQUAL(dictionary_size(diccionario),3);
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "c"));
+	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "d"));
+	CU_ASSERT_FALSE(dictionary_has_key(diccionario, "b"));
+
+	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 3);
+	CU_ASSERT_EQUAL(*pcb.c_stack,0);
+	}
+
+

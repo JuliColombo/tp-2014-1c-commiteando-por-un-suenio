@@ -54,7 +54,6 @@ int esPrimerContexto();
 void regenerarDiccionario(int tamanio_contexto);
 void volverAContextoAnterior(t_puntero* c_stack_viejo);
 void recuperarPosicionDeDirecciones();
-t_puntero calcularTamanioContextoAnterior(t_puntero direccion_contexto_actual);
 
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
