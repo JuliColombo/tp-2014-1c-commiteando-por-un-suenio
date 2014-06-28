@@ -75,7 +75,7 @@ void testIrALabel(){
 	crearPcb();
 	irAlLabel("doble");
 
-	CU_ASSERT_EQUAL(pcb.program_counter, 5);
+	CU_ASSERT_EQUAL(pcb.program_counter, 4);
 	CU_ASSERT_STRING_EQUAL(proximaInstruccion," variables f \n");
 
 }
@@ -104,7 +104,7 @@ void testLlamarSinRetorno() {
 
 	llamarSinRetorno("doble");
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
-	CU_ASSERT_EQUAL(pcb.program_counter, 5);
+	CU_ASSERT_EQUAL(pcb.program_counter, 4);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 4);
 	CU_ASSERT_EQUAL(pila->top_index,top_index);
 	CU_ASSERT_STRING_EQUAL(proximaInstruccion," variables f \n");
@@ -119,7 +119,7 @@ void testLlamarConRetorno() {
 
 	llamarConRetorno("doble",obtenerPosicionVariable('b'));
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
-	CU_ASSERT_EQUAL(pcb.program_counter, 5);
+	CU_ASSERT_EQUAL(pcb.program_counter, 4);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 7);
 	CU_ASSERT_EQUAL(pila->elementos[4],0);
 	CU_ASSERT_EQUAL(pila->elementos[5],4);
@@ -205,4 +205,14 @@ void testRetornar() {
 	CU_ASSERT_EQUAL(dictionary_size(diccionario),4);
 	CU_ASSERT_EQUAL(pila->elementos[6],1024);
 
+}
+
+void testIntegracion(){
+	crearPcb();
+	integracion();
+
+	CU_ASSERT_EQUAL(pila->elementos[0],'a');
+	CU_ASSERT_EQUAL(pila->elementos[1],17);
+	CU_ASSERT_EQUAL(pila->elementos[2],'b');
+	CU_ASSERT_EQUAL(pila->elementos[3],5);
 }

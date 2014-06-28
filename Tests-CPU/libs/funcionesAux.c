@@ -71,6 +71,42 @@ void elemento_delete(t_elemento* elemento) {
 	free(elemento);
 }
 
+
+/******************************************** RESERVAR CONTEXTO ***********************************************************/
+void reservarContextoSinRetorno() {
+	int cursor = *(pcb.c_stack);
+
+	t_puntero posicionContextoViejo;
+	posicionContextoViejo = calcularPosicionAsignacion(top_index);
+
+	//Pushear cursor de stack
+	PUSH_POSITION(&cursor,pila,posicionContextoViejo);
+	top_index = posicionContextoViejo +1;
+
+	//Pushear Program Counter de proxima instruccion:
+	pcb.program_counter +=1;
+	int pc = pcb.program_counter;
+
+	PUSH_POSITION(&pc,pila,top_index);
+
+	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
+	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+
+}
+
+void reservarContextoConRetorno(t_puntero donde_retornar){
+
+	int retornar = donde_retornar;
+	reservarContextoSinRetorno();
+
+	top_index += 1;
+
+	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
+	PUSH_POSITION(&retornar,pila,top_index);
+
+	esConRetorno = 1;
+}
+
 /******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {

@@ -8,6 +8,20 @@
 #include "PrimitivasEnTest.h"
 int esConRetorno = 0;
 
+AnSISOP_funciones funciones_parser = {
+			.AnSISOP_definirVariable		= definirVariable,
+			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariable,
+			.AnSISOP_dereferenciar			= dereferenciar,
+			.AnSISOP_asignar				= asignar,
+			.AnSISOP_finalizar				= finalizar,
+			.AnSISOP_irAlLabel				= irAlLabel,
+			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
+			.AnSISOP_llamarConRetorno		= llamarConRetorno,
+			.AnSISOP_retornar				= retornar,
+
+};
+AnSISOP_kernel funciones_kernel = { };
+
 /**************************************** DEFINIR VARIABLE ***************************************************/
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
@@ -27,6 +41,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	pcb.program_counter +=1;
 	pcb.tamanio_contexto += 1;
 
+	printf("\ndefinir variable %c\n",identificador_variable);
+
 	return posicion;
 }
 
@@ -40,6 +56,8 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 	} else {
 		posicion = -1;
 	}
+
+	printf("\n\nobtener posicion de %c\n\n",identificador_variable);
 
 	return posicion;
 
@@ -61,6 +79,8 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	}
 
 	pcb.program_counter += 1;
+
+	printf("\n\nasignar %d a %d\n\n",valor,direccion_variable);
 }
 
 /****************************************** DESREFERENCIAR ********************************************************/
@@ -89,28 +109,6 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 }
 
 /*************************************** LLAMAR SIN RETORNO *******************************************************/
-void reservarContextoSinRetorno() {
-	int cursor = *(pcb.c_stack);
-
-	t_puntero posicionContextoViejo;
-	posicionContextoViejo = calcularPosicionAsignacion(top_index);
-
-	//Pushear cursor de stack
-	PUSH_POSITION(&cursor,pila,posicionContextoViejo);
-	top_index = posicionContextoViejo +1;
-
-	//Pushear Program Counter de proxima instruccion:
-	pcb.program_counter +=1;
-	int pc = pcb.program_counter;
-
-	PUSH_POSITION(&pc,pila,top_index);
-
-	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
-	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
-
-}
-
-
 void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	reservarContextoSinRetorno();
@@ -139,20 +137,6 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 }
 
 /******************************************* LLAMAR CON RETORNO **************************************************/
-void reservarContextoConRetorno(t_puntero donde_retornar){
-
-	int retornar = donde_retornar;
-	reservarContextoSinRetorno();
-
-	top_index += 1;
-
-	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-	PUSH_POSITION(&retornar,pila,top_index);
-
-	esConRetorno = 1;
-}
-
-
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno(donde_retornar);
@@ -179,7 +163,10 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 /**************************************************** FINALIZAR *******************************************************/
 void finalizar() {
+
 	t_puntero c_stack_viejo;
+
+	if(!esPrimerContexto()) {
 
 	recuperarPosicionDeDirecciones();
 	volverAContextoAnterior(&c_stack_viejo);
@@ -189,6 +176,7 @@ void finalizar() {
 	*pcb.c_stack = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
+	}
 
 	if(esPrimerContexto()) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
@@ -217,4 +205,27 @@ void retornar(t_valor_variable retorno) {
 	PUSH_POSITION (&retorno,pila,direccionRetorno + 1);
 
 	esConRetorno = 0;
+}
+
+/***********************************************************************************************************************/
+/************************************************ INTEGRACION **********************************************************/
+/***********************************************************************************************************************/
+
+void parsear(){
+	t_intructions inst = indiceCodigo[pcb.program_counter];
+
+	buscarEnSegmentoCodigo(inst);
+
+	printf("la proxima instruccion es: %s\n", proximaInstruccion);
+
+	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
+
+}
+
+void integracion() {
+	parsear();
+	parsear();
+	parsear();
+	parsear();
+
 }

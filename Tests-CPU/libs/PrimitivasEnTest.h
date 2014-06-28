@@ -11,6 +11,7 @@
 #include "commons/collections/dictionary.h"
 #include "stack.h"
 #include "parser/metadata_program.h"
+#include "parser/parser.h"
 #include "funcionesAux.h"
 #include <stdint.h>
 
@@ -40,6 +41,7 @@ extern int top_index;
 t_stack* pila;
 t_dictionary* diccionario;
 char* indiceEtiquetas;
+char* indiceEtiquetasBis;
 char* segmentoCodigo;
 t_intructions* indiceCodigo;
 char* proximaInstruccion;
@@ -65,5 +67,9 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 void finalizar();
 void retornar();
+void integracion();
+
+/*AnSISOP_kernel funciones_kernel;
+AnSISOP_funciones funciones_parser;*/
 
 #endif /* PRIMITIVASENTEST_H_ */

@@ -66,6 +66,8 @@ void guardarAlternado ();
 void regenerarDiccionario(int tamanio_contexto);
 uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo);
 void recuperarDireccionRetorno(t_puntero* direccion_retorno);
+void reservarContextoSinRetorno();
+void reservarContextoConRetorno(t_puntero donde_retornar);
 
 
 #endif /* FUNCIONESAUX_H_ */

@@ -18,7 +18,7 @@ int main() {
 
 
 	CU_pSuite prueba2 = CU_add_suite("Suite de prueba 2",inicializarConIndices, limpiarConIndices);
-	CU_add_test(prueba2,"irAlLabel",testIrALabel);
+	CU_add_test(prueba2,"ir al label",testIrALabel);
 
 	CU_pSuite prueba3 = CU_add_suite("Suite de prueba 3",inicializarConIndices, limpiarConIndices);
 	CU_add_test(prueba3,"reservar sin retorno",testReservarSinRetorno);
@@ -34,6 +34,9 @@ int main() {
 
 	CU_pSuite prueba7 = CU_add_suite("Suite de prueba 7",inicializarConIndices, limpiarConIndices);
 	CU_add_test(prueba7,"retornar", testRetornar);
+
+	CU_pSuite prueba8 = CU_add_suite("Suite de prueba 8",inicializarConIndices2, limpiarConIndices2);
+	CU_add_test(prueba8,"integracion", testIntegracion);
 
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
@@ -62,6 +65,18 @@ int inicializarConIndices() {
 	return 0;
 }
 
+int inicializarConIndices2() {
+	pila = CREATE_STACK(100);
+	top_index = pila->top_index;
+	proximaInstruccion = malloc(50);
+	indiceEtiquetasBis=malloc(1000);
+	indiceCodigo = malloc(500);
+
+	crearPrograma2();
+
+	return 0;
+}
+
 int limpiar() {
 	DESTROY_STACK(pila);
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -80,9 +95,40 @@ int limpiarConIndices() {
 	return 0;
 }
 
+int limpiarConIndices2() {
+	DESTROY_STACK(pila);
+	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+	free(segmentoCodigo);
+	free(indiceEtiquetasBis);
+	free(indiceCodigo);
+	free(proximaInstruccion);
+
+	return 0;
+}
+
 void crearPrograma () {
-	segmentoCodigo = malloc(400);
-	strcpy(segmentoCodigo,"begin \n # primero declaro las variables \n variables a, b \n a = 20 \n a <- doble\n print a \n end \n function doble\n variables f \n f = $0 + $ 0\n return f \n end\n");
+	char* str = "# primero declaro las variables \n begin \n variables a, b\n a = 20 \n b <- doble a \n end \n function doble \n variables f \n f = $0 + $ 0 \n return f \n end\n";
+	segmentoCodigo = malloc(strlen(str));
+	strcpy(segmentoCodigo,str);
+	//strcpy(segmentoCodigo,"begin \n # primero declaro las variables \n variables a, b \n a = 20 \n end\n");
+
+	t_medatada_program *datos;
+	datos = metadatada_desde_literal(segmentoCodigo);
+
+	memcpy(indiceEtiquetas,datos->etiquetas,datos->etiquetas_size);
+
+	memcpy(indiceCodigo,datos->instrucciones_serializado,300);
+
+	free(datos->etiquetas);
+	free(datos->instrucciones_serializado);
+	free(datos);
+}
+
+void crearPrograma2 (){
+	char* str = "#!/usr/bin/ansisop \nbegin \n	variables a, b \n	a = 3 \n	b = 5 \n 	a = b + 12 \n end \n";
+	segmentoCodigo = malloc(strlen(str));
+	//strcpy(segmentoCodigo,"begin \n # primero declaro las variables \n variables a, b \n a = 20 \n a <- doble\n print a \n end \n function doble\n variables f \n f = $0 + $ 0\n return f \n end\n");
+	strcpy(segmentoCodigo,str);
 
 	t_medatada_program *datos;
 	datos = metadatada_desde_literal(segmentoCodigo);
