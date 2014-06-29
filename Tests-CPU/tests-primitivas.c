@@ -41,9 +41,9 @@ void testDefinirVariable(){
 }
 
 void testObtenerPosicionVariable(){
-	int pos1 = obtenerPosicionVariable('a');
-	int pos2 = obtenerPosicionVariable('b');
-	int pos3 = obtenerPosicionVariable('c');
+	int pos1 = obtenerPosicionVariableTest('a');
+	int pos2 = obtenerPosicionVariableTest('b');
+	int pos3 = obtenerPosicionVariableTest('c');
 	CU_ASSERT_EQUAL(pos1, 0);
 	CU_ASSERT_EQUAL(pos2, 2);
 	CU_ASSERT_EQUAL(pos3, 4);
@@ -85,10 +85,10 @@ void testReservarSinRetorno() {
 	definirVariableTest('a');
 	reservarContextoSinRetorno();
 
-	CU_ASSERT_EQUAL(pcb.program_counter, 2);
+	CU_ASSERT_EQUAL(pcb.program_counter, 0);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 0);
 	CU_ASSERT_EQUAL(pila->elementos[2],0);
-	CU_ASSERT_EQUAL(pila->elementos[3],2);
+	CU_ASSERT_EQUAL(pila->elementos[3],1);
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 1);
 	CU_ASSERT_EQUAL(pila->top_index,top_index);
 	CU_ASSERT_TRUE(dictionary_is_empty(diccionario));
@@ -117,12 +117,12 @@ void testLlamarConRetorno() {
 	definirVariableTest('b');
 	asignarTest(0,5);
 
-	llamarConRetornoTest("doble",obtenerPosicionVariable('b'));
+	llamarConRetornoTest("doble",obtenerPosicionVariableTest('b'));
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
 	CU_ASSERT_EQUAL(pcb.program_counter, 4);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 7);
 	CU_ASSERT_EQUAL(pila->elementos[4],0);
-	CU_ASSERT_EQUAL(pila->elementos[5],4);
+	CU_ASSERT_EQUAL(pila->elementos[5],1);
 	CU_ASSERT_EQUAL(pila->elementos[6],2);
 	CU_ASSERT_EQUAL(pila->top_index,6);
 	CU_ASSERT_STRING_EQUAL(proximaInstruccion," variables f \n");
@@ -180,7 +180,7 @@ void testRetornar() {
 	asignarTest(2,-19);
 	definirVariableTest('d');
 
-	llamarConRetornoTest("doble",obtenerPosicionVariable('d'));
+	llamarConRetornoTest("doble",obtenerPosicionVariableTest('d'));
 	definirVariableTest('b');
 	asignarTest(8,2048);
 
@@ -209,13 +209,13 @@ void testRetornar() {
 }
 
 void testIntegracionScriptFacil(){
-	/*crearPcb();
+	crearPcb();
 	integracionScriptFacil();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
 	CU_ASSERT_EQUAL(pila->elementos[1],17);
 	CU_ASSERT_EQUAL(pila->elementos[2],'b');
-	CU_ASSERT_EQUAL(pila->elementos[3],5);*/
+	CU_ASSERT_EQUAL(pila->elementos[3],5);
 }
 
 void testIntegracionConFuncionDoble() {

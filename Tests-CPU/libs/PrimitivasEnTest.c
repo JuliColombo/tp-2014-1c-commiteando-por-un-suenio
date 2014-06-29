@@ -9,25 +9,32 @@
 int esConRetorno = 0;
 
 AnSISOP_funciones funciones_parser = {
-			.AnSISOP_definirVariable		= definirVariable,
-			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariable,
+			.AnSISOP_definirVariable		= definirVariableTest,
+			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariableTest,
 			.AnSISOP_dereferenciar			= dereferenciar,
-			.AnSISOP_asignar				= asignar,
+			.AnSISOP_asignar				= asignarTest,
 			.AnSISOP_finalizar				= finalizar,
 			.AnSISOP_irAlLabel				= irAlLabel,
 			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
-			.AnSISOP_llamarConRetorno		= llamarConRetorno,
+			.AnSISOP_llamarConRetorno		= llamarConRetornoTest,
 			.AnSISOP_retornar				= retornar,
 
 };
 AnSISOP_kernel funciones_kernel = { };
 
-void parsear(){
+void proximaInst() {
+
 	t_intructions inst = indiceCodigo[pcb.program_counter];
+
+	pcb.program_counter += 1;
 
 	buscarEnSegmentoCodigo(inst);
 
-	printf("la proxima instruccion es: %s\n", proximaInstruccion);
+}
+
+void parsear(){
+
+	proximaInst();
 
 	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 
@@ -48,41 +55,13 @@ t_puntero definirVariableTest(t_nombre_variable identificador_variable) {
 	t_elemento* elem = elemento_create(str,posicion);
 	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
 
-
-	pcb.program_counter +=1;
 	pcb.tamanio_contexto += 1;
-
-	return posicion;
-}
-
-t_puntero definirVariable(t_nombre_variable identificador_variable) {
-	t_valor_variable id = identificador_variable;
-
-	t_puntero posicion = calcularPosicionAsignacion(top_index);
-
-	PUSH_POSITION (&id,pila,posicion);
-
-
-	top_index = pila->top_index;
-
-	const char* str=convertirAString(identificador_variable);
-	t_elemento* elem = elemento_create(str,posicion);
-	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
-
-
-	pcb.program_counter +=1;
-	pcb.tamanio_contexto += 1;
-
-	printf("\ndefinir variable %c en posicion %d",identificador_variable,posicion);
-
-	//LA DIFERENCIA CON definirVariableTest
-	parsear();
 
 	return posicion;
 }
 
 /********************************************* OBTENER POSICION **************************************************/
-t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
+t_puntero obtenerPosicionVariableTest(t_nombre_variable identificador_variable) {
 	t_puntero posicion = 0;
 	char* str = convertirAString(identificador_variable);
 	if(dictionary_has_key(diccionario,str)) {
@@ -96,15 +75,12 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 }
 
-
 /******************************************* ASIGNAR *************************************************************/
 void asignarTest(t_puntero direccion_variable, t_valor_variable valor) {
 	int top = top_index;
 
 	PUSH_POSITION (&valor,pila,direccion_variable+1);
 
-	printf("\nasignar %d a %d\n",valor,direccion_variable);
-
 	int posibleTop = direccion_variable + 1;
 
 	if(top < posibleTop){
@@ -113,28 +89,7 @@ void asignarTest(t_puntero direccion_variable, t_valor_variable valor) {
 		pila->top_index = top;
 	}
 
-	pcb.program_counter += 1;
-}
-
-void asignar(t_puntero direccion_variable, t_valor_variable valor) {
-	int top = top_index;
-
-	PUSH_POSITION (&valor,pila,direccion_variable+1);
-
-	printf("\nasignar %d a %d\n",valor,direccion_variable);
-
-	int posibleTop = direccion_variable + 1;
-
-	if(top < posibleTop){
-	top_index = posibleTop;} else {
-		top_index = top;
-		pila->top_index = top;
-	}
-
-	pcb.program_counter += 1;
-
-	//DIFERENCIA CON asignarTest
-	parsear();
+	//pcb.program_counter += 1;
 }
 
 /****************************************** DESREFERENCIAR ********************************************************/
@@ -215,32 +170,6 @@ void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) 
 	//analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 }
 
-void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-
-	reservarContextoConRetorno(donde_retornar);
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
-
-	int posicionAPushear = top_index +1;
-	//*pcb.c_stack = posicionAPushear;
-	*pcb.c_stack = posicionAPushear;
-
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,indiceEtiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
-
-	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = indiceCodigo[instruccion];
-
-	buscarEnSegmentoCodigo(inst);
-
-	pcb.tamanio_contexto = 0;
-
-	printf("PROXIMA INSTRUCCION VALE: %s\n",proximaInstruccion);
-
-	//Meto eso en analizador_de_linea... para invocar al parser
-	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
-}
-
 /**************************************************** FINALIZAR *******************************************************/
 void finalizar() {
 
@@ -269,7 +198,7 @@ void finalizar() {
 /************************************************** RETORNAR **********************************************************/
 
 void retornar(t_valor_variable retorno) {
-	printf("RETORNAR PIOLA\n");
+	printf("\nRETORNAR PIOLA\n");
 
 	recuperarPosicionDeDirecciones();
 
@@ -297,18 +226,21 @@ void retornar(t_valor_variable retorno) {
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
+
+//CREO QUE EN EL FOR VA LA CANTIDAD DE INTRUCCIONES DE LA FUNCION PRINCIPAL
+
 void integracionScriptFacil() {
-	parsear();
+	int i;
+	for(i = 0; i<4;i++) {
+		parsear();
+	}
 
 }
 
 void integracionConFuncionDoble() {
-	parsear();
-	printf("\nel valor de a: %d\n",pila->elementos[1]);
-	parsear();
-	printf("el valor de a: %d\n",pila->elementos[1]);
-	parsear();
-	printf("el valor de a: %d\n",pila->elementos[1]);
-	printf("el valor de b: %d\n",pila->elementos[3]);
+	int i;
+	for(i = 0; i<7;i++) {
+			parsear();
+	}
 
 }

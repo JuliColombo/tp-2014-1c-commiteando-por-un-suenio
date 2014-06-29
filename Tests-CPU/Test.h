@@ -24,11 +24,13 @@ extern char* proximaInstruccion;
 int inicializar();
 int inicializarConIndices();
 int inicializarConIndices2();
+int inicializarConIndices3();
 int limpiar();
 int limpiarConIndices();
 int limpiarConIndices2();
 void crearPrograma ();
 void crearPrograma2 ();
+void crearPrograma3 ();
 void crearPcb ();
 
 

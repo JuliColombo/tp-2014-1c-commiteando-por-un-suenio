@@ -84,8 +84,8 @@ void reservarContextoSinRetorno() {
 	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
-	pcb.program_counter +=1;
-	int pc = pcb.program_counter;
+	//pcb.program_counter +=1;
+	int pc  = pcb.program_counter + 1;
 
 	PUSH_POSITION(&pc,pila,top_index);
 

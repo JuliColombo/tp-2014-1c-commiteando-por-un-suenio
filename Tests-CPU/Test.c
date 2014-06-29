@@ -80,6 +80,18 @@ int inicializarConIndices2() {
 	return 0;
 }
 
+int inicializarConIndices3() {
+	pila = CREATE_STACK(100);
+	top_index = pila->top_index;
+	proximaInstruccion = malloc(50);
+	indiceEtiquetasBis=malloc(1000);
+	indiceCodigo = malloc(500);
+
+	crearPrograma();
+
+	return 0;
+}
+
 int limpiar() {
 	DESTROY_STACK(pila);
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -115,6 +127,9 @@ void auxiliarCrearPrograma() {
 	datos = metadatada_desde_literal(segmentoCodigo);
 	memcpy(indiceEtiquetas, datos->etiquetas, datos->etiquetas_size);
 	memcpy(indiceCodigo, datos->instrucciones_serializado, 300);
+
+	printf("CANTIDAD DE INSTRUCCIONES %d\n", datos->instrucciones_size);
+
 	free(datos->etiquetas);
 	free(datos->instrucciones_serializado);
 	free(datos);
@@ -126,7 +141,7 @@ void pasarScript(char* str) {
 }
 
 void crearPrograma () {
-	pasarScript("# primero declaro las variables \nbegin \n		variables a, b \n	a = 20 \n	b <- doble a \n end \n function doble \n variables f \n		f = $0 + $ 0 \n		return f \n end\n");
+	pasarScript("# primero declaro las variables \nbegin \n		variables a, b \n	a = 20 \n	b <- doble a \n end \n function doble \n variables f \n		f = $0 + $0 \n		return f \n end\n");
 	auxiliarCrearPrograma();
 }
 
@@ -135,4 +150,7 @@ void crearPrograma2 (){
 	auxiliarCrearPrograma();
 }
 
-
+void crearPrograma3 () {
+	pasarScript("#!/usr/bin/ansisop \nbegin \n		variables f, i, t \n		#`f`: Hasta donde contar \n			f=20 \n			:inicio \n			#`i`: Iterador \n			i=i+1			#Imprimir el contador \n			print i \n			#`t`: Comparador entre `i` y `f` \n			t=f-i \n			#De no ser iguales, salta a inicio \n			jnz t inicio \n	end \n");
+	auxiliarCrearPrograma();
+}
