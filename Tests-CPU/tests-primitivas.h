@@ -34,7 +34,8 @@ void testLlamarSinRetorno();
 void testLlamarConRetorno();
 void testFinalizar();
 void testRetornar();
-void testIntegracion();
+void testIntegracionScriptFacil();
+void testIntegracionConFuncionDoble();
 
 
 #endif /* TESTS_PRIMITIVAS_H_ */

@@ -27,9 +27,9 @@ void crearPcb() {
 
 void testDefinirVariable(){
 	crearPcb();
-	definirVariable('a');
-	definirVariable('b');
-	definirVariable('c');
+	definirVariableTest('a');
+	definirVariableTest('b');
+	definirVariableTest('c');
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
 	CU_ASSERT_EQUAL(pila->elementos[2],'b');
 	CU_ASSERT_EQUAL(pila->elementos[4],'c');
@@ -51,9 +51,9 @@ void testObtenerPosicionVariable(){
 
 void testAsignar(){
 	CU_ASSERT_EQUAL(top_index,4);
-	asignar(4,2048);
-	asignar(0,5);
-	asignar(2,-19);
+	asignarTest(4,2048);
+	asignarTest(0,5);
+	asignarTest(2,-19);
 	CU_ASSERT_EQUAL(pila->elementos[1],5);
 	CU_ASSERT_EQUAL(pila->elementos[3],-19);
 	CU_ASSERT_EQUAL(pila->elementos[5],2048);
@@ -82,7 +82,7 @@ void testIrALabel(){
 
 void testReservarSinRetorno() {
 	crearPcb();
-	definirVariable('a');
+	definirVariableTest('a');
 	reservarContextoSinRetorno();
 
 	CU_ASSERT_EQUAL(pcb.program_counter, 2);
@@ -97,8 +97,8 @@ void testReservarSinRetorno() {
 
 void testLlamarSinRetorno() {
 	crearPcb();
-	definirVariable('a');
-	asignar(0,5);
+	definirVariableTest('a');
+	asignarTest(0,5);
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 1);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 0);
 
@@ -113,11 +113,11 @@ void testLlamarSinRetorno() {
 
 void testLlamarConRetorno() {
 	crearPcb();
-	definirVariable('a');
-	definirVariable('b');
-	asignar(0,5);
+	definirVariableTest('a');
+	definirVariableTest('b');
+	asignarTest(0,5);
 
-	llamarConRetorno("doble",obtenerPosicionVariable('b'));
+	llamarConRetornoTest("doble",obtenerPosicionVariable('b'));
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 0);
 	CU_ASSERT_EQUAL(pcb.program_counter, 4);
 	CU_ASSERT_EQUAL(*pcb.c_stack, 7);
@@ -127,9 +127,9 @@ void testLlamarConRetorno() {
 	CU_ASSERT_EQUAL(pila->top_index,6);
 	CU_ASSERT_STRING_EQUAL(proximaInstruccion," variables f \n");
 
-	definirVariable('a');
-	definirVariable('b');
-	asignar(7,19);
+	definirVariableTest('a');
+	definirVariableTest('b');
+	asignarTest(7,19);
 
 	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
 	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "b"));
@@ -144,16 +144,16 @@ void testLlamarConRetorno() {
 
 void testFinalizar() {
 	crearPcb();
-	definirVariable('a');
-	asignar(0,5);
-	definirVariable('c');
-	asignar(2,-19);
-	definirVariable('d');
-	asignar(4,2048);
+	definirVariableTest('a');
+	asignarTest(0,5);
+	definirVariableTest('c');
+	asignarTest(2,-19);
+	definirVariableTest('d');
+	asignarTest(4,2048);
 
 	llamarSinRetorno("doble");
-	definirVariable('b');
-	asignar(7,2048);
+	definirVariableTest('b');
+	asignarTest(7,2048);
 
 	finalizar();
 
@@ -174,20 +174,21 @@ void testFinalizar() {
 void testRetornar() {
 	crearPcb();
 
-	definirVariable('a');
-	asignar(0,5);
-	definirVariable('c');
-	asignar(2,-19);
-	definirVariable('d');
+	definirVariableTest('a');
+	asignarTest(0,5);
+	definirVariableTest('c');
+	asignarTest(2,-19);
+	definirVariableTest('d');
 
-	llamarConRetorno("doble",obtenerPosicionVariable('d'));
-	definirVariable('b');
-	asignar(8,2048);
+	llamarConRetornoTest("doble",obtenerPosicionVariable('d'));
+	definirVariableTest('b');
+	asignarTest(8,2048);
 
 	retornar(33);
 
 	CU_ASSERT_EQUAL(top_index,5);
 	CU_ASSERT_EQUAL(pila->top_index,top_index);
+	CU_ASSERT_EQUAL(pila->elementos[5],33);
 
 	CU_ASSERT_EQUAL(dictionary_size(diccionario),3);
 	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "a"));
@@ -198,8 +199,8 @@ void testRetornar() {
 	CU_ASSERT_EQUAL(pcb.tamanio_contexto, 3);
 	CU_ASSERT_EQUAL(*pcb.c_stack,0);
 
-	definirVariable('z');
-	asignar(5,1024);
+	definirVariableTest('z');
+	asignarTest(5,1024);
 
 	CU_ASSERT_TRUE(dictionary_has_key(diccionario, "z"));
 	CU_ASSERT_EQUAL(dictionary_size(diccionario),4);
@@ -207,12 +208,22 @@ void testRetornar() {
 
 }
 
-void testIntegracion(){
-	crearPcb();
-	integracion();
+void testIntegracionScriptFacil(){
+	/*crearPcb();
+	integracionScriptFacil();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
 	CU_ASSERT_EQUAL(pila->elementos[1],17);
 	CU_ASSERT_EQUAL(pila->elementos[2],'b');
-	CU_ASSERT_EQUAL(pila->elementos[3],5);
+	CU_ASSERT_EQUAL(pila->elementos[3],5);*/
+}
+
+void testIntegracionConFuncionDoble() {
+	crearPcb();
+	integracionConFuncionDoble();
+
+	CU_ASSERT_EQUAL(pila->elementos[0],'a');
+	CU_ASSERT_EQUAL(pila->elementos[1],20);
+	CU_ASSERT_EQUAL(pila->elementos[2],'b');
+	CU_ASSERT_EQUAL(pila->elementos[3],40);
 }

@@ -59,15 +59,19 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo);
 void recuperarPosicionDeDirecciones();
 
 t_puntero definirVariable(t_nombre_variable identificador_variable);
+t_puntero definirVariableTest(t_nombre_variable identificador_variable);
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
 void asignar(t_puntero direccion_variable, t_valor_variable valor);
+void asignarTest(t_puntero direccion_variable, t_valor_variable valor);
 t_valor_variable dereferenciar(t_puntero direccion_variable);
 void irAlLabel(t_nombre_etiqueta etiqueta);
 void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
+void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 void finalizar();
 void retornar();
-void integracion();
+void integracionScriptFacil();
+void integracionConFuncionDoble();
 
 /*AnSISOP_kernel funciones_kernel;
 AnSISOP_funciones funciones_parser;*/

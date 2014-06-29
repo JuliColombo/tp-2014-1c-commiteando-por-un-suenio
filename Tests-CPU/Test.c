@@ -36,7 +36,10 @@ int main() {
 	CU_add_test(prueba7,"retornar", testRetornar);
 
 	CU_pSuite prueba8 = CU_add_suite("Suite de prueba 8",inicializarConIndices2, limpiarConIndices2);
-	CU_add_test(prueba8,"integracion", testIntegracion);
+	CU_add_test(prueba8,"integracion script facil", testIntegracionScriptFacil);
+
+	CU_pSuite prueba9 = CU_add_suite("Suite de prueba 9",inicializarConIndices, limpiarConIndices);
+	CU_add_test(prueba9,"integracion con funcion doble", testIntegracionConFuncionDoble);
 
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
@@ -106,40 +109,30 @@ int limpiarConIndices2() {
 	return 0;
 }
 
-void crearPrograma () {
-	char* str = "# primero declaro las variables \n begin \n variables a, b\n a = 20 \n b <- doble a \n end \n function doble \n variables f \n f = $0 + $ 0 \n return f \n end\n";
-	segmentoCodigo = malloc(strlen(str));
-	strcpy(segmentoCodigo,str);
-	//strcpy(segmentoCodigo,"begin \n # primero declaro las variables \n variables a, b \n a = 20 \n end\n");
-
-	t_medatada_program *datos;
+/************************************************************** CREACION SCRIPTS **************************************************************************************************/
+void auxiliarCrearPrograma() {
+	t_medatada_program* datos;
 	datos = metadatada_desde_literal(segmentoCodigo);
-
-	memcpy(indiceEtiquetas,datos->etiquetas,datos->etiquetas_size);
-
-	memcpy(indiceCodigo,datos->instrucciones_serializado,300);
-
+	memcpy(indiceEtiquetas, datos->etiquetas, datos->etiquetas_size);
+	memcpy(indiceCodigo, datos->instrucciones_serializado, 300);
 	free(datos->etiquetas);
 	free(datos->instrucciones_serializado);
 	free(datos);
 }
 
-void crearPrograma2 (){
-	char* str = "#!/usr/bin/ansisop \nbegin \n	variables a, b \n	a = 3 \n	b = 5 \n 	a = b + 12 \n end \n";
+void pasarScript(char* str) {
 	segmentoCodigo = malloc(strlen(str));
-	//strcpy(segmentoCodigo,"begin \n # primero declaro las variables \n variables a, b \n a = 20 \n a <- doble\n print a \n end \n function doble\n variables f \n f = $0 + $ 0\n return f \n end\n");
-	strcpy(segmentoCodigo,str);
+	strcpy(segmentoCodigo, str);
+}
 
-	t_medatada_program *datos;
-	datos = metadatada_desde_literal(segmentoCodigo);
+void crearPrograma () {
+	pasarScript("# primero declaro las variables \nbegin \n		variables a, b \n	a = 20 \n	b <- doble a \n end \n function doble \n variables f \n		f = $0 + $ 0 \n		return f \n end\n");
+	auxiliarCrearPrograma();
+}
 
-	memcpy(indiceEtiquetas,datos->etiquetas,datos->etiquetas_size);
-
-	memcpy(indiceCodigo,datos->instrucciones_serializado,300);
-
-	free(datos->etiquetas);
-	free(datos->instrucciones_serializado);
-	free(datos);
+void crearPrograma2 (){
+	pasarScript("#!/usr/bin/ansisop \nbegin \n	variables a, b \n	a = 3 \n	b = 5 \n 	a = b + 12 \n end \n");
+	auxiliarCrearPrograma();
 }
 
 

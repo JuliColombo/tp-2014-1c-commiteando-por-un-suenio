@@ -22,7 +22,39 @@ AnSISOP_funciones funciones_parser = {
 };
 AnSISOP_kernel funciones_kernel = { };
 
+void parsear(){
+	t_intructions inst = indiceCodigo[pcb.program_counter];
+
+	buscarEnSegmentoCodigo(inst);
+
+	printf("la proxima instruccion es: %s\n", proximaInstruccion);
+
+	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
+
+}
+
 /**************************************** DEFINIR VARIABLE ***************************************************/
+t_puntero definirVariableTest(t_nombre_variable identificador_variable) {
+	t_valor_variable id = identificador_variable;
+
+	t_puntero posicion = calcularPosicionAsignacion(top_index);
+
+	PUSH_POSITION (&id,pila,posicion);
+
+
+	top_index = pila->top_index;
+
+	const char* str=convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str,posicion);
+	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
+
+
+	pcb.program_counter +=1;
+	pcb.tamanio_contexto += 1;
+
+	return posicion;
+}
+
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 
@@ -41,7 +73,10 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	pcb.program_counter +=1;
 	pcb.tamanio_contexto += 1;
 
-	printf("\ndefinir variable %c\n",identificador_variable);
+	printf("\ndefinir variable %c en posicion %d",identificador_variable,posicion);
+
+	//LA DIFERENCIA CON definirVariableTest
+	parsear();
 
 	return posicion;
 }
@@ -57,18 +92,36 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 		posicion = -1;
 	}
 
-	printf("\n\nobtener posicion de %c\n\n",identificador_variable);
-
 	return posicion;
 
 }
 
 
 /******************************************* ASIGNAR *************************************************************/
+void asignarTest(t_puntero direccion_variable, t_valor_variable valor) {
+	int top = top_index;
+
+	PUSH_POSITION (&valor,pila,direccion_variable+1);
+
+	printf("\nasignar %d a %d\n",valor,direccion_variable);
+
+	int posibleTop = direccion_variable + 1;
+
+	if(top < posibleTop){
+	top_index = posibleTop;} else {
+		top_index = top;
+		pila->top_index = top;
+	}
+
+	pcb.program_counter += 1;
+}
+
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	int top = top_index;
 
 	PUSH_POSITION (&valor,pila,direccion_variable+1);
+
+	printf("\nasignar %d a %d\n",valor,direccion_variable);
 
 	int posibleTop = direccion_variable + 1;
 
@@ -80,7 +133,8 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	pcb.program_counter += 1;
 
-	printf("\n\nasignar %d a %d\n\n",valor,direccion_variable);
+	//DIFERENCIA CON asignarTest
+	parsear();
 }
 
 /****************************************** DESREFERENCIAR ********************************************************/
@@ -137,7 +191,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 }
 
 /******************************************* LLAMAR CON RETORNO **************************************************/
-void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
+void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno(donde_retornar);
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
@@ -158,11 +212,39 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	pcb.tamanio_contexto = 0;
 
 	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string,funciones_parser, funciones_kernel);
+	//analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
+}
+
+void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
+
+	reservarContextoConRetorno(donde_retornar);
+	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
+
+	int posicionAPushear = top_index +1;
+	//*pcb.c_stack = posicionAPushear;
+	*pcb.c_stack = posicionAPushear;
+
+	t_puntero_instruccion instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta,indiceEtiquetas,pcb.tamanio_indice);
+	pcb.program_counter = instruccion;
+
+	//Busco en indice de codigo qué le pido a UMV
+	t_intructions inst = indiceCodigo[instruccion];
+
+	buscarEnSegmentoCodigo(inst);
+
+	pcb.tamanio_contexto = 0;
+
+	printf("PROXIMA INSTRUCCION VALE: %s\n",proximaInstruccion);
+
+	//Meto eso en analizador_de_linea... para invocar al parser
+	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 }
 
 /**************************************************** FINALIZAR *******************************************************/
 void finalizar() {
+
+	printf("FINALIZAR PIOLA\n");
 
 	t_puntero c_stack_viejo;
 
@@ -187,6 +269,8 @@ void finalizar() {
 /************************************************** RETORNAR **********************************************************/
 
 void retornar(t_valor_variable retorno) {
+	printf("RETORNAR PIOLA\n");
+
 	recuperarPosicionDeDirecciones();
 
 	t_puntero direccionRetorno;
@@ -201,8 +285,10 @@ void retornar(t_valor_variable retorno) {
 
 	regenerarDiccionario(tamanio);
 
+	t_puntero posicionAsignacion = direccionRetorno + 1;
+
 	//socket_and_push(sockUMV,direccionRetorno+1,retorno);
-	PUSH_POSITION (&retorno,pila,direccionRetorno + 1);
+	PUSH_POSITION (&retorno,pila,posicionAsignacion);
 
 	esConRetorno = 0;
 }
@@ -211,21 +297,18 @@ void retornar(t_valor_variable retorno) {
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
-void parsear(){
-	t_intructions inst = indiceCodigo[pcb.program_counter];
-
-	buscarEnSegmentoCodigo(inst);
-
-	printf("la proxima instruccion es: %s\n", proximaInstruccion);
-
-	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
+void integracionScriptFacil() {
+	parsear();
 
 }
 
-void integracion() {
+void integracionConFuncionDoble() {
 	parsear();
+	printf("\nel valor de a: %d\n",pila->elementos[1]);
 	parsear();
+	printf("el valor de a: %d\n",pila->elementos[1]);
 	parsear();
-	parsear();
+	printf("el valor de a: %d\n",pila->elementos[1]);
+	printf("el valor de b: %d\n",pila->elementos[3]);
 
 }
