@@ -71,6 +71,18 @@ void elemento_delete(t_elemento* elemento) {
 	free(elemento);
 }
 
+t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
+	t_puntero_instruccion instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta, indiceEtiquetas,pcb.tamanio_indice);
+	pcb.program_counter = instruccion;
+	return instruccion;
+}
+
+void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
+	const char* str = convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str, posicion);
+	dictionary_put(diccionario, elem->name, elem);
+}
 
 /******************************************** RESERVAR CONTEXTO ***********************************************************/
 void reservarContextoSinRetorno() {
@@ -174,9 +186,7 @@ void guardarAlternado () {
 
 	t_valor_variable identificador_variable = pila->elementos[top_index];
 
-	const char* str=convertirAString(identificador_variable);
-	t_elemento* elem = elemento_create(str,top_index);
-	dictionary_put(diccionario,elem->name,elem);
+	insertarEnDiccionario(identificador_variable, top_index);
 
 	top_index -=2;
 

@@ -36,6 +36,7 @@ void testFinalizar();
 void testRetornar();
 void testIntegracionScriptFacil();
 void testIntegracionConFuncionDoble();
+void testIntegracionFor();
 
 
 #endif /* TESTS_PRIMITIVAS_H_ */
