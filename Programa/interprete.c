@@ -31,16 +31,13 @@ int main (int argc, char **argv){
 		log_escribir(archLog, "Programa",INFO,"La script es de tipo ANSISOP");
 	}else{
 		log_escribir(archLog, "Script",ERROR,"La script no puede ser interpretada");
-		abort();
+		return EXIT_FAILURE;
 	}
 
 
 
 	int sock_kernel_servidor=abrirSocket();
-	t_struct_pidycodigo* data;
-	data->pid=getpid();
-	data->codigo=archivo_ansisop;
-	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_PIDYCODIGO, &data);
+	int j = socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, &archivo_ansisop);
 	if(j==1){
 		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
 	}else{

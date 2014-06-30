@@ -92,11 +92,12 @@ typedef enum {
 typedef struct {
 	int peso;
 	t_prioridad_rr prioridad_rr;
-	t_medatada_program metadata;
+	t_medatada_program* metadata;
 	t_pcb* pcb;
 	int flag_terminado;
 	int flag_bloqueado;
 	int socket_descriptor_conexion;
+	char* codigo;
 } t_programa;
 
 typedef struct{

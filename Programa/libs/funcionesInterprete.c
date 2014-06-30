@@ -97,3 +97,5 @@ void cerrarSocket(int sock){
 		log_escribir(archLog,"Conexión",INFO,"La conexión se cerró correctamente");
 	}
 }
+
+

@@ -82,25 +82,77 @@ int posicion_Variable_Global(char* variable){
 }
 
 
+/*
+ * Nombre: agregarNuevoPrograma/2
+ * Argumentos:
+ * 		- pid del programa nuevo que se conecto
+ * 		- codigo ansisop del programa nuevo conectado
+ * 		- fd donde el Kernel se comunica con el programa
+ *
+ * Devuelve:
+ * 		Nada
+ *
+ * Funcion: encola un nuevo programa en la cola de new
+ */
+
+void agregarNuevoPrograma(char* codigo, int fd){
+	t_programa programa;
+	programa.codigo=codigo;
+	programa.flag_bloqueado=0;
+	programa.flag_terminado=0;
+	programa.pcb=malloc(sizeof(t_pcb));
+	programa.metadata=malloc(sizeof(t_medatada_program));
+	programa.metadata=metadatada_desde_literal(codigo);
+	programa.peso=calcularPeso(programa);
+	programa.socket_descriptor_conexion=fd;
+
+	pthread_mutex_lock(mutex_pid);
+	programa.pcb->pid=program_pid;
+	program_pid+=1;
+	pthread_mutex_unlock(mutex_pid);
+
+
+	pthread_mutex_lock(mutex_cola_new);
+	agregarAColaSegunPeso(programa,cola.new);
+	pthread_mutex_unlock(mutex_cola_new);
+
+	return;
+
+}
+
+
+
+
+
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
 void aceptarConexionEntrante(epoll_data_t data){
 
 }
 
-
+/*
+ * Nombre: manejar_ConexionNueva_Programas
+ * Argumentos:
+ * 		- data del evento recibido en el epoll
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: acepta la conexion de un nuevo programa y lo agrega a la cola de New
+ */
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
-	int n,i,j;
-	t_struct_pidycodigo* buffer;
+	int n,fd_aceptado,j;
+	char* buffer;
 	void* buff;
-	for(n=0;n<60;n++){
-		if(fds_conectados_programas[n]!=NULL){
-			i=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(i,&buffer, &buff);
+	for(n=0;fds_conectados_programas[n]!=NULL;n++){
+		if(n<MAX_EVENTS_EPOLL){
+			fd_aceptado=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
+			j=socket_recibir(fd_aceptado, (void*)&buffer, &buff);
 			if(j==1){
-				t_struct_pidycodigo* sarasa = (t_struct_pidycodigo*)buff;
-				printf("Todo bien\n");
+				char* sarasa = (char*)buff;
+				//agregarNuevoPrograma(sarasa, fd_aceptado);
+				printf("Se recibio una conexion de programa\n");
 			}
 		}else{
 			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");

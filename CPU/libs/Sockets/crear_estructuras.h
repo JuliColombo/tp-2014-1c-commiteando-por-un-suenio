@@ -10,6 +10,7 @@
 
 #include "estructuras_socket.h"
 #include "socket.h"
+#include "package.h"
 
 t_struct_push* crear_struct_pushear(uint32_t posicion, int32_t valor);
 void socket_and_push(int sockAjeno, int posicion, int id);

@@ -139,7 +139,7 @@ typedef struct struct_pcb{
  *
  */
 
-typedef int t_gradoMP;
+typedef unsigned int t_gradoMP;
 
 typedef struct struct_grado_MP{
 	t_gradoMP gradoMP;

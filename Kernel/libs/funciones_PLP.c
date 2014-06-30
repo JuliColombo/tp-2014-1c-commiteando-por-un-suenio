@@ -2,8 +2,10 @@
 
 pthread_t hilo_pcp_new, hilo_pcp_ready;
 
-void calcularPeso(t_programa programa){ //Calcula peso del programa
-	programa.peso=(5*programa.metadata.cantidad_de_etiquetas + 3* programa.metadata.cantidad_de_funciones + programa.metadata.instrucciones_size);
+int calcularPeso(t_programa programa){ //Calcula peso del programa
+	int peso=(5*programa.metadata->cantidad_de_etiquetas + 3* programa.metadata->cantidad_de_funciones + programa.metadata->instrucciones_size);
+
+	return peso;
 }
 
 void agregarAColaSegunPeso(t_programa programa, t_list* lista){

@@ -33,5 +33,6 @@ void leerConfiguracion(void);
 void imprimirConfiguracion(void);
 int abrirSocket(void);
 void cerrarSocket(int);
+t_struct_pidycodigo* crear_PID_Codigo(char* codigo);
 
 #endif /* FUNCIONESINTERPRETE_H_ */

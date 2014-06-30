@@ -35,6 +35,7 @@ extern pthread_mutex_t* mutex_cola_ready;
 extern pthread_mutex_t* mutex_cola_exec;
 extern pthread_mutex_t* mutex_cola_block;
 extern pthread_mutex_t* mutex_cola_exit;
+extern pthread_mutex_t* mutex_pid;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
@@ -42,11 +43,12 @@ extern int* fds_conectados_programas;
 extern int* fds_conectados_cpu;
 extern sem_t sem_new_programas, sem_new_multip, sem_ready, sem_cpu;
 extern t_programa* programas;
+extern int program_pid;
 
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
-void calcularPeso(t_programa); //Calcula el peso del programa
+int calcularPeso(t_programa); //Calcula el peso del programa
 void agregarAColaSegunPeso(t_programa, t_list*); //Agrega ordenadamente en la cola de new
 void mostrarNodosPorPantalla(t_list*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente

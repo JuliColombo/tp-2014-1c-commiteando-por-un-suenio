@@ -20,15 +20,18 @@ pthread_mutex_t* mutex_cola_new;
 pthread_mutex_t* mutex_cola_exec;
 pthread_mutex_t* mutex_cola_block;
 pthread_mutex_t* mutex_cola_exit;
+pthread_mutex_t* mutex_pid;
 int sock_programas, sock_umv, sock_cpu;
 int* fds_conectados_programas;
 int* fds_conectados_cpu;
 t_programa* programas;
+int program_pid;
 
 
 
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
+	program_pid=0;
 	PATH_config = argv[1];
 	inicializarColas();
 

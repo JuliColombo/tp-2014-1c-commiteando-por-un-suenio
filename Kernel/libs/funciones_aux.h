@@ -20,6 +20,7 @@ int* vector_num(char**, char**);
 int cant_identificadores(char**);
 void log_error_socket(void);
 int posicion_Variable_Global(char*);
+void agregarNuevoPrograma(char* codigo, int fd);
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
 void aceptarConexionEntrante (epoll_data_t);

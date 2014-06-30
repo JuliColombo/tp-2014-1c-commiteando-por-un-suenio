@@ -248,15 +248,14 @@ t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
 t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->codigo) + sizeof(int) + 1;
 
 	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
 
 	int tamanoTotal = sizeof(t_header);
 
-	memcpy(data + tamanoTotal, estructuraOrigen->pid, sizeof(t_pid));
+	memcpy(data + tamanoTotal , estructuraOrigen, sizeof(t_pid));
 
-	memcpy(data + tamanoTotal, estructuraOrigen->codigo, strlen(estructuraOrigen->codigo)+1);
 
 	paquete->data = data;
 
