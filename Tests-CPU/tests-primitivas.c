@@ -227,3 +227,15 @@ void testIntegracionConFuncionDoble() {
 	CU_ASSERT_EQUAL(pila->elementos[2],'b');
 	CU_ASSERT_EQUAL(pila->elementos[3],40);
 }
+
+void testIntegracionFor() {
+	crearPcb();
+	integracionFor();
+
+	CU_ASSERT_EQUAL(pila->elementos[0],'f');
+	CU_ASSERT_EQUAL(pila->elementos[1],20);
+	CU_ASSERT_EQUAL(pila->elementos[2],'i');
+	CU_ASSERT_EQUAL(pila->elementos[3],20);
+	CU_ASSERT_EQUAL(pila->elementos[4],'t');
+	CU_ASSERT_EQUAL(pila->elementos[5],0);
+}

@@ -6,7 +6,11 @@
  */
 
 #include "PrimitivasEnTest.h"
+
+#define DONE 5;
+
 int esConRetorno = 0;
+int termino;
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -18,6 +22,7 @@ AnSISOP_funciones funciones_parser = {
 			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
 			.AnSISOP_llamarConRetorno		= llamarConRetornoTest,
 			.AnSISOP_retornar				= retornar,
+			.AnSISOP_imprimir				= imprimir,
 
 };
 AnSISOP_kernel funciones_kernel = { };
@@ -26,8 +31,6 @@ void proximaInst() {
 
 	t_intructions inst = indiceCodigo[pcb.program_counter];
 
-	pcb.program_counter += 1;
-
 	buscarEnSegmentoCodigo(inst);
 
 }
@@ -35,6 +38,8 @@ void proximaInst() {
 void parsear(){
 
 	proximaInst();
+
+	pcb.program_counter += 1;
 
 	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 
@@ -48,12 +53,9 @@ t_puntero definirVariableTest(t_nombre_variable identificador_variable) {
 
 	PUSH_POSITION (&id,pila,posicion);
 
-
 	top_index = pila->top_index;
 
-	const char* str=convertirAString(identificador_variable);
-	t_elemento* elem = elemento_create(str,posicion);
-	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
+	insertarEnDiccionario(identificador_variable, posicion); //Elimino elementos junto con diccio despues
 
 	pcb.tamanio_contexto += 1;
 
@@ -89,7 +91,6 @@ void asignarTest(t_puntero direccion_variable, t_valor_variable valor) {
 		pila->top_index = top;
 	}
 
-	//pcb.program_counter += 1;
 }
 
 /****************************************** DESREFERENCIAR ********************************************************/
@@ -104,17 +105,12 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 /***************************************** IR AL LABEL ************************************************************/
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,indiceEtiquetas,pcb.tamanio_indice);
-
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	t_intructions inst = indiceCodigo[instruccion];
-	//RESERVAR CONTEXTO O ALGO?
+
 	buscarEnSegmentoCodigo(inst);
 
-	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string,funciones_parser, funciones_kernel);
 }
 
 /*************************************** LLAMAR SIN RETORNO *******************************************************/
@@ -127,9 +123,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	int posicionAPushear =  top_index +1;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,indiceEtiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	//Busco en indice de codigo qué le pido a UMV
 	t_intructions inst = indiceCodigo[instruccion];
@@ -139,9 +133,6 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	pcb.tamanio_contexto = 0;
 
 	esConRetorno = 0;
-
-	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(string,funciones_parser, funciones_kernel);
 
 }
 
@@ -155,9 +146,7 @@ void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) 
 	//*pcb.c_stack = posicionAPushear;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,indiceEtiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	//Busco en indice de codigo qué le pido a UMV
 	t_intructions inst = indiceCodigo[instruccion];
@@ -165,9 +154,6 @@ void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) 
 	buscarEnSegmentoCodigo(inst);
 
 	pcb.tamanio_contexto = 0;
-
-	//Meto eso en analizador_de_linea... para invocar al parser
-	//analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 }
 
 /**************************************************** FINALIZAR *******************************************************/
@@ -192,7 +178,10 @@ void finalizar() {
 	if(esPrimerContexto()) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 		printf("\n\nllegamos al if!\n\n");
+		termino = DONE;
+
 	}
+
 }
 
 /************************************************** RETORNAR **********************************************************/
@@ -222,25 +211,51 @@ void retornar(t_valor_variable retorno) {
 	esConRetorno = 0;
 }
 
+/*********************************************** PRINT DE MENTIRITAS ***************************************************/
+void imprimir(int valor) {
+	printf("imprimo %d\n",valor);
+}
+
 /***********************************************************************************************************************/
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
-
-//CREO QUE EN EL FOR VA LA CANTIDAD DE INTRUCCIONES DE LA FUNCION PRINCIPAL
+//IDEA PARA MANDAR A CORRER EL PARSER EN LA CPU
+void integracionCorrerParser(char* script) {
+	while(1){
+		termino = 0;
+		parsear();
+		if(termino == 5) {
+			break;
+		}
+	}
+}
 
 void integracionScriptFacil() {
-	int i;
-	for(i = 0; i<4;i++) {
+	while(1){
 		parsear();
+		if(pila->elementos[1] == 17) {
+			break;
+		}
 	}
 
 }
 
 void integracionConFuncionDoble() {
-	int i;
-	for(i = 0; i<7;i++) {
-			parsear();
+	while(1){
+		parsear();
+		if(pila->elementos[3] == 40) {
+			break;
+		}
 	}
-
 }
+
+void integracionFor(){
+	while(1){
+		parsear();
+		if((pila->elementos[3] == 20) && (pila->elementos[5]==0)) {
+			break;
+		}
+	}
+}
+
