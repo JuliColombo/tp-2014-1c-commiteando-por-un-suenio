@@ -49,7 +49,6 @@ typedef struct{
 	t_puntero pos;
 }t_elemento;
 
-
 char* buscarEnSegmentoCodigo(t_intructions instruccion);
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 int esPrimerContexto();
@@ -68,6 +67,7 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo);
 void recuperarDireccionRetorno(t_puntero* direccion_retorno);
 void reservarContextoSinRetorno();
 void reservarContextoConRetorno(t_puntero donde_retornar);
-
+t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta);
+void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion);
 
 #endif /* FUNCIONESAUX_H_ */

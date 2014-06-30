@@ -45,8 +45,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta);
 void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar);
 void finalizar();
 void retornar();
+void imprimir();
 void integracionScriptFacil();
 void integracionConFuncionDoble();
+void integracionFor();
+void integracionCorrerParser();
 
 /*AnSISOP_kernel funciones_kernel;
 AnSISOP_funciones funciones_parser;*/
