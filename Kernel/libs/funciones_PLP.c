@@ -197,7 +197,9 @@ void core_plp(void){
 	 * while (1){
 
 		completarGradoMultip();
+		pthread_mutex_lock(mutex_cola_new);
 		mostrarNodosPorPantalla(cola.new);
+		pthread_mutex_unlock(mutex_cola_new);
 
 
 		t_programa programa; //Este programa llega por los sockets

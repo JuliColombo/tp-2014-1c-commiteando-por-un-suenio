@@ -81,6 +81,21 @@ int posicion_Variable_Global(char* variable){
 	return -1;
 }
 
+void inicializarSemaforos(void){
+	mutex_cola_new=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_ready=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_exec=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_block=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_exit=malloc(sizeof(pthread_mutex_t));
+	mutex_pid=malloc(sizeof(pthread_mutex_t));
+
+	pthread_mutex_init(mutex_cola_new,NULL);
+	pthread_mutex_init(mutex_cola_ready,NULL);
+	pthread_mutex_init(mutex_cola_exec,NULL);
+	pthread_mutex_init(mutex_cola_block,NULL);
+	pthread_mutex_init(mutex_cola_exit,NULL);
+	pthread_mutex_init(mutex_pid,NULL);
+}
 
 /*
  * Nombre: agregarNuevoPrograma/2
@@ -109,6 +124,7 @@ void agregarNuevoPrograma(char* codigo, int fd){
 	pthread_mutex_lock(mutex_pid);
 	programa.pcb->pid=program_pid;
 	program_pid+=1;
+	printf("%d\n",program_pid);
 	pthread_mutex_unlock(mutex_pid);
 
 
@@ -150,9 +166,8 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 			fd_aceptado=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
 			j=socket_recibir(fd_aceptado, (void*)&buffer, &buff);
 			if(j==1){
-				char* sarasa = (char*)buff;
-				//agregarNuevoPrograma(sarasa, fd_aceptado);
 				printf("Se recibio una conexion de programa\n");
+				agregarNuevoPrograma((char*)buff, fd_aceptado);
 			}
 		}else{
 			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");

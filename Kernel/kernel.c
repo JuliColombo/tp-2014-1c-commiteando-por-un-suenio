@@ -32,6 +32,7 @@ int program_pid;
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
 	program_pid=0;
+	inicializarSemaforos();
 	PATH_config = argv[1];
 	inicializarColas();
 
