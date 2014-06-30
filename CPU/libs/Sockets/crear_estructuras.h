@@ -22,6 +22,10 @@ t_struct_string* crear_struct_string(char* string);
 void socket_and_string(int sockAjeno,char* string);
 t_struct_asignar_compartida* crear_struct_asignar_compartida(char* string, int32_t valor);
 void socket_and_asignar_compartida(int sockAjeno,char* string, int valor);
+t_struct_instruccion* crear_struct_instruccion(t_intructions instruccion);
+void socket_and_instruccion(int sockAjeno,t_intructions instruccion);
+t_struct_numero* crear_struct_numero(int32_t num);
+void socket_and_number(int sockAjeno,int num);
 
 void* socket_recibir_estructura(int sockAjeno);
 

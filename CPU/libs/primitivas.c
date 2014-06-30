@@ -106,7 +106,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 	return valor;
 }
 
-/*
+
 void irAlLabel(t_nombre_etiqueta etiqueta) {
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
@@ -117,18 +117,11 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
-	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
-	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
-	free(estructura);
+	socket_and_instruccion(sockUMV,inst);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_estructura tipo = STRUCT_STRING;
-	void** estructura2;
-	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_string** estructuraAux = (struct_string**)estructura2;
-	char* const string = (*estructuraAux)->string;
-	free(estructuraAux);
-	free(estructura2);
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	char* const string = estructura->string;
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	analizadorLinea(string,funciones_parser, funciones_kernel);
@@ -142,7 +135,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
 
 	int posicionAPushear =  top_index +1;
-	pcb.c_stack = posicionAPushear;
+	pcb.c_stack = &posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
@@ -152,18 +145,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
-	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
-	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
-	free(estructura);
+	socket_and_instruccion(sockUMV,inst);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_estructura tipo = STRUCT_STRING;
-	void** estructura2;
-	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_string** estructuraAux = (struct_string**)estructura2;
-	char* const string = (*estructuraAux)->string;
-	free(estructuraAux);
-	free(estructura2);
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	char* const string = estructura->string;
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	analizadorLinea(string,funciones_parser, funciones_kernel);
@@ -177,7 +163,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
 
 	int posicionAPushear = top_index +1;
-	pcb.c_stack = posicionAPushear;
+	pcb.c_stack = &posicionAPushear;
 
 	t_puntero_instruccion instruccion;
 	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
@@ -187,28 +173,20 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	t_intructions inst = codigoo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
-	struct_tipo_instruccion* estructura = crear_struct_tipo_instruccion(inst);
-	socket_enviar(sockUMV, STRUCT_TIPO_INSTRUCCION,estructura);
-	free(estructura);
+	socket_and_instruccion(sockUMV,inst);
 
 	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_estructura tipo = STRUCT_STRING;
-	void** estructura2;
-	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_string** estructuraAux = (struct_string**)estructura2;
-	char* const string = (*estructuraAux)->string;
-	free(estructuraAux);
-	free(estructura2);
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	char* const string = estructura->string;
 
 	//Meto eso en analizador_de_linea... para invocar al parser
 	analizadorLinea(string,funciones_parser, funciones_kernel);
-
-
 }
 
+
 void finalizar() {
-	t_puntero c_stack = pcb.c_stack;
-	t_puntero stack = pcb.stack;
+	t_puntero c_stack = *(pcb.c_stack);
+	t_puntero stack = *(pcb.stack);
 
 	recuperarPosicionDeDirecciones();
 	volverAContextoAnterior();
@@ -248,9 +226,7 @@ int imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
 	//Socket a Kernel enviandole texto
-	struct_string* estructura = crear_struct_string(texto);
-	socket_enviar(sockKernel,STRUCT_STRING,estructura);
-	free(estructura);
+	socket_and_string(sockKernel,texto);
 
 	return 0;
 }
@@ -260,12 +236,12 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 	//Socket con mensaje?
 	return 0;
-}*/
+}
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
-
-/*int wait(t_nombre_semaforo identificador_semaforo) {
+/*
+int wait(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 

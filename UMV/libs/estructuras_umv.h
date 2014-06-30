@@ -43,7 +43,6 @@ enum tipo_algoritmo{
 
 
 typedef struct segmentDescriptor{
-	//tipo segmento segmento; No iría algo de esto???
 	int inicio;
 	int tamanio;
 	int ubicacionMP;
