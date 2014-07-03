@@ -9,14 +9,14 @@
 
 log_t* archLog;
 t_config_programa configuracion_programa;
-char* PATH_config=pathconfig;
+char* PATH_config;
 char* archivo_ansisop;
 int sock_kernel_servidor;
 FILE* script;
 
 
 int main (int argc, char **argv){
-	//PATH_config =getenv("ANSISOP_CONFIG");
+	PATH_config =getenv("ANSISOP_CONFIG");
 	printf("%s\n",PATH_config);
 	inicializarConfiguracion();
 	off_t fileSize=0;
