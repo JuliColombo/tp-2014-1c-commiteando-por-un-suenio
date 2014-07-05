@@ -220,8 +220,8 @@ void imprimir(int valor) {
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
-//IDEA PARA MANDAR A CORRER EL PARSER EN LA CPU
-void integracionCorrerParser(char* script) {
+//IDEA PARA MANDAR A CORRER EL PARSER EN LA CPU. LLEGARIA SCRIPT POR PARAMETRO.
+void integracionCorrerParser() {
 	while(1){
 		termino = 0;
 		parsear();

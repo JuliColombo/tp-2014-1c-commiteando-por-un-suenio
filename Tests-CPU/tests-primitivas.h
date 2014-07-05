@@ -37,6 +37,7 @@ void testRetornar();
 void testIntegracionScriptFacil();
 void testIntegracionConFuncionDoble();
 void testIntegracionFor();
+void testIntegracionDesreferencia();
 
 
 #endif /* TESTS_PRIMITIVAS_H_ */

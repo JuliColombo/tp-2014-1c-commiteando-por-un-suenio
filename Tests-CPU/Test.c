@@ -44,6 +44,9 @@ int main() {
 	CU_pSuite prueba10 = CU_add_suite("Suite de prueba 10",inicializarConIndices3, limpiarConIndices2);
 	CU_add_test(prueba10,"integracion script con for", testIntegracionFor);
 
+	CU_pSuite prueba11 = CU_add_suite("Suite de prueba 11",inicializarConIndices4, limpiarConIndices2);
+	CU_add_test(prueba11,"integracion script desreferencias", testIntegracionDesreferencia);
+
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
@@ -91,6 +94,18 @@ int inicializarConIndices3() {
 	indiceCodigo = malloc(500);
 
 	crearPrograma3();
+
+	return 0;
+}
+
+int inicializarConIndices4() {
+	pila = CREATE_STACK(1000);
+	top_index = pila->top_index;
+	proximaInstruccion = malloc(50);
+	indiceEtiquetasBis=malloc(1000);
+	indiceCodigo = malloc(500);
+
+	crearPrograma4();
 
 	return 0;
 }
@@ -155,5 +170,10 @@ void crearPrograma2 (){
 
 void crearPrograma3 () {
 	pasarScript("#!/usr/bin/ansisop \nbegin \n		variables f, i, t \n		#`f`: Hasta donde contar \n			f=20 \n			i=0 \n			:inicio \n			#`i`: Iterador \n			i=i+1			#Imprimir el contador \n			print i \n			#`t`: Comparador entre `i` y `f` \n			t=f-i \n			#De no ser iguales, salta a inicio \n			jnz t inicio \n	end \n");
+	auxiliarCrearPrograma();
+}
+
+void crearPrograma4 () {
+	pasarScript("#!/usr/bin/ansisop \nbegin \n		variables a, p \n			p = &a \n			a = 19 \n			print *p \n			print 30+*p \n			print *p+30 \n			p = &a+30 \n			print p \n			p = 30+&a \n			print p \n end \n");
 	auxiliarCrearPrograma();
 }

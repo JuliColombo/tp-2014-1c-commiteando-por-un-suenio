@@ -210,7 +210,8 @@ void testRetornar() {
 
 void testIntegracionScriptFacil(){
 	crearPcb();
-	integracionScriptFacil();
+	//integracionScriptFacil();
+	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
 	CU_ASSERT_EQUAL(pila->elementos[1],17);
@@ -220,7 +221,8 @@ void testIntegracionScriptFacil(){
 
 void testIntegracionConFuncionDoble() {
 	crearPcb();
-	integracionConFuncionDoble();
+	//integracionConFuncionDoble();
+	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
 	CU_ASSERT_EQUAL(pila->elementos[1],20);
@@ -230,7 +232,8 @@ void testIntegracionConFuncionDoble() {
 
 void testIntegracionFor() {
 	crearPcb();
-	integracionFor();
+	//integracionFor();
+	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'f');
 	CU_ASSERT_EQUAL(pila->elementos[1],20);
@@ -238,4 +241,10 @@ void testIntegracionFor() {
 	CU_ASSERT_EQUAL(pila->elementos[3],20);
 	CU_ASSERT_EQUAL(pila->elementos[4],'t');
 	CU_ASSERT_EQUAL(pila->elementos[5],0);
+}
+
+void testIntegracionDesreferencia() {
+	crearPcb();
+	integracionCorrerParser();
+
 }
