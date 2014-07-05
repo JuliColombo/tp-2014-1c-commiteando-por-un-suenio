@@ -53,7 +53,7 @@ t_puntero definirVariableTest(t_nombre_variable identificador_variable) {
 
 	PUSH_POSITION (&id,pila,posicion);
 
-	top_index = pila->top_index;
+	top_index = posicion;
 
 	insertarEnDiccionario(identificador_variable, posicion); //Elimino elementos junto con diccio despues
 

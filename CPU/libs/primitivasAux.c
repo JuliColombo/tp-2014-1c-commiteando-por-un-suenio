@@ -13,6 +13,10 @@ int sockfd;
 int sockUMV;
 int top_index;
 
+char* proximaInstruccion;
+char* indiceEtiquetas;
+int esConRetorno;
+
 /*
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice;
@@ -31,6 +35,30 @@ char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 }*/
 
 
+void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
+	const char* str = convertirAString(identificador_variable);
+	t_elemento* elem = elemento_create(str, posicion);
+	dictionary_put(diccionario, elem->name, elem);
+}
+
+t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
+	t_puntero_instruccion instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta, indiceEtiquetas,pcb.tamanio_indice);
+	pcb.program_counter = instruccion;
+	return instruccion;
+}
+
+void recibirProximaInstruccion(int sockUMV) {
+	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
+	char* const string = estructura->string;
+	proximaInstruccion = strdup(string);
+}
+
+int esPrimerContexto() {
+	int a = (*pcb.c_stack == *pcb.stack );
+	return (a);
+}
+
 t_puntero calcularPosicionAsignacionCPU(int top_index) {
 	t_puntero posicion=0;
 	if(top_index == -1) {
@@ -39,6 +67,30 @@ t_puntero calcularPosicionAsignacionCPU(int top_index) {
 		posicion = top_index + 2;
 	}
 	return posicion;}
+
+
+int esPar(int numero){
+	return (numero % 2 == 0);
+}
+
+
+t_puntero calcularPosicionAsignacion(int top_index) {
+	t_puntero posicion;
+	if(esConRetorno) {
+		if(esPar(top_index)) {
+				posicion = top_index + 1;
+			} else {
+				posicion = calcularPosicionAsignacionCPU(top_index);
+			}
+	} else {
+		if(esPar(top_index)) {
+				posicion = calcularPosicionAsignacionCPU(top_index);
+			} else {
+				posicion = top_index +1;
+			}
+	}
+	return posicion;
+}
 
 char* convertirAString(t_nombre_variable c) {
 	static char str[2];
@@ -59,131 +111,135 @@ void elemento_delete(t_elemento* elemento) {
 	free(elemento);
 }
 
+/******************************************** RESERVAR CONTEXTO ***********************************************************/
+
 void reservarContextoSinRetorno() {
-	t_puntero posicionContextoViejo;
 	int cursor = *(pcb.c_stack);
 
-	posicionContextoViejo = calcularPosicionAsignacionCPU(top_index);
+	t_puntero posicionContextoViejo;
+	posicionContextoViejo = calcularPosicionAsignacion(top_index);
 
-	//Socket a UMV para que haga: PUSH_SIZE_CHECK(cursor,pila,posicionContextoViejo);
+	//Pushear cursor de stack
 	socket_and_push(sockUMV,posicionContextoViejo,cursor);
+	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
-	int posicionPC;
-	pcb.program_counter +=1;
-	int pc = pcb.program_counter;
-	posicionPC = calcularPosicionAsignacionCPU(top_index);
+	int pc  = pcb.program_counter + 1;
+	socket_and_push(sockUMV,top_index,pc);
 
-	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&pc,pila,posicionPC);
-	socket_and_push(sockUMV,posicionPC,pc);
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
 }
 
-void reservarContextoConRetorno(){
-	t_puntero posicionAVariable;
-	int posicionVar = top_index;
+void reservarContextoConRetorno(t_puntero donde_retornar){
 
+	int retornar = donde_retornar;
 	reservarContextoSinRetorno();
 
-	posicionAVariable = calcularPosicionAsignacionCPU(top_index);
+	top_index += 1;
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-	socket_and_push(sockUMV,posicionAVariable,posicionVar);
+	socket_and_push(sockUMV,retornar,top_index);
+
+	esConRetorno = 1;
 }
 
-
-/*Lo que hago con esta funcion es:
- * estoy en la posicion de cursor contexto.
- * Pongo en el diccionario el id y su posicion.
- * Disminuyo el top_index en 2 para llegar al nombre de una variable (si restara uno, obtendria el valor) la proxima vez que la use.
- * Invoco esta funcion tantas veces como el tamaño del contexto sea.
- */
-
-void guardarAlternado () {
-	//Socket a UMV para que haga: pila->top_index = top_index;
-	socket_and_modificar_top_index(sockUMV,top_index);
-	//Socket a UMV para que haga TOP(pila)
-	//socket_enviarSignal(sockUMV, TOP);
-
-	//Socket de UMV para que me pase lo ultimo que hay pusheado en la pila, y yo hacer: t_nombre_variable identificador_variable = TOP(pila);
-	t_struct_char* estructura =(t_struct_char*)socket_recibir_estructura(sockUMV);
-	t_valor_variable identificador_variable = estructura->letra;
-
-	const char* str=convertirAString(identificador_variable);
-	t_elemento* elem = elemento_create(str,top_index);
-	dictionary_put(diccionario,elem->name,elem);
-
-	top_index -=2;
-
-}
-
-uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_actual) {
-	uint32_t diferencia = direccion_contexto_actual - (*pcb.c_stack);
-	return (diferencia/5); //Divido esa cantidad de bytes por 5 (1 byte de id de variable, y 4 bytes del valor) para saber cuantas variables habia.
-}
-
-
-//Una vez que regenere el diccionario, pongo el top_index en la posicion del valor de la ultima variable, cosa que si se quieren definir nuevas con la funcion
-//calcularPosicion, no tire error.
-void regenerarDiccionario(int tamanio_contexto) {
-	int i = 0;
-	int top = top_index - 1;
-	while (i < tamanio_contexto) {
-		guardarAlternado();
-		i++;
-	}
-
-	//Socket a UMV para que haga: pila->top_index = top;
-	socket_and_modificar_top_index(sockUMV,top);
-
-}
-
-t_puntero recuperarDireccionRetorno() {
-	socket_and_pop_position(sockUMV,*(pcb.stack) - 1); //resto uno porque era retornar
-
-	//QUIERO LO DE ABAJO¡???
-	t_puntero retorno;
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	retorno = estructura->numero;
-
-	return retorno;
-}
+/******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {
-	socket_and_modificar_top_index(sockUMV,*(pcb.c_stack)-1);
+	//Esto va?
+	socket_and_modificar_top_index (sockUMV,*(pcb.c_stack)-1);
+
+	top_index = *pcb.c_stack -1;
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
-	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
-	//hay que calcular la posicion del pop!!!!!!!!!
 
+	socket_and_pop_position(sockUMV,top_index);
+
+	//Socket a UMV para que haga POP_POSITION(pila,top_index);
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	*program_counter = estructura->numero;
+
+	top_index -= 1;
+
+	//esto va?
+	socket_and_modificar_top_index (sockUMV,top_index);
 }
 
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
-	//Socket a UMV para que haga: t_puntero program_counter = POP(pila);
-	//hay que calcular la posicion del pop!!!!!!!!!
 
+	socket_and_pop_position(sockUMV,top_index);
+
+	//Socket a UMV para que haga POP_POSITION(pila,top_index);
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	*cursor_stack_viejo = estructura->numero;
+
+	top_index -= 1;
+
+	//esto va?
+	socket_and_modificar_top_index (sockUMV,top_index);
+
 }
 
-//Popea dos veces en el stack para recuperar el valor del program_counter y el de c_stack al volver al contexto anterior
-void volverAContextoAnterior() {
-	t_puntero program_counter, cursor_stack_viejo;
+void volverAContextoAnterior(t_puntero* c_stack_viejo) {
+	t_puntero program_counter;
 
 	recuperarProgramCounter(&program_counter);
-	recuperarCursorAnterior(&cursor_stack_viejo);
-
-	//Socket de UMV para que yo actualice el top_index
+	recuperarCursorAnterior(c_stack_viejo);
 
 	pcb.program_counter = program_counter;
-	pcb.c_stack = &cursor_stack_viejo;
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
 }
 
+void guardarAlternado () {
+	//Socket a UMV para que haga TOP(pila) HACEEEEEEEERRRRRR
+	//socket_enviarSignal(sockUMV, TOP);
+
+	t_struct_char* estructura =(t_struct_char*)socket_recibir_estructura(sockUMV);
+	t_valor_variable identificador_variable = estructura->letra;
+
+	insertarEnDiccionario(identificador_variable, top_index);
+
+	top_index -=2;
+
+}
+
+void regenerarDiccionario(int tamanio_contexto) {
+	int i = 0;
+	int top = top_index;
+
+	top_index -=1;
+	while (i < tamanio_contexto) {
+		guardarAlternado();
+		i++;
+	}
+
+	top_index = top;
+	socket_and_modificar_top_index (sockUMV,top);
+
+	pcb.tamanio_contexto = tamanio_contexto;
+
+}
+
+uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
+	uint32_t diferencia = (*pcb.c_stack) - direccion_contexto_viejo;
+
+	float dif=(float)(diferencia / 2.5);
+	int enteraDeDif = (int)dif;
+
+	return enteraDeDif; //Divido esa cantidad de bytes por 5 (1 byte de id de variable, y 4 bytes del valor) para saber cuantas variables habia.
+}
+
+/******************** RECUPERAR CONTEXTO CON RETORNO***********************/
+void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
+	socket_and_pop_position(sockUMV,top_index);
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
+	*direccion_retorno = estructura->numero;
+
+	top_index -= 1;
+	socket_and_modificar_top_index (sockUMV,top_index);
+}

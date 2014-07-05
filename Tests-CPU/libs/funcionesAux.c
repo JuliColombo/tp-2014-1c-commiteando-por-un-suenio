@@ -157,8 +157,6 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo) {
 	recuperarProgramCounter(&program_counter);
 	recuperarCursorAnterior(c_stack_viejo);
 
-	//Socket de UMV para que yo actualice el top_index
-
 	pcb.program_counter = program_counter;
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -175,7 +173,7 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo) {
 void guardarAlternado () {
 	//Socket a UMV para que haga: pila->top_index = top_index;
 	//socket_and_modificar_top_index(sockUMV,top_index);
-	pila->top_index = top_index;
+	//pila->top_index = top_index;
 
 	//Socket a UMV para que haga TOP(pila)
 	//socket_enviarSignal(sockUMV, TOP);

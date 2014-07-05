@@ -11,29 +11,35 @@
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
 
+#define DONE 5;
+
 t_dictionary *diccionario;
 int sockfd;
 int sockUMV;
 int sockKernel;
 int top_index;
 
-char* etiquetas;
-t_intructions* codigoo;
+char* indiceEtiquetas;
+t_intructions* indiceCodigo;
+
+char* proximaInstruccion;
+
+int termino;
+int esConRetorno = 0;
 
 
 
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
-	t_puntero posicion = calcularPosicionAsignacionCPU(top_index);
+
+	t_puntero posicion = calcularPosicionAsignacion(top_index);
 
 	socket_and_push(sockUMV,posicion,id);
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas como asignar
 
-	const char* str=convertirAString(identificador_variable);
-	t_elemento* elem = elemento_create(str,posicion);
-	dictionary_put(diccionario,elem->name,elem); //Elimino elementos junto con diccio despues
+	top_index = posicion;
 
-	pcb.program_counter +=1;
+	insertarEnDiccionario(identificador_variable, posicion); //Elimino elementos junto con diccio despues
+
 	pcb.tamanio_contexto += 1;
 
 	return posicion;
@@ -55,7 +61,7 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
-	socket_and_pop_position(sockUMV,direccion_variable);
+	socket_and_pop_position(sockUMV,direccion_variable + 1);
 
 	//Socket recibiendo t_valor_variable id
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
@@ -69,17 +75,18 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	//top_index que se actualiza cada vez que UMV pushea o popea
 
+	int top = top_index;
+
 	socket_and_push(sockUMV,direccion_variable,valor);
 
-	if(top_index < direccion_variable) {
-		top_index = direccion_variable;
+	int posibleTop = direccion_variable + 1;
+
+	if(top < posibleTop) {
+		top_index = posibleTop;
+	} else {
+		top_index = top;
+		socket_and_modificar_top_index(sockUMV,top); //Que stack actualice su top_index. HACE FALTA REALMENTE ??????
 	}
-
-	//Le digo a UMV que actualice su top_index del stack
-	//Socket enviando top_index para que UMV haga: pila->top_index = top_index;
-	socket_and_modificar_top_index(sockUMV,top_index);
-
-	pcb.program_counter += 1;
 }
 
 
@@ -106,25 +113,17 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 	return valor;
 }
 
-
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
 
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = codigoo[instruccion];
+	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
+	t_intructions inst = indiceCodigo[instruccion];
 
-	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	socket_and_instruccion(sockUMV,inst);
 
-	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	char* const string = estructura->string;
-
-	//Meto eso en analizador_de_linea... para invocar al parser
-	analizadorLinea(string,funciones_parser, funciones_kernel);
+	recibirProximaInstruccion(sockUMV);
 }
 
 
@@ -132,71 +131,65 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	reservarContextoSinRetorno();
 
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
-
 	int posicionAPushear =  top_index +1;
-	pcb.c_stack = &posicionAPushear;
+	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = codigoo[instruccion];
+	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
+	t_intructions inst = indiceCodigo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	socket_and_instruccion(sockUMV,inst);
 
-	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	char* const string = estructura->string;
-
-	//Meto eso en analizador_de_linea... para invocar al parser
-	analizadorLinea(string,funciones_parser, funciones_kernel);
+	recibirProximaInstruccion(sockUMV);
 
 }
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
-	reservarContextoConRetorno();
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
+	reservarContextoConRetorno(donde_retornar);
 
 	int posicionAPushear = top_index +1;
-	pcb.c_stack = &posicionAPushear;
+	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta,etiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
+	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = codigoo[instruccion];
+	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
+	t_intructions inst = indiceCodigo[instruccion];
 
 	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
 	socket_and_instruccion(sockUMV,inst);
 
-	//Socket recibiendo la instruccion a ejecutar de UMV
-	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	char* const string = estructura->string;
+	recibirProximaInstruccion(sockUMV);
 
-	//Meto eso en analizador_de_linea... para invocar al parser
-	analizadorLinea(string,funciones_parser, funciones_kernel);
+	pcb.tamanio_contexto = 0;
 }
 
 
 void finalizar() {
-	t_puntero c_stack = *(pcb.c_stack);
-	t_puntero stack = *(pcb.stack);
+	t_puntero c_stack_viejo;
+
+	if(!esPrimerContexto()) {
 
 	recuperarPosicionDeDirecciones();
-	volverAContextoAnterior();
+	volverAContextoAnterior(&c_stack_viejo);
 
-	int tamanio = calcularTamanioContextoAnterior(c_stack);
+	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
+
+	*pcb.c_stack = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
+	}
 
-	if(c_stack == stack) {
+	if(esPrimerContexto()) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
+		printf("\n\nllegamos al if!\n\n");
+		termino = DONE;
+
 	}
 }
 
@@ -204,12 +197,24 @@ void finalizar() {
 void retornar(t_valor_variable retorno) {
 
 	recuperarPosicionDeDirecciones();
-	t_puntero direccionRetorno = recuperarDireccionRetorno();
 
-	volverAContextoAnterior();
-	regenerarDiccionario(pcb.tamanio_contexto);
+	t_puntero direccionRetorno;
+	recuperarDireccionRetorno(&direccionRetorno);
 
-	socket_and_push(sockUMV,direccionRetorno+1,retorno);
+	t_puntero c_stack_viejo;
+	volverAContextoAnterior(&c_stack_viejo);
+
+	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
+
+	*pcb.c_stack = c_stack_viejo;
+
+	regenerarDiccionario(tamanio);
+
+	t_puntero posicionAsignacion = direccionRetorno + 1;
+
+	socket_and_push(sockUMV,posicionAsignacion,retorno);
+
+	esConRetorno = 0;
 
 }
 
