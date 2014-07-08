@@ -47,6 +47,7 @@ void* core_conexion_kernel(void){
 	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
 		log_error_socket();
 	}
+	printf("se conecto al kernel\n");
 	while(1){
 
 	}
@@ -115,7 +116,7 @@ void* core_conexion_umv(void){
 
 }
 	if(socket_cerrarConexion(sock)==-1){
-		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
 	}
 	return NULL;
 }

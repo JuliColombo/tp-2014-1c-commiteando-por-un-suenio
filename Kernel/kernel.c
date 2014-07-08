@@ -26,6 +26,7 @@ int* fds_conectados_programas;
 int* fds_conectados_cpu;
 t_programa* programas;
 int program_pid;
+sem_t sem_plp, sem_pcp;
 
 
 
@@ -42,8 +43,8 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 
 	esperarYCerrarConexiones();
-	pthread_join(plp, NULL);
 	//pthread_join(pcp, NULL);
+	pthread_join(plp, NULL);
 
 	return EXIT_SUCCESS;
 }

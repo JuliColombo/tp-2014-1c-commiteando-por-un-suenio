@@ -20,19 +20,19 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 	list_add_in_index(lista, position, &programa);
 }
 
-void mostrarNodosPorPantalla(t_list* lista){
+void mostrarNodosPorPantalla(t_list* lista, char* nombreLista){
 	int i;
 	int p;
 	//system("clear");
 	if(lista->head==NULL){
-		printf("No hay nodos en la cola\n");
+		printf("No hay programas en la cola %s\n", nombreLista);
 		return;
 	}
-	printf("Estado de la cola:\n");
+	printf("Estado de la cola %s:\nPID  PESO\n", nombreLista);
 	for (i=0;i<(list_size(lista));i++){
 		t_programa* aux=(t_programa*)list_get(lista, i);
 		p=aux->peso;
-		printf(" Nodo %d   Peso %d\n", i, p); //Tal vez agregar el nombre del programa(? Preguntar
+		printf("%d    %d\n", i, p); //Tal vez agregar el nombre del programa(? Preguntar
 	}
 }
 
@@ -87,10 +87,10 @@ void leerConfiguracion(void){
 	configuracion_kernel.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
 	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
-	configuracion_kernel.id_semaforos = config_get_array_value(config,"Lista de nombres de Semaforos");
-	configuracion_kernel.valor_semaforos=vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.id_semaforos);
-	configuracion_kernel.id_hio = config_get_array_value(config,"Lista de hio");
-	configuracion_kernel.retardo_hio = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.id_hio);
+	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
+	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
+	configuracion_kernel.hio.id = config_get_array_value(config,"Lista de hio");
+	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
 	configuracion_kernel.var_globales.identificador = config_get_array_value(config,"Variables globales");
@@ -109,16 +109,14 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 
 	int i;
-	for(i=0;i<cant_identificadores(configuracion_kernel.id_semaforos);i++){
-		printf("Semaforo (valor): %s (%d)\n",configuracion_kernel.id_semaforos[i], configuracion_kernel.valor_semaforos[i]);
+	for(i=0;i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
+		printf("Semaforo (valor): %s (%d)\n",configuracion_kernel.semaforos.id[i], configuracion_kernel.semaforos.valor[i]);
 	}
 
-	free(configuracion_kernel.valor_semaforos);
-	for(i=0;configuracion_kernel.id_hio[i]!=NULL;i++){
-		printf("ID HIO (retardo): %s ", configuracion_kernel.id_hio[i]);
-		printf("(%d)\n", configuracion_kernel.retardo_hio[i]);
+	for(i=0;configuracion_kernel.hio.id[i]!=NULL;i++){
+		printf("ID HIO (retardo): %s ", configuracion_kernel.hio.id[i]);
+		printf("(%d)\n", configuracion_kernel.hio.retardo[i]);
 	}
-	free(configuracion_kernel.retardo_hio);
 	printf("IP de la UMV: %s\n", configuracion_kernel.ip_umv);
 	printf("Puerto UMV: %d\n", configuracion_kernel.puerto_umv);
 	
@@ -126,7 +124,6 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	for(i=0;configuracion_kernel.var_globales.identificador[i]!=NULL;i++){
 		printf("\n%s (%d) ", configuracion_kernel.var_globales.identificador[i], configuracion_kernel.var_globales.valor[i]);
 	}
-
 
 	printf("\nTamaño del Stack: %d\n", configuracion_kernel.tamanio_stack);
 
@@ -137,10 +134,9 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 t_pcb crearPcb(char* codigo) {
 	t_pcb nuevoPCB;
-	t_medatada_program *pcbAux;
-	pcbAux=metadatada_desde_literal(codigo);
+	t_medatada_program *metadata_programa =metadatada_desde_literal(codigo);
 	nuevoPCB.pid=getpid();
-	nuevoPCB.program_counter=pcbAux->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+	nuevoPCB.program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
 
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
@@ -170,69 +166,84 @@ t_pcb crearPcb(char* codigo) {
 
 
 pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
-sem_t sem_new_programas, sem_new_programas, sem_new_multip, sem_ready;
+
 
 void core_plp(void){
 
-	if((sem_init(&sem_new_programas, 1, 0))==-1){
-		perror("No se puede crear el semáforo"); exit(1);
-	}
-	if((sem_init(&sem_new_multip, 1, 0))==-1){
-		perror("No se puede crear el semáforo"); exit(1);
-	}
-	if((sem_init(&sem_ready, 1, 0))==-1){
-		perror("No se puede crear el semáforo"); exit(1);
-	}
+	crearSemaforos();
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-	//aca deberia llegar un programa nuevo a la cola de new e insertarlo segun peso --Segúin entiendo yo, el progarma entra en el thread de conexion_programas y ahi lo encolamos, o no?
-	//deberia mandarlo para acá y que de ahí lo encole, no es responsabilidad de la conexion encolarlo, es que llegue nada más
 
-	while(1){
+	sleep(20);
 
-	}
-	/*
-	 * while (1){
+	while (1){
+		sem_wait(&sem_plp);
 
-		completarGradoMultip();
 		pthread_mutex_lock(mutex_cola_new);
-		mostrarNodosPorPantalla(cola.new);
+		mostrarNodosPorPantalla(cola.new,"New");
 		pthread_mutex_unlock(mutex_cola_new);
 
+		pthread_mutex_lock(mutex_cola_new);
+		pthread_mutex_lock(mutex_cola_ready);
 
-		t_programa programa; //Este programa llega por los sockets
-		t_pcb pcb=crearPcb("Aca va el codigo fuente");
-		programa.pcb = &pcb;
-		programa.flag_terminado=0;
-		calcularPeso(programa);
-		agregarAColaSegunPeso(programa, cola.new);
+		t_programa* programa = (t_programa*)list_remove(cola.new,0);
+
+		pthread_mutex_unlock(mutex_cola_new);
+
+		list_add(cola.ready, (void*) programa);
+
+		pthread_mutex_unlock(mutex_cola_ready);
+
+		sem_post(&sem_pcp);
+	}
 
 
-		while(1){
-			pthread_mutex_lock(mutex_cola_ready);
-			t_programa* programa = list_remove(cola.ready,0);
-			pthread_mutex_unlock(mutex_cola_ready);
+	cerrarSemaforos();
+	return;
+}
+
+void core_pcp(void){
+	t_programa programa;
+
+	while(1){
+	sem_wait(&sem_pcp);
+
+
+
+
+
+
+	if(programa.flag_terminado==1){
+		sem_post(&sem_plp);
+	}
+
+
+	}
+
+}
+
+
+void core_io(int retardo, char* dispositivo){
+	int i;
+	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
+		if((strcmp(dispositivo,configuracion_kernel.hio.id[i]))==0){
+			pthread_mutex_lock(mutex_cola_exec);
+			pthread_mutex_lock(mutex_cola_block);
+			//Falta mover de la cola de exec a block, tengo que ver remove_condition
+
+			pthread_mutex_unlock(mutex_cola_exec);
+			pthread_mutex_unlock(mutex_cola_block);
+			sleep(retardo*configuracion_kernel.hio.retardo[i]);
+
 		}
-	}*/
-
-	int sem_cerrado=-1;
-	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(&sem_new_programas);
-	}
-	sem_cerrado=-1;
-	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(&sem_new_multip);
-	}
-	sem_cerrado=-1;
-	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(&sem_ready);
 	}
 
 	return;
 }
 
+/************************* HILOS DE CONEXIONES *************************/
 
 void core_conexion_plp_programas(void){
 
@@ -281,64 +292,46 @@ void core_conexion_pcp_cpu(void){
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
 	event.events=EPOLLIN | EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	event.data.fd=sock_programas;
+	event.data.fd=sock_cpu;
 	while(1){
-//		int i = epoll_escucharBloqueante(efd_cpu,events);
+		//int i = epoll_escucharBloqueante(efd_cpu,events);
 //		printf("epoll cpu = %d \n", i);
-		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
+		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, NULL);
 		printf("epoll cpu= %d \n", i);
 	}
 
 	//int* tipoRecibido;
-	t_tipoEstructura tipoRecibido = D_STRUCT_NUMERO;
-	void* structRecibida;
-	int j=socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
-	if(j==1){
-	printf("Se recibio envio bien el paquete\n");
-	int* k = ((int*)structRecibida);
-	printf("%d\n", *k);
-	}
+//	t_tipoEstructura tipoRecibido = D_STRUCT_NUMERO;
+//	void* structRecibida;
+//	int j=socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
+//	if(j==1){
+//	printf("Se recibio envio bien el paquete\n");
+//	int* k = ((int*)structRecibida);
+//	printf("%d\n", *k);
+//	}
 
 	return;
 }
 
 
-void core_pcp(void){
 
-	pthread_create(&hilo_pcp_new, NULL, (void*) &core_pcp_new, NULL);
-	pthread_create(&hilo_pcp_ready, NULL, (void*) &core_pcp_ready, NULL);
 
-	pthread_join(hilo_pcp_ready, NULL);
-	pthread_join(hilo_pcp_new, NULL);
-	return;
-}
 
 void core_pcp_new(void){
 	t_programa *programa;
 
 	while(1){
-		sem_wait(&sem_new_programas);
+		sem_wait(&sem_plp);
 		pthread_mutex_lock(mutex_cola_new);
 		pthread_mutex_lock(mutex_cola_ready);
 		programa=(t_programa*)list_remove(cola.new, 0);
 		pthread_mutex_unlock(mutex_cola_new);
 		list_add(cola.ready, (void*)programa);
 		pthread_mutex_unlock(mutex_cola_ready);
-		sem_post(&sem_new_programas);
+		sem_post(&sem_plp);
 	}
 	return;
 }
-
-void core_pcp_ready(void){
-
-	return;
-}
-
-void core_io(int retardo){
-
-	return;
-}
-
 
 
 void esperarYCerrarConexiones(void){

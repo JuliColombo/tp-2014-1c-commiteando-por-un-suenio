@@ -44,10 +44,17 @@ int main (int argc, char **argv){
 		printf("ERROR: no se pudo enviar el paquete\n");
 	}
 
-
+	char* cadenaAImprimir;
+	void* buffer;
 	while(1){
-
+		/*socket_recibir(sock_kernel_servidor, (void*)&cadenaAImprimir, &buffer);
+		if(strcmp("finalizado", cadenaAImprimir)==0){
+			break;
 		}
+		for(i=0; cadenaAImprimir[i]!=NULL;i++){
+			printf("%c", cadenaAImprimir[i]);
+		}*/
+	}
 
 
 

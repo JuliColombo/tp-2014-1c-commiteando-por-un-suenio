@@ -41,7 +41,7 @@ extern int sock_cpu;
 extern int sock_umv;
 extern int* fds_conectados_programas;
 extern int* fds_conectados_cpu;
-extern sem_t sem_new_programas, sem_new_multip, sem_ready, sem_cpu;
+extern sem_t sem_plp, sem_pcp;
 extern t_programa* programas;
 extern int program_pid;
 
@@ -50,7 +50,7 @@ extern int program_pid;
 
 int calcularPeso(t_programa); //Calcula el peso del programa
 void agregarAColaSegunPeso(t_programa, t_list*); //Agrega ordenadamente en la cola de new
-void mostrarNodosPorPantalla(t_list*); //Muestra los programas que estan en New por pantalla
+void mostrarNodosPorPantalla(t_list*, char*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct correspondiente
 void imprimirConfiguracion(void);
@@ -64,7 +64,7 @@ t_pcb crearPcb(char*);
 /************************* HILOS *************************/
 void core_plp(void);
 void core_pcp(void);
-void core_io(int);
+void core_io(int, char*);
 void core_conexion_plp_programas(void);
 void core_conexion_umv(void);
 void core_conexion_pcp_cpu(void);

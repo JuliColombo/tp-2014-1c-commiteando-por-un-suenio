@@ -36,6 +36,16 @@ typedef int8_t* t_prioridad;
 typedef int8_t* t_nombre_cola;
 
 typedef struct{
+	t_id_hio id;						//Identificador de cada dispositivo de entrada/salida
+	t_retardo_hio retardo;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
+}t_hio;
+
+typedef struct{
+	t_id_semaforos id;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
+	t_valor_semaforos valor;		//Valor inicial de cada semáforo
+}t_semaforos;
+
+typedef struct{
 	char** identificador;
 	int* valor;
 }t_variables_globales;
@@ -47,10 +57,8 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_quantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
-	t_id_semaforos id_semaforos;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
-	t_valor_semaforos valor_semaforos;		//Valor inicial de cada semáforo
-	t_id_hio id_hio;						//Identificador de cada dispositivo de entrada/salida
-	t_retardo_hio retardo_hio;				//Retardo en milisegundos de cada unidad de	operación de entrada/salida.
+	t_semaforos semaforos;
+	t_hio hio;
 	t_ip_umv ip_umv;						//IP de la UMV
 	t_variables_globales var_globales;		//Variables globales del sistema
 	t_tamanio_stack tamanio_stack;			//Tamaño del Stack

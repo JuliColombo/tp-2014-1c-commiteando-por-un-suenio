@@ -81,6 +81,17 @@ int posicion_Variable_Global(char* variable){
 	return -1;
 }
 
+/*
+ * Nombre: inicializarSemaforos/0
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: inicializa los mutex
+ */
+
 void inicializarSemaforos(void){
 	mutex_cola_new=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_ready=malloc(sizeof(pthread_mutex_t));
@@ -96,6 +107,56 @@ void inicializarSemaforos(void){
 	pthread_mutex_init(mutex_cola_exit,NULL);
 	pthread_mutex_init(mutex_pid,NULL);
 }
+
+/*
+ * Nombre: crearSemaforos/0
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: inicializa los semaforos
+ */
+
+void crearSemaforos(void){
+	if((sem_init(&sem_plp, 1, configuracion_kernel.multiprogramacion))==-1){
+			perror("No se puede crear el semáforo");
+			exit(1);
+	}
+
+	if((sem_init(&sem_pcp, 1, 0))==-1){
+		perror("No se puede crear el semáforo");
+		exit(1);
+	}
+}
+
+/*
+ * Nombre: cerrarSemaforos/0
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: cierra los semaforos cuando terminan para liberar memoria
+ */
+
+void cerrarSemaforos(void){
+	int sem_cerrado=-1;
+
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(&sem_plp);
+	}
+
+	sem_cerrado=-1;
+
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(&sem_pcp);
+	}
+}
+
+
 
 /*
  * Nombre: agregarNuevoPrograma/2
@@ -176,3 +237,30 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	}
 }
 
+/*
+ * Nombre: manejar_ConexionNueva_CPU/1
+ * Argumentos:
+ * 		- data del evento recibido en el epoll
+ *
+ * Devuelve:
+ *		nada
+ *
+ * Funcion:
+ * 		acepta la conexion de una nueva cpu al sistema
+ */
+
+void manejar_ConexionNueva_CPU(epoll_data_t data){
+	int n, fd_aceptado, j;
+	int* id;
+	void* buffer;
+	for(n=0; fds_conectados_cpu[n]!=NULL;n++){
+		if(n<MAX_EVENTS_EPOLL){
+			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
+			j=socket_recibir(fd_aceptado,(void*)&id,&buffer);
+			if(j==1){
+				printf("Se recibio una conexion de cpu\n");
+			}
+		}
+	}
+
+}
