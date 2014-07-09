@@ -13,7 +13,6 @@ char* PATH_config;
 char* codigo_ansisop;
 int sock_kernel_servidor;
 FILE* script;
-char* k;
 
 int main (int argc, char **argv){
 	PATH_config =getenv("ANSISOP_CONFIG");
@@ -22,7 +21,7 @@ int main (int argc, char **argv){
 
 	off_t fileSize=0;
 	leerScript(&fileSize,argv[1]);
-	if (k == NULL) {
+	if (codigo_ansisop == NULL) {
 			log_escribir(archLog, "Programa", ERROR, "Error en la lectura del Script");
 			return EXIT_FAILURE;
 	}
@@ -44,14 +43,13 @@ int main (int argc, char **argv){
 //	}else{
 //		printf("ERROR: no se pudo enviar el paquete\n");
 //	}
-	t_struct_string* q = malloc(sizeof(t_struct_string));
-	//char* k = "lalala";
-	q->string=k;
-	printf("el valor que se manda es \n%s\n", q->string);
-	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, q);
+	t_struct_string* paquete = malloc(sizeof(t_struct_string));
+	paquete->string=codigo_ansisop;
+	printf("el valor que se manda es \n%s\n", paquete->string);
+	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, paquete);
 	if(j==1){
 		printf("Se envio bien el paquete\n");
-		free(q);
+		free(paquete);
 	}
 
 

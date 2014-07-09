@@ -13,7 +13,7 @@ void leerScript(off_t* fileSize,char* path) {
 
 	struct stat file_info;
 	int control = lstat(path, &file_info);
-	char* buffer = NULL;
+	codigo_ansisop = NULL;
 
 	if (control == -1) {
 		log_escribir(archLog, "Leer Script", ERROR, "El archivo no existe");
@@ -23,11 +23,11 @@ void leerScript(off_t* fileSize,char* path) {
 		int c;
 		*fileSize = file_info.st_size;
 		FILE* script = fopen(path, "r");
-		k = (char*)malloc(*fileSize);
+		codigo_ansisop = (char*)malloc(*fileSize);
 	    int i=0;
 		while ((c = getc(script)) != EOF){
-			k[i]=(char)c;
-			printf("%c",k[i]);
+			codigo_ansisop[i]=(char)c;
+			printf("%c",codigo_ansisop[i]);
 			i++;
 		}
 		printf("Paso el print del while\n");

@@ -26,7 +26,6 @@ void crearSemaforos(void);
 void cerrarSemaforos(void);
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
-void aceptarConexionEntrante (epoll_data_t);
 void manejar_ConexionNueva_Programas(epoll_data_t);
 void manejar_ConexionNueva_CPU(epoll_data_t data);
 

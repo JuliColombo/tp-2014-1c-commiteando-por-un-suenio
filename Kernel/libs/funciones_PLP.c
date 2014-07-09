@@ -132,10 +132,16 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 
 
-t_pcb crearPcb(char* codigo) {
-	t_pcb nuevoPCB;
-	t_medatada_program *metadata_programa =metadatada_desde_literal(codigo);
-	nuevoPCB.program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
+	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
+
+	pthread_mutex_lock(mutex_pid);
+	nuevoPCB->pid=program_pid;
+	program_pid+=1;
+	pthread_mutex_unlock(mutex_pid);
+
+	nuevoPCB->program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+	//nuevoPCB->codigo=solicitarMemoria()
 
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
@@ -263,7 +269,6 @@ void core_conexion_plp_programas(void){
 	event.data.fd=sock_programas;
 	while(1){
 		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
-		printf("epoll programas = %d\n", i);
 	}
 	return;
 }

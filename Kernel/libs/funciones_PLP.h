@@ -59,7 +59,7 @@ void completarGradoMultip(void); //Completa grado de multiprogramacion del siste
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos
-t_pcb crearPcb(char*);
+t_pcb* crearPcb(char*,t_medatada_program*);
 
 /************************* HILOS *************************/
 void core_plp(void);

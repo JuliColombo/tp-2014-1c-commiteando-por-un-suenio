@@ -187,20 +187,14 @@ void agregarNuevoPrograma(char* codigo, int fd){
 	programa.codigo=codigo;
 	programa.flag_bloqueado=0;
 	programa.flag_terminado=0;
-	programa.pcb=malloc(sizeof(t_pcb));
 	programa.metadata=malloc(sizeof(t_medatada_program));
 	programa.metadata=metadata_desde_literal(codigo);
-	printf("La cantidad de etiquetas es: %d\n", programa.metadata->cantidad_de_etiquetas);
-	printf("La cantidad de funciones es: %d\n", programa.metadata->cantidad_de_funciones);
-	printf("La cantidad de instrucciones es: %d\n", programa.metadata->etiquetas_size);
+	programa.pcb=crearPcb(codigo, programa.metadata);
 	programa.peso=calcularPeso(programa);
 	printf("El peso es: %d\n",programa.peso);
 	programa.socket_descriptor_conexion=fd;
 
-	pthread_mutex_lock(mutex_pid);
-	programa.pcb->pid=program_pid;
-	program_pid+=1;
-	pthread_mutex_unlock(mutex_pid);
+
 
 
 	pthread_mutex_lock(mutex_cola_new);
@@ -217,10 +211,6 @@ void agregarNuevoPrograma(char* codigo, int fd){
 
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
-void aceptarConexionEntrante(epoll_data_t data){
-
-}
-
 /*
  * Nombre: manejar_ConexionNueva_Programas
  * Argumentos:
@@ -233,24 +223,16 @@ void aceptarConexionEntrante(epoll_data_t data){
  */
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
-	int n,fd_aceptado,j;
+	int fd_aceptado,j;
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	for(n=0;fds_conectados_programas[n]!=NULL;n++){
-		if(n<MAX_EVENTS_EPOLL){
-			fd_aceptado=socket_aceptarCliente(data.fd);
-			j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
-			if(j==1){
-				printf("Se recibio bien el paquete\n");
-				t_struct_string* k = ((t_struct_string*)structRecibida);
-				agregarNuevoPrograma(k->string, fd_aceptado);
-				sem_post(&sem_new);
-			}
-			//}
-		}else{
-			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");
-		}
-
+	fd_aceptado=socket_aceptarCliente(data.fd);
+	j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
+	if(j==1){
+		printf("Se recibio bien el paquete\n");
+		t_struct_string* k = ((t_struct_string*)structRecibida);
+		agregarNuevoPrograma(k->string, fd_aceptado);
+		sem_post(&sem_new);
 	}
 }
 
