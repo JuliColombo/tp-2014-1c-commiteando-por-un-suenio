@@ -26,7 +26,7 @@ int* fds_conectados_programas;
 int* fds_conectados_cpu;
 t_programa* programas;
 int program_pid;
-sem_t sem_plp, sem_pcp;
+sem_t sem_plp, sem_pcp, sem_new;
 
 
 

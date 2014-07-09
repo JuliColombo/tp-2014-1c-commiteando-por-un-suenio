@@ -14,7 +14,7 @@ typedef uint16_t t_tamanio_stack;
 typedef char* t_ip_umv;
 
 typedef uint8_t t_quantum;
-typedef uint8_t t_retardo_quantum;
+typedef long t_retardo_quantum;
 typedef uint8_t t_grado_multip;
 
 typedef unsigned int t_pid;

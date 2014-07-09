@@ -10,42 +10,53 @@
 log_t* archLog;
 t_config_programa configuracion_programa;
 char* PATH_config;
-char* archivo_ansisop;
+char* codigo_ansisop;
 int sock_kernel_servidor;
 FILE* script;
-
+char* k;
 
 int main (int argc, char **argv){
 	PATH_config =getenv("ANSISOP_CONFIG");
-	printf("%s\n",PATH_config);
 	inicializarConfiguracion();
+
+
 	off_t fileSize=0;
-	archivo_ansisop = leerScript(&fileSize,argv[1]);
-	if (archivo_ansisop == NULL) {
+	leerScript(&fileSize,argv[1]);
+	if (k == NULL) {
 			log_escribir(archLog, "Programa", ERROR, "Error en la lectura del Script");
 			return EXIT_FAILURE;
 	}
 
-	int i=0;
-	if((i=validarScript())==0){
-		log_escribir(archLog, "Programa",INFO,"La script es de tipo ANSISOP");
-	}else{
-		log_escribir(archLog, "Script",ERROR,"La script no puede ser interpretada");
-		return EXIT_FAILURE;
-	}
+//	int i;
+//	if((i=validarScript())==0){
+//		log_escribir(archLog, "Programa",INFO,"La script es de tipo ANSISOP");
+//	}else{
+//		log_escribir(archLog, "Script",ERROR,"La script no puede ser interpretada");
+//	//	return EXIT_FAILURE;
+//	}
 
 
 
 	int sock_kernel_servidor=abrirSocket();
-	int j = socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, &archivo_ansisop);
+//	int j = socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, codigo_ansisop);
+//	if(j==1){
+//		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
+//	}else{
+//		printf("ERROR: no se pudo enviar el paquete\n");
+//	}
+	t_struct_string* q = malloc(sizeof(t_struct_string));
+	//char* k = "lalala";
+	q->string=k;
+	printf("el valor que se manda es \n%s\n", q->string);
+	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, q);
 	if(j==1){
-		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
-	}else{
-		printf("ERROR: no se pudo enviar el paquete\n");
+		printf("Se envio bien el paquete\n");
+		free(q);
 	}
 
-	char* cadenaAImprimir;
-	void* buffer;
+
+//	char* cadenaAImprimir;
+//	void* buffer;
 	while(1){
 		/*socket_recibir(sock_kernel_servidor, (void*)&cadenaAImprimir, &buffer);
 		if(strcmp("finalizado", cadenaAImprimir)==0){

@@ -129,6 +129,11 @@ void crearSemaforos(void){
 		perror("No se puede crear el semáforo");
 		exit(1);
 	}
+
+	if((sem_init(&sem_new, 1, 0))==-1){
+		perror("No se puede crear el semáforo");
+		exit(1);
+	}
 }
 
 /*
@@ -154,6 +159,12 @@ void cerrarSemaforos(void){
 	while(sem_cerrado==-1){
 		sem_cerrado=sem_destroy(&sem_pcp);
 	}
+
+	sem_cerrado=-1;
+
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(&sem_new);
+	}
 }
 
 
@@ -161,7 +172,6 @@ void cerrarSemaforos(void){
 /*
  * Nombre: agregarNuevoPrograma/2
  * Argumentos:
- * 		- pid del programa nuevo que se conecto
  * 		- codigo ansisop del programa nuevo conectado
  * 		- fd donde el Kernel se comunica con el programa
  *
@@ -173,19 +183,23 @@ void cerrarSemaforos(void){
 
 void agregarNuevoPrograma(char* codigo, int fd){
 	t_programa programa;
+	programa.peso=0;
 	programa.codigo=codigo;
 	programa.flag_bloqueado=0;
 	programa.flag_terminado=0;
 	programa.pcb=malloc(sizeof(t_pcb));
 	programa.metadata=malloc(sizeof(t_medatada_program));
-	programa.metadata=metadatada_desde_literal(codigo);
+	programa.metadata=metadata_desde_literal(codigo);
+	printf("La cantidad de etiquetas es: %d\n", programa.metadata->cantidad_de_etiquetas);
+	printf("La cantidad de funciones es: %d\n", programa.metadata->cantidad_de_funciones);
+	printf("La cantidad de instrucciones es: %d\n", programa.metadata->etiquetas_size);
 	programa.peso=calcularPeso(programa);
+	printf("El peso es: %d\n",programa.peso);
 	programa.socket_descriptor_conexion=fd;
 
 	pthread_mutex_lock(mutex_pid);
 	programa.pcb->pid=program_pid;
 	program_pid+=1;
-	printf("%d\n",program_pid);
 	pthread_mutex_unlock(mutex_pid);
 
 
@@ -220,16 +234,19 @@ void aceptarConexionEntrante(epoll_data_t data){
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int n,fd_aceptado,j;
-	char* buffer;
-	void* buff;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
 	for(n=0;fds_conectados_programas[n]!=NULL;n++){
 		if(n<MAX_EVENTS_EPOLL){
-			fd_aceptado=fds_conectados_programas[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(fd_aceptado, (void*)&buffer, &buff);
+			fd_aceptado=socket_aceptarCliente(data.fd);
+			j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
 			if(j==1){
-				printf("Se recibio una conexion de programa\n");
-				agregarNuevoPrograma((char*)buff, fd_aceptado);
+				printf("Se recibio bien el paquete\n");
+				t_struct_string* k = ((t_struct_string*)structRecibida);
+				agregarNuevoPrograma(k->string, fd_aceptado);
+				sem_post(&sem_new);
 			}
+			//}
 		}else{
 			log_escribir(archLog, "Kernel - Programas", ERROR,"Se alcanzó el máximo de Programas aceptados");
 		}

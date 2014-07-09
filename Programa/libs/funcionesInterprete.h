@@ -20,13 +20,14 @@
 
 extern t_config_programa configuracion_programa;
 extern char* PATH_config;
-extern char* archivo_ansisop;
+extern char* codigo_ansisop;
 extern int sock_kernel_servidor;
 extern FILE* script;
+extern char* k;
 
 /************** FUNCIONES **************/
 
-char* leerScript(off_t* ,char*); //lee el script
+void leerScript(off_t* ,char*); //lee el script
 int validarScript(void);
 void inicializarConfiguracion(void);
 void leerConfiguracion(void);

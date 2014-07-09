@@ -9,7 +9,7 @@
 #include "funcionesInterprete.h"
 
 
-char* leerScript(off_t* fileSize,char* path) {
+void leerScript(off_t* fileSize,char* path) {
 
 	struct stat file_info;
 	int control = lstat(path, &file_info);
@@ -20,27 +20,33 @@ char* leerScript(off_t* fileSize,char* path) {
 		*fileSize = 0;
 
 	}else{
+		int c;
 		*fileSize = file_info.st_size;
 		FILE* script = fopen(path, "r");
-		buffer = malloc(*fileSize);
-		fread(buffer, *fileSize, sizeof(char), script);
+		k = (char*)malloc(*fileSize);
+	    int i=0;
+		while ((c = getc(script)) != EOF){
+			k[i]=(char)c;
+			printf("%c",k[i]);
+			i++;
+		}
+		printf("Paso el print del while\n");
 		fclose(script);
+
 
 	}
 
-	return buffer;
 }
 
 
 int validarScript(void){
 	int i=0;
 	char* aux = malloc(18*sizeof(char));
-
-	while(archivo_ansisop[i]!='\n'){
-		aux[i]=archivo_ansisop[i];
+	while(codigo_ansisop[i]!='\n'){
+		printf("%c",codigo_ansisop[i]);
+		aux[i]=codigo_ansisop[i];
 		i++;
 	}
-
 	int resultado = strcmp(aux,"#!/usr/bin/ansisop");
 	free(aux);
 	return resultado;

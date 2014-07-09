@@ -85,7 +85,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.puerto_programas = config_get_int_value(config,"Puerto TCP para recibir conexiones de los Programas");
 	configuracion_kernel.puerto_cpus = config_get_int_value(config,"Puerto TCP para recibir conexiones de los CPUs");
 	configuracion_kernel.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
-	configuracion_kernel.retardo_quantum = config_get_int_value(config,"Retardo del Quantum");
+	configuracion_kernel.retardo_quantum = config_get_long_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
 	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
@@ -135,7 +135,6 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 t_pcb crearPcb(char* codigo) {
 	t_pcb nuevoPCB;
 	t_medatada_program *metadata_programa =metadatada_desde_literal(codigo);
-	nuevoPCB.pid=getpid();
 	nuevoPCB.program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
 
 	/*Esto es lo falta cargarle al PCB
@@ -176,10 +175,10 @@ void core_plp(void){
 	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 
-	sleep(20);
-
+	sleep(15);
 	while (1){
 		sem_wait(&sem_plp);
+		sem_wait(&sem_new);
 
 		pthread_mutex_lock(mutex_cola_new);
 		mostrarNodosPorPantalla(cola.new,"New");
@@ -231,10 +230,14 @@ void core_io(int retardo, char* dispositivo){
 		if((strcmp(dispositivo,configuracion_kernel.hio.id[i]))==0){
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block);
+			t_programa* programa= (t_programa*) list_remove(cola.exec,0);
 			//Falta mover de la cola de exec a block, tengo que ver remove_condition
 
 			pthread_mutex_unlock(mutex_cola_exec);
+			list_add(cola.block, (void*)programa);
+			mostrarNodosPorPantalla(cola.block,"block");
 			pthread_mutex_unlock(mutex_cola_block);
+
 			sleep(retardo*configuracion_kernel.hio.retardo[i]);
 
 		}
