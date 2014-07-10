@@ -142,6 +142,11 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 	nuevoPCB->program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
 	//nuevoPCB->codigo=solicitarMemoria()
+	//nuevoPCB->stack=solicitarMemoria()
+	//nuevoPCB->c_stack=solicitarMemoria()
+	//nuevoPCB->index_codigo=solicitarMemoria()
+	//nuevoPCB->index_etiquetas=solicitarMemoria()
+
 
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
@@ -183,7 +188,7 @@ void core_plp(void){
 
 	sleep(15);
 	while (1){
-		sem_wait(&sem_plp);
+		sem_wait(&sem_multiProg);
 		sem_wait(&sem_new);
 
 		pthread_mutex_lock(mutex_cola_new);
@@ -198,12 +203,14 @@ void core_plp(void){
 		pthread_mutex_unlock(mutex_cola_new);
 
 		list_add(cola.ready, (void*) programa);
-
 		pthread_mutex_unlock(mutex_cola_ready);
 
 		sem_post(&sem_pcp);
 	}
 
+	pthread_join(conexion_plp_programas,NULL);
+	pthread_join(conexion_plp_umv,NULL);
+	pthread_join(conexion_plp_cpu,NULL);
 
 	cerrarSemaforos();
 	return;
@@ -215,13 +222,20 @@ void core_pcp(void){
 	while(1){
 	sem_wait(&sem_pcp);
 
+	pthread_mutex_lock(mutex_cola_ready);
+	mostrarNodosPorPantalla(cola.ready,"Ready");
+	pthread_mutex_unlock(mutex_cola_ready);
 
 
 
 
+	if(programa.flag_bloqueado==1){
+
+	}
 
 	if(programa.flag_terminado==1){
-		sem_post(&sem_plp);
+
+		sem_post(&sem_multiProg);
 	}
 
 
@@ -230,17 +244,15 @@ void core_pcp(void){
 }
 
 
-void core_io(int retardo, char* dispositivo){
+void core_io(t_programa programa, int retardo, char* dispositivo){
 	int i;
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
 		if((strcmp(dispositivo,configuracion_kernel.hio.id[i]))==0){
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block);
-			t_programa* programa= (t_programa*) list_remove(cola.exec,0);
-			//Falta mover de la cola de exec a block, tengo que ver remove_condition
-
+			bloquearPrograma(programa.pcb->pid);
 			pthread_mutex_unlock(mutex_cola_exec);
-			list_add(cola.block, (void*)programa);
+
 			mostrarNodosPorPantalla(cola.block,"block");
 			pthread_mutex_unlock(mutex_cola_block);
 
@@ -260,7 +272,6 @@ void core_conexion_plp_programas(void){
 	struct epoll_event* events;
 	programas = malloc(MAX_EVENTS_EPOLL*sizeof(t_programa));
 
-	fds_conectados_programas = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketServidor(efd_programas,sock_programas);
@@ -277,14 +288,8 @@ void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
 		printf("Conectado a la UMV\n");
 	}
-	int* i;
-	int k=5;
-	i=&k;
-	printf("el valor que se manda es %d\n", k);
-	int j=socket_enviar(sock_umv, D_STRUCT_NUMERO, i);
-	if(j==1){
-		printf("Se envio bien el paquete\n");
-	}
+
+
 	return;
 }
 
@@ -329,14 +334,14 @@ void core_pcp_new(void){
 	t_programa *programa;
 
 	while(1){
-		sem_wait(&sem_plp);
+		sem_wait(&sem_multiProg);
 		pthread_mutex_lock(mutex_cola_new);
 		pthread_mutex_lock(mutex_cola_ready);
 		programa=(t_programa*)list_remove(cola.new, 0);
 		pthread_mutex_unlock(mutex_cola_new);
 		list_add(cola.ready, (void*)programa);
 		pthread_mutex_unlock(mutex_cola_ready);
-		sem_post(&sem_plp);
+		sem_post(&sem_multiProg);
 	}
 	return;
 }
@@ -353,33 +358,4 @@ void esperarYCerrarConexiones(void){
 }
 
 
-/*
- * lo del PCP
-while(1){
-		while(programa.flag_terminado==0){
 
-		//Acá manda el programa al cpu los quantums que le correspondan, si termina antes de que termine el quantum se devuelve y asigna con cuánto terminó
-			pthread_mutex_lock(mutex_cola_exec);
-			list_add(cola.exec,programa); //Agrego el programa a la lista exec porque está en la cpu, cuando vuelva se vé si vuelve a ready o pasa a block
-			pthread_mutex_unlock(mutex_cola_exec);
-
-		//Aca deberia esperar a que la cpu lo devuelva, de todas formas no estoy seguro
-			if(programa.flag_bloqueado==0){
-			//Sacar al programa por el pid de la cola exec y ponerlo en ready
-			}else{
-				pthread_mutex_lock(mutex_cola_block);
-				list_add(cola.block,programa);
-				pthread_mutex_unlock(mutex_cola_block);
-			}
-		}
-
-		if(programa.flag_terminado==1){ //Esto va al final,
-			pthread_mutex_lock(mutex_cola_exec);
-			pthread_mutex_lock(mutex_cola_exit);
-			list_add(cola.exit,list_remove(cola.exec,0)); //Hay que usar remove_by_condition y preguntar por el flag_terminado
-			pthread_mutex_unlock(mutex_cola_exit);
-			pthread_mutex_unlock(mutex_cola_exec);
-
-		}
-}
-*/

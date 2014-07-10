@@ -120,7 +120,7 @@ void inicializarSemaforos(void){
  */
 
 void crearSemaforos(void){
-	if((sem_init(&sem_plp, 1, configuracion_kernel.multiprogramacion))==-1){
+	if((sem_init(&sem_multiProg, 1, configuracion_kernel.multiprogramacion))==-1){
 			perror("No se puede crear el semáforo");
 			exit(1);
 	}
@@ -151,7 +151,7 @@ void cerrarSemaforos(void){
 	int sem_cerrado=-1;
 
 	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(&sem_plp);
+		sem_cerrado=sem_destroy(&sem_multiProg);
 	}
 
 	sem_cerrado=-1;
@@ -166,6 +166,34 @@ void cerrarSemaforos(void){
 		sem_cerrado=sem_destroy(&sem_new);
 	}
 }
+
+
+/*
+ * Nombre: bloquearPrograma/1
+ * Argumentos:
+ * 		-pid
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: pasa un programa, buscandolo por su pid, de la cola de exec a la de bloqueados
+ */
+
+void bloquearPrograma(int pid){
+	t_link_element *element= cola.exec->head;
+	int position = 0;
+
+	while ((element != NULL)&&(((t_programa*)(element->data))->pcb->pid !=pid)){
+		element = element->next;
+		position++;
+	}
+	t_programa* programa;
+	programa = (t_programa*) list_remove(cola.exec,position);
+	list_add(cola.block,(void*)programa);
+
+	return;
+}
+
 
 
 
@@ -250,12 +278,12 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 
 void manejar_ConexionNueva_CPU(epoll_data_t data){
 	int n, fd_aceptado, j;
-	int* id;
-	void* buffer;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
 	for(n=0; fds_conectados_cpu[n]!=NULL;n++){
 		if(n<MAX_EVENTS_EPOLL){
 			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(fd_aceptado,(void*)&id,&buffer);
+			j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
 			if(j==1){
 				printf("Se recibio una conexion de cpu\n");
 			}

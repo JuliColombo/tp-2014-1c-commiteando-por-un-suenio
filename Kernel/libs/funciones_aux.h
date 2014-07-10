@@ -24,6 +24,7 @@ void agregarNuevoPrograma(char* codigo, int fd);
 void inicializarSemaforos(void);
 void crearSemaforos(void);
 void cerrarSemaforos(void);
+void bloquearPrograma(int pid);
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
 void manejar_ConexionNueva_Programas(epoll_data_t);

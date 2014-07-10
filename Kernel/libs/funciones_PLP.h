@@ -26,7 +26,7 @@
 extern t_config_kernel configuracion_kernel;
 extern log_t* archLog;
 extern char* PATH_config;
-extern t_thread_io io;
+extern pthread_t io;
 extern pthread_t plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 extern pthread_t pcp, conexion_pcp_cpu, hilo_pcp_ready, hilo_pcp_new;
 extern cola_procesos cola;
@@ -39,9 +39,8 @@ extern pthread_mutex_t* mutex_pid;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
-extern int* fds_conectados_programas;
 extern int* fds_conectados_cpu;
-extern sem_t sem_plp, sem_pcp, sem_new;
+extern sem_t sem_multiProg, sem_pcp, sem_new;
 extern t_programa* programas;
 extern int program_pid;
 
@@ -64,7 +63,7 @@ t_pcb* crearPcb(char*,t_medatada_program*);
 /************************* HILOS *************************/
 void core_plp(void);
 void core_pcp(void);
-void core_io(int, char*);
+void core_io(t_programa,int, char*);
 void core_conexion_plp_programas(void);
 void core_conexion_umv(void);
 void core_conexion_pcp_cpu(void);
