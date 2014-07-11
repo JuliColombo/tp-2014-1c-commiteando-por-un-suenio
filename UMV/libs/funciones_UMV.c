@@ -95,8 +95,9 @@ int ubicarEnTabla(int inicio){
 	return -1;
 }
 
-t_buffer solicitarBytes(int base,int offset, int longitud){
-	t_buffer buffer;
+t_buffer* solicitarBytes(int base,int offset, int longitud){
+	t_buffer* buffer;
+	buffer = malloc(sizeof(longitud));
 	int i=0;
 	int procesoDelHilo=0; // Donde lo declaramos?
 	int segmentoBase = ubicarEnTabla(base);
@@ -316,8 +317,8 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	int i;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(validarSolicitud(tamanio)){
-		if(configuracion_UMV.algoritmo == firstfit){ubicacion = escogerUbicacionF(tamanio);}
-		if(configuracion_UMV.algoritmo == worstfit){ubicacion = escogerUbicacionW(tamanio);}
+		if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
+		if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
 		}else{
 			printf("No hay espacio disponible para %d",id_prog);
 			return;
@@ -329,7 +330,6 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
-	//aux.segmento=segmento;
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
