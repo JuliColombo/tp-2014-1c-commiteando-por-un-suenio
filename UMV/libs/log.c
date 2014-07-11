@@ -12,7 +12,7 @@ log_t* log_crear(char* dirLog) {
 	char pathLog[80];
 
 	log_t* log = malloc(sizeof(log_t));
-	log->mode = M_CONSOLEANDFILE;
+	log->mode = M_FILE;
 	log->pid = getpid();
 
 	sprintf(pathLog,"%s UMV.[%d].log",dirLog,log->pid);
@@ -38,7 +38,7 @@ int log_escribir(log_t *log, const char *program_name, e_message_type type,
 
 	va_list args_list;
 	va_start(args_list, format);
-	return 1/*log_vwrite(log, program_name, type, format, args_list)*/;
+	return log_vwrite(log, program_name, type, format, args_list);
 
 }
 
