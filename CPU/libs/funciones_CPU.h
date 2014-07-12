@@ -8,16 +8,17 @@
 #ifndef FUNCIONES_CPU_H_
 #define FUNCIONES_CPU_H_
 
-
-#include <commons/collections/dictionary.h>
-#include "parser/metadata_program.h"
 #include <stdio.h>
-#include "primitivas.h"
-#include "primitivasAux.h"
 #include "commons/config.h"
 #include "log.h"
 #include <pthread.h>
-#include "Sockets/socket.h"
+#include "parserCPU.h"
+
+typedef uint8_t t_quantum;
+typedef long t_retardo_quantum;
+
+extern t_quantum quantum;
+extern t_retardo_quantum retardo;
 
 typedef struct{
 	char* ip_kernel;
@@ -29,7 +30,9 @@ typedef struct{
 /************** VARIABLES GLOBALES **************/
 extern config_cpu configuracion_CPU;
 extern char* PATH;
+int termino;
 
+//VA ACA EL QUANTUM Y SU RETARDO?
 
 /*************  PROTOTIPO FUNCIONES  *************/
 
@@ -39,6 +42,8 @@ void imprimirConfiguracion(void);
 void log_error_socket(void);
 void* core_conexion_kernel(void);
 void* core_conexion_umv(void);
+void recibir_quantum(int sockKernel);
+void recibir_retardo_quantum(int sockKernel);
 
 
 #endif /* FUNCIONES_CPU_H_ */

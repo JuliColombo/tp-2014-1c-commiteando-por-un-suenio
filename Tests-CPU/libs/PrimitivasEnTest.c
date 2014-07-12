@@ -7,10 +7,13 @@
 
 #include "PrimitivasEnTest.h"
 
+#define QUANTUM 3;
 #define DONE 5;
 
 int esConRetorno = 0;
 int termino;
+int retardo = 150;
+int quantum = 100;
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -105,11 +108,13 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 /***************************************** IR AL LABEL ************************************************************/
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
+
 	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
 	t_intructions inst = indiceCodigo[instruccion];
 
 	buscarEnSegmentoCodigo(inst);
+
 
 }
 
@@ -178,6 +183,9 @@ void finalizar() {
 	if(esPrimerContexto()) {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 		printf("\n\nllegamos al if!\n\n");
+		printf("\nACA PIDO DESTRUIR ESTRUCTURAS CORRESPONDIENTES\n");
+		printf("\nMUESTRO ESTADO FINAL DE LAS VARIABLES POR CONSOLA (SOCKET?)\n");
+		printf("\nLE INDICO A PCP QUE FINALICE\n");
 		termino = DONE;
 
 	}
@@ -220,40 +228,42 @@ void imprimir(int valor) {
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
-//IDEA PARA MANDAR A CORRER EL PARSER EN LA CPU. LLEGARIA SCRIPT POR PARAMETRO.
+void hot_plug(int signum) {
+	if(signum == SIGUSR1){
+		termino = 5;
+		printf("******************* ACA DEBERIA CERRAR EL SOCKET DE LA CPU *******************************\n");
+	}
+}
+
+void esperar_retardo(int tiempo){
+	usleep(tiempo*1000);
+}
+
+void salir(int termino) {
+	switch (termino) {
+	case 5: //finalizo
+	printf("\ntermino ejecucion \n");
+	break;
+	case 3: //sale por quantum
+	printf("\nsalgo por quantum\n");
+	break;
+	}
+}
+
 void integracionCorrerParser() {
-	while(1){
+	signal(SIGUSR1,hot_plug);
+
+	int i;
+	for(i=0;i<=quantum;i++){
 		termino = 0;
-		parsear();
-		if(termino == 5) {
-			break;
-		}
-	}
-}
 
-void integracionScriptFacil() {
-	while(1){
 		parsear();
-		if(pila->elementos[1] == 17) {
-			break;
-		}
-	}
 
-}
+		esperar_retardo(retardo);
 
-void integracionConFuncionDoble() {
-	while(1){
-		parsear();
-		if(pila->elementos[3] == 40) {
-			break;
-		}
-	}
-}
-
-void integracionFor(){
-	while(1){
-		parsear();
-		if((pila->elementos[3] == 20) && (pila->elementos[5]==0)) {
+		if (termino != 0) {
+			salir(termino);
+			termino = 0;
 			break;
 		}
 	}

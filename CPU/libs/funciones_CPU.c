@@ -8,6 +8,7 @@
 #include "Sockets/estructuras_socket.h"
 config_cpu configuracion_cpu;
 
+
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
 	struct stat file_info;
@@ -41,80 +42,46 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 }
 
-
+/******************************** CONEXION KERNEL ***************************************************/
 void* core_conexion_kernel(void){
 	int sock;
 	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
 		log_error_socket();
+		printf("se conecto al kernel\n");
 	}
-	printf("se conecto al kernel\n");
-	while(1){
 
-	}
+	//CODEO ACA
+	recibir_quantum(sock);
+	recibir_retardo_quantum(sock);
+
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
 	}
 	return NULL;
 }
 
+void recibir_quantum(int sockKernel) {
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
+	quantum = estructura->numero;
+}
+
+void recibir_retardo_quantum(int sockKernel) {
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
+	retardo = estructura->numero;
+}
+
+/******************************** CONEXION UMV ***************************************************/
+
 void* core_conexion_umv(void){
 	int sock;
 	if ((sock=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))>0){
+			log_error_socket();
 			printf("Conectado a la UMV\n");
 		}
 
-	/*t_struct_numero* i = malloc(sizeof(t_struct_numero));
-	 uint32_t k=5;
-	 i->numero=k;
-	 printf("el valor que se manda es %d\n", k);
-	 int j=socket_enviar(sock, D_STRUCT_NUMERO, i);
-	 if(j==1){
-	 printf("Se envio bien el paquete\n");
-	 free(i);*/
+	//CODEO ACA
 
-	/*t_struct_string* i = malloc(sizeof(t_struct_string));
-		 char* k = "argentina";
-		 i->string=k;
-		 printf("el valor que se manda es %s\n", i->string);
-		 int j=socket_enviar(sock, D_STRUCT_STRING, i);
-		 if(j==1){
-		 printf("Se envio bien el paquete\n");
-		 free(i);*/
 
-	/*t_struct_char* i = malloc(sizeof(t_struct_char));
-		 char k = 'a';
-		 i->letra=k;
-		 printf("el valor que se manda es %c\n", i->letra);
-		 int j=socket_enviar(sock, D_STRUCT_CHAR, i);
-		 if(j==1){
-		 printf("Se envio bien el paquete\n");
-		 free(i);*/
-
-	t_struct_push* i = malloc(sizeof(t_struct_push));
-	uint32_t pos = 14;
-	int32_t val = -9;
-	i->posicion = pos;
-	i->valor = val;
-	printf("el valor que se manda es %d y %d\n",i->posicion,i->valor);
-	int j= socket_enviar(sock,D_STRUCT_PUSH,i);
-	if(j==1){
-		printf("se envio bien el paquete\n");
-		free(i);
-
-	/*t_struct_instruccion* i = malloc(sizeof(t_struct_instruccion));
-		uint32_t st = 9;
-		uint32_t off = 32;
-		t_intructions juji;
-		juji.start= st;
-		juji.offset=off;
-		i->inst=juji;
-		printf("el valor que se manda es %s y %d\n",i->inst.start,i->inst.offset);
-		int j= socket_enviar(sock,D_STRUCT_ASIGNARCOMPARTIDA,i);
-		if(j==1){
-			printf("se envio bien el paquete\n");
-			free(i);*/
-
-}
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
 	}

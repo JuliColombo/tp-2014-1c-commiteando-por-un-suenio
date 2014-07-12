@@ -11,6 +11,9 @@
 #include <parser/metadata_program.h>
 #include <commons/collections/dictionary.h>
 #include "Sockets/crear_estructuras.h"
+#include "Sockets/socket.h"
+#include <stdio.h>
+
 
 typedef struct{
 	char* name;
@@ -18,9 +21,6 @@ typedef struct{
 }t_elemento;
 
 t_struct_pcb pcb;
-
-AnSISOP_kernel (*funciones_kernel) (const char* string);
-AnSISOP_funciones (*funciones_parser) (const char* string);
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 

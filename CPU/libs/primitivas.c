@@ -5,13 +5,9 @@
  *      Author: utnso
  */
 
-#include "primitivasAux.h"
-#include "Sockets/crear_estructuras.h"
-#include "primitivas.h"
-#include <commons/collections/dictionary.h>
-#include <parser/metadata_program.h>
-
 #define DONE 5;
+#define QUANTUM 3;
+
 
 t_dictionary *diccionario;
 int sockfd;
@@ -24,7 +20,7 @@ t_intructions* indiceCodigo;
 
 char* proximaInstruccion;
 
-int termino;
+extern int termino; //tiene que ser extern??
 int esConRetorno = 0;
 
 
@@ -73,7 +69,6 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 
 
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
-	//top_index que se actualiza cada vez que UMV pushea o popea
 
 	int top = top_index;
 
@@ -85,7 +80,6 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 		top_index = posibleTop;
 	} else {
 		top_index = top;
-		socket_and_modificar_top_index(sockUMV,top); //Que stack actualice su top_index. HACE FALTA REALMENTE ??????
 	}
 }
 
@@ -245,25 +239,25 @@ int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
-/*
-int wait(t_nombre_semaforo identificador_semaforo) {
+
+int wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 
-	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,WAIT);
+	/*struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,WAIT);
 	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
-	free(estructura);
+	free(estructura);*/
 
 	return 0;
 }
 
-int signal(t_nombre_semaforo identificador_semaforo) {
+int signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función signal para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si desbloquear otros procesos o no.
 
-	struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,SIGNAL);
+	/*struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,SIGNAL);
 	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
-	free(estructura);
+	free(estructura);*/
 
 	return 0;
-}*/
+}

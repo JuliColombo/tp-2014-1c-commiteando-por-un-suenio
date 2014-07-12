@@ -8,6 +8,8 @@
 #ifndef PRIMITIVAS_H_
 #define PRIMITIVAS_H_
 
+#include "primitivasAux.h"
+
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
@@ -36,10 +38,9 @@ int imprimirTexto(char* texto);
 
 int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo);
 
-int signal(t_nombre_semaforo identificador_semaforo);
+int signal_ansisop(t_nombre_semaforo identificador_semaforo);
 
-int wait(t_nombre_semaforo identificador_semaforo);
+int wait_ansisop(t_nombre_semaforo identificador_semaforo);
 
-void retornarrr(t_valor_variable retorno); //SACAR ESTO !
 
 #endif /* PRIMITIVAS_H_ */

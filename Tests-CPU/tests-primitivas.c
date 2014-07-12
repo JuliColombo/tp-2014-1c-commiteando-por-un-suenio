@@ -210,7 +210,6 @@ void testRetornar() {
 
 void testIntegracionScriptFacil(){
 	crearPcb();
-	//integracionScriptFacil();
 	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
@@ -221,7 +220,6 @@ void testIntegracionScriptFacil(){
 
 void testIntegracionConFuncionDoble() {
 	crearPcb();
-	//integracionConFuncionDoble();
 	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'a');
@@ -232,7 +230,6 @@ void testIntegracionConFuncionDoble() {
 
 void testIntegracionFor() {
 	crearPcb();
-	//integracionFor();
 	integracionCorrerParser();
 
 	CU_ASSERT_EQUAL(pila->elementos[0],'f');

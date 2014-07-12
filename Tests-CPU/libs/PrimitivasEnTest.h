@@ -14,6 +14,8 @@
 #include "parser/parser.h"
 #include "funcionesAux.h"
 #include <stdint.h>
+#include <unistd.h>
+#include <signal.h>
 
 extern int top_index;
 t_stack* pila;

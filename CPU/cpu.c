@@ -17,11 +17,6 @@ int main (int argc, char **argv){
 	PATH=argv[1];
 	inicializarConfiguracion();
 
-	//Cuando me conecto a UMV, que me diga si la pila esta vacia y me guardo su valor de top_index. Si esta vacia, es -1, sino lo que corresponda.
-	//Con el top_index voy a poder calcular la posicion a pushear
-
-
-
 	pthread_create(&conexion_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
 
