@@ -24,11 +24,11 @@ AnSISOP_kernel funciones_kernel = { };
 void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
 
-	/*t_intructions inst = indiceCodigo[pcb.program_counter];
+	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb.program_counter);
 
-	buscarEnSegmentoCodigo(inst);*/
+	socket_and_instruccion(sockUMV,inst);
 
-
+	recibirProximaInstruccion(sockUMV);
 
 }
 
@@ -43,14 +43,20 @@ void parsear(){
 }
 
 void esperar_retardo(int tiempo){
-	usleep(tiempo*1000);
+	usleep(tiempo/1000);
 }
 
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
-		if (i==quantum){
+		for(i;i<=quantum;i++){
+				termino = 0;
+				parsear();
+				esperar_retardo(retardo);
+
 		termino = 5;
-		printf("******************* ACA DEBERIA CERRAR EL SOCKET DE LA CPU *******************************\n");
+		i = 0;
+		if(socket_cerrarConexion(sockKernel)==-1){
+			log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");}
 		}
 	}
 }
@@ -72,13 +78,14 @@ void correrParser() {
 	for(i=0;i<=quantum;i++){
 		termino = 0;
 
-		//parsear();
+		parsear();
 
 		esperar_retardo(retardo);
 
 		if (termino != 0) {
 			salir(termino);
 			termino = 0;
+			i = 0;
 			break;
 		}
 	}

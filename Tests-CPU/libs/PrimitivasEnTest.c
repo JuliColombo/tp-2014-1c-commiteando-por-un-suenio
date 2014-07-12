@@ -123,17 +123,10 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 	reservarContextoSinRetorno();
 
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
-
 	int posicionAPushear =  top_index +1;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
-
-	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = indiceCodigo[instruccion];
-
-	buscarEnSegmentoCodigo(inst);
+	irAlLabel(etiqueta);
 
 	pcb.tamanio_contexto = 0;
 
@@ -145,18 +138,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 	reservarContextoConRetorno(donde_retornar);
-	//Socket recibiendo top_index de pila para actualizar el mio y poder llevar a cabo otras primitivas
 
 	int posicionAPushear = top_index +1;
-	//*pcb.c_stack = posicionAPushear;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
-
-	//Busco en indice de codigo qué le pido a UMV
-	t_intructions inst = indiceCodigo[instruccion];
-
-	buscarEnSegmentoCodigo(inst);
+	irAlLabel(etiqueta);
 
 	pcb.tamanio_contexto = 0;
 }
