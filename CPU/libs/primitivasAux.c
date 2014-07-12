@@ -17,22 +17,18 @@ char* proximaInstruccion;
 char* indiceEtiquetas;
 int esConRetorno;
 
-/*
+
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice;
 	//tendria que aclararle a la umv que es para generar el indice
 
-	t_estructura tipo = STRUCT_STRING;
-	void** estructura2;
-	socket_recibir(sockUMV,&tipo, estructura2);
-	struct_string** estructuraAux = (struct_string**)estructura2;
 
 	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	indice = estructura->string
+	indice = estructura->string;
 
 	return indice;
 
-}*/
+}
 
 
 void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
@@ -46,6 +42,14 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 	instruccion = metadata_buscar_etiqueta(etiqueta, indiceEtiquetas,pcb.tamanio_indice);
 	pcb.program_counter = instruccion;
 	return instruccion;
+}
+
+t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
+	socket_and_number(sockUMV,instruccion);
+
+	t_struct_instruccion* estructura =(t_struct_instruccion*)socket_recibir_estructura(sockUMV);
+	t_intructions inst = estructura->inst;
+	return inst;
 }
 
 void recibirProximaInstruccion(int sockUMV) {

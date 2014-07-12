@@ -66,5 +66,7 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo);
 
 void recuperarDireccionRetorno(t_puntero* direccion_retorno);
 
+void instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion);
+
 
 #endif /* PRIMITIVASAUX_H_ */
