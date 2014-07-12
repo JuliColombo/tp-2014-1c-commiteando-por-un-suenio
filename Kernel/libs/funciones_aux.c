@@ -233,6 +233,26 @@ void agregarNuevoPrograma(char* codigo, int fd){
 
 }
 
+/*
+ * Nombre: actualizarPCB/2
+ * Argumentos:
+ * 		-programa
+ * 		-pcb actualizada
+ *
+ * Devuelve:
+ *		nada
+ *
+ * Funcion: actualiza el pcb recibido de una cpu y libera la memoria
+ */
+void actualizarPCB(t_programa programa, t_pcb pcb ){
+	programa.pcb->program_counter=pcb.program_counter;
+	programa.pcb->tamanio_contexto=pcb.tamanio_contexto;
+	programa.pcb->tamanio_indice=pcb.tamanio_indice;
+	//HAY QUE VER SI NO FALTA ALGO MAS
+
+	free(pcb);
+	return;
+}
 
 
 
@@ -277,16 +297,15 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
  */
 
 void manejar_ConexionNueva_CPU(epoll_data_t data){
-	int n, fd_aceptado, j;
-	t_tipoEstructura tipoRecibido;
-	void* structRecibida;
+	int n, fd_aceptado;
+	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+	uint32_t k=configuracion_kernel.quantum;
+	paquete->numero=k;
 	for(n=0; fds_conectados_cpu[n]!=NULL;n++){
 		if(n<MAX_EVENTS_EPOLL){
 			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
-			j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
-			if(j==1){
-				printf("Se recibio una conexion de cpu\n");
-			}
+			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			//enviar el retardo del quantum
 		}
 	}
 
