@@ -12,7 +12,7 @@ log_t* log_crear(char* dirLog) {
 	char pathLog[80];
 
 	log_t* log = malloc(sizeof(log_t));
-	log->mode = M_CONSOLEANDFILE;
+	log->mode = M_FILE;
 	log->pid = getpid();
 
 	sprintf(pathLog,"%s Kernel.[%d].log",dirLog,log->pid);
