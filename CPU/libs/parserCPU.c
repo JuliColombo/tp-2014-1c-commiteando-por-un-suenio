@@ -11,15 +11,22 @@ AnSISOP_funciones funciones_parser = {
 			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariable,
 			.AnSISOP_dereferenciar			= dereferenciar,
 			.AnSISOP_asignar				= asignar,
-			.AnSISOP_finalizar				= finalizar,
+			.AnSISOP_asignarValorCompartida = asignarValorCompartida,
+			.AnSISOP_obtenerValorCompartida = obtenerValorCompartida,
 			.AnSISOP_irAlLabel				= irAlLabel,
 			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
 			.AnSISOP_llamarConRetorno		= llamarConRetorno,
 			.AnSISOP_retornar				= retornar,
+			.AnSISOP_finalizar				= finalizar,
 			.AnSISOP_imprimir				= imprimir,
+			.AnSISOP_imprimirTexto			= imprimirTexto,
+			.AnSISOP_entradaSalida			= entradaSalida,
 
 };
-AnSISOP_kernel funciones_kernel = { };
+AnSISOP_kernel funciones_kernel = {
+			.AnSISOP_signal					= signal_ansisop,
+			.AnSISOP_wait					= wait_ansisop,
+};
 
 void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
@@ -48,7 +55,7 @@ void esperar_retardo(int tiempo){
 
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
-		for(i;i<=quantum;i++){
+		for(i = 0;i<=quantum;i++){ //i no deberia ser igual a 0
 				termino = 0;
 				parsear();
 				esperar_retardo(retardo);

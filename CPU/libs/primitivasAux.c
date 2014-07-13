@@ -20,7 +20,7 @@ int esConRetorno;
 
 char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 	char* indice;
-	//tendria que aclararle a la umv que es para generar el indice
+	//tendria que aclararlee a la umv que es para generar el indice
 
 
 	t_struct_string* estructura = socket_recibir_estructura(sockUMV);

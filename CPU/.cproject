@@ -35,8 +35,8 @@
 								</option>
 								<option id="gnu.c.link.option.libs.712291239" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="commons"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="parser-ansisop"/>
 									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="/home/utnso/ansisop-parser/parser/build/libparser-ansisop.so"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2073222483" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -111,7 +111,14 @@
 		<project id="CPU.cdt.managedbuild.target.gnu.exe.2082746210" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/CPU"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/CPU"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1983206259;cdt.managedbuild.config.gnu.exe.debug.1983206259.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.2114859926;cdt.managedbuild.tool.gnu.c.compiler.input.540350480">

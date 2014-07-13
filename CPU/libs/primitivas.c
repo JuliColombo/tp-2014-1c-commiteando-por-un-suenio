@@ -26,7 +26,6 @@ extern int termino; //tiene que ser extern??
 int esConRetorno = 0;
 
 
-
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_valor_variable id = identificador_variable;
 
@@ -61,7 +60,7 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_and_pop_position(sockUMV,direccion_variable + 1);
 
-	//Socket recibiendo t_valor_variable id
+	//Socket recibiendoo t_valor_variable id
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	t_valor_variable valor_variable = estructura->numero;
 
@@ -198,35 +197,33 @@ void retornar(t_valor_variable retorno) {
 
 }
 
-int imprimir(t_valor_variable valor_mostrar) {
-	//Envía valor_mostrar al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución.
+void imprimir(t_valor_variable valor_mostrar) {
+	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
 	//Socket a Kernel enviandole el valor a mostrar
 	socket_and_number(sockKernel, valor_mostrar);
 
-	return 0;
 }
 
-int imprimirTexto(char* texto) {
+void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
 	//Socket a Kernel enviandole texto
 	socket_and_string(sockKernel,texto);
 
-	return 0;
 }
 
-int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
+void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
 
 	//Socket con mensaje?
-	return 0;
+
 }
 
 
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
-int wait_ansisop(t_nombre_semaforo identificador_semaforo) {
+void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si bloquearlo o no.
 
@@ -234,10 +231,9 @@ int wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
 	free(estructura);*/
 
-	return 0;
 }
 
-int signal_ansisop(t_nombre_semaforo identificador_semaforo) {
+void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 	//Informa al kernel que ejecute la función signal para el semáforo con el nombre identificador_semaforo.
 	//El kernel deberá decidir si desbloquear otros procesos o no.
 
@@ -245,5 +241,4 @@ int signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
 	free(estructura);*/
 
-	return 0;
 }

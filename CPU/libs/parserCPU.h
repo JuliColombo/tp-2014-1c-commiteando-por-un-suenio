@@ -1,17 +1,23 @@
 /*
- * parser.h
+ * parserCPU.h
  *
  *  Created on: 12/07/2014
  *      Author: utnso
  */
 
-#ifndef PARSER_H_
-#define PARSER_H_
+#ifndef PARSERCPU_H_
+#define PARSERCPU_H_
 
 #include "primitivas.h"
 #include "primitivasAux.h"
-#include "Sockets/socket.h"
+#include "log.h"
 #include <signal.h>
+
+typedef uint8_t t_quantum;
+typedef long t_retardo_quantum;
+
+extern t_quantum quantum;
+extern t_retardo_quantum retardo;
 
 int i;
 char* proximaInstruccion;

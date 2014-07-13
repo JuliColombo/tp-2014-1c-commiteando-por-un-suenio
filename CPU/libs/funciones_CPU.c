@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 #include "funciones_CPU.h"
-#include "Sockets/estructuras_socket.h"
+
 config_cpu configuracion_cpu;
 
 

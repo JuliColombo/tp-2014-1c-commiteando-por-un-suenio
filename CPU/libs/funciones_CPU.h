@@ -8,17 +8,9 @@
 #ifndef FUNCIONES_CPU_H_
 #define FUNCIONES_CPU_H_
 
-#include <stdio.h>
 #include "commons/config.h"
-#include "log.h"
 #include <pthread.h>
 #include "parserCPU.h"
-
-typedef uint8_t t_quantum;
-typedef long t_retardo_quantum;
-
-extern t_quantum quantum;
-extern t_retardo_quantum retardo;
 
 typedef struct{
 	char* ip_kernel;

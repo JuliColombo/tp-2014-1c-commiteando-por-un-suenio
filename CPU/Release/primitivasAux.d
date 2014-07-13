@@ -1,5 +1,5 @@
-primitivasAux.d: ../primitivasAux.c ../primitivasAux.h ../stack.h
+primitivasAux.d: ../primitivasAux.c ../primitivasAux.h
 
 ../primitivasAux.h:
 
-../stack.h:
+

@@ -11,9 +11,6 @@
 #include <parser/metadata_program.h>
 #include <commons/collections/dictionary.h>
 #include "Sockets/crear_estructuras.h"
-#include "Sockets/socket.h"
-#include <stdio.h>
-
 
 typedef struct{
 	char* name;
@@ -66,7 +63,7 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo);
 
 void recuperarDireccionRetorno(t_puntero* direccion_retorno);
 
-void instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion);
+t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion);
 
 
 #endif /* PRIMITIVASAUX_H_ */

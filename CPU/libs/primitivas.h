@@ -32,15 +32,15 @@ void finalizar();
 
 void retornar();
 
-int imprimir(t_valor_variable valor_mostrar);
+void imprimir(t_valor_variable valor_mostrar);
 
-int imprimirTexto(char* texto);
+void imprimirTexto(char* texto);
 
-int entradaSalida(t_nombre_dispositivo dispositivo, int tiempo);
+void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo);
 
-int signal_ansisop(t_nombre_semaforo identificador_semaforo);
+void signal_ansisop(t_nombre_semaforo identificador_semaforo);
 
-int wait_ansisop(t_nombre_semaforo identificador_semaforo);
+void wait_ansisop(t_nombre_semaforo identificador_semaforo);
 
 
 #endif /* PRIMITIVAS_H_ */
