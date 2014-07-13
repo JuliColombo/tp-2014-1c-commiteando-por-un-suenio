@@ -350,6 +350,7 @@ int getPosTablaSeg(int id_prog){
 		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
 		tablaDeSegmentos = malloc(sizeof(tablaSeg));
 		tablaDeSegmentos[0].cant_segmentos=0;
+		cant_tablas++;
 		return 0;
 	}
 	else{
