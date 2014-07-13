@@ -134,29 +134,7 @@ typedef struct struct_pcb{
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } __attribute__ ((__packed__)) t_struct_pcb;
 
-/* Estructura tipo STRUCT_GRADOMP
- * envia el grado de multiprogramacion del sistema
- *
- */
 
-typedef int t_gradoMP;
-
-typedef struct struct_grado_MP{
-	t_gradoMP gradoMP;
-}__attribute__ ((__packed__)) t_struct_gradoMP;
-
-
-/* Estructura tipo STRUCT_PIDYCODIGO
- * envia el pid de un programa y su respectivo codigo ansisop
- */
-
-typedef int* pid;
-typedef char* t_codigo;
-
-typedef struct struct_pidycodigo{
-	t_pid pid;
-	t_codigo codigo;
-}__attribute__ ((__packed__)) t_struct_pidycodigo;
 
 /* Estructura tipo STRUCT_PUSH
  *

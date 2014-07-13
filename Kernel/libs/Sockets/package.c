@@ -43,12 +43,6 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCB:
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
-			case D_STRUCT_GRADOMP:
-				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
-				break;
-			case D_STRUCT_PIDYCODIGO:
-				paquete = paquetizarStruct_pidycodigo((t_struct_pidycodigo*) estructuraOrigen);
-				break;
 			case D_STRUCT_PUSH:
 				paquete = paquetizarStruct_push((t_struct_push*) estructuraOrigen);
 				break;
@@ -234,35 +228,6 @@ t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
 	return paquete;
 }
 
-/*
- * Nombre: paquetizarStruct_pidycodigo/1
- * Argumentos:
- * 		-estructura tipo pidycodigo
- *
- * Devuelve:
- *		paquete
- *
- * Funcion: crearDataConHeader(6,length)
- */
-
-t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
-	t_stream* paquete = malloc(sizeof(t_stream));
-
-	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
-
-	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
-
-	int tamanoTotal = sizeof(t_header);
-
-	memcpy(data + tamanoTotal, estructuraOrigen->pid, sizeof(t_pid));
-
-	memcpy(data + tamanoTotal, estructuraOrigen->codigo, strlen(estructuraOrigen->codigo)+1);
-
-	paquete->data = data;
-
-
-	return paquete;
-}
 
 
 /*
@@ -468,7 +433,7 @@ t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
  */
 void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length){
 
-	void * estructuraDestino;
+	void * estructuraDestino=NULL;
 
 	switch (tipoEstructura){
 			case D_STRUCT_NOMBREMENSAJE:
@@ -488,9 +453,6 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_PCB:
 				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
-				break;
-			case D_STRUCT_PIDYCODIGO:
-				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
 				break;
 			case D_STRUCT_PUSH:
 				estructuraDestino = despaquetizarStruct_push(dataPaquete, length);
@@ -641,36 +603,6 @@ t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t lenght){
 	return estructuraDestino;
 }
 
-
-/*
- * Nombre: despaquetizarStruct_pidycodigo/2
- * Argumentos:
- * 		-paquete
- * 		-length
- *
- * Devuelve:
- *		estructura de tipo D_STRUCT_PIDYCODIGO
- *
- * Funcion:
- *
- */
-t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length){
-	t_struct_pidycodigo* estructuraDestino;
-
-
-	int tamanoTotal = 0, tamanoDato = 0;
-
-	tamanoTotal = tamanoDato;
-	estructuraDestino->pid = malloc(sizeof(int));
-	memcpy(&estructuraDestino->pid, dataPaquete, sizeof(int));
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != NULL;tamanoDato++);
-
-	estructuraDestino->codigo= malloc(tamanoDato);
-	memcpy(estructuraDestino->codigo, dataPaquete + tamanoTotal, tamanoDato);
-
-	return estructuraDestino;
-}
 
 
 /*

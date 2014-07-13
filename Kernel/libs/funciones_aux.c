@@ -299,12 +299,39 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 	uint32_t k=configuracion_kernel.quantum;
 	paquete->numero=k;
-	for(n=0; fds_conectados_cpu[n]!=NULL;n++){
+	for(n=0; fds_conectados_cpu[n]>-1;n++){
 		if(n<MAX_EVENTS_EPOLL){
 			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-			//enviar el retardo del quantum
+			sleep(1);
+			k=configuracion_kernel.retardo_quantum;
+			paquete->numero=k;
+			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
 		}
+		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 	}
+	free(paquete);
 
+}
+
+/*
+ * Nombre: desconectar_cpu/1
+ * Argumentos:
+ * 		- data epoll
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: saca la cpu del kernel
+ */
+
+void desconexion_cpu(epoll_data_t data){
+	int pos;
+	for(pos=0; pos<MAX_EVENTS_EPOLL; pos++){
+		if(fds_conectados_cpu[pos]==data.fd){
+			fds_conectados_cpu[pos]=-1;
+			break;
+		}
+
+	}
 }

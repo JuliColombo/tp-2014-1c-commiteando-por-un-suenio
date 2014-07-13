@@ -104,7 +104,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	printf("Puerto programas: %d\n", configuracion_kernel.puerto_programas);
 	printf("Puerto CPUs: %d\n", configuracion_kernel.puerto_cpus);
 	printf("Quantum: %d\n", configuracion_kernel.quantum);
-	printf("Retardo quantum: %d\n", configuracion_kernel.retardo_quantum);
+	printf("Retardo quantum: %l\n", configuracion_kernel.retardo_quantum);
 	printf("Grado de multiprogramacion: %d\n", configuracion_kernel.multiprogramacion);
 
 
@@ -279,7 +279,10 @@ void core_conexion_plp_programas(void){
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_programas;
 	while(1){
-		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
+		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, (void*) &desconexion_cpu);
+		if(i==-1){
+			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
+		}
 	}
 	return;
 }
@@ -297,9 +300,12 @@ void core_conexion_pcp_cpu(void){
 
 	struct epoll_event event;
 	struct epoll_event* events;
-
+	int i;
 
 	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
+	for(i=0; i<MAX_EVENTS_EPOLL;i++){
+		fds_conectados_cpu[i]=-1;
+	}
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
@@ -307,21 +313,10 @@ void core_conexion_pcp_cpu(void){
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_cpu;
 	while(1){
-		//int i = epoll_escucharBloqueante(efd_cpu,events);
-//		printf("epoll cpu = %d \n", i);
 		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, NULL);
-		printf("epoll cpu= %d \n", i);
+		printf("Se recibio una cpu \n", i);
 	}
 
-	//int* tipoRecibido;
-//	t_tipoEstructura tipoRecibido = D_STRUCT_NUMERO;
-//	void* structRecibida;
-//	int j=socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
-//	if(j==1){
-//	printf("Se recibio envio bien el paquete\n");
-//	int* k = ((int*)structRecibida);
-//	printf("%d\n", *k);
-//	}
 
 	return;
 }

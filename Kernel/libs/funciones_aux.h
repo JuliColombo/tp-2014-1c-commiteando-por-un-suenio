@@ -29,6 +29,7 @@ void bloquearPrograma(int pid);
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
 void manejar_ConexionNueva_Programas(epoll_data_t);
 void manejar_ConexionNueva_CPU(epoll_data_t data);
+void desconexion_cpu(epoll_data_t data);
 
 
 #endif /* FUNCIONES_AUX_H_ */
