@@ -32,18 +32,6 @@ void socket_and_pop_position(int sockAjeno,int posicion){
 	free(estructura);
 }
 
-t_struct_modificar_top_index* crear_struct_modificar_top_index(int top_index){
-	t_struct_modificar_top_index* estructura = malloc(sizeof(t_struct_modificar_top_index));
-	estructura->posicion = top_index;
-	return estructura;
-}
-
-void socket_and_modificar_top_index(int sockAjeno,int top_index){
-	t_struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
-	socket_enviar(sockAjeno, D_STRUCT_MODIFICARTOPINDEX, estructura);
-	free(estructura);
-}
-
 t_struct_string* crear_struct_string(char* string){
 	t_struct_string* estructura = malloc(sizeof(t_struct_string));
 	estructura->string = string;
@@ -84,6 +72,24 @@ t_struct_instruccion* crear_struct_instruccion(t_intructions instruccion){
 void socket_and_instruccion(int sockAjeno,t_intructions instruccion){
 	t_struct_instruccion* estructura = crear_struct_instruccion(instruccion);
 	socket_enviar(sockAjeno, D_STRUCT_INSTRUCCION, estructura);
+	free(estructura);
+}
+
+t_struct_semaforo* crear_struct_semaforo(char* string){
+	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
+	estructura->nombre_semaforo = string;
+	return estructura;
+}
+
+void socket_and_signal_semaforo(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_SIGNALSEMAFORO, estructura);
+	free(estructura);
+}
+
+void socket_and_wait(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_WAIT, estructura);
 	free(estructura);
 }
 

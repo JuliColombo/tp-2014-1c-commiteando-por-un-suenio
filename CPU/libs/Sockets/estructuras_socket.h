@@ -51,11 +51,12 @@ enum{
 	D_STRUCT_PIDYCODIGO=7,
 	D_STRUCT_PUSH=8,
 	D_STRUCT_POP=9, //Del tipo t_struct_numero
-	D_STRUCT_MODIFICARTOPINDEX=10, //Del tipo t_struct_numero
 	D_STRUCT_ASIGNARCOMPARTIDA=11,
 	D_STRUCT_INSTRUCCION=12,
 	D_STRUCT_INDICE_ETIQUETAS=13,
 	D_STRUCT_OBTENERCOMPARTIDA=14,
+	D_STRUCT_WAIT=15,
+	D_STRUCT_SIGNALSEMAFORO=16,
 };
 
 
@@ -182,15 +183,6 @@ typedef struct struct_pop{
 }__attribute__ ((__packed__)) t_struct_pop;
 
 
-/* Estructura tipo STRUCT_MODIFICAR_TOP_INDEX
- *
- */
-
-typedef struct struct_modificar_top_index{
-	t_posicion posicion;
-}__attribute__ ((__packed__)) t_struct_modificar_top_index;
-
-
 /* Estructura tipo STRUCT_ASIGNAR_COMPARTIDA
  *
  */
@@ -218,5 +210,13 @@ typedef struct struct_etiquetas{
 	t_puntero index_etiquetas;
 	t_size etiquetas_size;
 }__attribute__ ((__packed__)) t_struct_indice_etiquetas;
+
+/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+ *
+ */
+
+typedef struct struct_semaforo{
+	t_nombre_semaforo nombre_semaforo;
+}__attribute__ ((__packed__)) t_struct_semaforo;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */
