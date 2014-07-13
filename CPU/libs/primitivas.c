@@ -215,8 +215,7 @@ void imprimirTexto(char* texto) {
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
-
-	//Socket con mensaje?
+	socket_and_io(sockKernel,dispositivo,tiempo);
 
 }
 
@@ -224,21 +223,13 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
 void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
-	//Informa al kernel que ejecute la función wait para el semáforo con el nombre identificador_semaforo.
-	//El kernel deberá decidir si bloquearlo o no.
 
-	/*struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,WAIT);
-	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
-	free(estructura);*/
+	socket_and_wait(sockKernel,identificador_semaforo);
 
 }
 
 void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
-	//Informa al kernel que ejecute la función signal para el semáforo con el nombre identificador_semaforo.
-	//El kernel deberá decidir si desbloquear otros procesos o no.
 
-	/*struct_semaforo* estructura = crear_struct_semaforo(identificador_semaforo,SIGNAL);
-	socket_enviar(sockKernel,STRUCT_SEMAFORO,estructura);
-	free(estructura);*/
+	socket_and_signal_semaforo(sockKernel,identificador_semaforo);
 
 }

@@ -51,9 +51,13 @@ enum{
 	D_STRUCT_PIDYCODIGO=7,
 	D_STRUCT_PUSH=8,
 	D_STRUCT_POP=9, //Del tipo t_struct_numero
-	D_STRUCT_MODIFICARTOPINDEX=10, //Del tipo t_struct_numero
 	D_STRUCT_ASIGNARCOMPARTIDA=11,
 	D_STRUCT_INSTRUCCION=12,
+	D_STRUCT_INDICE_ETIQUETAS=13,
+	D_STRUCT_OBTENERCOMPARTIDA=14,
+	D_STRUCT_WAIT=15,
+	D_STRUCT_SIGNALSEMAFORO=16,
+	D_STRUCT_IO=17,
 };
 
 
@@ -134,7 +138,29 @@ typedef struct struct_pcb{
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } __attribute__ ((__packed__)) t_struct_pcb;
 
+/* Estructura tipo STRUCT_GRADOMP
+ * envia el grado de multiprogramacion del sistema
+ *
+ */
 
+typedef int t_gradoMP;
+
+typedef struct struct_grado_MP{
+	t_gradoMP gradoMP;
+}__attribute__ ((__packed__)) t_struct_gradoMP;
+
+
+/* Estructura tipo STRUCT_PIDYCODIGO
+ * envia el pid de un programa y su respectivo codigo ansisop
+ */
+
+typedef int* pid;
+typedef char* t_codigo;
+
+typedef struct struct_pidycodigo{
+	t_pid pid;
+	t_codigo codigo;
+}__attribute__ ((__packed__)) t_struct_pidycodigo;
 
 /* Estructura tipo STRUCT_PUSH
  *
@@ -158,15 +184,6 @@ typedef struct struct_pop{
 }__attribute__ ((__packed__)) t_struct_pop;
 
 
-/* Estructura tipo STRUCT_MODIFICAR_TOP_INDEX
- *
- */
-
-typedef struct struct_modificar_top_index{
-	t_posicion posicion;
-}__attribute__ ((__packed__)) t_struct_modificar_top_index;
-
-
 /* Estructura tipo STRUCT_ASIGNAR_COMPARTIDA
  *
  */
@@ -186,5 +203,30 @@ typedef struct struct_instruccion{
 	t_intructions inst;
 }__attribute__ ((__packed__)) t_struct_instruccion;
 
+/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+ *
+ */
+
+typedef struct struct_etiquetas{
+	t_puntero index_etiquetas;
+	t_size etiquetas_size;
+}__attribute__ ((__packed__)) t_struct_indice_etiquetas;
+
+/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+ *
+ */
+
+typedef struct struct_semaforo{
+	t_nombre_semaforo nombre_semaforo;
+}__attribute__ ((__packed__)) t_struct_semaforo;
+
+/* Estructura tipo STRUCT_IO
+ *
+ */
+
+typedef struct struct_io{
+	t_nombre_dispositivo dispositivo;
+	int32_t tiempo;
+}__attribute__ ((__packed__)) t_struct_io;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

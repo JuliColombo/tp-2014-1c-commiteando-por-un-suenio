@@ -32,18 +32,6 @@ void socket_and_pop_position(int sockAjeno,int posicion){
 	free(estructura);
 }
 
-t_struct_modificar_top_index* crear_struct_modificar_top_index(int top_index){
-	t_struct_modificar_top_index* estructura = malloc(sizeof(t_struct_modificar_top_index));
-	estructura->posicion = top_index;
-	return estructura;
-}
-
-void socket_and_modificar_top_index(int sockAjeno,int top_index){
-	t_struct_modificar_top_index* estructura = crear_struct_modificar_top_index(top_index);
-	socket_enviar(sockAjeno, D_STRUCT_MODIFICARTOPINDEX, estructura);
-	free(estructura);
-}
-
 t_struct_string* crear_struct_string(char* string){
 	t_struct_string* estructura = malloc(sizeof(t_struct_string));
 	estructura->string = string;
@@ -87,6 +75,24 @@ void socket_and_instruccion(int sockAjeno,t_intructions instruccion){
 	free(estructura);
 }
 
+t_struct_semaforo* crear_struct_semaforo(char* string){
+	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
+	estructura->nombre_semaforo = string;
+	return estructura;
+}
+
+void socket_and_signal_semaforo(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_SIGNALSEMAFORO, estructura);
+	free(estructura);
+}
+
+void socket_and_wait(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_WAIT, estructura);
+	free(estructura);
+}
+
 t_struct_numero* crear_struct_numero(int32_t num){
 	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 	estructura->numero = num;
@@ -117,5 +123,18 @@ t_struct_indice_etiquetas* crear_struct_indice_etiquetas(uint32_t index, uint32_
 void socket_and_indice_etiquetas(int sockAjeno,uint32_t index, uint32_t size){
 	t_struct_indice_etiquetas* estructura = crear_struct_indice_etiquetas(index,size);
 	socket_enviar(sockAjeno,D_STRUCT_INDICE_ETIQUETAS,estructura);
+	free(estructura);
+}
+
+t_struct_io* crear_struct_io(char* string, int32_t valor){
+	t_struct_io* estructura = malloc(sizeof(t_struct_io));
+	estructura->dispositivo = string;
+	estructura->tiempo = valor;
+	return estructura;
+}
+
+void socket_and_io(int sockAjeno,char* string, int valor){
+	t_struct_io* estructura = crear_struct_io(string, valor);
+	socket_enviar(sockAjeno, D_STRUCT_IO, estructura);
 	free(estructura);
 }

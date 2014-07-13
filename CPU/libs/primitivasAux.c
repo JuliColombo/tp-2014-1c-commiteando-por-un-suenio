@@ -149,9 +149,6 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 /******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {
-	//Esto va?
-	socket_and_modificar_top_index (sockUMV,*(pcb.c_stack)-1);
-
 	top_index = *pcb.c_stack -1;
 }
 
@@ -164,9 +161,6 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 	*program_counter = estructura->numero;
 
 	top_index -= 1;
-
-	//esto va?
-	socket_and_modificar_top_index (sockUMV,top_index);
 }
 
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
@@ -178,9 +172,6 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 	*cursor_stack_viejo = estructura->numero;
 
 	top_index -= 1;
-
-	//esto va?
-	socket_and_modificar_top_index (sockUMV,top_index);
 
 }
 
@@ -220,7 +211,6 @@ void regenerarDiccionario(int tamanio_contexto) {
 	}
 
 	top_index = top;
-	socket_and_modificar_top_index (sockUMV,top);
 
 	pcb.tamanio_contexto = tamanio_contexto;
 
@@ -242,5 +232,4 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 	*direccion_retorno = estructura->numero;
 
 	top_index -= 1;
-	socket_and_modificar_top_index (sockUMV,top_index);
 }
