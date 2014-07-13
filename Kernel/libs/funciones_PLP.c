@@ -182,8 +182,8 @@ void core_plp(void){
 
 	crearSemaforos();
 
-	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
-	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
+	//pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
+	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 
 	sleep(15);
@@ -208,8 +208,8 @@ void core_plp(void){
 		sem_post(&sem_pcp);
 	}
 
-	pthread_join(conexion_plp_programas,NULL);
-	pthread_join(conexion_plp_umv,NULL);
+	//pthread_join(conexion_plp_programas,NULL);
+	//pthread_join(conexion_plp_umv,NULL);
 	pthread_join(conexion_plp_cpu,NULL);
 
 	cerrarSemaforos();
@@ -274,7 +274,7 @@ void core_conexion_plp_programas(void){
 
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
-	epoll_agregarSocketServidor(efd_programas,sock_programas);
+	epoll_agregarSocketCliente(efd_programas,sock_programas);
 	event.events=EPOLLIN|EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
 	event.data.fd=sock_programas;
@@ -298,8 +298,8 @@ void core_conexion_umv(void){
 
 void core_conexion_pcp_cpu(void){
 
-	struct epoll_event event;
-	struct epoll_event* events;
+	/*struct epoll_event event;
+	struct epoll_event* events;*/
 	int i;
 
 	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
@@ -309,12 +309,14 @@ void core_conexion_pcp_cpu(void){
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
-	event.events=EPOLLIN | EPOLLRDHUP;
+	/*event.events=EPOLLIN | EPOLLRDHUP;
 	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	event.data.fd=sock_cpu;
+	event.data.fd=sock_cpu;*/
 	while(1){
-		int i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, NULL);
-		printf("Se recibio una cpu \n", i);
+		int j = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, NULL);
+		if(j==0){
+			printf("Se agrego una cpu\n");
+		}
 	}
 
 
