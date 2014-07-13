@@ -87,7 +87,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
-	socket_and_string(sockKernel, variable);
+	socket_and_obtener_compartida(sockKernel, variable);
 
 	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
 

@@ -54,6 +54,8 @@ enum{
 	D_STRUCT_MODIFICARTOPINDEX=10, //Del tipo t_struct_numero
 	D_STRUCT_ASIGNARCOMPARTIDA=11,
 	D_STRUCT_INSTRUCCION=12,
+	D_STRUCT_INDICE_ETIQUETAS=13,
+	D_STRUCT_OBTENERCOMPARTIDA=14,
 };
 
 
@@ -208,5 +210,13 @@ typedef struct struct_instruccion{
 	t_intructions inst;
 }__attribute__ ((__packed__)) t_struct_instruccion;
 
+/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+ *
+ */
+
+typedef struct struct_etiquetas{
+	t_puntero index_etiquetas;
+	t_size etiquetas_size;
+}__attribute__ ((__packed__)) t_struct_indice_etiquetas;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

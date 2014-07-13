@@ -18,16 +18,13 @@ char* indiceEtiquetas;
 int esConRetorno;
 
 
-char* generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
-	char* indice;
-	//tendria que aclararlee a la umv que es para generar el indice
+void generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 
+	socket_and_indice_etiquetas(sockUMV,index_etiquetas,etiquetas_size);
 
 	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	indice = estructura->string;
-
-	return indice;
-
+	proximaInstruccion = estructura->string;
+	//SE DEBERIA HACER UN MALLOC EN PROXIMAINSTRUCCION Y DESPUES ACA HACER UN MEMCPY?
 }
 
 

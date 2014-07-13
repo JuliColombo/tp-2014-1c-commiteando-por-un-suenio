@@ -61,8 +61,11 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_ASIGNARCOMPARTIDA:
 				paquete = paquetizarStruct_asignarCompartida((t_struct_asignar_compartida*) estructuraOrigen);
 				break;
-			case D_STRUCT_INSTRUCCION:
-				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
+			case D_STRUCT_INDICE_ETIQUETAS:
+				paquete = paquetizarStruct_indiceEtiquetas((t_struct_indice_etiquetas*) estructuraOrigen);
+				break;
+			case D_STRUCT_OBTENERCOMPARTIDA:
+				paquete = paquetizarStruct_obtenerCompartida((t_struct_string*) estructuraOrigen);
 				break;
 		}
 
@@ -184,6 +187,33 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_obtenerCompartida/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_obtenerCompartida(t_struct_string * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->string) + 1;
+
+	char * data = crearDataConHeader(D_STRUCT_OBTENERCOMPARTIDA, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->string, strlen(estructuraOrigen->string)+1);		//copio a data el string.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: paquetizarStruct_signal/1
  * Argumentos:
  * 		- estructuraOrigen
@@ -291,6 +321,38 @@ t_stream * paquetizarStruct_push(t_struct_push * estructuraOrigen){
 	tamanioTotal += tamanioDato;
 
 	memcpy(data + tamanioTotal, &estructuraOrigen->valor, sizeof(int32_t));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_indiceEtiquetas/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(8, length)
+ */
+t_stream * paquetizarStruct_indiceEtiquetas(t_struct_indice_etiquetas * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_INDICE_ETIQUETAS, paquete->length);
+
+	int tamanioTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->index_etiquetas ,tamanioDato = sizeof(uint32_t));
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->etiquetas_size, sizeof(uint32_t));
 
 	paquete->data = data;
 
@@ -507,6 +569,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_INSTRUCCION:
 				estructuraDestino = despaquetizarStruct_instruccion(dataPaquete, length);
 				break;
+			case D_STRUCT_INDICE_ETIQUETAS:
+				estructuraDestino = despaquetizarStruct_indiceEtiquetas(dataPaquete, length);
+				break;
 		}
 
 	return estructuraDestino;
@@ -612,6 +677,20 @@ t_struct_string * despaquetizarStruct_string(char * dataPaquete, uint16_t length
 	return estructuraDestino;
 }
 
+/*
+ * Nombre: despaquetizarStruct_obtenerCompartida/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_OBTENERCOMPARTIDA.
+ *
+ */
+t_struct_string * despaquetizarStruct_obtenerCompartida(char * dataPaquete, uint16_t length){
+	return despaquetizarStruct_string(dataPaquete, length);
+}
+
 t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length){
 	t_struct_signal * estructuraDestino = malloc(sizeof(t_struct_signal));
 
@@ -689,6 +768,26 @@ t_struct_push * despaquetizarStruct_push(char * dataPaquete, uint16_t length){//
 	memcpy(&estructuraDestino->posicion, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
 
 	memcpy(&estructuraDestino->valor, dataPaquete+ sizeof(uint32_t), sizeof(int32_t)); //copio el valor del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_indiceEtiquetas/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_INDICE_ETIQUETAS.
+ *
+ */
+t_struct_indice_etiquetas * despaquetizarStruct_indiceEtiquetas(char * dataPaquete, uint16_t length){//
+	t_struct_indice_etiquetas * estructuraDestino = malloc(sizeof(t_struct_indice_etiquetas));
+
+	memcpy(&estructuraDestino->index_etiquetas, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
+
+	memcpy(&estructuraDestino->etiquetas_size, dataPaquete+ sizeof(uint32_t), sizeof(uint32_t)); //copio el valor del paquete a la estructura.
 
 	return estructuraDestino;
 }

@@ -26,6 +26,9 @@ t_struct_instruccion* crear_struct_instruccion(t_intructions instruccion);
 void socket_and_instruccion(int sockAjeno,t_intructions instruccion);
 t_struct_numero* crear_struct_numero(int32_t num);
 void socket_and_number(int sockAjeno,int num);
+t_struct_indice_etiquetas* crear_struct_indice_etiquetas(uint32_t index, uint32_t size);
+void socket_and_indice_etiquetas(int sockAjeno,uint32_t index, uint32_t size);
+void socket_and_obtener_compartida(int sockAjeno,char* string);
 
 void* socket_recibir_estructura(int sockAjeno);
 

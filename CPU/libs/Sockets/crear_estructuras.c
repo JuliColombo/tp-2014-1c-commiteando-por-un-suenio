@@ -56,6 +56,12 @@ void socket_and_string(int sockAjeno,char* string){
 	free(estructura);
 }
 
+void socket_and_obtener_compartida(int sockAjeno,char* string){
+	t_struct_string* estructura = crear_struct_string(string);
+	socket_enviar(sockAjeno, D_STRUCT_OBTENERCOMPARTIDA, estructura);
+	free(estructura);
+}
+
 t_struct_asignar_compartida* crear_struct_asignar_compartida(char* string, int32_t valor){
 	t_struct_asignar_compartida* estructura = malloc(sizeof(t_struct_asignar_compartida));
 	estructura->nombre = string;
@@ -99,4 +105,17 @@ void* socket_recibir_estructura(int sockAjeno){
 	void* structRecibida;
 	socket_recibir(sockAjeno,&tipoRecibido,&structRecibida);
 	return estructura;
+}
+
+t_struct_indice_etiquetas* crear_struct_indice_etiquetas(uint32_t index, uint32_t size){
+	t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+	estructura->index_etiquetas = index;
+	estructura->etiquetas_size = size;
+	return estructura;
+}
+
+void socket_and_indice_etiquetas(int sockAjeno,uint32_t index, uint32_t size){
+	t_struct_indice_etiquetas* estructura = crear_struct_indice_etiquetas(index,size);
+	socket_enviar(sockAjeno,D_STRUCT_INDICE_ETIQUETAS,estructura);
+	free(estructura);
 }
