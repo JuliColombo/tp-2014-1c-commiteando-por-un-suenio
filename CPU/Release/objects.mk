@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lcommons -lpthread -l/home/utnso/ansisop-parser/parser/build/libparser-ansisop.so
+LIBS := -lcommons -lpthread -lparser-ansisop
 

@@ -47,12 +47,12 @@ void* core_conexion_kernel(void){
 	int sock;
 	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
 		log_error_socket();
-		printf("se conecto al kernel\n");
 	}
+	printf("se conecto al kernel\n");
 
 	//CODEO ACA
-	recibir_quantum(sock);
-	recibir_retardo_quantum(sock);
+	//recibir_quantum(sock);
+	//recibir_retardo_quantum(sock);
 
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");

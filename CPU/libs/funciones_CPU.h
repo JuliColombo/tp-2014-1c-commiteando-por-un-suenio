@@ -12,6 +12,9 @@
 #include <pthread.h>
 #include "parserCPU.h"
 
+t_quantum quantum;
+t_retardo_quantum retardo;
+
 typedef struct{
 	char* ip_kernel;
 	int puerto_kernel;

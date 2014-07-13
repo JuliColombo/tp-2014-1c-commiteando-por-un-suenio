@@ -536,55 +536,7 @@ void core_conexion_cpu(void){
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
-
-			/*t_tipoEstructura tipoRecibido;
-					void* structRecibida;
-					int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-					if(j==1){
-					printf("Se recibio envio bien el paquete\n");
-					t_struct_numero* k = ((t_struct_numero*)structRecibida);
-					printf("%d\n", k->numero);
-					}*/
-
-			/*t_tipoEstructura tipoRecibido;
-				void* structRecibida;
-				int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-				if(j==1){
-				printf("Se recibio bien el paquete\n");
-				t_struct_string* k = ((t_struct_string*)structRecibida);
-				printf("%s\n", k->string);
-				}*/
-
-
-				/*t_tipoEstructura tipoRecibido;
-				void* structRecibida;
-				int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-				if(j==1){
-				printf("Se recibio envio bien el paquete\n");
-				t_struct_char* k = ((t_struct_char*)structRecibida);
-				printf("%c\n", k->letra);
-				}*/
-
-
-			t_tipoEstructura tipoRecibido;
-			void* structRecibida;
-			int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-			if(j==1){
-			printf("Se recibio envio bien el paquete\n");
-			t_struct_push* k = ((t_struct_push*)structRecibida);
-			printf("%d\n", k->posicion);
-			printf("%d\n", k->valor);
 			}
-
-			/*t_tipoEstructura tipoRecibido;
-			void* structRecibida;
-			int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-			if(j==1){
-			printf("Se recibio envio bien el paquete\n");
-			t_struct_instruccion* k = ((t_struct_instruccion*)structRecibida);
-			printf("%s\n", k->inst);
-			}*/
-	}
 
 	}
 
