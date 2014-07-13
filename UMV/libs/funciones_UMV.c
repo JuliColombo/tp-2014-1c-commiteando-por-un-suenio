@@ -325,18 +325,12 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 		 }
 	//segmento=malloc(sizeof(tamanio));
 	int pos=getPosTablaSeg(id_prog);
-		if (pos==-1){
-			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
-		}
-
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
-
 	//Armado del segmento creado
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
-
 	//Asignación de los campos de la tabla de segmentos correspondiente
 	tablaDeSegmentos[pos].id_prog = id_prog;
 	tablaDeSegmentos[pos].cant_segmentos++;
