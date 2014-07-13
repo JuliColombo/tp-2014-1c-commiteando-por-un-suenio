@@ -57,6 +57,7 @@ enum{
 	D_STRUCT_OBTENERCOMPARTIDA=14,
 	D_STRUCT_WAIT=15,
 	D_STRUCT_SIGNALSEMAFORO=16,
+	D_STRUCT_IO=17,
 };
 
 
@@ -218,5 +219,14 @@ typedef struct struct_etiquetas{
 typedef struct struct_semaforo{
 	t_nombre_semaforo nombre_semaforo;
 }__attribute__ ((__packed__)) t_struct_semaforo;
+
+/* Estructura tipo STRUCT_IO
+ *
+ */
+
+typedef struct struct_io{
+	t_nombre_dispositivo dispositivo;
+	int32_t tiempo;
+}__attribute__ ((__packed__)) t_struct_io;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

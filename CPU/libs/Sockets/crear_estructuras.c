@@ -125,3 +125,16 @@ void socket_and_indice_etiquetas(int sockAjeno,uint32_t index, uint32_t size){
 	socket_enviar(sockAjeno,D_STRUCT_INDICE_ETIQUETAS,estructura);
 	free(estructura);
 }
+
+t_struct_io* crear_struct_io(char* string, int32_t valor){
+	t_struct_io* estructura = malloc(sizeof(t_struct_io));
+	estructura->dispositivo = string;
+	estructura->tiempo = valor;
+	return estructura;
+}
+
+void socket_and_io(int sockAjeno,char* string, int valor){
+	t_struct_io* estructura = crear_struct_io(string, valor);
+	socket_enviar(sockAjeno, D_STRUCT_IO, estructura);
+	free(estructura);
+}

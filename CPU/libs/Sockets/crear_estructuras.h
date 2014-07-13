@@ -30,6 +30,8 @@ void socket_and_obtener_compartida(int sockAjeno,char* string);
 t_struct_semaforo* crear_struct_semaforo(char* string);
 void socket_and_signal_semaforo(int sockAjeno,char* string);
 void socket_and_wait(int sockAjeno,char* string);
+t_struct_io* crear_struct_io(char* string, int32_t valor);
+void socket_and_io(int sockAjeno,char* string, int valor);
 
 void* socket_recibir_estructura(int sockAjeno);
 

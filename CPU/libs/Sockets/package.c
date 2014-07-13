@@ -70,6 +70,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SIGNALSEMAFORO:
 				paquete = paquetizarStruct_signal((t_struct_semaforo*) estructuraOrigen);
 				break;
+			case D_STRUCT_IO:
+				paquete = paquetizarStruct_io((t_struct_io*) estructuraOrigen);
+				break;
 		}
 
 
@@ -226,7 +229,7 @@ t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen){
  *
  * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
-t_stream * paquetizarStruct_signal(t_struct_semaforo * estructuraOrigen){
+t_stream * paquetizarStruct_signalSemaforo(t_struct_semaforo * estructuraOrigen){
 
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
@@ -475,6 +478,38 @@ t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estr
 }
 
 /*
+ * Nombre: paquetizarStruct_io/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(11, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_io(t_struct_io * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->dispositivo) + 1 + sizeof(int32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_IO, paquete->length); //creo el data.
+
+	int tamanoTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, tamanioDato = strlen(estructuraOrigen->dispositivo)+1);		//copio a data el nombre de la variable.
+
+	tamanoTotal += tamanioDato;
+
+	memcpy(data + tamanoTotal, &estructuraOrigen->tiempo, sizeof(int32_t));  //copio a data el valor de la variable.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: paquetizarStruct_instruccion/1
  * Argumentos:
  * 		- estructuraOrigen
@@ -604,7 +639,10 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				estructuraDestino = despaquetizarStruct_signalSemaforo(dataPaquete, length);
 				break;
 			case D_STRUCT_WAIT:
-				estructuraDestino = despaquetizarStruct_signalwait(dataPaquete, length);
+				estructuraDestino = despaquetizarStruct_wait(dataPaquete, length);
+				break;
+			case D_STRUCT_IO:
+				estructuraDestino = despaquetizarStruct_io(dataPaquete, length);
 				break;
 
 		}
@@ -910,6 +948,35 @@ t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataP
 	tamanoTotal += tamanoDato;
 
 	memcpy(&estructuraDestino->valor, dataPaquete + tamanoTotal, sizeof(int32_t));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_asignarCompartida/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_ASIGNARCOMPARTIDA.
+ *
+ */
+t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length){
+	t_struct_io * estructuraDestino = malloc(sizeof(t_struct_io));
+
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->dispositivo = malloc(tamanoDato);
+	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura
+
+	tamanoTotal += tamanoDato;
+
+	memcpy(&estructuraDestino->tiempo, dataPaquete + tamanoTotal, sizeof(int32_t));
 
 	return estructuraDestino;
 }

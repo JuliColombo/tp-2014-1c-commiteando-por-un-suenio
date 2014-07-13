@@ -215,8 +215,7 @@ void imprimirTexto(char* texto) {
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
-
-	//Socket con mensaje?
+	socket_and_io(sockKernel,dispositivo,tiempo);
 
 }
 
