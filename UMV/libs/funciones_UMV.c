@@ -325,25 +325,40 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 		 }
 	//segmento=malloc(sizeof(tamanio));
 	int pos=getPosTablaSeg(id_prog);
-		if (pos==-1){
-			//Excepcion, el programa al que se le quiere crear el segmento no esta en la tabla
-		}
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	//Armado del segmento creado
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
-
+	//Asignación de los campos de la tabla de segmentos correspondiente
+	tablaDeSegmentos[pos].id_prog = id_prog;
+	tablaDeSegmentos[pos].cant_segmentos++;
 	tablaDeSegmentos[pos].segmentos[i]=aux;
 }
 
 int getPosTablaSeg(int id_prog){
-	int i;
-	int posFinalTablaSeg; //Hay que ver como conseguirla, o validar que ya se recorrieron todos los segmentos de otra forma
-	while (tablaDeSegmentos[i].id_prog != id_prog && i<= posFinalTablaSeg) i++;
+	int i=0;
+	//Verifico si hay tablas
+	if(cant_tablas==0){
+		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
+		tablaDeSegmentos = malloc(sizeof(tablaSeg));
+		tablaDeSegmentos[0].cant_segmentos=0;
+		cant_tablas++;
+		return 0;
+	}
+	else{
+		//Como hay tablas, busco si ya hay una para el prog correspondiente
+	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
+		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
+		//FIXME: no estoy seguro de este realloc
+		tablaDeSegmentos = realloc(tablaDeSegmentos, sizeof(tablaDeSegmentos+sizeof(tablaSeg)));
+		i=cant_tablas;
+		cant_tablas++;
 		return i;
-	} else return -1;
+		} else return i;
+	}
 }
 
 int escogerUbicacionF(int tamanio){

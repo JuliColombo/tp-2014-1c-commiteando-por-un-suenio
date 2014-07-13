@@ -5,6 +5,8 @@
  *      Author: utnso
  */
 
+#include "primitivas.h"
+
 #define DONE 5;
 #define QUANTUM 3;
 
@@ -111,9 +113,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
 
-	//Busco en indice de codigo qué le pido a UMV
-	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
-	t_intructions inst = indiceCodigo[instruccion];
+	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(instruccion);
 
 	socket_and_instruccion(sockUMV,inst);
 
@@ -128,16 +128,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	int posicionAPushear =  top_index +1;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
+	irAlLabel(etiqueta);
 
-	//Busco en indice de codigo qué le pido a UMV
-	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
-	t_intructions inst = indiceCodigo[instruccion];
+	pcb.tamanio_contexto = 0;
 
-	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
-	socket_and_instruccion(sockUMV,inst);
-
-	recibirProximaInstruccion(sockUMV);
+	esConRetorno = 0;
 
 }
 
@@ -149,16 +144,7 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	int posicionAPushear = top_index +1;
 	*pcb.c_stack = posicionAPushear;
 
-	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
-
-	//Busco en indice de codigo qué le pido a UMV
-	//CREO QUE ACA LE TENGO QUE MANDAR POR SOCKET A UMV PARA QUE LO HAGA ELLA
-	t_intructions inst = indiceCodigo[instruccion];
-
-	//Socket enviando a UMV el start y offset para que me pase la instruccion a ejecutar
-	socket_and_instruccion(sockUMV,inst);
-
-	recibirProximaInstruccion(sockUMV);
+	irAlLabel(etiqueta);
 
 	pcb.tamanio_contexto = 0;
 }

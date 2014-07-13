@@ -51,6 +51,7 @@ typedef struct segmentDescriptor{
 
 typedef struct tablaSeg{
 	int id_prog;
+	int cant_segmentos;
 	segmentDescriptor* segmentos;
 }tablaSeg;
 

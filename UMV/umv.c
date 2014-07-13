@@ -13,6 +13,7 @@ char* PATH=PATHCONFIG;
 int retardo;
 int procesoEnUso;
 tablaSeg* tablaDeSegmentos;
+int cant_tablas=0;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, KERNEL, CPU;
 log_t* archLog;
