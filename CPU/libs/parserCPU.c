@@ -53,27 +53,59 @@ void esperar_retardo(int tiempo){
 	usleep(tiempo/1000);
 }
 
+void continuarHastaQuantum() {
+	for (i; i <= quantum; i++) {
+		termino = CONTINUES;
+		parsear();
+		esperar_retardo(retardo);
+	}
+}
+
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
-		for(i = 0;i<=quantum;i++){ //i no deberia ser igual a 0
-				termino = 0;
-				parsear();
-				esperar_retardo(retardo);
-
-		termino = 5;
+		continuarHastaQuantum();
+		termino = DONE;
 		i = 0;
 		if(socket_cerrarConexion(sockKernel)==-1){
-			log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");}
+			log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
 		}
 	}
 }
 
+void destruirEstructuras(){
+	//SOCKET A UMV PARA QUE DESTRUYA STACK Y/O INDICE DE CODIGO Y/O INDICE DE ETIQUETAS
+	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+}
+
+void closureMostrarEstado(char* key, int posicion) {
+	socket_and_pop_position(sockUMV,posicion + 1);
+
+	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
+	t_valor_variable valor_variable = estructura->numero;
+
+	imprimir(valor_variable);
+}
+
+void mostrarEstadoVariables(){
+	dictionary_iterator(diccionario,(void*)closureMostrarEstado);
+}
+
+void salirPorFinalizacion(){
+	mostrarEstadoVariables();
+	destruirEstructuras();
+	//enviar por socket pcb a kernel para notificar que termine
+}
+
 void salir(int termino) {
 	switch (termino) {
-	case 5: //finalizo
+
+	case DONE:
+	salirPorFinalizacion();
 	printf("\ntermino ejecucion \n");
 	break;
-	case 3: //sale por quantum
+
+	case QUANTUM:
+		//enviar por socket pcb a kernel para notificar que termino quantum y me tiene que mandar otro
 	printf("\nsalgo por quantum\n");
 	break;
 	}
@@ -83,15 +115,19 @@ void correrParser() {
 	signal(SIGUSR1,hot_plug);
 
 	for(i=0;i<=quantum;i++){
-		termino = 0;
+		termino = CONTINUES;
 
 		parsear();
 
 		esperar_retardo(retardo);
 
-		if (termino != 0) {
+		if((i == quantum) && (termino == CONTINUES)){
+			termino = QUANTUM;
+		}
+
+		if (termino != CONTINUES) {
 			salir(termino);
-			termino = 0;
+			termino = CONTINUES;
 			i = 0;
 			break;
 		}

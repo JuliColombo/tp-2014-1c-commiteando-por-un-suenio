@@ -50,6 +50,9 @@ void* core_conexion_kernel(void){
 	}
 	printf("se conecto al kernel\n");
 
+	while(1){
+
+	}
 	//CODEO ACA
 	//recibir_quantum(sock);
 	//recibir_retardo_quantum(sock);

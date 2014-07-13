@@ -7,10 +7,6 @@
 
 #include "primitivas.h"
 
-#define DONE 5;
-#define QUANTUM 3;
-
-
 t_dictionary *diccionario;
 int sockfd;
 int sockUMV;
@@ -200,7 +196,6 @@ void retornar(t_valor_variable retorno) {
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
-	//Socket a Kernel enviandole el valor a mostrar
 	socket_and_number(sockKernel, valor_mostrar);
 
 }
@@ -208,7 +203,6 @@ void imprimir(t_valor_variable valor_mostrar) {
 void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
-	//Socket a Kernel enviandole texto
 	socket_and_string(sockKernel,texto);
 
 }

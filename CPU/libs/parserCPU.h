@@ -18,6 +18,7 @@ typedef long t_retardo_quantum;
 
 extern t_quantum quantum;
 extern t_retardo_quantum retardo;
+extern t_dictionary* diccionario;
 
 int i;
 char* proximaInstruccion;
@@ -31,5 +32,9 @@ void esperar_retardo(int tiempo);
 void hot_plug(int signum);
 void salir(int termino);
 void correrParser();
+void continuarHastaQuantum();
+void destruirEstructuras();
+void mostrarEstadoVariables();
+void salirPorFinalizacion();
 
-#endif /* PARSER_H_ */
+#endif /* PARSERCPU_H_ */
