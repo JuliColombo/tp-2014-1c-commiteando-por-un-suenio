@@ -48,8 +48,8 @@ extern int program_pid;
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
-int calcularPeso(t_programa); //Calcula el peso del programa
-void agregarAColaSegunPeso(t_programa, t_list*); //Agrega ordenadamente en la cola de new
+int calcularPeso(t_programa*); //Calcula el peso del programa
+void agregarAColaSegunPeso(t_programa*, t_list*); //Agrega ordenadamente en la cola de new
 void mostrarNodosPorPantalla(t_list*, char*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct correspondiente

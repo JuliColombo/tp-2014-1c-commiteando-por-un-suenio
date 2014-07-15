@@ -210,17 +210,17 @@ void bloquearPrograma(int pid){
  */
 
 void agregarNuevoPrograma(char* codigo, int fd){
-	t_programa programa;
-	programa.peso=0;
-	programa.codigo=codigo;
-	programa.flag_bloqueado=0;
-	programa.flag_terminado=0;
-	programa.metadata=malloc(sizeof(t_medatada_program));
-	programa.metadata=metadata_desde_literal(codigo);
-	programa.pcb=crearPcb(codigo, programa.metadata);
-	programa.peso=calcularPeso(programa);
-	printf("El peso es: %d\n",programa.peso);
-	programa.socket_descriptor_conexion=fd;
+	t_programa* programa=malloc(sizeof(t_programa));
+	programa->peso=0;
+	programa->codigo=codigo;
+	programa->flag_bloqueado=0;
+	programa->flag_terminado=0;
+	programa->metadata=malloc(sizeof(t_medatada_program));
+	programa->metadata=metadata_desde_literal(codigo);
+	programa->pcb=crearPcb(codigo, programa->metadata);
+	programa->peso=calcularPeso(programa);
+	printf("El peso es: %d\n",programa->peso);
+	programa->socket_descriptor_conexion=fd;
 
 
 

@@ -2,41 +2,50 @@
 
 pthread_t hilo_pcp_new, hilo_pcp_ready;
 
-int calcularPeso(t_programa programa){ //Calcula peso del programa
-	int peso=(5*programa.metadata->cantidad_de_etiquetas + 3* programa.metadata->cantidad_de_funciones + programa.metadata->instrucciones_size);
+int calcularPeso(t_programa* programa){ //Calcula peso del programa
+	int peso=(5*programa->metadata->cantidad_de_etiquetas + 3* programa->metadata->cantidad_de_funciones + programa->metadata->instrucciones_size);
 
 	return peso;
 }
 
-void agregarAColaSegunPeso(t_programa programa, t_list* lista){
+void agregarAColaSegunPeso(t_programa* programa, t_list* lista){
 	t_link_element* element = lista->head;
 	int position = 0;
 
-	while ((element != NULL)&&(((t_programa*)(element->data))->peso < programa.peso)) {
+	while ((element != NULL)&&((((t_programa*)(element->data))->peso) < (programa->peso))) {
 		element = element->next;
 		position++;
 	}
 
-	list_add_in_index(lista, position, &programa);
+	list_add_in_index(lista, position, programa);
 }
 
 void mostrarNodosPorPantalla(t_list* lista, char* nombreLista){
-	int i, peso, pid;
+	int peso, pid;
 	//system("clear");
 	if(lista->head==NULL){
 		printf("No hay programas en la cola %s\n", nombreLista);
 		return;
 	}
 	printf("Estado de la cola %s:\nPID  PESO\n", nombreLista);
-	i=0;
-	while(i<list_size(lista)){
-		printf("El size de la lista es: %d\n",list_size(lista));
-		t_programa* aux=(t_programa*)list_get(lista, i);
-		pid=aux->pcb->pid;
-		peso=aux->peso;
+	t_link_element* element = lista->head;
+	while(element!=NULL){
+		t_programa* programa = element->data;
+		pid = programa->pcb->pid;
+		peso = programa->peso;
 		printf("%d    %d\n", pid, peso);
-		i++;
+		element=element->next;
 	}
+	return;
+	/*for(i=0;i<list_size(lista);i++){
+		printf("El size de la lista es: %d\n",list_size(lista));
+		t_programa* programa=(t_programa*)list_get(lista, 0);
+		printf("Pasa el get\n");
+		pid=programa->pcb->pid;
+		printf("Pasa el assign del pid");
+		peso=programa->peso;
+		printf("%d    %d\n", pid, peso);
+	}*/
 }
 
 int cantidadProgramasEnEjecucion(void){
@@ -188,7 +197,6 @@ void core_plp(void){
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-
 	sleep(15);
 	while (1){
 		sem_wait(&sem_multiProg);
@@ -220,7 +228,7 @@ void core_plp(void){
 }
 
 void core_pcp(void){
-	t_programa programa;
+	t_programa* programa;
 
 	while(1){
 	sem_wait(&sem_pcp);
@@ -231,14 +239,17 @@ void core_pcp(void){
 
 
 
-
-	if(programa.flag_bloqueado==1){
+	if(programa->flag_bloqueado==1){
 
 	}
 
-	if(programa.flag_terminado==1){
-
+	if(programa->flag_terminado==1){
+		pthread_mutex_lock(mutex_cola_exec);
+		pthread_mutex_lock(mutex_cola_exit);
 		sem_post(&sem_multiProg);
+		list_add(cola.exit,(void*)programa);
+		pthread_mutex_unlock(mutex_cola_exec);
+		pthread_mutex_unlock(mutex_cola_exit);
 	}
 
 
@@ -277,7 +288,7 @@ void core_conexion_plp_programas(void){
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketCliente(efd_programas,sock_programas);
 	while(1){
-		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, (void*) &handler_conexion_cpu, (void*) &desconexion_cpu);
+		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		if(i==-1){
 			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
