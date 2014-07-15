@@ -244,14 +244,39 @@ void agregarNuevoPrograma(char* codigo, int fd){
  *
  * Funcion: actualiza el pcb recibido de una cpu y libera la memoria en que estaba la pcb vieja
  */
-void actualizarPCB(t_programa programa, t_pcb pcb ){
-	t_pcb* aux = programa.pcb;
-	programa.pcb = &pcb;
+void actualizarPCB(t_programa* programa, t_pcb* pcb ){
+	t_pcb* aux = programa->pcb;
+	programa->pcb = pcb;
 
 	free(aux);
 	return;
 }
 
+/*
+ * Nombre: buscarPrograma/2
+ * Argumentos:
+ * 		- pid
+ * 		- lista
+ *
+ * Devuelve:
+ * 		la data de la pcb que se busca
+ *
+ * Funcion: recorre la lista buscando el programa con el pid que recibe por parametro
+ */
+
+void* buscarPrograma(int pid, t_list* lista){
+	if(lista->head==NULL){
+		return NULL;
+	}
+	t_link_element* element = lista->head;
+	while( (element!=NULL) && (((t_programa*)element->data)->pcb->pid!=pid)){
+		element = element->next;
+	}
+	if(element == NULL){
+		perror("No esta el elemento en la lista");
+	}
+	return element->data;
+}
 
 
 
@@ -313,6 +338,23 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 		}
 	free(paquete);
 
+}
+
+/*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+void handler_conexion_cpu(epoll_data_t data){
+	t_pcb* pcb = (t_pcb*)data.ptr;
+	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
+	actualizarPCB(programa, pcb);
 }
 
 /*

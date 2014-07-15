@@ -40,6 +40,7 @@ extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
 extern int* fds_conectados_cpu;
+extern int* estado_cpu;
 extern sem_t sem_multiProg, sem_pcp, sem_new;
 extern t_programa* programas;
 extern int program_pid;
@@ -67,8 +68,6 @@ void core_io(t_programa,int, char*);
 void core_conexion_plp_programas(void);
 void core_conexion_umv(void);
 void core_conexion_pcp_cpu(void);
-void core_pcp_ready(void);
-void core_pcp_new(void);
 
 
 #endif /* FUNCIONESPLP_H_ */

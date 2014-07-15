@@ -21,18 +21,21 @@ void agregarAColaSegunPeso(t_programa programa, t_list* lista){
 }
 
 void mostrarNodosPorPantalla(t_list* lista, char* nombreLista){
-	int i;
-	int p;
+	int i, peso, pid;
 	//system("clear");
 	if(lista->head==NULL){
 		printf("No hay programas en la cola %s\n", nombreLista);
 		return;
 	}
 	printf("Estado de la cola %s:\nPID  PESO\n", nombreLista);
-	for (i=0;i<(list_size(lista));i++){
+	i=0;
+	while(i<list_size(lista)){
+		printf("El size de la lista es: %d\n",list_size(lista));
 		t_programa* aux=(t_programa*)list_get(lista, i);
-		p=aux->peso;
-		printf("%d    %d\n", i, p); //Tal vez agregar el nombre del programa(? Preguntar
+		pid=aux->pcb->pid;
+		peso=aux->peso;
+		printf("%d    %d\n", pid, peso);
+		i++;
 	}
 }
 
@@ -182,7 +185,7 @@ void core_plp(void){
 
 	crearSemaforos();
 
-	//pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
+	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 
@@ -208,7 +211,7 @@ void core_plp(void){
 		sem_post(&sem_pcp);
 	}
 
-	//pthread_join(conexion_plp_programas,NULL);
+	pthread_join(conexion_plp_programas,NULL);
 	//pthread_join(conexion_plp_umv,NULL);
 	pthread_join(conexion_plp_cpu,NULL);
 
@@ -268,20 +271,15 @@ void core_io(t_programa programa, int retardo, char* dispositivo){
 
 void core_conexion_plp_programas(void){
 
-	struct epoll_event event;
-	struct epoll_event* events;
 	programas = malloc(MAX_EVENTS_EPOLL*sizeof(t_programa));
 
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketCliente(efd_programas,sock_programas);
-	event.events=EPOLLIN|EPOLLRDHUP;
-	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	event.data.fd=sock_programas;
 	while(1){
-		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, (void*) &desconexion_cpu);
+		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		if(i==-1){
-			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
+			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento en programas");
 		}
 	}
 	return;
@@ -298,24 +296,22 @@ void core_conexion_umv(void){
 
 void core_conexion_pcp_cpu(void){
 
-	/*struct epoll_event event;
-	struct epoll_event* events;*/
 	int i;
 
 	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
+	estado_cpu=malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	for(i=0; i<MAX_EVENTS_EPOLL;i++){
-		fds_conectados_cpu[i]=-1;
+		 estado_cpu[i]=LIBRE;
+		 fds_conectados_cpu[i]=0;
 	}
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
-	/*event.events=EPOLLIN | EPOLLRDHUP;
-	events=calloc(MAX_EVENTS_EPOLL,sizeof(event));
-	event.data.fd=sock_cpu;*/
+
 	while(1){
-		int j = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, NULL);
-		if(j==0){
-			printf("Se agrego una cpu\n");
+		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*) &handler_conexion_cpu, (void*) &desconexion_cpu);
+		if(i==-1){
+			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
 	}
 
@@ -323,25 +319,6 @@ void core_conexion_pcp_cpu(void){
 	return;
 }
 
-
-
-
-
-void core_pcp_new(void){
-	t_programa *programa;
-
-	while(1){
-		sem_wait(&sem_multiProg);
-		pthread_mutex_lock(mutex_cola_new);
-		pthread_mutex_lock(mutex_cola_ready);
-		programa=(t_programa*)list_remove(cola.new, 0);
-		pthread_mutex_unlock(mutex_cola_new);
-		list_add(cola.ready, (void*)programa);
-		pthread_mutex_unlock(mutex_cola_ready);
-		sem_post(&sem_multiProg);
-	}
-	return;
-}
 
 
 void esperarYCerrarConexiones(void){
