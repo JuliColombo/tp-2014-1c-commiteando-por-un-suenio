@@ -66,6 +66,7 @@ int escogerUbicacionW(int tamanio);
 int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
+int getPosTablaSeg(int id_prog);
 
 
 /*Operaciones de Consola*/

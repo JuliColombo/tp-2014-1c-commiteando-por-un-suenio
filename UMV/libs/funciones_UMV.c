@@ -41,13 +41,13 @@ int estaEnDicTOP(char palabra[]){
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
 	tamanioMP = configuracion_UMV.memSize;
-	int* MP;
-	MP = malloc(tamanioMP);
-	if(MP==NULL){
+	int* aux_MP;
+	aux_MP = malloc(tamanioMP);
+	if(aux_MP==NULL){
 		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
 		abort();
 	}
-	return MP;
+	return aux_MP;
 }
 
 void log_error_socket(void){
@@ -314,40 +314,58 @@ int validarSegmentoDisponibleEn(int pos, int j) {
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion;
 	segmentDescriptor aux;
-	int i;
+	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
-	if(validarSolicitud(tamanio)){
+	printf("Escoge la ubicacion\n");
 		if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
 		if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
-		}else{
-			printf("No hay espacio disponible para %d",id_prog);
-			return;
-		 }
-	//segmento=malloc(sizeof(tamanio));
+	printf("La ubicacion es : %d\n", ubicacion);
+	printf(" Consigue posicion en tabladeSeg\n");
 	int pos=getPosTablaSeg(id_prog);
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
+	printf("Arma el segmento\n");
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
 	//Asignación de los campos de la tabla de segmentos correspondiente
+	printf("Asigna los campos de la tabla\n");
 	tablaDeSegmentos[pos].id_prog = id_prog;
 	tablaDeSegmentos[pos].cant_segmentos++;
-	tablaDeSegmentos[pos].segmentos[i]=aux;
+	num_segmento=tablaDeSegmentos[pos].cant_segmentos;
+	tablaDeSegmentos[pos].segmentos[num_segmento]=aux;
+	printf("Logra asignar la tabla\n");
 }
 
 int getPosTablaSeg(int id_prog){
 	int i=0;
+	tablaSeg* aux_tabla;
+	segmentDescriptor* aux_segmentos;
 	//Verifico si hay tablas
+
 	if(cant_tablas==0){
+		printf("La cant de tablas es 0\n");
 		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
-		tablaDeSegmentos = malloc(sizeof(tablaSeg));
-		tablaDeSegmentos[0].cant_segmentos=0;
+		aux_tabla = malloc(sizeof(tablaSeg));
+			if(aux_tabla==NULL){
+				log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+				abort();
+			}
+		tablaDeSegmentos = aux_tabla;
+		tablaDeSegmentos[i].cant_segmentos=0;
+		aux_segmentos = malloc(sizeof(segmentDescriptor));
+						if(aux_segmentos==NULL){
+							log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+							abort();
+						}
+		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
-		return 0;
+		printf("Inicializa la tabla\n");
+		return i;
 	}
 	else{
+		printf("La cant de tablas no es 0\n");
 		//Como hay tablas, busco si ya hay una para el prog correspondiente
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
@@ -355,6 +373,12 @@ int getPosTablaSeg(int id_prog){
 		//FIXME: no estoy seguro de este realloc
 		tablaDeSegmentos = realloc(tablaDeSegmentos, sizeof(tablaDeSegmentos+sizeof(tablaSeg)));
 		i=cant_tablas;
+		aux_segmentos = malloc(sizeof(segmentDescriptor));
+								if(aux_segmentos==NULL){
+									log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+									abort();
+								}
+		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
 		return i;
 		} else return i;
@@ -364,14 +388,15 @@ int getPosTablaSeg(int id_prog){
 int escogerUbicacionF(int tamanio){
 	int posicionDeDestino;
 	int i=0;
+	int aux;
 			//Recorro la memoria principal
 		while(i<tamanioMP){
-			int aux=0;			//Obtengo primer posicion libre en MP
+			 aux=0;			//Obtengo primer posicion libre en MP
 			while (MP[i]!=NULL && i<tamanioMP) i++;
 			posicionDeDestino= i;
 			//Checkeo la cantidad de posiciones libres hasta llegar a
 			//una posicion ocupada, o el final de la memoria
-			while(MP[i] != NULL && i<tamanioMP){
+			while(MP[i] == NULL && i<tamanioMP){
 				aux++;
 				i++;
 			}
@@ -402,7 +427,7 @@ int escogerUbicacionW(int tamanio){
 				posicionDeDestino= i;
 			//Checkeo la cantidad de posiciones libres hasta llegar a
 			//una posicion ocupada, o el final de la memoria
-				while(MP[i]!= NULL && i<tamanioMP){
+				while(MP[i]== NULL && i<tamanioMP){
 					aux++;
 					i++;
 				}
@@ -701,7 +726,7 @@ void *consola (void){
 				if(strcmp(tipoOperacion, "crear") == 0){
 					  puts("Ingrese el tamaño del segmento");
 					  int tamanio;
-					  scanf("%d",tamanio);
+					  scanf("%d",&tamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  crearSegmentoPrograma(procesoDelHilo,tamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
