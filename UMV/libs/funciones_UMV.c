@@ -317,9 +317,10 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	printf("Escoge la ubicacion\n");
-		if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
-		if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
+	if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
+	if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
 	printf("La ubicacion es : %d\n", ubicacion);
+	reservarEspacioMP(ubicacion, tamanio);
 	printf(" Consigue posicion en tabladeSeg\n");
 	int pos=getPosTablaSeg(id_prog);
 	i=rand();
@@ -338,6 +339,16 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("Logra asignar la tabla\n");
 }
 
+void reservarEspacioMP(int ubicacion, int tamanio){
+	int i=0;
+	int aux=tamanio;
+	while(i<=tamanioMP && aux>0){
+			MP[ubicacion+i]=-1;
+			aux--;
+			i++;
+		}
+}
+
 int getPosTablaSeg(int id_prog){
 	int i=0;
 	tablaSeg* aux_tabla;
@@ -345,7 +356,7 @@ int getPosTablaSeg(int id_prog){
 	//Verifico si hay tablas
 
 	if(cant_tablas==0){
-		printf("La cant de tablas es 0\n");
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
 		aux_tabla = malloc(sizeof(tablaSeg));
 			if(aux_tabla==NULL){
@@ -365,13 +376,18 @@ int getPosTablaSeg(int id_prog){
 		return i;
 	}
 	else{
-		printf("La cant de tablas no es 0\n");
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como hay tablas, busco si ya hay una para el prog correspondiente
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
 		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
 		//FIXME: no estoy seguro de este realloc
-		tablaDeSegmentos = realloc(tablaDeSegmentos, sizeof(tablaDeSegmentos+sizeof(tablaSeg)));
+		aux_tabla =realloc(tablaDeSegmentos, sizeof(tablaDeSegmentos+sizeof(tablaSeg)));
+		if(aux_tabla==NULL){
+						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+						abort();
+					}
+		tablaDeSegmentos = aux_tabla;
 		i=cant_tablas;
 		aux_segmentos = malloc(sizeof(segmentDescriptor));
 								if(aux_segmentos==NULL){
