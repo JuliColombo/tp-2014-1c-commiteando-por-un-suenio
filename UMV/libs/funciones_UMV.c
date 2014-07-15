@@ -97,7 +97,7 @@ int ubicarEnTabla(int inicio){
 
 t_buffer* solicitarBytes(int base,int offset, int longitud){
 	t_buffer* buffer;
-	buffer = malloc(sizeof(longitud));
+	buffer = malloc(sizeof(longitud*sizeof(int)));
 	int i=0;
 	int procesoDelHilo=0; // Donde lo declaramos?
 	int segmentoBase = ubicarEnTabla(base);
@@ -312,31 +312,26 @@ int validarSegmentoDisponibleEn(int pos, int j) {
 }
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
-	int ubicacion;
+	int ubicacion=-1;
 	segmentDescriptor aux;
 	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
-	printf("Escoge la ubicacion\n");
 	if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
 	if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
 	printf("La ubicacion es : %d\n", ubicacion);
 	reservarEspacioMP(ubicacion, tamanio);
-	printf(" Consigue posicion en tabladeSeg\n");
 	int pos=inicializarTabla(id_prog);
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
-	printf("Arma el segmento\n");
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
 	//Asignación de los campos de la tabla de segmentos correspondiente
-	printf("Asigna los campos de la tabla\n");
 	tablaDeSegmentos[pos].id_prog = id_prog;
 	tablaDeSegmentos[pos].cant_segmentos++;
 	num_segmento=tablaDeSegmentos[pos].cant_segmentos;
 	tablaDeSegmentos[pos].segmentos[num_segmento]=aux;
-	printf("Logra asignar la tabla\n");
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
@@ -372,7 +367,6 @@ int inicializarTabla(int id_prog){
 						}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
-		printf("Inicializa la tabla\n");
 		return i;
 	}
 	else{
@@ -381,8 +375,8 @@ int inicializarTabla(int id_prog){
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
 		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
-		//FIXME: no estoy seguro de este realloc
-		aux_tabla =realloc(tablaDeSegmentos, sizeof(tablaDeSegmentos+sizeof(tablaSeg)));
+		//FIXME: no funciona bien este realloc
+		aux_tabla =realloc(tablaDeSegmentos, sizeof(sizeof(tablaDeSegmentos)+sizeof(tablaSeg)));
 		if(aux_tabla==NULL){
 						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
 						abort();
@@ -397,7 +391,17 @@ int inicializarTabla(int id_prog){
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
 		return i;
-		} else return i;
+		} else {
+			tablaDeSegmentos[i].cant_segmentos++;
+			//FIXME: no funciona bien este realloc
+			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, (sizeof(tablaDeSegmentos[i].segmentos)+sizeof(segmentDescriptor)));
+									if(aux_segmentos==NULL){
+										log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+										abort();
+									}
+			tablaDeSegmentos[i].segmentos = aux_segmentos;
+			return i;
+		}
 	}
 }
 
