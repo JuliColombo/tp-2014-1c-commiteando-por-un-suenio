@@ -9,6 +9,7 @@
 #define PRIMITIVAS_H_
 
 #include "primitivasAux.h"
+#include "log.h"
 
 enum{
 	CONTINUES = 0,

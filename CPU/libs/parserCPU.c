@@ -45,12 +45,15 @@ void parsear(){
 
 	pcb.program_counter += 1;
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se ejecuta nueva instruccion");
+
 	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 
 }
 
 void esperar_retardo(int tiempo){
 	usleep(tiempo/1000);
+	log_escribir(archLog, "Ejecucion", INFO, "Retardo de %d ms",tiempo);
 }
 
 void continuarHastaQuantum() {
@@ -67,7 +70,7 @@ void hot_plug(int signum) {
 		termino = DONE;
 		i = 0;
 		if(socket_cerrarConexion(sockKernel)==-1){
-			log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+			log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar conexion");
 		}
 	}
 }

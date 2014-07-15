@@ -106,11 +106,10 @@ void socket_and_number(int sockAjeno,int num){
 }
 
 void* socket_recibir_estructura(int sockAjeno){
-	void* estructura;
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(sockAjeno,&tipoRecibido,&structRecibida);
-	return estructura;
+	return structRecibida;
 }
 
 t_struct_indice_etiquetas* crear_struct_indice_etiquetas(uint32_t index, uint32_t size){

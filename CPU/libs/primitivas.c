@@ -35,6 +35,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	pcb.tamanio_contexto += 1;
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se definio variable %c",identificador_variable);
+
 	return posicion;
 }
 
@@ -48,8 +50,10 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 	} else {
 		posicion = -1;
 	}
-	return posicion;
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se obtuvo posicion de variable %c",identificador_variable);
+
+	return posicion;
 }
 
 
@@ -60,8 +64,9 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	t_valor_variable valor_variable = estructura->numero;
 
-	return valor_variable;
+	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
 
+	return valor_variable;
 }
 
 
@@ -78,6 +83,9 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	} else {
 		top_index = top;
 	}
+
+	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a direccion de variable %d",valor, direccion_variable);
+
 }
 
 
@@ -90,6 +98,8 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
 	t_valor_variable valor = estructura->numero;
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se obtuvo valo de variable compartida %s",variable);
+
 	return valor;
 
 }
@@ -100,7 +110,8 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"
 	socket_and_asignar_compartida(sockKernel,variable,valor);
 
-	pcb.program_counter += 1;
+	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a variable compartida %s",valor, variable);
+
 	return valor;
 }
 
@@ -113,6 +124,8 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	socket_and_instruccion(sockUMV,inst);
 
 	recibirProximaInstruccion(sockUMV);
+
+	log_escribir(archLog, "Ejecucion", INFO, "Se va al label %s y se obtiene el numero de su primera instruccion ejecutable",etiqueta);
 }
 
 
@@ -165,6 +178,8 @@ void finalizar() {
 		printf("\n\nllegamos al if!\n\n");
 		termino = DONE;
 
+		log_escribir(archLog, "Ejecucion", INFO, "Finalizo ejecucion");
+
 	}
 }
 
@@ -191,12 +206,16 @@ void retornar(t_valor_variable retorno) {
 
 	esConRetorno = 0;
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se retorna el valor %d",retorno);
+
 }
 
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
 	socket_and_number(sockKernel, valor_mostrar);
+
+	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %d para imprimirlo por pantalla",valor_mostrar);
 
 }
 
@@ -205,11 +224,15 @@ void imprimirTexto(char* texto) {
 
 	socket_and_string(sockKernel,texto);
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %s para imprimirlo por pantalla",texto);
+
 }
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
 	socket_and_io(sockKernel,dispositivo,tiempo);
+
+	log_escribir(archLog, "Ejecucion", INFO, "Se envia conecto %s por %d tiempo",dispositivo,tiempo);
 
 }
 
@@ -220,10 +243,13 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 
 	socket_and_wait(sockKernel,identificador_semaforo);
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (wait)",identificador_semaforo);
+
 }
 
 void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 
 	socket_and_signal_semaforo(sockKernel,identificador_semaforo);
 
+	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (signal)",identificador_semaforo);
 }
