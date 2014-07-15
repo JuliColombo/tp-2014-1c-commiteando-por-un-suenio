@@ -280,6 +280,7 @@ void* buscarPrograma(int pid, t_list* lista){
 
 
 
+
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
 /*
@@ -324,10 +325,11 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 	uint32_t k=configuracion_kernel.quantum;
 	paquete->numero=k;
-	for(n=0; fds_conectados_cpu[n]!=-1;n++){
-		}
+	for(n=0; estado_cpu[n]!=LIBRE;n++){
+	}
 		if(n<MAX_EVENTS_EPOLL){
 			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
+			estado_cpu[n]=USADA;
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
 			sleep(1);
 			k=configuracion_kernel.retardo_quantum;
@@ -337,6 +339,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 		}
 	free(paquete);
+
 
 }
 
@@ -372,7 +375,7 @@ void desconexion_cpu(epoll_data_t data){
 	int pos;
 	for(pos=0; pos<MAX_EVENTS_EPOLL; pos++){
 		if(fds_conectados_cpu[pos]==data.fd){
-			fds_conectados_cpu[pos]=-1;
+			estado_cpu[pos]=LIBRE;
 			break;
 		}
 

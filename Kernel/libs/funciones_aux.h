@@ -21,6 +21,8 @@ enum{
 	USADA
 };
 
+
+
 int* vector_num(char**, char**);
 int cant_identificadores(char**);
 void log_error_socket(void);
@@ -32,6 +34,7 @@ void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
 void actualizarPCB(t_programa* programa, t_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista);
+
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/
 void manejar_ConexionNueva_Programas(epoll_data_t);

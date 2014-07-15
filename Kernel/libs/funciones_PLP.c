@@ -9,10 +9,10 @@ int calcularPeso(t_programa programa){ //Calcula peso del programa
 }
 
 void agregarAColaSegunPeso(t_programa programa, t_list* lista){
-	t_link_element *element = lista->head;
+	t_link_element* element = lista->head;
 	int position = 0;
 
-	while ((element != NULL)&&(((t_programa*)(element->data))->peso < programa.peso) ) {
+	while ((element != NULL)&&(((t_programa*)(element->data))->peso < programa.peso)) {
 		element = element->next;
 		position++;
 	}
@@ -107,7 +107,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 	printf("Puerto programas: %d\n", configuracion_kernel.puerto_programas);
 	printf("Puerto CPUs: %d\n", configuracion_kernel.puerto_cpus);
 	printf("Quantum: %d\n", configuracion_kernel.quantum);
-	printf("Retardo quantum: %l\n", configuracion_kernel.retardo_quantum);
+	printf("Retardo quantum: %lu\n", configuracion_kernel.retardo_quantum);
 	printf("Grado de multiprogramacion: %d\n", configuracion_kernel.multiprogramacion);
 
 
@@ -277,9 +277,9 @@ void core_conexion_plp_programas(void){
 	int efd_programas = epoll_crear();
 	epoll_agregarSocketCliente(efd_programas,sock_programas);
 	while(1){
-		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
+		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, (void*) &handler_conexion_cpu, (void*) &desconexion_cpu);
 		if(i==-1){
-			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento en programas");
+			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
 	}
 	return;
@@ -306,18 +306,20 @@ void core_conexion_pcp_cpu(void){
 	}
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
-	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
+	epoll_agregarSocketCliente(efd_cpu,sock_cpu);
 
 	while(1){
-		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*) &handler_conexion_cpu, (void*) &desconexion_cpu);
+		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, (void*) &desconexion_cpu);
 		if(i==-1){
 			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
 	}
-
+	free(fds_conectados_cpu);
+	free(estado_cpu);
 
 	return;
 }
+
 
 
 
