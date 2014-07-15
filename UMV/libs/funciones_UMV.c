@@ -322,7 +322,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La ubicacion es : %d\n", ubicacion);
 	reservarEspacioMP(ubicacion, tamanio);
 	printf(" Consigue posicion en tabladeSeg\n");
-	int pos=getPosTablaSeg(id_prog);
+	int pos=inicializarTabla(id_prog);
 	i=rand();
 	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
@@ -349,7 +349,7 @@ void reservarEspacioMP(int ubicacion, int tamanio){
 		}
 }
 
-int getPosTablaSeg(int id_prog){
+int inicializarTabla(int id_prog){
 	int i=0;
 	tablaSeg* aux_tabla;
 	segmentDescriptor* aux_segmentos;
@@ -465,26 +465,36 @@ int escogerUbicacionW(int tamanio){
 }
 
 void destruirSegmentosPrograma(int id_prog){
-	int pos= getPosTablaSeg(id_prog);
+	int pos= getPosTabla(id_prog);
+	printf("La posicion es: %d\n", pos);
 	liberarMP(pos);
+	printf("Se libera el espacio de memoria\n");
 	eliminarSegmentos(pos);
+	printf("Se libera el espacio de los segmentos\n");
 	return;
 
 }
 
+int getPosTabla(int id_prog){
+	int i=0;
+	while(tablaDeSegmentos[i].id_prog != id_prog) i++;
+	return i;
+}
+
+
 void liberarMP(int pos){
-	int i,j,tam;
+	int i,ubicacion,tam;
 	i=0;
 	while(i<tamanioMP){
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
-			j=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
+			ubicacion=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
 			tam=tablaDeSegmentos[pos].segmentos[i].tamanio;
 		//Recorro las posiciones de MP en base a ubicacionMP y tamanio
 		// y las igualo a NULL
 			while(tam!=0){
-				MP[j]=NULL;
-				j++;
+				MP[ubicacion]=NULL;
+				ubicacion++;
 				tam--;
 			}
 			i++;
@@ -495,11 +505,11 @@ void liberarMP(int pos){
 void eliminarSegmentos(int pos){
 	int i,ultimaPos;
 	i=0;
-	ultimaPos= sizeof(tablaDeSegmentos[pos].segmentos);
+	ultimaPos= (tablaDeSegmentos[pos].cant_segmentos-1);
 	//Recorro la tabla de segmentos del id_prog
 	while(i<ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
-		//free(tablaDeSegmentos[pos].segmentos[i]);
+		tablaDeSegmentos[pos].segmentos = NULL;
 		i++;
 	}
 }
