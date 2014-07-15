@@ -34,6 +34,7 @@ void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
 void actualizarPCB(t_programa* programa, t_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista);
+void mandarAReady(t_programa* programa);
 
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/

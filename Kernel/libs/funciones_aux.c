@@ -278,6 +278,34 @@ void* buscarPrograma(int pid, t_list* lista){
 	return element->data;
 }
 
+/*
+ * Nombre: mandarAReady
+ * Argumentos:
+ * 		-programa
+ *
+ * Devuelve:
+ *		nada
+ *
+ * Funcion:envia un programa de exec a ready
+ */
+
+void mandarAReady(t_programa* programa){
+	t_link_element* element=cola.exec->head;
+	int pos=0;
+	pthread_mutex_lock(mutex_cola_exec);
+	pthread_mutex_lock(mutex_cola_ready);
+	while((element != NULL) && ((((t_programa*)element->data)->pcb->pid) != (programa->pcb->pid))){
+		pos++;
+	}
+	if(element!=NULL){
+	list_remove(cola.exec,pos);
+	pthread_mutex_unlock(mutex_cola_exec);
+	list_add(cola.ready, programa);
+	pthread_mutex_unlock(mutex_cola_ready);
+	}
+	return;
+}
+
 
 
 
@@ -358,6 +386,8 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_pcb* pcb = (t_pcb*)data.ptr;
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);
+	mandarAReady(programa);
+
 }
 
 /*
