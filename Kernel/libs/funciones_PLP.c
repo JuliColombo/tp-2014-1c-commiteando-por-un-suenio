@@ -116,25 +116,68 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 }
 
+int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4){
+	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+	paquete->numero = tamanioSeg1;
+	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
+	paquete->numero = tamanioSeg2;
+	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
+	paquete->numero = tamanioSeg3 ;
+	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
+	paquete->numero = tamanioSeg4;
+	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
+	free(paquete);
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int i=socket_recibir(sock_umv,&tipoRecibido,&structRecibida);
+	t_struct_numero* valor=malloc(sizeof(t_struct_numero));
+	valor->numero=1;
+	if(i==1){
+		valor = ((t_struct_numero*)structRecibida);
+	}
 
 
+	return valor->numero;
+}
 
-t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
+/*
+ * Nombre: crearPcb/3
+ * Argumentos:
+ * 		- codigo
+ * 		- metadata del programa
+ * 		- fd del programa
+ *
+ * Devuelve:
+ * 		- null si no hay espacio suficiente para los segmentos de codigo
+ *		- la pcb creada si hay espacio
+ * Funcion:
+ */
+t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 
-	pthread_mutex_lock(mutex_pid);
-	nuevoPCB->pid=program_pid;
-	program_pid+=1;
-	pthread_mutex_unlock(mutex_pid);
+	pthread_mutex_lock(solicitarMemoria);
 
-	nuevoPCB->program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
-	//nuevoPCB->codigo=solicitarMemoria()
-	//nuevoPCB->stack=solicitarMemoria()
-	//nuevoPCB->c_stack=solicitarMemoria()
-	//nuevoPCB->index_codigo=solicitarMemoria()
-	//nuevoPCB->index_etiquetas=solicitarMemoria()
+	if(solicitarMemoriaUMV(1,2,3,4)==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
+//		nuevoPCB->stack=enviarBytes()
+//		nuevoPCB->c_stack=enviarBytes()
+//		nuevoPCB->index_codigo=enviarBytes()
+//		nuevoPCB->index_etiquetas=enviarBytes()
+		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+		pthread_mutex_unlock(solicitarMemoria);
+		pthread_mutex_lock(mutex_pid);
+		nuevoPCB->pid=program_pid;
+		program_pid+=1;
+		pthread_mutex_unlock(mutex_pid);
+	}else{	//Si no hay memoria suficiente, le avisa al programa
+		pthread_mutex_unlock(solicitarMemoria);
+		t_struct_string* paquete = malloc(sizeof(t_struct_string));
+		paquete->string= -1;
+		socket_enviar(fd, D_STRUCT_STRING, paquete);
 
 
+		free(paquete);
+		return NULL;
+	}
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
 	nuevoPCB.stack;				//Dirección del primer byte en la UMV del segmento de stack
@@ -165,7 +208,6 @@ void enviar_pcb_a_cpu(void){
 	pthread_mutex_lock(mutex_cola_ready);
 	t_programa* programa = (t_programa*)list_remove(cola.ready,0);
 	pthread_mutex_unlock(mutex_cola_ready);
-	pthread_mutex_lock(mutex_cola_exec);
 	paquete->c_stack=programa->pcb->c_stack;
 	paquete->codigo=programa->pcb->codigo;
 	paquete->index_codigo=programa->pcb->index_codigo;
@@ -177,6 +219,8 @@ void enviar_pcb_a_cpu(void){
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
 	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
 	if(i==1){
+		printf("Se envia bien la pcb\n");
+		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		free(paquete);
@@ -194,7 +238,7 @@ void core_plp(void){
 
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
-	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
+	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 	while (1){
 		sem_wait(&sem_new);
@@ -209,10 +253,10 @@ void core_plp(void){
 	}
 
 	pthread_join(conexion_plp_programas,NULL);
-	//pthread_join(conexion_plp_umv,NULL);
+	pthread_join(conexion_plp_umv,NULL);
 	pthread_join(conexion_plp_cpu,NULL);
 
-	cerrarSemaforos();
+
 	return;
 }
 
@@ -247,7 +291,7 @@ void core_pcp(void){
 				pthread_mutex_lock(mutex_cola_exec);
 				mostrarColasPorPantalla(cola.exec, "Exec");
 				pthread_mutex_unlock(mutex_cola_exec);
-	/*			if(programa->flag_bloqueado==1){
+				if(programa->flag_bloqueado==1){
 					bloquearPrograma(programa->pcb->pid);
 				}
 
@@ -257,9 +301,10 @@ void core_pcp(void){
 					sem_post(&sem_multiProg);
 					list_add(cola.exit,(void*)programa);
 					pthread_mutex_unlock(mutex_cola_exec);
-					mostrarNodosPorPantalla(cola.exit, "Exit");
+					mostrarColasPorPantalla(cola.exit, "Exit");
 					pthread_mutex_unlock(mutex_cola_exit);
-				}*/
+					break;
+				}
 
 			}
 		}

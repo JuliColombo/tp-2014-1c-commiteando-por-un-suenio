@@ -20,6 +20,7 @@ pthread_mutex_t* mutex_cola_exec;
 pthread_mutex_t* mutex_cola_block;
 pthread_mutex_t* mutex_cola_exit;
 pthread_mutex_t* mutex_pid;
+pthread_mutex_t* solicitarMemoria;
 int sock_programas, sock_umv, sock_cpu;
 int* fds_conectados_cpu;
 int* estado_cpu;
@@ -44,6 +45,7 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 
 
 	esperarYCerrarConexiones();
+	cerrarSemaforos();
 	pthread_join(pcp, NULL);
 	pthread_join(plp, NULL);
 

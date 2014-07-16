@@ -53,13 +53,21 @@ int main (int argc, char **argv){
 	}
 
 
-//	char* cadenaAImprimir;
-//	void* buffer;
+//	t_tipoEstructura tipoRecibido;
+//	void* structRecibida;
 	while(1){
-		/*socket_recibir(sock_kernel_servidor, (void*)&cadenaAImprimir, &buffer);
-		if(strcmp("finalizado", cadenaAImprimir)==0){
-			break;
+		/*socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
+		char* cadenaAImprimir = (char*) structRecibida;
+		if(cadenaAImprimir==0){
+			cerrarSocket(sock_kernel_servidor);
+			return EXIT_SUCCESS;
 		}
+		if(cadenaAImprimir==-1){
+			printf("No hay memoria suficiente para el programa\n");
+			cerrarSocket(sock_kernel_servidor);
+			return EXIT_FAILURE;
+		}
+
 		for(i=0; cadenaAImprimir[i]!=NULL;i++){
 			printf("%c", cadenaAImprimir[i]);
 		}*/
@@ -68,7 +76,7 @@ int main (int argc, char **argv){
 
 
 
-	cerrarSocket(sock_kernel_servidor);
+
 
 
 

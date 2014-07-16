@@ -36,6 +36,7 @@ extern pthread_mutex_t* mutex_cola_exec;
 extern pthread_mutex_t* mutex_cola_block;
 extern pthread_mutex_t* mutex_cola_exit;
 extern pthread_mutex_t* mutex_pid;
+extern pthread_mutex_t* solicitarMemoria;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;
@@ -58,7 +59,8 @@ int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que e
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos
-t_pcb* crearPcb(char*,t_medatada_program*);
+t_pcb* crearPcb(char*,t_medatada_program*, int);
+int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4);
 void enviar_pcb_a_cpu(void);
 
 /************************* HILOS *************************/

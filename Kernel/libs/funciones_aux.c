@@ -99,6 +99,7 @@ void inicializarMutex(void){
 	mutex_cola_block=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_exit=malloc(sizeof(pthread_mutex_t));
 	mutex_pid=malloc(sizeof(pthread_mutex_t));
+	solicitarMemoria=malloc(sizeof(pthread_mutex_t));
 
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
@@ -106,6 +107,7 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_cola_block,NULL);
 	pthread_mutex_init(mutex_cola_exit,NULL);
 	pthread_mutex_init(mutex_pid,NULL);
+	pthread_mutex_init(solicitarMemoria,NULL);
 }
 
 /*
@@ -229,16 +231,17 @@ void agregarNuevoPrograma(char* codigo, int fd){
 	programa->flag_terminado=0;
 	programa->metadata=malloc(sizeof(t_medatada_program));
 	programa->metadata=metadata_desde_literal(codigo);
-	programa->pcb=crearPcb(codigo, programa->metadata);
-	programa->peso=calcularPeso(programa);
-	programa->socket_descriptor_conexion=fd;
+	if((programa->pcb=crearPcb(codigo, programa->metadata, fd))!=NULL){
+		programa->peso=calcularPeso(programa);
+		programa->socket_descriptor_conexion=fd;
 
+		pthread_mutex_lock(mutex_cola_new);
+		agregarAColaSegunPeso(programa,cola.new);
+		pthread_mutex_unlock(mutex_cola_new);
+	}else{
+		free(programa);
+	}
 
-
-
-	pthread_mutex_lock(mutex_cola_new);
-	agregarAColaSegunPeso(programa,cola.new);
-	pthread_mutex_unlock(mutex_cola_new);
 
 	return;
 
@@ -389,7 +392,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 		k=configuracion_kernel.retardo_quantum;
 		paquete->numero=k;
 		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-		//sem_post(&sem_cpu);
+		sem_post(&sem_cpu);
 	} else {
 		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 	}
