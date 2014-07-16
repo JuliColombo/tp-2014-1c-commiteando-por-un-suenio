@@ -50,12 +50,11 @@ extern int program_pid;
 
 int calcularPeso(t_programa*); //Calcula el peso del programa
 void agregarAColaSegunPeso(t_programa*, t_list*); //Agrega ordenadamente en la cola de new
-void mostrarNodosPorPantalla(t_list*, char*); //Muestra los programas que estan en New por pantalla
+void mostrarColasPorPantalla(t_list*, char*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct correspondiente
 void imprimirConfiguracion(void);
 int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que estan en el pcp actualmente
-void completarGradoMultip(void); //Completa grado de multiprogramacion del sistema
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos

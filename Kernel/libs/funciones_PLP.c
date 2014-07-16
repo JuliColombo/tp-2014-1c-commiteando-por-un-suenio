@@ -20,7 +20,7 @@ void agregarAColaSegunPeso(t_programa* programa, t_list* lista){
 	list_add_in_index(lista, position, programa);
 }
 
-void mostrarNodosPorPantalla(t_list* lista, char* nombreLista){
+void mostrarColasPorPantalla(t_list* lista, char* nombreLista){
 	int peso, pid;
 	//system("clear");
 	if(lista->head==NULL){
@@ -37,38 +37,13 @@ void mostrarNodosPorPantalla(t_list* lista, char* nombreLista){
 		element=element->next;
 	}
 	return;
-	/*for(i=0;i<list_size(lista);i++){
-		printf("El size de la lista es: %d\n",list_size(lista));
-		t_programa* programa=(t_programa*)list_get(lista, 0);
-		printf("Pasa el get\n");
-		pid=programa->pcb->pid;
-		printf("Pasa el assign del pid");
-		peso=programa->peso;
-		printf("%d    %d\n", pid, peso);
-	}*/
 }
 
 int cantidadProgramasEnEjecucion(void){
 	return (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block));
 }
 
-void completarGradoMultip(void){
-	if(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion){
-		pthread_mutex_lock(mutex_cola_new);
-		void* aux=list_remove(cola.new,0);
-		pthread_mutex_unlock(mutex_cola_new);
-		while(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion && aux!=NULL){
-			pthread_mutex_lock(mutex_cola_ready);
-			list_add(cola.ready,aux);
-			pthread_mutex_unlock(mutex_cola_ready);
-			if(cantidadProgramasEnEjecucion()<configuracion_kernel.multiprogramacion){
-				pthread_mutex_lock(mutex_cola_new);
-				aux=list_remove(cola.new,0);
-				pthread_mutex_unlock(mutex_cola_new);
-			}
-		}
-	}
-}
+
 
 void inicializarColas(void){
 	cola.new=list_create();
@@ -221,7 +196,7 @@ void core_plp(void){
 		sem_wait(&sem_new);
 
 		pthread_mutex_lock(mutex_cola_new);
-		mostrarNodosPorPantalla(cola.new,"New");
+		mostrarColasPorPantalla(cola.new,"New");
 		pthread_mutex_unlock(mutex_cola_new);
 
 
@@ -254,11 +229,11 @@ void core_pcp(void){
 		pthread_mutex_unlock(mutex_cola_ready);
 
 		pthread_mutex_lock(mutex_cola_ready);
-		mostrarNodosPorPantalla(cola.ready,"Ready");
+		mostrarColasPorPantalla(cola.ready,"Ready");
 		pthread_mutex_unlock(mutex_cola_ready);
 
 	/*if(programa->flag_bloqueado==1){
-
+		bloquearPrograma(programa->pcb->pid);
 	}
 
 	if(programa->flag_terminado==1){
@@ -267,6 +242,7 @@ void core_pcp(void){
 		sem_post(&sem_multiProg);
 		list_add(cola.exit,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
+		mostrarNodosPorPantalla(cola.exit, "Exit");
 		pthread_mutex_unlock(mutex_cola_exit);
 	}*/
 
@@ -285,7 +261,7 @@ void core_io(t_programa programa, int retardo, char* dispositivo){
 			bloquearPrograma(programa.pcb->pid);
 			pthread_mutex_unlock(mutex_cola_exec);
 
-			mostrarNodosPorPantalla(cola.block,"block");
+			mostrarColasPorPantalla(cola.block,"block");
 			pthread_mutex_unlock(mutex_cola_block);
 
 			sleep(retardo*configuracion_kernel.hio.retardo[i]);
