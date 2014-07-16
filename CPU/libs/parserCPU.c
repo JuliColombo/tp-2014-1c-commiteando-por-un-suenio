@@ -96,7 +96,7 @@ void mostrarEstadoVariables(){
 void salirPorFinalizacion(){
 	mostrarEstadoVariables();
 	destruirEstructuras();
-	//enviar por socket pcb a kernel para notificar que termine
+	socket_and_pcb(sockKernel,pcb);//enviar por socket pcb a kernel para notificar que termine
 }
 
 void salir(int termino) {
@@ -108,7 +108,7 @@ void salir(int termino) {
 	break;
 
 	case QUANTUM:
-		//enviar por socket pcb a kernel para notificar que termino quantum y me tiene que mandar otro
+	socket_and_pcb(sockKernel,pcb);//enviar por socket pcb a kernel para notificar que termino quantum y me tiene que mandar otro
 	printf("\nsalgo por quantum\n");
 	break;
 	}

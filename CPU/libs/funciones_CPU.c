@@ -54,8 +54,9 @@ void* core_conexion_kernel(void){
 
 	}
 	//CODEO ACA
-	//recibir_quantum(sock);
-	//recibir_retardo_quantum(sock);
+	recibir_quantum(sock);
+	recibir_retardo_quantum(sock);
+	recibir_pcb(sock);
 
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
@@ -71,6 +72,11 @@ void recibir_quantum(int sockKernel) {
 void recibir_retardo_quantum(int sockKernel) {
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
 	retardo = estructura->numero;
+}
+
+void recibir_pcb(int sockKernel) {
+	t_struct_pcb* estructura = (t_struct_pcb*)socket_recibir_estructura(sockKernel);
+	crear_recibir_pcb(pcb,estructura);
 }
 
 /******************************** CONEXION UMV ***************************************************/

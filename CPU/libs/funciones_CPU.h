@@ -25,7 +25,8 @@ typedef struct{
 /************** VARIABLES GLOBALES **************/
 extern config_cpu configuracion_CPU;
 extern char* PATH;
-int termino;
+extern int termino;
+extern t_struct_pcb pcb;
 
 //VA ACA EL QUANTUM Y SU RETARDO?
 
@@ -39,6 +40,7 @@ void* core_conexion_kernel(void);
 void* core_conexion_umv(void);
 void recibir_quantum(int sockKernel);
 void recibir_retardo_quantum(int sockKernel);
+void recibir_pcb(int sockKernel);
 
 
 #endif /* FUNCIONES_CPU_H_ */
