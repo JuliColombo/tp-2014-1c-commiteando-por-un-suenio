@@ -58,7 +58,7 @@ void log_error_socket(void){
 
 _Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien esto y el memOverload de abajo
 	if ( > tamanioMP) {
-	    printf("Segmentation Fault al intentar acceder a posicion %d \n", base+offset);
+		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
 		return true;
 	} else{
 		return false;
@@ -66,20 +66,17 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien es
 	return false; //pongo esto para que no se queje
 }
 
-_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud){/*
-	if (> tamanioMP) {
-		    printf("Memory Overload al intentar escribir %d bytes en la posicion %d \n", longitud,base+offset);
+_Bool memoryOverload(int longitud){
+	int tamanioLibre= tamanioMP - list_count_satisfying(MP, &MP != NULL);
+	if (longitud < tamanioLibre) {
+		    log_escribir(archLog, "Memory Overload", ERROR, "Memory Overload al intentar acceder a la posicion");
 			return true;
 		} else{
 			return false;
-		}*/
+		}
 	return false; //pongo esto para que no se queje
 }
 
-//Funcion que recibe el programa del PLP y le reserva memoria (si puede)
-/*_Bool solicitarMemoria(t_programa programa){
-	return true;
-}         esto quedo colgado no????*/
 
 // ***********************************Solicitar bytes en memoria*******************
 
@@ -133,7 +130,6 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 }
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int procesoDelHilo; //Donde lo declaramos??
 	int segmentoBase= ubicarEnTabla(base);
 	if (segmentoBase!= -1){
 		if (validarSolicitud(longitud)){
@@ -155,17 +151,16 @@ _Bool validarSolicitud(uint32_t longitud){
 	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
-		printf("No alcanza el espacio en memoria:");
-		/*if(segmentationFault(longitud)){
+		if(segmentationFault(longitud)){
 			return false;
 		}else{
 			if(memoryOverload(longitud)){
 				return false;
 			}else{
-				//printf("Excepcion Desconocida"); ???
+				//log("Excepcion Desconocida"); ???
 				return false;
 				}
-			}*/
+			}
 		return false; //pongo esto para que no joda
 		}
 }
@@ -180,7 +175,7 @@ _Bool hayEspacioEnMemoriaPara(uint32_t longitud){
 	}
 }
 
-_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
+_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reemplazar con las funciones de las commons si no funciona
 	int aux=0;
 	int contador=0;
 	while (aux < tamanioMP){
