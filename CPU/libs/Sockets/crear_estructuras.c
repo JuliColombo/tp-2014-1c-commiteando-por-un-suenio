@@ -138,35 +138,35 @@ void socket_and_io(int sockAjeno,char* string, int valor){
 	free(estructura);
 }
 
-void crear_recibir_pcb (t_struct_pcb pcb,t_struct_pcb* pcbRecibido){
-	pcb.pid= pcbRecibido->pid;
-	pcb.codigo=pcbRecibido->codigo;
-	pcb.stack=pcbRecibido->stack;
-	pcb.c_stack=pcbRecibido->c_stack;
-	pcb.index_codigo=pcbRecibido->index_codigo;
-	pcb.index_etiquetas=pcbRecibido->index_etiquetas;
-	pcb.program_counter=pcbRecibido->program_counter;
-	pcb.tamanio_contexto=pcbRecibido->tamanio_contexto;
-	pcb.tamanio_indice=pcbRecibido->tamanio_indice;
+void crear_recibir_pcb (t_struct_pcb* pcb,t_struct_pcb* pcbRecibido){
+	pcb->pid= pcbRecibido->pid;
+	pcb->codigo=pcbRecibido->codigo;
+	pcb->stack=pcbRecibido->stack;
+	pcb->c_stack=pcbRecibido->c_stack;
+	pcb->index_codigo=pcbRecibido->index_codigo;
+	pcb->index_etiquetas=pcbRecibido->index_etiquetas;
+	pcb->program_counter=pcbRecibido->program_counter;
+	pcb->tamanio_contexto=pcbRecibido->tamanio_contexto;
+	pcb->tamanio_indice=pcbRecibido->tamanio_indice;
 
 }
 
-t_struct_pcb* crear_struct_pcb(t_struct_pcb pcb){
+t_struct_pcb* crear_struct_pcb(t_struct_pcb* pcb){
 	t_struct_pcb* estructura = malloc(sizeof(t_struct_pcb));
-	estructura->pid= pcb.pid;
-	estructura->codigo=pcb.codigo;
-	estructura->stack=pcb.stack;
-	estructura->c_stack=pcb.c_stack;
-	estructura->index_codigo=pcb.index_codigo;
-	estructura->index_etiquetas=pcb.index_etiquetas;
-	estructura->program_counter=pcb.program_counter;
-	estructura->tamanio_contexto=pcb.tamanio_contexto;
-	estructura->tamanio_indice=pcb.tamanio_indice;
+	estructura->pid= pcb->pid;
+	estructura->codigo=pcb->codigo;
+	estructura->stack=pcb->stack;
+	estructura->c_stack=pcb->c_stack;
+	estructura->index_codigo=pcb->index_codigo;
+	estructura->index_etiquetas=pcb->index_etiquetas;
+	estructura->program_counter=pcb->program_counter;
+	estructura->tamanio_contexto=pcb->tamanio_contexto;
+	estructura->tamanio_indice=pcb->tamanio_indice;
 
 	return estructura;
 }
 
-void socket_and_pcb(int sockAjeno,t_struct_pcb pcb){
+void socket_and_pcb(int sockAjeno,t_struct_pcb* pcb){
 	t_struct_pcb* estructura = crear_struct_pcb(pcb);
 	socket_enviar(sockAjeno,D_STRUCT_PCB,estructura);
 	free(estructura);

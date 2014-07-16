@@ -31,7 +31,7 @@ AnSISOP_kernel funciones_kernel = {
 void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
 
-	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb.program_counter);
+	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
 
 	socket_and_instruccion(sockUMV,inst);
 
@@ -43,7 +43,7 @@ void parsear(){
 
 	proximaInst();
 
-	pcb.program_counter += 1;
+	pcb->program_counter += 1;
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se ejecuta nueva instruccion");
 
@@ -83,8 +83,16 @@ void destruirEstructuras(){
 void closureMostrarEstado(char* key, int posicion) {
 	socket_and_pop_position(sockUMV,posicion + 1);
 
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	t_valor_variable valor_variable = estructura->numero;
+	t_valor_variable valor_variable;
+
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_numero* k = ((t_struct_numero*)structRecibida);
+			valor_variable= k->numero;
+			free(k);
+		}
 
 	imprimir(valor_variable);
 }

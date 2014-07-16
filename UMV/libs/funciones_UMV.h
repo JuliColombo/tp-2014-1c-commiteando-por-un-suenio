@@ -44,14 +44,14 @@ extern int sock_cpu;
 extern int retardo;
 extern int* procesosActivos;
 extern int gradoDeMultiprogramacion;
-
+extern lista_handshake lista_handshakes;
 
 /*Prototipos de funciones auxiliares*/
 
 int asignarFisicamente();
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
-_Bool memoryOverload(uint32_t base,uint32_t offset, uint32_t longitud);
+_Bool memoryOverload(uint32_t longitud);
 _Bool segmentationFault(uint32_t base,uint32_t offset);
 _Bool validarSolicitud(uint32_t longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
@@ -69,6 +69,10 @@ int estaEnDicTOP(char palabra[]);
 int inicializarTabla(int id_prog);
 void reservarEspacioMP(int ubicacion, int tamanio);
 int getPosTabla(int id_prog);
+void agregarHandshake(int id_prog, tipo_handshake tipo);
+void inicializarYAgregar(int id_prog, tipo_handshake tipo);
+
+
 
 /*Operaciones de Consola*/
 void algoritmo(void);

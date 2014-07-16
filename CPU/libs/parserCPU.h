@@ -20,6 +20,7 @@ extern t_quantum quantum;
 extern t_retardo_quantum retardo;
 extern t_dictionary* diccionario;
 
+
 int i;
 char* proximaInstruccion;
 int termino;

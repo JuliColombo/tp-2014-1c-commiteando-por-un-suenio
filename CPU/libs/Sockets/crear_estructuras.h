@@ -32,10 +32,10 @@ void socket_and_signal_semaforo(int sockAjeno,char* string);
 void socket_and_wait(int sockAjeno,char* string);
 t_struct_io* crear_struct_io(char* string, int32_t valor);
 void socket_and_io(int sockAjeno,char* string, int valor);
-t_struct_pcb* crear_struct_pcb(t_struct_pcb pcb);
-void socket_and_pcb(int sockAjeno,t_struct_pcb pcb);
+t_struct_pcb* crear_struct_pcb(t_struct_pcb* pcb);
+void socket_and_pcb(int sockAjeno,t_struct_pcb* pcb);
 
 void* socket_recibir_estructura(int sockAjeno);
-void crear_recibir_pcb (t_struct_pcb pcb,t_struct_pcb* pcbRecibido);
+void crear_recibir_pcb (t_struct_pcb* pcb,t_struct_pcb* pcbRecibido);
 
 #endif /* CREAR_ESTRUCTURAS_H_ */

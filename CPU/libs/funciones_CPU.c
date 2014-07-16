@@ -50,18 +50,21 @@ void core_conexion_kernel(void){
 		abort();
 	}
 	printf("se conecto al kernel\n");
+
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
 	if(j==1){
 		t_struct_numero* k = ((t_struct_numero*)structRecibida);
 		quantum = k->numero;
+		printf("me llego quantum %d\n",quantum);
 		free(k);
 	}
 	j=socket_recibir(sock,&tipoRecibido,&structRecibida);
 	if(j==1){
 		t_struct_numero* k = ((t_struct_numero*)structRecibida);
 		retardo = k->numero;
+		printf("me llego retardo %li\n",retardo);
 		free(k);
 	}
 
@@ -70,14 +73,13 @@ void core_conexion_kernel(void){
 		if(j==1){
 			t_struct_pcb* pcb_recibida = ((t_struct_pcb*)structRecibida);
 			pcb = pcb_recibida;
-			printf("%d\n", pcb.pid);
+			printf("%d\n", pcb->pid);
 		}
 
 
 	}
 	//CODEO ACA
-	//recibir_retardo_quantum(sock);
-	//recibir_pcb(sock);
+
 
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
@@ -85,20 +87,6 @@ void core_conexion_kernel(void){
 	return;
 }
 
-int recibir_quantum(int sockKernel) {
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
-	return estructura->numero;
-}
-
-void recibir_retardo_quantum(int sockKernel) {
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
-	retardo = estructura->numero;
-}
-
-void recibir_pcb(int sockKernel) {
-	t_struct_pcb* estructura = (t_struct_pcb*)socket_recibir_estructura(sockKernel);
-	crear_recibir_pcb(pcb,estructura);
-}
 
 /******************************** CONEXION UMV ***************************************************/
 
