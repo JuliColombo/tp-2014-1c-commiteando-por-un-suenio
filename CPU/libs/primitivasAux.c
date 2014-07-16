@@ -22,8 +22,16 @@ void generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
 
 	socket_and_indice_etiquetas(sockUMV,index_etiquetas,etiquetas_size);
 
-	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	proximaInstruccion = estructura->string;
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_string* k = ((t_struct_string*)structRecibida);
+			proximaInstruccion= k->string;
+			free(k);
+		}
+
+
 	//SE DEBERIA HACER UN MALLOC EN PROXIMAINSTRUCCION Y DESPUES ACA HACER UN MEMCPY?
 }
 
@@ -44,15 +52,33 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
 	socket_and_number(sockUMV,instruccion);
 
-	t_struct_instruccion* estructura =(t_struct_instruccion*)socket_recibir_estructura(sockUMV);
-	t_intructions inst = estructura->inst;
+	t_intructions inst;
+
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_instruccion* k = ((t_struct_instruccion*)structRecibida);
+		inst= k->inst;
+		free(k);
+	}
 	return inst;
 }
 
 void recibirProximaInstruccion(int sockUMV) {
-	t_struct_string* estructura = socket_recibir_estructura(sockUMV);
-	char* const string = estructura->string;
-	proximaInstruccion = strdup(string);
+
+	char* string;
+
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_string* k = ((t_struct_string*)structRecibida);
+		string= k->string;
+		free(k);
+	}
+
+	proximaInstruccion = strdup(string); //que onde el const?
 }
 
 int esPrimerContexto() {
@@ -156,9 +182,14 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 
 	socket_and_pop_position(sockUMV,top_index);
 
-	//Socket a UMV para que haga POP_POSITION(pila,top_index);
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	*program_counter = estructura->numero;
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_numero* k = ((t_struct_numero*)structRecibida);
+			*program_counter= k->numero;
+			free(k);
+		}
 
 	top_index -= 1;
 }
@@ -167,9 +198,14 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 
 	socket_and_pop_position(sockUMV,top_index);
 
-	//Socket a UMV para que haga POP_POSITION(pila,top_index);
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	*cursor_stack_viejo = estructura->numero;
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_numero* k = ((t_struct_numero*)structRecibida);
+			*cursor_stack_viejo= k->numero;
+			free(k);
+		}
 
 	top_index -= 1;
 
@@ -191,8 +227,16 @@ void guardarAlternado () {
 	//Socket a UMV para que haga TOP(pila) HACEEEEEEEERRRRRR
 	//socket_enviarSignal(sockUMV, TOP);
 
-	t_struct_char* estructura =(t_struct_char*)socket_recibir_estructura(sockUMV);
-	t_valor_variable identificador_variable = estructura->letra;
+	t_valor_variable identificador_variable;
+
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_numero* k = ((t_struct_numero*)structRecibida);
+			identificador_variable= k->numero;
+			free(k);
+		}
 
 	insertarEnDiccionario(identificador_variable, top_index);
 
@@ -228,8 +272,15 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
 /******************** RECUPERAR CONTEXTO CON RETORNO***********************/
 void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 	socket_and_pop_position(sockUMV,top_index);
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	*direccion_retorno = estructura->numero;
+
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_numero* k = ((t_struct_numero*)structRecibida);
+		*direccion_retorno= k->numero;
+		free(k);
+	}
 
 	top_index -= 1;
 }

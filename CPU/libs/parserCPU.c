@@ -83,8 +83,16 @@ void destruirEstructuras(){
 void closureMostrarEstado(char* key, int posicion) {
 	socket_and_pop_position(sockUMV,posicion + 1);
 
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	t_valor_variable valor_variable = estructura->numero;
+	t_valor_variable valor_variable;
+
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_numero* k = ((t_struct_numero*)structRecibida);
+			valor_variable= k->numero;
+			free(k);
+		}
 
 	imprimir(valor_variable);
 }

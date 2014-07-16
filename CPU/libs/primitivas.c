@@ -60,9 +60,17 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_and_pop_position(sockUMV,direccion_variable + 1);
 
-	//Socket recibiendoo t_valor_variable id
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	t_valor_variable valor_variable = estructura->numero;
+	t_valor_variable valor_variable;
+
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_numero* k = ((t_struct_numero*)structRecibida);
+		valor_variable= k->numero;
+		free(k);
+	}
+
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
 
@@ -93,10 +101,17 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
 	socket_and_obtener_compartida(sockKernel, variable);
 
-	//Socket recibiendo lacopia (no puntero) del valor de la "variable"
+	t_valor_variable valor;
 
-	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockUMV);
-	t_valor_variable valor = estructura->numero;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_numero* k = ((t_struct_numero*)structRecibida);
+		valor= k->numero;
+		free(k);
+	}
+
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se obtuvo valo de variable compartida %s",variable);
 
