@@ -66,7 +66,7 @@ _Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien es
 	return false; //pongo esto para que no se queje
 }
 
-_Bool memoryOverload(int longitud){
+_Bool memoryOverload(uint32_t longitud){
 	int tamanioLibre= tamanioMP - list_count_satisfying(MP, &MP != NULL);
 	if (longitud < tamanioLibre) {
 		    log_escribir(archLog, "Memory Overload", ERROR, "Memory Overload al intentar acceder a la posicion");
@@ -107,7 +107,7 @@ t_buffer* solicitarBytes(int base,int offset, int longitud){
 	if (sizeof(buffer) != i){
 		printf("El buffer no se obtuvo completamente. Rechazarlo? S/N");//No se si es necesario, pero capaz ayuda
 		char respuesta;
-		gets(respuesta);
+		scanf("%c",&respuesta);
 		if (respuesta=='N') return buffer;
 		else{
 			buffer=NULL;
@@ -133,10 +133,10 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int segmentoBase= ubicarEnTabla(base);
 	if (segmentoBase!= -1){
 		if (validarSolicitud(longitud)){
-			int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
+			/*int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
 			asignarFisicamenteDesde(posicionReal,longitud,buffer);
 			puts("resultadodelaasignacion");
-			} else puts("No se pudo realizar la asignacion");
+			*/} else puts("No se pudo realizar la asignacion");
 		}
 }
 
@@ -151,7 +151,7 @@ _Bool validarSolicitud(uint32_t longitud){
 	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
-		if(segmentationFault(longitud)){
+		if(/*segmentationFault(longitud)*/1){
 			return false;
 		}else{
 			if(memoryOverload(longitud)){
@@ -191,6 +191,47 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reempla
 			}
 	}
 	return false;
+}
+
+/*************************Handshake*************************/
+
+void hacerHandshake(int id_prog, tipo_handshake tipo){
+	if(lista_handshakes.cantidad == 0){
+		inicializarYAgregar(id_prog, tipo);
+	} else { agregarHandshake(id_prog, tipo);
+	}
+}
+
+void inicializarYAgregar(int id_prog, tipo_handshake tipo){
+	handshake* aux_lista;
+	handshake aux_handshake;
+	aux_lista = malloc(sizeof(handshake));
+	if(aux_lista==NULL){
+					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
+					abort();
+				}
+	lista_handshakes.cantidad ++;
+	aux_handshake.id_prog = id_prog;
+	aux_handshake.tipo = tipo;
+	lista_handshakes.handshakes[0] = aux_handshake;
+
+}
+
+void agregarHandshake(int id_prog, tipo_handshake tipo){
+	handshake* aux_lista;
+	handshake aux_handshake;
+	int aux=lista_handshakes.cantidad;
+	aux_lista = realloc(lista_handshakes.handshakes,(sizeof(lista_handshakes.handshakes)+sizeof(handshake)));
+	if(aux_lista==NULL){
+					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
+					abort();
+				}
+	lista_handshakes.handshakes = aux_lista;
+	aux_handshake.id_prog=id_prog;
+	aux_handshake.tipo=tipo;
+	lista_handshakes.handshakes[aux] = aux_handshake;
+	lista_handshakes.cantidad++;
+	return;
 }
 
 //Comandos de consola:

@@ -10,6 +10,7 @@
 
 #include <pthread.h>
 #include "parser/metadata_program.h"
+#include "commons/collections/list.h"
 #include <stdint.h>
 
 typedef uint16_t t_puerto_cpu;
@@ -40,7 +41,20 @@ enum tipo_algoritmo{
 					firstfit,worstfit
 };
 
+typedef enum tipo_handshake{
+	kernel, cpu
+}tipo_handshake;
 
+
+typedef struct handshake{
+	int id_prog;
+	tipo_handshake tipo;
+}handshake;
+
+typedef struct lista_handshake{
+	int cantidad;
+	handshake* handshakes;
+}lista_handshake;
 
 typedef struct segmentDescriptor{
 	int inicio;

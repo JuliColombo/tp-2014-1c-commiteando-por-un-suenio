@@ -23,6 +23,7 @@ int sock_kernel_servidor;
 int sock_cpu;
 int* procesosActivos;
 int gradoDeMultiprogramacion;
+lista_handshake lista_handshakes;
 
 
 int main (int argc, char **argv){
