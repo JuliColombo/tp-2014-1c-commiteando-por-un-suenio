@@ -41,7 +41,7 @@ extern int sock_cpu;
 extern int sock_umv;
 extern int* fds_conectados_cpu;
 extern int* estado_cpu;
-extern sem_t sem_multiProg, sem_pcp, sem_new;
+extern sem_t sem_multiProg, sem_pcp, sem_new, sem_cpu;
 extern t_programa* programas;
 extern int program_pid;
 

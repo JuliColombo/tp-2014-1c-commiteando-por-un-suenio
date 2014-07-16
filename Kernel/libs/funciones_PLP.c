@@ -227,26 +227,32 @@ void core_pcp(void){
 
 		list_add(cola.ready, (void*) programa);
 		pthread_mutex_unlock(mutex_cola_ready);
+		while(1){
+			pthread_mutex_lock(mutex_cola_ready);
+			mostrarColasPorPantalla(cola.ready,"Ready");
+			pthread_mutex_unlock(mutex_cola_ready);
 
-		pthread_mutex_lock(mutex_cola_ready);
-		mostrarColasPorPantalla(cola.ready,"Ready");
-		pthread_mutex_unlock(mutex_cola_ready);
+			sem_wait(&sem_cpu);
+			enviar_pcb_a_cpu();
 
-	/*if(programa->flag_bloqueado==1){
-		bloquearPrograma(programa->pcb->pid);
-	}
+			pthread_mutex_lock(mutex_cola_exec);
+			mostrarColasPorPantalla(cola.exec, "Exec");
+			pthread_mutex_unlock(mutex_cola_exec);
+	/*		if(programa->flag_bloqueado==1){
+				bloquearPrograma(programa->pcb->pid);
+			}
 
-	if(programa->flag_terminado==1){
-		pthread_mutex_lock(mutex_cola_exec);
-		pthread_mutex_lock(mutex_cola_exit);
-		sem_post(&sem_multiProg);
-		list_add(cola.exit,(void*)programa);
-		pthread_mutex_unlock(mutex_cola_exec);
-		mostrarNodosPorPantalla(cola.exit, "Exit");
-		pthread_mutex_unlock(mutex_cola_exit);
-	}*/
+			if(programa->flag_terminado==1){
+				pthread_mutex_lock(mutex_cola_exec);
+				pthread_mutex_lock(mutex_cola_exit);
+				sem_post(&sem_multiProg);
+				list_add(cola.exit,(void*)programa);
+				pthread_mutex_unlock(mutex_cola_exec);
+				mostrarNodosPorPantalla(cola.exit, "Exit");
+				pthread_mutex_unlock(mutex_cola_exit);
+			}*/
 
-
+		}
 	}
 
 }

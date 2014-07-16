@@ -134,6 +134,11 @@ void crearSemaforos(void){
 		perror("No se puede crear el semáforo");
 		exit(1);
 	}
+
+	if((sem_init(&sem_cpu, 1, 0))==-1){
+		perror("No se puede crear el semáforo");
+		exit(1);
+	}
 }
 
 /*
@@ -377,6 +382,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			k=configuracion_kernel.retardo_quantum;
 			paquete->numero=k;
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			sem_post(&sem_cpu);
 		} else {
 		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 		}
@@ -401,6 +407,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);
 	mandarAReady(programa);
+	sem_post(&sem_cpu);
 
 }
 
