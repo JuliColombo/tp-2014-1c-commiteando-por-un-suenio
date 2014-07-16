@@ -175,12 +175,13 @@ void enviar_pcb_a_cpu(void){
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
-	//int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
-	int i = 1;
+	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
 	if(i==1){
 		list_add(cola.exec,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		free(paquete);
+	}else{
+		enviar_pcb_a_cpu();
 	}
 }
 
@@ -240,6 +241,7 @@ void core_pcp(void){
 				pthread_mutex_unlock(mutex_cola_ready);
 
 				sem_wait(&sem_cpu);
+				printf("Pasa el sem cpu\n");
 				enviar_pcb_a_cpu();
 
 				pthread_mutex_lock(mutex_cola_exec);
@@ -289,8 +291,6 @@ void core_io(t_programa programa, int retardo, char* dispositivo){
 /************************* HILOS DE CONEXIONES *************************/
 
 void core_conexion_plp_programas(void){
-
-	programas = malloc(MAX_EVENTS_EPOLL*sizeof(t_programa));
 
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
 	int efd_programas = epoll_crear();

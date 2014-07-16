@@ -13,8 +13,8 @@
 #include "log.h"
 #include <signal.h>
 
-typedef uint8_t t_quantum;
-typedef long t_retardo_quantum;
+typedef unsigned int t_quantum;
+typedef long int t_retardo_quantum;
 
 extern t_quantum quantum;
 extern t_retardo_quantum retardo;

@@ -12,9 +12,6 @@
 #include <pthread.h>
 #include "parserCPU.h"
 
-t_quantum quantum;
-t_retardo_quantum retardo;
-
 typedef struct{
 	char* ip_kernel;
 	int puerto_kernel;
@@ -27,8 +24,8 @@ extern config_cpu configuracion_CPU;
 extern char* PATH;
 extern int termino;
 extern t_struct_pcb pcb;
-
-//VA ACA EL QUANTUM Y SU RETARDO?
+extern t_quantum quantum;
+extern t_retardo_quantum retardo;
 
 /*************  PROTOTIPO FUNCIONES  *************/
 
@@ -36,9 +33,9 @@ void inicializarConfiguracion(void);
 void leerConfiguracion();
 void imprimirConfiguracion(void);
 void log_error_socket(void);
-void* core_conexion_kernel(void);
-void* core_conexion_umv(void);
-void recibir_quantum(int sockKernel);
+void core_conexion_kernel(void);
+void core_conexion_umv(void);
+int recibir_quantum(int sockKernel);
 void recibir_retardo_quantum(int sockKernel);
 void recibir_pcb(int sockKernel);
 

@@ -170,6 +170,13 @@ void cerrarSemaforos(void){
 	while(sem_cerrado==-1){
 		sem_cerrado=sem_destroy(&sem_new);
 	}
+
+	sem_cerrado=-1;
+
+	while(sem_cerrado==-1){
+		sem_cerrado=sem_destroy(&sem_cpu);
+	}
+
 }
 
 
@@ -351,6 +358,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	if(j==1){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
 		agregarNuevoPrograma(k->string, fd_aceptado);
+		free(k);
 		sem_post(&sem_new);
 	}
 }
@@ -374,18 +382,17 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	paquete->numero=k;
 	for(n=0; estado_cpu[n]!=LIBRE;n++){
 	}
-		if(n<MAX_EVENTS_EPOLL){
-			fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
-			estado_cpu[n]=USADA;
-			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-			sleep(1);
-			k=configuracion_kernel.retardo_quantum;
-			paquete->numero=k;
-			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-			sem_post(&sem_cpu);
-		} else {
+	if(n<MAX_EVENTS_EPOLL){
+		fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
+		estado_cpu[n]=USADA;
+		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+		k=configuracion_kernel.retardo_quantum;
+		paquete->numero=k;
+		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+		//sem_post(&sem_cpu);
+	} else {
 		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
-		}
+	}
 	free(paquete);
 
 

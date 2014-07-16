@@ -43,30 +43,51 @@ void log_error_socket(void){
 }
 
 /******************************** CONEXION KERNEL ***************************************************/
-void* core_conexion_kernel(void){
+void core_conexion_kernel(void){
 	int sock;
 	if((sock=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
 		log_error_socket();
+		abort();
 	}
 	printf("se conecto al kernel\n");
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_numero* k = ((t_struct_numero*)structRecibida);
+		quantum = k->numero;
+		free(k);
+	}
+	j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+	if(j==1){
+		t_struct_numero* k = ((t_struct_numero*)structRecibida);
+		retardo = k->numero;
+		free(k);
+	}
 
 	while(1){
+		j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_pcb* pcb_recibida = ((t_struct_pcb*)structRecibida);
+			pcb = pcb_recibida;
+			printf("%d\n", pcb.pid);
+		}
+
 
 	}
 	//CODEO ACA
-	recibir_quantum(sock);
-	recibir_retardo_quantum(sock);
-	recibir_pcb(sock);
+	//recibir_retardo_quantum(sock);
+	//recibir_pcb(sock);
 
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
 	}
-	return NULL;
+	return;
 }
 
-void recibir_quantum(int sockKernel) {
+int recibir_quantum(int sockKernel) {
 	t_struct_numero* estructura =(t_struct_numero*)socket_recibir_estructura(sockKernel);
-	quantum = estructura->numero;
+	return estructura->numero;
 }
 
 void recibir_retardo_quantum(int sockKernel) {
@@ -81,12 +102,12 @@ void recibir_pcb(int sockKernel) {
 
 /******************************** CONEXION UMV ***************************************************/
 
-void* core_conexion_umv(void){
+void core_conexion_umv(void){
 	int sock;
 	if ((sock=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))>0){
-			log_error_socket();
-			printf("Conectado a la UMV\n");
-		}
+		log_error_socket();
+		printf("Conectado a la UMV\n");
+	}
 
 	//CODEO ACA
 
@@ -94,6 +115,6 @@ void* core_conexion_umv(void){
 	if(socket_cerrarConexion(sock)==-1){
 		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
 	}
-	return NULL;
+	return;
 }
 
