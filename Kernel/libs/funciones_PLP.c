@@ -175,10 +175,13 @@ void enviar_pcb_a_cpu(void){
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
-	socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
-	list_add(cola.exec,(void*)programa);
-	pthread_mutex_unlock(mutex_cola_exec);
-	free(paquete);
+	//int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
+	int i = 1;
+	if(i==1){
+		list_add(cola.exec,(void*)programa);
+		pthread_mutex_unlock(mutex_cola_exec);
+		free(paquete);
+	}
 }
 
 
@@ -214,6 +217,8 @@ void core_plp(void){
 
 void core_pcp(void){
 
+	t_programa* programa;
+
 	while(1){
 		sem_wait(&sem_multiProg);
 		sem_wait(&sem_pcp);
@@ -221,37 +226,40 @@ void core_pcp(void){
 		pthread_mutex_lock(mutex_cola_new);
 		pthread_mutex_lock(mutex_cola_ready);
 
-		t_programa* programa = (t_programa*)list_remove(cola.new,0);
+		if((programa = (t_programa*)list_remove(cola.new,0))!=NULL){
 
-		pthread_mutex_unlock(mutex_cola_new);
 
-		list_add(cola.ready, (void*) programa);
-		pthread_mutex_unlock(mutex_cola_ready);
-		while(1){
-			pthread_mutex_lock(mutex_cola_ready);
-			mostrarColasPorPantalla(cola.ready,"Ready");
+
+			pthread_mutex_unlock(mutex_cola_new);
+
+			list_add(cola.ready, (void*) programa);
 			pthread_mutex_unlock(mutex_cola_ready);
+			while(1){
+				pthread_mutex_lock(mutex_cola_ready);
+				mostrarColasPorPantalla(cola.ready,"Ready");
+				pthread_mutex_unlock(mutex_cola_ready);
 
-			sem_wait(&sem_cpu);
-			enviar_pcb_a_cpu();
+				sem_wait(&sem_cpu);
+				enviar_pcb_a_cpu();
 
-			pthread_mutex_lock(mutex_cola_exec);
-			mostrarColasPorPantalla(cola.exec, "Exec");
-			pthread_mutex_unlock(mutex_cola_exec);
-	/*		if(programa->flag_bloqueado==1){
-				bloquearPrograma(programa->pcb->pid);
-			}
-
-			if(programa->flag_terminado==1){
 				pthread_mutex_lock(mutex_cola_exec);
-				pthread_mutex_lock(mutex_cola_exit);
-				sem_post(&sem_multiProg);
-				list_add(cola.exit,(void*)programa);
+				mostrarColasPorPantalla(cola.exec, "Exec");
 				pthread_mutex_unlock(mutex_cola_exec);
-				mostrarNodosPorPantalla(cola.exit, "Exit");
-				pthread_mutex_unlock(mutex_cola_exit);
-			}*/
+	/*			if(programa->flag_bloqueado==1){
+					bloquearPrograma(programa->pcb->pid);
+				}
 
+				if(programa->flag_terminado==1){
+					pthread_mutex_lock(mutex_cola_exec);
+					pthread_mutex_lock(mutex_cola_exit);
+					sem_post(&sem_multiProg);
+					list_add(cola.exit,(void*)programa);
+					pthread_mutex_unlock(mutex_cola_exec);
+					mostrarNodosPorPantalla(cola.exit, "Exit");
+					pthread_mutex_unlock(mutex_cola_exit);
+				}*/
+
+			}
 		}
 	}
 
