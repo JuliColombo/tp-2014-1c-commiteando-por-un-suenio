@@ -31,7 +31,7 @@ AnSISOP_kernel funciones_kernel = {
 void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
 
-	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb.program_counter);
+	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
 
 	socket_and_instruccion(sockUMV,inst);
 
@@ -43,7 +43,7 @@ void parsear(){
 
 	proximaInst();
 
-	pcb.program_counter += 1;
+	pcb->program_counter += 1;
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se ejecuta nueva instruccion");
 

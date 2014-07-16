@@ -23,7 +23,7 @@ typedef struct{
 extern config_cpu configuracion_CPU;
 extern char* PATH;
 extern int termino;
-extern t_struct_pcb pcb;
+extern t_struct_pcb* pcb;
 extern t_quantum quantum;
 extern t_retardo_quantum retardo;
 
@@ -35,9 +35,7 @@ void imprimirConfiguracion(void);
 void log_error_socket(void);
 void core_conexion_kernel(void);
 void core_conexion_umv(void);
-int recibir_quantum(int sockKernel);
-void recibir_retardo_quantum(int sockKernel);
-void recibir_pcb(int sockKernel);
+
 
 
 #endif /* FUNCIONES_CPU_H_ */

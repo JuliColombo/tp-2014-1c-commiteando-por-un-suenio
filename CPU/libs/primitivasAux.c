@@ -36,8 +36,8 @@ void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero po
 
 t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 	t_puntero_instruccion instruccion;
-	instruccion = metadata_buscar_etiqueta(etiqueta, indiceEtiquetas,pcb.tamanio_indice);
-	pcb.program_counter = instruccion;
+	instruccion = metadata_buscar_etiqueta(etiqueta, indiceEtiquetas,pcb->tamanio_indice);
+	pcb->program_counter = instruccion;
 	return instruccion;
 }
 
@@ -56,7 +56,7 @@ void recibirProximaInstruccion(int sockUMV) {
 }
 
 int esPrimerContexto() {
-	int a = (*pcb.c_stack == *pcb.stack );
+	int a = (*pcb->c_stack == *pcb->stack );
 	return (a);
 }
 
@@ -115,7 +115,7 @@ void elemento_delete(t_elemento* elemento) {
 /******************************************** RESERVAR CONTEXTO ***********************************************************/
 
 void reservarContextoSinRetorno() {
-	int cursor = *(pcb.c_stack);
+	int cursor = *(pcb->c_stack);
 
 	t_puntero posicionContextoViejo;
 	posicionContextoViejo = calcularPosicionAsignacion(top_index);
@@ -125,7 +125,7 @@ void reservarContextoSinRetorno() {
 	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
-	int pc  = pcb.program_counter + 1;
+	int pc  = pcb->program_counter + 1;
 	socket_and_push(sockUMV,top_index,pc);
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
@@ -149,7 +149,7 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 /******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {
-	top_index = *pcb.c_stack -1;
+	top_index = *pcb->c_stack -1;
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
@@ -181,7 +181,7 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo) {
 	recuperarProgramCounter(&program_counter);
 	recuperarCursorAnterior(c_stack_viejo);
 
-	pcb.program_counter = program_counter;
+	pcb->program_counter = program_counter;
 
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
 
@@ -212,12 +212,12 @@ void regenerarDiccionario(int tamanio_contexto) {
 
 	top_index = top;
 
-	pcb.tamanio_contexto = tamanio_contexto;
+	pcb->tamanio_contexto = tamanio_contexto;
 
 }
 
 uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
-	uint32_t diferencia = (*pcb.c_stack) - direccion_contexto_viejo;
+	uint32_t diferencia = (*pcb->c_stack) - direccion_contexto_viejo;
 
 	float dif=(float)(diferencia / 2.5);
 	int enteraDeDif = (int)dif;

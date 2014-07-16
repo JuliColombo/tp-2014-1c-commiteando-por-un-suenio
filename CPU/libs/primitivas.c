@@ -33,7 +33,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	insertarEnDiccionario(identificador_variable, posicion); //Elimino elementos junto con diccio despues
 
-	pcb.tamanio_contexto += 1;
+	pcb->tamanio_contexto += 1;
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se definio variable %c",identificador_variable);
 
@@ -134,11 +134,11 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	reservarContextoSinRetorno();
 
 	int posicionAPushear =  top_index +1;
-	*pcb.c_stack = posicionAPushear;
+	*pcb->c_stack = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
-	pcb.tamanio_contexto = 0;
+	pcb->tamanio_contexto = 0;
 
 	esConRetorno = 0;
 
@@ -150,11 +150,11 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	reservarContextoConRetorno(donde_retornar);
 
 	int posicionAPushear = top_index +1;
-	*pcb.c_stack = posicionAPushear;
+	*pcb->c_stack = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
-	pcb.tamanio_contexto = 0;
+	pcb->tamanio_contexto = 0;
 }
 
 
@@ -168,7 +168,7 @@ void finalizar() {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb.c_stack = c_stack_viejo;
+	*pcb->c_stack = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 	}
@@ -196,7 +196,7 @@ void retornar(t_valor_variable retorno) {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb.c_stack = c_stack_viejo;
+	*pcb->c_stack = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 
