@@ -184,7 +184,27 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	return nuevoPCB;
 	}
 
-
+void enviar_pcb_a_cpu(void){
+	int fd_cpu_libre = buscar_cpu_libre();
+	t_struct_pcb* paquete = malloc(sizeof(t_struct_pcb));
+	pthread_mutex_lock(mutex_cola_ready);
+	t_programa* programa = (t_programa*)list_remove(cola.ready,0);
+	pthread_mutex_unlock(mutex_cola_ready);
+	pthread_mutex_lock(mutex_cola_exec);
+	paquete->c_stack=programa->pcb->c_stack;
+	paquete->codigo=programa->pcb->codigo;
+	paquete->index_codigo=programa->pcb->index_codigo;
+	paquete->index_etiquetas=programa->pcb->index_etiquetas;
+	paquete->pid=programa->pcb->pid;
+	paquete->program_counter=programa->pcb->program_counter;
+	paquete->stack=programa->pcb->stack;
+	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
+	paquete->tamanio_indice=programa->pcb->tamanio_indice;
+	socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
+	list_add(cola.exec,(void*)programa);
+	pthread_mutex_unlock(mutex_cola_exec);
+	free(paquete);
+}
 
 
 pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
@@ -192,29 +212,19 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void core_plp(void){
 
-	crearSemaforos();
+
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	//pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-	sleep(15);
 	while (1){
-		sem_wait(&sem_multiProg);
 		sem_wait(&sem_new);
 
 		pthread_mutex_lock(mutex_cola_new);
 		mostrarNodosPorPantalla(cola.new,"New");
 		pthread_mutex_unlock(mutex_cola_new);
 
-		pthread_mutex_lock(mutex_cola_new);
-		pthread_mutex_lock(mutex_cola_ready);
 
-		t_programa* programa = (t_programa*)list_remove(cola.new,0);
-
-		pthread_mutex_unlock(mutex_cola_new);
-
-		list_add(cola.ready, (void*) programa);
-		pthread_mutex_unlock(mutex_cola_ready);
 
 		sem_post(&sem_pcp);
 	}
@@ -228,18 +238,26 @@ void core_plp(void){
 }
 
 void core_pcp(void){
-	t_programa* programa;
 
 	while(1){
-	sem_wait(&sem_pcp);
+		sem_wait(&sem_multiProg);
+		sem_wait(&sem_pcp);
 
-	pthread_mutex_lock(mutex_cola_ready);
-	mostrarNodosPorPantalla(cola.ready,"Ready");
-	pthread_mutex_unlock(mutex_cola_ready);
+		pthread_mutex_lock(mutex_cola_new);
+		pthread_mutex_lock(mutex_cola_ready);
 
+		t_programa* programa = (t_programa*)list_remove(cola.new,0);
 
+		pthread_mutex_unlock(mutex_cola_new);
 
-	if(programa->flag_bloqueado==1){
+		list_add(cola.ready, (void*) programa);
+		pthread_mutex_unlock(mutex_cola_ready);
+
+		pthread_mutex_lock(mutex_cola_ready);
+		mostrarNodosPorPantalla(cola.ready,"Ready");
+		pthread_mutex_unlock(mutex_cola_ready);
+
+	/*if(programa->flag_bloqueado==1){
 
 	}
 
@@ -250,7 +268,7 @@ void core_pcp(void){
 		list_add(cola.exit,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		pthread_mutex_unlock(mutex_cola_exit);
-	}
+	}*/
 
 
 	}

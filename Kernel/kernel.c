@@ -32,11 +32,13 @@ sem_t sem_multiProg, sem_pcp, sem_new;
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
 	program_pid=0;
-	inicializarSemaforos();
 	PATH_config = argv[1];
-	inicializarColas();
+	inicializarMutex();
 
 	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
+	inicializarColas();
+	crearSemaforos();
+
 	pthread_create(&plp, NULL, (void*) &core_plp, NULL);
 	pthread_create(&pcp, NULL, (void*) &core_pcp, NULL);
 

@@ -33,7 +33,7 @@ int main (int argc, char **argv){
 
 	//Crear estructuras administrativas
 
-	inicializarSemaforos();
+	inicializarMutex();
 	inicializarHilos();
 
 	esperarHilos();

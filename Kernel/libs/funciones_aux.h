@@ -28,13 +28,14 @@ int cant_identificadores(char**);
 void log_error_socket(void);
 int posicion_Variable_Global(char*);
 void agregarNuevoPrograma(char* codigo, int fd);
-void inicializarSemaforos(void);
+void inicializarMutex(void);
 void crearSemaforos(void);
 void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
 void actualizarPCB(t_programa* programa, t_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista);
 void mandarAReady(t_programa* programa);
+int buscar_cpu_libre(void);
 
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/

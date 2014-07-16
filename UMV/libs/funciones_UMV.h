@@ -87,7 +87,7 @@ void imprimirConfiguracion(void);			  				 			 // Muestra por pantalla todos los
 void inicializarConfiguracion(void);
 
 /*Prototipos de semaforos*/
-void inicializarSemaforos(void);
+void inicializarMutex(void);
 
 /*Prototipos de threads*/
 void inicializarHilos(void);

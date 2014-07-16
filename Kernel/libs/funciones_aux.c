@@ -92,7 +92,7 @@ int posicion_Variable_Global(char* variable){
  * Funcion: inicializa los mutex
  */
 
-void inicializarSemaforos(void){
+void inicializarMutex(void){
 	mutex_cola_new=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_ready=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_exec=malloc(sizeof(pthread_mutex_t));
@@ -219,7 +219,6 @@ void agregarNuevoPrograma(char* codigo, int fd){
 	programa->metadata=metadata_desde_literal(codigo);
 	programa->pcb=crearPcb(codigo, programa->metadata);
 	programa->peso=calcularPeso(programa);
-	printf("El peso es: %d\n",programa->peso);
 	programa->socket_descriptor_conexion=fd;
 
 
@@ -306,6 +305,22 @@ void mandarAReady(t_programa* programa){
 	return;
 }
 
+/*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+int buscar_cpu_libre(void){
+	int i;
+	for(i=0; estado_cpu[i]!=LIBRE;i++){
+	}
+	return fds_conectados_cpu[i];
+}
 
 
 
@@ -329,7 +344,6 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	fd_aceptado=socket_aceptarCliente(data.fd);
 	j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
 	if(j==1){
-		printf("Se recibio bien el paquete\n");
 		t_struct_string* k = ((t_struct_string*)structRecibida);
 		agregarNuevoPrograma(k->string, fd_aceptado);
 		sem_post(&sem_new);
@@ -372,14 +386,14 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 }
 
 /*
- * Nombre:
+ * Nombre: handler_conexion_cpu
  * Argumentos:
- * 		-
+ * 		-data
  *
  * Devuelve:
+ *		nada
  *
- *
- * Funcion:
+ * Funcion: actualiza el pcb y envia el programa a ready
  */
 
 void handler_conexion_cpu(epoll_data_t data){

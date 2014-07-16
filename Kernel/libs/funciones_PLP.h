@@ -60,6 +60,7 @@ void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos
 t_pcb* crearPcb(char*,t_medatada_program*);
+void enviar_pcb_a_cpu(void);
 
 /************************* HILOS *************************/
 void core_plp(void);
