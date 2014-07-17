@@ -306,11 +306,18 @@ void core_pcp(void){
 					bloquearPrograma(programa->pcb->pid);
 					mostrarColasPorPantalla(cola.block,"Block");
 					pthread_mutex_unlock(mutex_cola_block);
+
 				}
 
 				if(programa->flag_terminado==1){
 					pthread_mutex_lock(mutex_cola_exec);
 					pthread_mutex_lock(mutex_cola_exit);
+					t_struct_string* paquete = malloc(sizeof(t_struct_string));
+					paquete->string="Aca iria como termina cada variable";
+					socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_STRING, paquete);
+					paquete->string=0;
+					socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, paquete);
+					free(paquete);
 					sem_post(&sem_multiProg);
 					list_add(cola.exit,(void*)programa);
 					pthread_mutex_unlock(mutex_cola_exec);
@@ -383,8 +390,8 @@ void core_conexion_pcp_cpu(void){
 	}
 	pthread_mutex_unlock(mutex_array);
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
-	int efd_cpu=epoll_crear();
-	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
+	efd_cpu=epoll_crear();
+	epoll_agregarSocketCliente(efd_cpu,sock_cpu);
 
 	while(1){
 		printf("Llega al escuchar\n");

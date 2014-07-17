@@ -388,8 +388,11 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	paquete->numero=k;
 	for(n=0; estado_cpu[n]!=LIBRE;n++){
 	}
+	printf("Pasa el for\n");
 	if(n<MAX_EVENTS_EPOLL){
+		printf("entra al if\n");
 		fd_aceptado=socket_aceptarCliente(data.fd);
+		epoll_agregarSocketCliente(efd_cpu,fd_aceptado);
 		pthread_mutex_lock(mutex_array);
 		fds_conectados_cpu[n]=fd_aceptado;
 		estado_cpu[n]=LIBRE;
@@ -422,8 +425,10 @@ void handler_conexion_cpu(epoll_data_t data){
 	printf("Llega al handler\n");
 	t_struct_pcb* pcb = (t_struct_pcb*)data.ptr;
 	printf("pid recibido: %d\n", pcb->pid);
+	pthread_mutex_lock(mutex_cola_exec);
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);
+	pthread_mutex_unlock(mutex_cola_exec);
 	mandarAReady(programa);
 	sem_post(&sem_cpu);
 	return;

@@ -22,10 +22,9 @@ pthread_mutex_t* mutex_cola_exit;
 pthread_mutex_t* mutex_pid;
 pthread_mutex_t* mutex_solicitarMemoria;
 pthread_mutex_t* mutex_array;
-int sock_programas, sock_umv, sock_cpu;
+int sock_programas, sock_umv, sock_cpu, efd_cpu;
 int* fds_conectados_cpu;
 int* estado_cpu;
-t_programa* programas;
 int program_pid;
 sem_t sem_multiProg, sem_pcp, sem_new, sem_cpu;
 
