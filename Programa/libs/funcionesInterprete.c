@@ -27,10 +27,8 @@ void leerScript(off_t* fileSize,char* path) {
 	    int i=0;
 		while ((c = getc(script)) != EOF){
 			codigo_ansisop[i]=(char)c;
-			printf("%c",codigo_ansisop[i]);
 			i++;
 		}
-		printf("Paso el print del while\n");
 		fclose(script);
 
 

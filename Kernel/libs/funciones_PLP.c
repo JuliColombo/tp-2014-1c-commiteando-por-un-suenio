@@ -286,18 +286,25 @@ void core_pcp(void){
 		list_add(cola.ready, (void*) programa);
 		pthread_mutex_unlock(mutex_cola_ready);
 			while(1){
+				sem_wait(&sem_cpu);
 				pthread_mutex_lock(mutex_cola_ready);
 				mostrarColasPorPantalla(cola.ready,"Ready");
 				pthread_mutex_unlock(mutex_cola_ready);
 
-				sem_wait(&sem_cpu);
+
 				enviar_pcb_a_cpu();
 
 				pthread_mutex_lock(mutex_cola_exec);
 				mostrarColasPorPantalla(cola.exec, "Exec");
 				pthread_mutex_unlock(mutex_cola_exec);
+
+
+
 				if(programa->flag_bloqueado==1){
+					pthread_mutex_lock(mutex_cola_block);
 					bloquearPrograma(programa->pcb->pid);
+					mostrarColasPorPantalla(cola.block,"Block");
+					pthread_mutex_unlock(mutex_cola_block);
 				}
 
 				if(programa->flag_terminado==1){

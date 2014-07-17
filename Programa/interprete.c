@@ -37,21 +37,15 @@ int main (int argc, char **argv){
 
 
 	int sock_kernel_servidor=abrirSocket();
-//	int j = socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, codigo_ansisop);
-//	if(j==1){
-//		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
-//	}else{
-//		printf("ERROR: no se pudo enviar el paquete\n");
-//	}
 	t_struct_string* paquete = malloc(sizeof(t_struct_string));
 	paquete->string=codigo_ansisop;
-	printf("el valor que se manda es \n%s\n", paquete->string);
 	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, paquete);
 	if(j==1){
-		printf("Se envio bien el paquete\n");
+		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
 		free(paquete);
+	}else{
+		log_escribir(archLog,"Envio paquete" ,ERROR,"no se pudo enviar");
 	}
-
 
 //	t_tipoEstructura tipoRecibido;
 //	void* structRecibida;
