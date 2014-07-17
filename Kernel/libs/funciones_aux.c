@@ -99,7 +99,8 @@ void inicializarMutex(void){
 	mutex_cola_block=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_exit=malloc(sizeof(pthread_mutex_t));
 	mutex_pid=malloc(sizeof(pthread_mutex_t));
-	solicitarMemoria=malloc(sizeof(pthread_mutex_t));
+	mutex_solicitarMemoria=malloc(sizeof(pthread_mutex_t));
+	mutex_array=malloc(sizeof(pthread_mutex_t));
 
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
@@ -107,7 +108,8 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_cola_block,NULL);
 	pthread_mutex_init(mutex_cola_exit,NULL);
 	pthread_mutex_init(mutex_pid,NULL);
-	pthread_mutex_init(solicitarMemoria,NULL);
+	pthread_mutex_init(mutex_solicitarMemoria,NULL);
+	pthread_mutex_init(mutex_array,NULL);
 }
 
 /*
@@ -321,20 +323,22 @@ void mandarAReady(t_programa* programa){
 }
 
 /*
- * Nombre:
+ * Nombre: buscar_cpu_libre
  * Argumentos:
- * 		-
+ * 		-nada
  *
  * Devuelve:
+ *		- devuelve el fd de la cpu
  *
- *
- * Funcion:
+ * Funcion: busca el fd de una cpu libre
  */
 int buscar_cpu_libre(void){
-	int i;
-	for(i=0; estado_cpu[i]!=LIBRE;i++){
+	int i=0;
+	while(estado_cpu[i]!=LIBRE){
+		i++;
 	}
-	return fds_conectados_cpu[i];
+	int fd = fds_conectados_cpu[i];
+	return fd;
 }
 
 
@@ -386,8 +390,11 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	for(n=0; estado_cpu[n]!=LIBRE;n++){
 	}
 	if(n<MAX_EVENTS_EPOLL){
-		fd_aceptado=fds_conectados_cpu[n]=socket_aceptarCliente(data.fd);
-		estado_cpu[n]=USADA;
+		fd_aceptado=socket_aceptarCliente(data.fd);
+		pthread_mutex_lock(mutex_array);
+		fds_conectados_cpu[n]=fd_aceptado;
+		estado_cpu[n]=LIBRE;
+		pthread_mutex_unlock(mutex_array);
 		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
 		k=configuracion_kernel.retardo_quantum;
 		paquete->numero=k;

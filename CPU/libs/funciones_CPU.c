@@ -68,22 +68,25 @@ void core_conexion_kernel(void){
 		free(k);
 	}
 	t_struct_pcb* pcb_recibida;
-	t_struct_pcb* pcb_actualizada;
+	//t_struct_pcb* pcb_actualizada;
+		//t_tipoEstructura tipoRecibido;
+		//void* structRecibida;
 	while(1){
-		j=socket_recibir(sock,&tipoRecibido,&structRecibida);
-		if(j==1){
-			pcb_recibida = ((t_struct_pcb*)structRecibida);
-			t_pcb* pcb = malloc(sizeof(t_pcb));
-			pcb->pid=pcb_recibida->pid;
+			j=socket_recibir(sock,&tipoRecibido,&structRecibida);
+			if(j==1){
+				printf("MUNDO FELIZ\n");
+				pcb_recibida = ((t_struct_pcb*)structRecibida);
+				t_pcb* pcb = malloc(sizeof(t_pcb));
+				pcb->pid=pcb_recibida->pid;
 
-			printf("el pid es: %d\n", pcb->pid);
-			break;
+				printf("el pid es: %d\n", pcb->pid);
+
+			}
 //			pcb->program_counter=pcb->program_counter+1;
 //			pcb_actualizada=pcb_recibida;
 //			pcb_actualizada->program_counter=(pcb_recibida->program_counter +1);
 //			socket_enviar(sock,D_STRUCT_PCB,pcb_actualizada);
 
-		}
 
 
 

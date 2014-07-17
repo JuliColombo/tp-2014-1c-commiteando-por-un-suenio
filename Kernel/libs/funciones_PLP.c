@@ -155,7 +155,7 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
 t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 
-	pthread_mutex_lock(solicitarMemoria);
+	pthread_mutex_lock(mutex_solicitarMemoria);
 	//solicitarMemoriaUMV(1,2,3,4) va en el if
 	if(0==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
@@ -166,13 +166,13 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
 		nuevoPCB->tamanio_contexto=0;
 		nuevoPCB->tamanio_indice=0;
-		pthread_mutex_unlock(solicitarMemoria);
+		pthread_mutex_unlock(mutex_solicitarMemoria);
 		pthread_mutex_lock(mutex_pid);
 		nuevoPCB->pid=program_pid;
 		program_pid+=1;
 		pthread_mutex_unlock(mutex_pid);
 	}else{	//Si no hay memoria suficiente, le avisa al programa
-		pthread_mutex_unlock(solicitarMemoria);
+		pthread_mutex_unlock(mutex_solicitarMemoria);
 		t_struct_string* paquete = malloc(sizeof(t_struct_string));
 		paquete->string= (char*)1;
 		socket_enviar(fd, D_STRUCT_STRING, paquete);
@@ -216,13 +216,14 @@ void enviar_pcb_a_cpu(void){
 	paquete->index_codigo=programa->pcb->index_codigo;
 	paquete->index_etiquetas=programa->pcb->index_etiquetas;
 	paquete->pid=programa->pcb->pid;
+	printf("El pid que se manda en la pcb es: %d", paquete->pid);
 	paquete->program_counter=programa->pcb->program_counter;
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
 	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
 	if(i==1){
-		//printf("Se envia bien la pcb\n");
+		printf("Se envia bien la pcb\n");
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
@@ -365,19 +366,20 @@ void core_conexion_umv(void){
 void core_conexion_pcp_cpu(void){
 
 	int i;
-
+	pthread_mutex_lock(mutex_array);
 	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	estado_cpu=malloc(MAX_EVENTS_EPOLL*sizeof(int));
 	for(i=0; i<MAX_EVENTS_EPOLL;i++){
 		 estado_cpu[i]=LIBRE;
 		 fds_conectados_cpu[i]=0;
 	}
+	pthread_mutex_unlock(mutex_array);
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
 	epoll_agregarSocketCliente(efd_cpu,sock_cpu);
 
 	while(1){
-		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, NULL, (void*) &desconexion_cpu);
+		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*)&handler_conexion_cpu, (void*) &desconexion_cpu);
 		if(i==-1){
 			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
