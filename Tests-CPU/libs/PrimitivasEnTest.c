@@ -7,13 +7,17 @@
 
 #include "PrimitivasEnTest.h"
 
-#define QUANTUM 3;
-#define DONE 5;
+enum {
+	CONTINUES = 0,
+	QUANTUM = 3,
+	DONE = 5,
+};
 
 int esConRetorno = 0;
 int termino;
 int retardo = 150;
-int quantum = 100;
+int quantum = 5;
+int i;
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -207,17 +211,28 @@ void retornar(t_valor_variable retorno) {
 
 /*********************************************** PRINT DE MENTIRITAS ***************************************************/
 void imprimir(int valor) {
-	printf("imprimo %d\n",valor);
+	printf("\n\nimprimo %d\n\n",valor);
 }
 
 /***********************************************************************************************************************/
 /************************************************ INTEGRACION **********************************************************/
 /***********************************************************************************************************************/
 
+void continuarHastaQuantum() {
+	for (i; i < quantum; i++) {
+		printf("\nCONTINUO HASTA QUANTUM\n");
+		termino = CONTINUES;
+		parsear();
+		esperar_retardo(retardo);
+	}
+}
+
 void hot_plug(int signum) {
-	if(signum == SIGUSR1){
-		termino = 5;
-		printf("******************* ACA DEBERIA CERRAR EL SOCKET DE LA CPU *******************************\n");
+	if(signum == SIGINT){
+		continuarHastaQuantum();
+		termino = DONE;
+		i = 0;
+		printf("\n\nME DESCONECTO!!!!!!!!!\n\n");
 	}
 }
 
@@ -225,21 +240,42 @@ void esperar_retardo(int tiempo){
 	usleep(tiempo*1000);
 }
 
+
+void destruirEstructuras(){
+	//SOCKET A UMV PARA QUE DESTRUYA STACK Y/O INDICE DE CODIGO Y/O INDICE DE ETIQUETAS
+	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+}
+
+void closureMostrarEstado(char* key, t_elemento* elem) {
+	printf("\n\naca viene lo del closure\n\n ");
+	t_puntero i = elem->pos;
+	imprimir(pila->elementos[i+1]);
+}
+
+void mostrarEstadoVariables(){
+	dictionary_iterator(diccionario,(void*)closureMostrarEstado);
+}
+
+void salirPorFinalizacion(){
+	mostrarEstadoVariables();
+}
+
+
 void salir(int termino) {
 	switch (termino) {
-	case 5: //finalizo
+	case DONE: //finalizo
+	salirPorFinalizacion();
 	printf("\ntermino ejecucion \n");
 	break;
-	case 3: //sale por quantum
+	case QUANTUM: //sale por quantum
 	printf("\nsalgo por quantum\n");
 	break;
 	}
 }
 
 void integracionCorrerParser() {
-	signal(SIGUSR1,hot_plug);
+	signal(SIGINT,hot_plug);
 
-	int i;
 	for(i=0;i<=quantum;i++){
 		termino = 0;
 
@@ -247,9 +283,15 @@ void integracionCorrerParser() {
 
 		esperar_retardo(retardo);
 
-		if (termino != 0) {
+		if((i == quantum) && (termino == CONTINUES)){
+					termino = QUANTUM;
+				}
+
+		if (termino != CONTINUES) {
 			salir(termino);
-			termino = 0;
+			printf("\naca deberia salir!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+			termino = CONTINUES;
+			i = 0;
 			break;
 		}
 	}
