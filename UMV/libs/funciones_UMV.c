@@ -105,8 +105,9 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 }
 
 int traducirPosicion(int base){
-	int i=0,j=0;
+	int i=0,j;
 	while(i<cant_tablas){
+		j=0;
 		while(j<tablaDeSegmentos[i].cant_segmentos){
 			if(tablaDeSegmentos[i].segmentos[j].inicio == base){
 						return tablaDeSegmentos[i].segmentos[j].ubicacionMP;
@@ -134,10 +135,16 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int i=0;
-	int j;
+	int j,aux;
 		if (validarSolicitud(base,offset,longitud)){
-			printf("El resultado de la asignacion es:\n");
+			aux=traducirPosicion(base);
+			if(aux==-1){
+							printf("La direccion base es erronea");
+							return;
+						}
 			j=traducirPosicion(base)+offset;
+			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
+			printf("El resultado de la asignacion es:\n");
 			while(i<longitud){
 				MP[j]= buffer[i];
 				printf("Posicion %d de memoria principal = %d\n", j, MP[j]);
@@ -821,8 +828,7 @@ void *consola (void){
 
 	while(strcmp(comando, "exit") != 0){
 			if(strcmp(comando, "operacion") == 0){
-				puts("Ingrese el processID de programa a usar");
-				scanf("%d",&procesoDelHilo);
+
 				char tipoOperacion[32];
 				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				scanf("%s",&tipoOperacion);
@@ -855,6 +861,8 @@ void *consola (void){
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
+					  puts("Ingrese el processID de programa a usar");
+				 	  scanf("%d",&procesoDelHilo);
 					  puts("Ingrese el tamaño del segmento");
 					  int tamanio;
 					  scanf("%d",&tamanio);
@@ -863,6 +871,8 @@ void *consola (void){
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
+					  puts("Ingrese el processID de programa a usar");
+					  scanf("%d",&procesoDelHilo);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  destruirSegmentosPrograma(procesoDelHilo);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
