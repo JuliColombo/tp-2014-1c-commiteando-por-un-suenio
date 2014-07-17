@@ -62,7 +62,7 @@ int main (int argc, char **argv){
 			cerrarSocket(sock_kernel_servidor);
 			return EXIT_SUCCESS;
 		}
-		if(cadenaAImprimir==-1){
+		if(cadenaAImprimir==1){
 			printf("No hay memoria suficiente para el programa\n");
 			cerrarSocket(sock_kernel_servidor);
 			return EXIT_FAILURE;

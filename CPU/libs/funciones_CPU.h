@@ -11,6 +11,7 @@
 #include "commons/config.h"
 #include <pthread.h>
 #include "parserCPU.h"
+#include "estructuras.h"
 
 typedef struct{
 	char* ip_kernel;
@@ -23,7 +24,7 @@ typedef struct{
 extern config_cpu configuracion_CPU;
 extern char* PATH;
 extern int termino;
-extern t_struct_pcb* pcb;
+//extern t_struct_pcb* pcb;
 extern t_quantum quantum;
 extern t_retardo_quantum retardo;
 

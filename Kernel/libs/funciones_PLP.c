@@ -156,13 +156,16 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 
 	pthread_mutex_lock(solicitarMemoria);
-
-	if(solicitarMemoriaUMV(1,2,3,4)==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
-//		nuevoPCB->stack=enviarBytes()
-//		nuevoPCB->c_stack=enviarBytes()
-//		nuevoPCB->index_codigo=enviarBytes()
-//		nuevoPCB->index_etiquetas=enviarBytes()
-		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;	//Seteamos el PC a la primera instruccion del parser
+	//solicitarMemoriaUMV(1,2,3,4) va en el if
+	if(0==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
+		// enviarBytes()
+		nuevoPCB->stack=NULL;
+		nuevoPCB->c_stack=NULL;
+		nuevoPCB->index_codigo=NULL;
+		nuevoPCB->index_etiquetas=NULL;
+		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
+		nuevoPCB->tamanio_contexto=0;
+		nuevoPCB->tamanio_indice=0;
 		pthread_mutex_unlock(solicitarMemoria);
 		pthread_mutex_lock(mutex_pid);
 		nuevoPCB->pid=program_pid;
@@ -171,7 +174,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	}else{	//Si no hay memoria suficiente, le avisa al programa
 		pthread_mutex_unlock(solicitarMemoria);
 		t_struct_string* paquete = malloc(sizeof(t_struct_string));
-		paquete->string= -1;
+		paquete->string= (char*)1;
 		socket_enviar(fd, D_STRUCT_STRING, paquete);
 
 
@@ -219,14 +222,16 @@ void enviar_pcb_a_cpu(void){
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
 	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
 	if(i==1){
-		printf("Se envia bien la pcb\n");
+		//printf("Se envia bien la pcb\n");
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		free(paquete);
 	}else{
+		free(paquete);
 		enviar_pcb_a_cpu();
 	}
+	return;
 }
 
 
@@ -275,17 +280,16 @@ void core_pcp(void){
 
 
 
-			pthread_mutex_unlock(mutex_cola_new);
+		pthread_mutex_unlock(mutex_cola_new);
 
-			list_add(cola.ready, (void*) programa);
-			pthread_mutex_unlock(mutex_cola_ready);
+		list_add(cola.ready, (void*) programa);
+		pthread_mutex_unlock(mutex_cola_ready);
 			while(1){
 				pthread_mutex_lock(mutex_cola_ready);
 				mostrarColasPorPantalla(cola.ready,"Ready");
 				pthread_mutex_unlock(mutex_cola_ready);
 
 				sem_wait(&sem_cpu);
-				printf("Pasa el sem cpu\n");
 				enviar_pcb_a_cpu();
 
 				pthread_mutex_lock(mutex_cola_exec);
