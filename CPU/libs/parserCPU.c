@@ -80,8 +80,8 @@ void destruirEstructuras(){
 	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
 }
 
-void closureMostrarEstado(char* key, int posicion) {
-	socket_and_pop_position(sockUMV,posicion + 1);
+void closureMostrarEstado(char* key, t_elemento* elem) {
+	socket_and_pop_position(sockUMV,elem->pos + 1);
 
 	t_valor_variable valor_variable;
 

@@ -82,6 +82,7 @@ void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero po
 	const char* str = convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str, posicion);
 	dictionary_put(diccionario, elem->name, elem);
+
 }
 
 /******************************************** RESERVAR CONTEXTO ***********************************************************/
