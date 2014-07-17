@@ -209,10 +209,10 @@ _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reempla
 
 /*************************Handshake*************************/
 
-void hacerHandshake(int id_prog, tipo_handshake tipo){
+void hacerHandshake(tipo_handshake tipo){
 	if(lista_handshakes.cantidad == 0){
-		inicializarYAgregar(id_prog, tipo);
-	} else { agregarHandshake(id_prog, tipo);
+		inicializarYAgregar(tipo);
+	} else { agregarHandshake(tipo);
 	}
 }
 
@@ -222,33 +222,31 @@ void inicializarListaHandshakes(void){
 }
 
 
-void inicializarYAgregar(int id_prog, tipo_handshake tipo){
-	handshake* aux_lista;
-	handshake aux_handshake;
-	aux_lista = malloc(sizeof(handshake));
+void inicializarYAgregar(tipo_handshake tipo){
+	tipo_handshake* aux_lista;
+	tipo_handshake aux_handshake;
+	aux_lista = malloc(sizeof(tipo_handshake));
 	if(aux_lista==NULL){
 					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
 					abort();
 				}
 	lista_handshakes.cantidad ++;
-	aux_handshake.id_prog = id_prog;
-	aux_handshake.tipo = tipo;
+	aux_handshake = tipo;
 	lista_handshakes.handshakes[0] = aux_handshake;
 
 }
 
-void agregarHandshake(int id_prog, tipo_handshake tipo){
-	handshake* aux_lista;
-	handshake aux_handshake;
+void agregarHandshake(tipo_handshake tipo){
+	tipo_handshake* aux_lista;
+	tipo_handshake aux_handshake;
 	int aux=lista_handshakes.cantidad;
-	aux_lista = realloc(lista_handshakes.handshakes,(sizeof(lista_handshakes.handshakes)+sizeof(handshake)));
+	aux_lista = realloc(lista_handshakes.handshakes,(sizeof(lista_handshakes.handshakes)+sizeof(tipo_handshake)));
 	if(aux_lista==NULL){
 					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
 					abort();
 				}
 	lista_handshakes.handshakes = aux_lista;
-	aux_handshake.id_prog=id_prog;
-	aux_handshake.tipo=tipo;
+	aux_handshake=tipo;
 	lista_handshakes.handshakes[aux] = aux_handshake;
 	lista_handshakes.cantidad++;
 	return;
@@ -356,7 +354,7 @@ void compactar(){/*
 void dump(){
 	FILE* archivo;
 	int i=0;
-	archivo = fopen("/home/utnso/dump_config", "w");
+	archivo = fopen("/home/utnso/dump_file", "w");
 	if (archivo==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
@@ -691,7 +689,6 @@ void core_conexion_cpu(void){
 
 	}
 
-
 	while(1){
 	if((sock=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
@@ -700,20 +697,18 @@ void core_conexion_cpu(void){
 			pthread_mutex_unlock(mutex_log);
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
 			}
-
-	}
-
-
 	if(socket_cerrarConexion(sock_cpu)==0){
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
-		pthread_mutex_unlock(mutex_log);
-		//Error cerrando el socket
-	} else {
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
-		pthread_mutex_unlock(mutex_log);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
+			pthread_mutex_unlock(mutex_log);
+			//Error cerrando el socket
+		} else {
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
+			pthread_mutex_unlock(mutex_log);
+		}
 	}
+
 	return;
 }
 

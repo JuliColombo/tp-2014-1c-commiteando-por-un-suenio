@@ -70,8 +70,9 @@ int inicializarTabla(int id_prog);
 void inicializarListaHandshakes(void);
 void reservarEspacioMP(int ubicacion, int tamanio);
 int getPosTabla(int id_prog);
-void agregarHandshake(int id_prog, tipo_handshake tipo);
-void inicializarYAgregar(int id_prog, tipo_handshake tipo);
+void hacerHandshake(tipo_handshake tipo);
+void agregarHandshake(tipo_handshake tipo);
+void inicializarYAgregar(tipo_handshake tipo);
 int traducirPosicion(int base);
 int validarPosicionVirtual(int posVirtual);
 

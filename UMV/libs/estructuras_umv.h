@@ -45,15 +45,9 @@ typedef enum tipo_handshake{
 	kernel, cpu
 }tipo_handshake;
 
-
-typedef struct handshake{
-	int id_prog;
-	tipo_handshake tipo;
-}handshake;
-
 typedef struct lista_handshake{
 	int cantidad;
-	handshake* handshakes;
+	tipo_handshake* handshakes;
 }lista_handshake;
 
 typedef struct segmentDescriptor{
