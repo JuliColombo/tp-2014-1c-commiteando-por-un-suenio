@@ -299,7 +299,6 @@ void core_pcp(void){
 				mostrarColasPorPantalla(cola.exec, "Exec");
 				pthread_mutex_unlock(mutex_cola_exec);
 
-				break;
 
 				if(programa->flag_bloqueado==1){
 					pthread_mutex_lock(mutex_cola_block);

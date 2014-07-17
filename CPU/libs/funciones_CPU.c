@@ -82,7 +82,6 @@ void core_conexion_kernel(void){
 				pcb_actualizada->codigo=pcb->codigo;
 				pcb_actualizada->index_codigo=pcb->index_codigo;
 				pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
-				pcb_actualizada->pid=9;
 				printf("El pid que se manda en la pcb es: %d\n", pcb_actualizada->pid);
 				pcb_actualizada->program_counter=pcb->program_counter;
 				pcb_actualizada->stack=pcb->stack;

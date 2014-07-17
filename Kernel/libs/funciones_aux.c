@@ -261,10 +261,17 @@ void agregarNuevoPrograma(char* codigo, int fd){
  * Funcion: actualiza el pcb recibido de una cpu y libera la memoria en que estaba la pcb vieja
  */
 void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
-	t_pcb* aux = programa->pcb;
 	programa->pcb->pid = pcb->pid;
+	programa->pcb->c_stack=pcb->c_stack;
+	programa->pcb->codigo=pcb->codigo;
+	programa->pcb->index_codigo=pcb->index_codigo;
+	programa->pcb->index_etiquetas=pcb->index_etiquetas;
+	programa->pcb->program_counter=pcb->program_counter;
+	programa->pcb->stack=pcb->stack;
+	programa->pcb->tamanio_contexto=pcb->tamanio_contexto;
+	programa->pcb->tamanio_indice=pcb->tamanio_indice;
+	free(pcb);
 
-	free(aux);
 	return;
 }
 
