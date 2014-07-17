@@ -55,48 +55,37 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 	pthread_mutex_unlock(mutex_log);
 }
+_Bool validacionSegFault(int base, int offset,int longitud){
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien esto y el memOverload de abajo
-	if ( > tamanioMP) {
+	int numSeg=traducirPosicion(base);
+	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].inicio == NULL) return true;
+	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].tamanio < longitud) return true;
+	return false;
+}
+_Bool segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
+	if (validacionSegFault(base,offset,longitud) ) {
 		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
 		return true;
-	} else{
-		return false;
-	}*/
-	return false; //pongo esto para que no se queje
+	} else return false;
 }
 
-_Bool memoryOverload(uint32_t longitud){
+_Bool memoryOverload(int longitud){
 	int tamanioLibre= tamanioMP - list_count_satisfying(MP, &MP != NULL);
 	if (longitud < tamanioLibre) {
 		    log_escribir(archLog, "Memory Overload", ERROR, "Memory Overload al intentar acceder a la posicion");
 			return true;
-		} else{
-			return false;
-		}
-	return false; //pongo esto para que no se queje
+		} else return false;
 }
 
 
 // ***********************************Solicitar bytes en memoria*******************
 
-int ubicarEnTabla(int inicio){
-	int i=0;
-	int procesoDelHilo=0; // Donde lo declaramos??
-	while(i < sizeof(tablaDeSegmentos[procesoDelHilo].segmentos)){
-		if (tablaDeSegmentos[procesoDelHilo].segmentos[i].inicio==inicio) return i;
-		else i++;
-	}
-	//Si llega aca no se encontro un segmento que inicie en: inicio
-	printf("La posicion de base no se encuentra en la tabla de segmentos");
-	return -1;
-}
-
-
 t_buffer solicitarBytes(int base,int offset, int longitud){
 	t_buffer buffer;
 	buffer = malloc(sizeof(longitud*sizeof(int)));
-	int i=0,j=base;
+	int i=0;
+	int j;
+	j=traducirPosicion(base)+offset;
 	while (i < longitud){
 		buffer[j]= MP[j];
 		j++;
@@ -115,6 +104,22 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	return buffer;
 }
 
+int traducirPosicion(int base){
+	int i=0,j=0;
+	while(i<cant_tablas){
+		while(j<tablaDeSegmentos[i].cant_segmentos){
+			if(tablaDeSegmentos[i].segmentos[j].inicio == base){
+						return tablaDeSegmentos[i].segmentos[j].ubicacionMP;
+					} else {
+						j++;
+					}
+		}
+		i++;
+	}
+	log_escribir(archLog, "Solicitar memoria", ERROR, "Posicion erronea");
+	return -1;
+}
+
 //****************************************enviarBytes*************************************
 
 void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
@@ -129,9 +134,10 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int i=0;
-	int j=base;
-		if (validarSolicitud(longitud)){
+	int j;
+		if (validarSolicitud(base,offset,longitud)){
 			printf("El resultado de la asignacion es:\n");
+			j=traducirPosicion(base)+offset;
 			while(i<longitud){
 				MP[j]= buffer[i];
 				printf("Posicion %d de memoria principal = %d\n", j, MP[j]);
@@ -148,11 +154,11 @@ void cambioDeProcesoEnElHilo(int id_prog){
 
 /*************************    Logica de validacion de solicitudes ***************************/
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
-_Bool validarSolicitud(uint32_t longitud){
+_Bool validarSolicitud(int base, int offset,int longitud){
 	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
-		if(/*segmentationFault(longitud)*/1){
+		if(segmentationFault(base,offset,longitud)){
 			return false;
 		}else{
 			if(memoryOverload(longitud)){
@@ -202,6 +208,12 @@ void hacerHandshake(int id_prog, tipo_handshake tipo){
 	} else { agregarHandshake(id_prog, tipo);
 	}
 }
+
+void inicializarListaHandshakes(void){
+	lista_handshakes.cantidad=0;
+	lista_handshakes.handshakes=NULL;
+}
+
 
 void inicializarYAgregar(int id_prog, tipo_handshake tipo){
 	handshake* aux_lista;
@@ -338,14 +350,19 @@ void dump(){
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
 }
 
-int validarSegmentoDisponibleEn(int pos, int j) {
-	/*int ultimoSegmentoDelProg;	//hay que ver como conseguirlo!!!
-	while (j < ultimoSegmentoDelProg){
-	if (tablaDeSegmentos[pos].segmentos[j].inicio == i) {
-		break;
+int validarPosicionVirtual(int posVirtual) {
+	int i=0,j=0;
+	while(i<cant_tablas){
+		while(j<tablaDeSegmentos[i].cant_segmentos){
+			if(tablaDeSegmentos[i].segmentos[j].inicio == posVirtual){
+						return 0;
+					} else {
+						j++;
+					}
+		}
+		i++;
 	}
-	}*/
-	return 1; //pongo esto para que no se queje
+	return 1;
 }
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
@@ -355,20 +372,24 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	//Escoge la ubicacion en base al algoritmo de config
 	if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
 	if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
-	printf("La ubicacion es : %d\n", ubicacion);
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
-	while(!validarSegmentoDisponibleEn(pos,i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	while(!validarPosicionVirtual(i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
 	aux.tamanio=tamanio;
 	//Asignación de los campos de la tabla de segmentos correspondiente
 	tablaDeSegmentos[pos].id_prog = id_prog;
-	tablaDeSegmentos[pos].cant_segmentos++;
 	num_segmento=tablaDeSegmentos[pos].cant_segmentos;
+	tablaDeSegmentos[pos].cant_segmentos++;
 	tablaDeSegmentos[pos].segmentos[num_segmento]=aux;
+	printf("El programa es : %d\n", tablaDeSegmentos[pos].id_prog);
+	printf("La cantidad de segmentos es: %d\n", tablaDeSegmentos[pos].cant_segmentos);
+	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
+	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
+	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
@@ -388,7 +409,6 @@ int inicializarTabla(int id_prog){
 	//Verifico si hay tablas
 
 	if(cant_tablas==0){
-		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
 		aux_tabla = malloc(sizeof(tablaSeg));
 			if(aux_tabla==NULL){
@@ -404,16 +424,16 @@ int inicializarTabla(int id_prog){
 						}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		return i;
 	}
 	else{
-		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como hay tablas, busco si ya hay una para el prog correspondiente
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
 		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
 		//FIXME: no funciona bien este realloc
-		aux_tabla =realloc(tablaDeSegmentos, sizeof(sizeof(tablaDeSegmentos)+sizeof(tablaSeg)));
+		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
 		if(aux_tabla==NULL){
 						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
 						abort();
@@ -426,17 +446,19 @@ int inicializarTabla(int id_prog){
 									abort();
 								}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
+		tablaDeSegmentos[i].cant_segmentos=0;
 		cant_tablas++;
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		return i;
 		} else {
-			tablaDeSegmentos[i].cant_segmentos++;
 			//FIXME: no funciona bien este realloc
-			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, (sizeof(tablaDeSegmentos[i].segmentos)+sizeof(segmentDescriptor)));
+			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, ((tablaDeSegmentos[i].cant_segmentos+1)*sizeof(segmentDescriptor)));
 									if(aux_segmentos==NULL){
 										log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
 										abort();
 									}
 			tablaDeSegmentos[i].segmentos = aux_segmentos;
+			printf("La cant de tablas es: %d\n", cant_tablas);
 			return i;
 		}
 	}
@@ -841,6 +863,7 @@ void *consola (void){
 		if(strcmp(comando,"exit") ==0){
 			destruirTodosLosSegmentos();
 			free(MP);
+			free(tablaDeSegmentos);
 		   	socket_cerrarConexion(sock_kernel_servidor);
 		   	socket_cerrarConexion(sock_cpu);
 		   	matarHilos();

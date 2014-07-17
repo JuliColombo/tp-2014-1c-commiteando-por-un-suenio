@@ -51,9 +51,9 @@ extern lista_handshake lista_handshakes;
 int asignarFisicamente();
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
-_Bool memoryOverload(uint32_t longitud);
-_Bool segmentationFault(uint32_t base,uint32_t offset);
-_Bool validarSolicitud(uint32_t longitud);
+_Bool memoryOverload(int longitud);
+_Bool segmentationFault(int base,int offset,int longitud);
+_Bool validarSolicitud(int base, int offset, int longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
 
@@ -67,11 +67,13 @@ int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 int inicializarTabla(int id_prog);
+void inicializarListaHandshakes(void);
 void reservarEspacioMP(int ubicacion, int tamanio);
 int getPosTabla(int id_prog);
 void agregarHandshake(int id_prog, tipo_handshake tipo);
 void inicializarYAgregar(int id_prog, tipo_handshake tipo);
-
+int traducirPosicion(int base);
+int validarPosicionVirtual(int posVirtual);
 
 
 /*Operaciones de Consola*/
