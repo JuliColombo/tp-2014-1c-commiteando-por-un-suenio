@@ -367,6 +367,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	fd_aceptado=socket_aceptarCliente(data.fd);
+	epoll_agregarSocketCliente(efd_programas,fd_aceptado);
 	j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
 	if(j==1){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
@@ -375,6 +376,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 		sem_post(&sem_new);
 	}
 }
+
 
 /*
  * Nombre: manejar_ConexionNueva_CPU/1
@@ -429,12 +431,10 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
  */
 
 void handler_conexion_cpu(epoll_data_t data){
-	printf("Llega al handler\n");
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	int j=socket_recibir(data.fd,&tipoRecibido,&structRecibida);
 	t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
-	printf("el pid recibido es: %d\n", pcb->pid);
 	pthread_mutex_lock(mutex_cola_exec);
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);

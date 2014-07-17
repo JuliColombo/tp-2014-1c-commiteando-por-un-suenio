@@ -357,7 +357,7 @@ void core_io(t_programa programa, int retardo, char* dispositivo){
 void core_conexion_plp_programas(void){
 
 	sock_programas=socket_crearServidor("127.0.0.1",configuracion_kernel.puerto_programas);
-	int efd_programas = epoll_crear();
+	efd_programas = epoll_crear();
 	epoll_agregarSocketCliente(efd_programas,sock_programas);
 	while(1){
 		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
@@ -393,9 +393,7 @@ void core_conexion_pcp_cpu(void){
 	epoll_agregarSocketCliente(efd_cpu,sock_cpu);
 
 	while(1){
-		printf("Llega al escuchar\n");
 		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*)&handler_conexion_cpu, (void*) &desconexion_cpu);
-		printf("Se escucho un epollcpu\n");
 		if(i==-1){
 			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}

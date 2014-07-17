@@ -46,7 +46,6 @@ int main (int argc, char **argv){
 	}else{
 		log_escribir(archLog,"Envio paquete" ,ERROR,"no se pudo enviar");
 	}
-
 //	t_tipoEstructura tipoRecibido;
 //	void* structRecibida;
 	while(1){
