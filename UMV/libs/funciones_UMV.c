@@ -92,19 +92,17 @@ int ubicarEnTabla(int inicio){
 	return -1;
 }
 
-t_buffer* solicitarBytes(int base,int offset, int longitud){
-	t_buffer* buffer;
+
+t_buffer solicitarBytes(int base,int offset, int longitud){
+	t_buffer buffer;
 	buffer = malloc(sizeof(longitud*sizeof(int)));
-	int i=0;
-	int procesoDelHilo=0; // Donde lo declaramos?
-	int segmentoBase = ubicarEnTabla(base);
-	int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP + offset;
+	int i=0,j=base;
 	while (i < longitud){
-		buffer[i]= MP[posicionReal];
-		posicionReal++;
+		buffer[j]= MP[j];
+		j++;
 		i++;
 	}
-	if (sizeof(buffer) != i){
+	if (sizeof(buffer) != longitud){
 		printf("El buffer no se obtuvo completamente. Rechazarlo? S/N");//No se si es necesario, pero capaz ayuda
 		char respuesta;
 		scanf("%c",&respuesta);
@@ -130,14 +128,17 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 }
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int segmentoBase= ubicarEnTabla(base);
-	if (segmentoBase!= -1){
+	int i=0;
+	int j=base;
 		if (validarSolicitud(longitud)){
-			/*int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
-			asignarFisicamenteDesde(posicionReal,longitud,buffer);
-			puts("resultadodelaasignacion");
-			*/} else puts("No se pudo realizar la asignacion");
-		}
+			printf("El resultado de la asignacion es:\n");
+			while(i<longitud){
+				MP[j]= buffer[i];
+				printf("Posicion %d de memoria principal = %d\n", j, MP[j]);
+				j++;
+				i++;
+			}
+			} else puts("No se pudo realizar la asignacion");
 }
 
 
@@ -745,7 +746,7 @@ void *consola (void){
 
 	//system("clear");
 	char comando[32];
-	int procesoDelHilo,unaBase,unOffset,unTamanio,modo;
+	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	t_buffer buffer;
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);
@@ -823,10 +824,8 @@ void *consola (void){
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando,"dump") ==0){
-				   printf("Ingrese modo de dump (1 = enabled, 0 = disabled)\n");
-				   scanf("%d",&modo);
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				 //dump(modo);
+				 //dump();
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
