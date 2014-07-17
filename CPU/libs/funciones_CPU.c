@@ -67,14 +67,27 @@ void core_conexion_kernel(void){
 		printf("me llego retardo %li\n",retardo);
 		free(k);
 	}
-
+	t_struct_pcb* pcb_recibida;
+	t_struct_pcb* pcb_actualizada;
 	while(1){
 		j=socket_recibir(sock,&tipoRecibido,&structRecibida);
 		if(j==1){
-			t_struct_pcb* pcb_recibida = ((t_struct_pcb*)structRecibida);
-			pcb = pcb_recibida;
-			printf("%d\n", pcb->pid);
+			pcb_recibida = ((t_struct_pcb*)structRecibida);
+			t_pcb* pcb = malloc(sizeof(t_pcb));
+			pcb->pid=pcb_recibida->pid;
+
+			printf("el pid es: %d\n", pcb->pid);
+			break;
+//			pcb->program_counter=pcb->program_counter+1;
+//			pcb_actualizada=pcb_recibida;
+//			pcb_actualizada->program_counter=(pcb_recibida->program_counter +1);
+//			socket_enviar(sock,D_STRUCT_PCB,pcb_actualizada);
+
 		}
+
+
+
+
 
 
 	}
