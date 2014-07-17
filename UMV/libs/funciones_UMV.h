@@ -51,9 +51,9 @@ extern lista_handshake lista_handshakes;
 int asignarFisicamente();
 void log_error_socket(void);
 _Bool solicitarMemoria(t_programa prgrama);
-_Bool memoryOverload(uint32_t longitud);
-_Bool segmentationFault(uint32_t base,uint32_t offset);
-_Bool validarSolicitud(uint32_t longitud);
+_Bool memoryOverload(int longitud);
+_Bool segmentationFault(int base,int offset,int longitud);
+_Bool validarSolicitud(int base, int offset, int longitud);
 _Bool hayEspacioEnMemoriaPara(uint32_t longitud);
 _Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
 

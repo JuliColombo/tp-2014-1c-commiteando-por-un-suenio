@@ -55,26 +55,27 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 	pthread_mutex_unlock(mutex_log);
 }
+_Bool validacionSegFault(int base, int offset,int longitud){
+	int ubicarEnTabla(int base);
 
-_Bool segmentationFault(uint32_t base,uint32_t offset){/*// TODO Revisar bien esto y el memOverload de abajo
-	if ( > tamanioMP) {
+	int numSeg=ubicarEnTabla(base);
+	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].inicio == NULL) return true;
+	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].tamanio < longitud) return true;
+	return false;
+}
+_Bool segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
+	if (validacionSegFault(base,offset,longitud) ) {
 		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
 		return true;
-	} else{
-		return false;
-	}*/
-	return false; //pongo esto para que no se queje
+	} else return false;
 }
 
-_Bool memoryOverload(uint32_t longitud){
+_Bool memoryOverload(int longitud){
 	int tamanioLibre= tamanioMP - list_count_satisfying(MP, &MP != NULL);
 	if (longitud < tamanioLibre) {
 		    log_escribir(archLog, "Memory Overload", ERROR, "Memory Overload al intentar acceder a la posicion");
 			return true;
-		} else{
-			return false;
-		}
-	return false; //pongo esto para que no se queje
+		} else return false;
 }
 
 
@@ -88,7 +89,7 @@ int ubicarEnTabla(int inicio){
 		else i++;
 	}
 	//Si llega aca no se encontro un segmento que inicie en: inicio
-	printf("La posicion de base no se encuentra en la tabla de segmentos");
+	log_escribir(archLog, "Error al buscar la base", ERROR, "La posicion de base no se encuentra en la tabla de segmentos");
 	return -1;
 }
 
@@ -132,7 +133,7 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int segmentoBase= ubicarEnTabla(base);
 	if (segmentoBase!= -1){
-		if (validarSolicitud(longitud)){
+		if (validarSolicitud(longitud,base,offset)){
 			/*int posicionReal= tablaDeSegmentos[procesoDelHilo].segmentos[segmentoBase].ubicacionMP+offset;
 			asignarFisicamenteDesde(posicionReal,longitud,buffer);
 			puts("resultadodelaasignacion");
@@ -147,11 +148,11 @@ void cambioDeProcesoEnElHilo(int id_prog){
 
 /*************************    Logica de validacion de solicitudes ***************************/
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
-_Bool validarSolicitud(uint32_t longitud){
+_Bool validarSolicitud(int base, int offset,int longitud){
 	if(hayEspacioEnMemoriaPara(longitud)){
 		return true;
 	} else{
-		if(/*segmentationFault(longitud)*/1){
+		if(segmentationFault(base,offset,longitud)){
 			return false;
 		}else{
 			if(memoryOverload(longitud)){
