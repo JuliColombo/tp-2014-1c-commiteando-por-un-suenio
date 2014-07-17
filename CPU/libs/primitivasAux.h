@@ -17,6 +17,9 @@ typedef struct{
 	t_puntero pos;
 }t_elemento;
 
+extern int stack;
+extern int cursor;
+
 t_struct_pcb* pcb;
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);

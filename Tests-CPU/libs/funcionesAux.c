@@ -7,6 +7,9 @@
 
 #include "funcionesAux.h"
 int esConRetorno;
+int cursor;
+int stack;
+
 
 /************** SOLO PARA TEST **********************/
 char* buscarEnSegmentoCodigo(t_intructions instruccion) {
@@ -25,9 +28,14 @@ t_puntero calcularPosicionAsignacionCPU(int top_index) {
 	return posicion;}
 
 
-int esPrimerContexto() {
+/*int esPrimerContexto() {
 	int a = (*pcb.c_stack == *pcb.stack );
 	return (a);
+}*/
+
+int esPrimerContexto(){
+	int a = stack == cursor;
+	return a;
 }
 
 int esPar(int numero){
@@ -87,13 +95,14 @@ void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero po
 
 /******************************************** RESERVAR CONTEXTO ***********************************************************/
 void reservarContextoSinRetorno() {
-	int cursor = *(pcb.c_stack);
+	//int cursorrr = *(pcb.c_stack);
+	int cursorrr = cursor;
 
 	t_puntero posicionContextoViejo;
 	posicionContextoViejo = calcularPosicionAsignacion(top_index);
 
 	//Pushear cursor de stack
-	PUSH_POSITION(&cursor,pila,posicionContextoViejo);
+	PUSH_POSITION(&cursorrr,pila,posicionContextoViejo);
 	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
@@ -123,11 +132,12 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 /******************** RECUPERAR CONTEXTO SIN RETORNO***********************/
 
 void recuperarPosicionDeDirecciones() {
-	//socket_and_modificar_top_index (sockUMV,*(pcb.c_stack)-1);
-	pila->top_index = *pcb.c_stack -1;
+	//pila->top_index = *pcb.c_stack -1;
+	pila->top_index = cursor -1;
 
 	//Esto va
-	top_index = *pcb.c_stack -1;
+	//top_index = *pcb.c_stack -1;
+	top_index = cursor -1;
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
@@ -214,7 +224,8 @@ void regenerarDiccionario(int tamanio_contexto) {
 }
 
 uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
-	uint32_t diferencia = (*pcb.c_stack) - direccion_contexto_viejo;
+	//uint32_t diferencia = (*pcb.c_stack) - direccion_contexto_viejo;
+	uint32_t diferencia = cursor - direccion_contexto_viejo;
 
 	float dif=(float)(diferencia / 2.5);
 	int enteraDeDif = (int)dif;

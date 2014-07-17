@@ -28,6 +28,16 @@ AnSISOP_kernel funciones_kernel = {
 			.AnSISOP_wait					= wait_ansisop,
 };
 
+void darValoresDeStackYCursor(t_pcb* pcb){
+	if(pcb->c_stack == pcb->stack){
+		cursor = 0;
+		stack = 0;
+	} else {
+		stack = 0;
+		cursor = pcb->c_stack - pcb->stack;
+	}
+}
+
 void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
 
@@ -162,6 +172,8 @@ void correrParser() {
 
 		if((i == quantum) && (termino == CONTINUES)){
 			termino = QUANTUM;
+			pcb->c_stack += cursor;
+			pcb->stack += stack;
 		}
 
 		if (termino != CONTINUES) {

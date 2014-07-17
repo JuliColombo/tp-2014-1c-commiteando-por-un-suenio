@@ -16,8 +16,10 @@ enum {
 int esConRetorno = 0;
 int termino;
 int retardo = 150;
-int quantum = 5;
+int quantum = 155;
 int i;
+extern int stack;
+extern int cursor;
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -128,7 +130,8 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	reservarContextoSinRetorno();
 
 	int posicionAPushear =  top_index +1;
-	*pcb.c_stack = posicionAPushear;
+	//*pcb.c_stack = posicionAPushear;
+	cursor = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
@@ -144,7 +147,8 @@ void llamarConRetornoTest(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) 
 	reservarContextoConRetorno(donde_retornar);
 
 	int posicionAPushear = top_index +1;
-	*pcb.c_stack = posicionAPushear;
+	//*pcb.c_stack = posicionAPushear;
+	cursor = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
@@ -165,7 +169,8 @@ void finalizar() {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb.c_stack = c_stack_viejo;
+	//*pcb.c_stack = c_stack_viejo;
+	cursor = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 	}
@@ -177,6 +182,8 @@ void finalizar() {
 		printf("\nMUESTRO ESTADO FINAL DE LAS VARIABLES POR CONSOLA (SOCKET?)\n");
 		printf("\nLE INDICO A PCP QUE FINALICE\n");
 		termino = DONE;
+		*(pcb.c_stack) += cursor;
+		*(pcb.stack) += stack;
 
 	}
 
@@ -197,7 +204,8 @@ void retornar(t_valor_variable retorno) {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb.c_stack = c_stack_viejo;
+	//*pcb.c_stack = c_stack_viejo;
+	cursor = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 
@@ -237,7 +245,7 @@ void hot_plug(int signum) {
 }
 
 void esperar_retardo(int tiempo){
-	usleep(tiempo*1000);
+	usleep(tiempo/1000);
 }
 
 
@@ -285,6 +293,8 @@ void integracionCorrerParser() {
 
 		if((i == quantum) && (termino == CONTINUES)){
 					termino = QUANTUM;
+					*(pcb.c_stack) += cursor;
+					*(pcb.stack) += stack;
 				}
 
 		if (termino != CONTINUES) {

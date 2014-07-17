@@ -12,6 +12,7 @@
 #include "primitivasAux.h"
 #include "log.h"
 #include <signal.h>
+#include "estructuras.h"
 
 typedef unsigned int t_quantum;
 typedef long int t_retardo_quantum;
@@ -37,5 +38,6 @@ void continuarHastaQuantum();
 void destruirEstructuras();
 void mostrarEstadoVariables();
 void salirPorFinalizacion();
+void darValoresDeStackYCursor(t_pcb* pcb);
 
 #endif /* PARSERCPU_H_ */
