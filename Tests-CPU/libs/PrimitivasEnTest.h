@@ -52,6 +52,8 @@ void integracionScriptFacil();
 void integracionConFuncionDoble();
 void integracionFor();
 void integracionCorrerParser();
+void esperar_retardo(int tiempo);
+void parsear();
 
 /*AnSISOP_kernel funciones_kernel;
 AnSISOP_funciones funciones_parser;*/

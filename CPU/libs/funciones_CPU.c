@@ -76,6 +76,8 @@ void core_conexion_kernel(void){
 				t_pcb* pcb = malloc(sizeof(t_pcb));
 				pcb->pid=pcb_recibida->pid;
 
+				darValoresDeStackYCursor(pcb);
+
 				printf("el pid es: %d\n", pcb->pid);
 				pcb_actualizada = malloc(sizeof(t_struct_pcb));
 				pcb_actualizada->c_stack=pcb->c_stack;
@@ -89,8 +91,8 @@ void core_conexion_kernel(void){
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
 				int i = socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
 				if(i==1){
-					printf("Se mando bien el paquete\n");
-					free(pcb_actualizada);
+				printf("Se mando bien el paquete\n");
+				free(pcb_actualizada);
 				}
 			}
 //			pcb->program_counter=pcb->program_counter+1;

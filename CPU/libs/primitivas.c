@@ -20,6 +20,8 @@ char* proximaInstruccion;
 
 extern int termino; //tiene que ser extern??
 int esConRetorno = 0;
+int cursor;
+int stack;
 
 
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
@@ -149,7 +151,8 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 	reservarContextoSinRetorno();
 
 	int posicionAPushear =  top_index +1;
-	*pcb->c_stack = posicionAPushear;
+	//*pcb->c_stack = posicionAPushear;
+	cursor = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
@@ -165,7 +168,8 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 	reservarContextoConRetorno(donde_retornar);
 
 	int posicionAPushear = top_index +1;
-	*pcb->c_stack = posicionAPushear;
+	//*pcb->c_stack = posicionAPushear;
+	cursor = posicionAPushear;
 
 	irAlLabel(etiqueta);
 
@@ -183,7 +187,8 @@ void finalizar() {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb->c_stack = c_stack_viejo;
+	//*pcb->c_stack = c_stack_viejo;
+	cursor = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 	}
@@ -192,6 +197,8 @@ void finalizar() {
 		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
 		printf("\n\nllegamos al if!\n\n");
 		termino = DONE;
+		pcb->c_stack += cursor;
+		pcb->stack += stack;
 
 		log_escribir(archLog, "Ejecucion", INFO, "Finalizo ejecucion");
 
@@ -211,7 +218,8 @@ void retornar(t_valor_variable retorno) {
 
 	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
 
-	*pcb->c_stack = c_stack_viejo;
+	//*pcb->c_stack = c_stack_viejo;
+	cursor = c_stack_viejo;
 
 	regenerarDiccionario(tamanio);
 
