@@ -27,6 +27,8 @@ extern int termino;
 //extern t_struct_pcb* pcb;
 extern t_quantum quantum;
 extern t_retardo_quantum retardo;
+extern int sockKernel;
+extern int sockUMV;
 
 /*************  PROTOTIPO FUNCIONES  *************/
 

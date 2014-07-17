@@ -104,19 +104,47 @@ void mostrarEstadoVariables(){
 void salirPorFinalizacion(){
 	mostrarEstadoVariables();
 	destruirEstructuras();
-	socket_and_pcb(sockKernel,pcb);//enviar por socket pcb a kernel para notificar que termine
+
 }
 
 void salir(int termino) {
-	switch (termino) {
+	t_struct_pcb* pcb_actualizada=malloc(sizeof(t_struct_pcb));
 
+	switch (termino) {
 	case DONE:
 	salirPorFinalizacion();
+
+	pcb_actualizada->c_stack=pcb->c_stack;
+	pcb_actualizada->codigo=pcb->codigo;
+	pcb_actualizada->index_codigo=pcb->index_codigo;
+	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
+	pcb_actualizada->pid=pcb->pid;
+	pcb_actualizada->program_counter=pcb->program_counter;
+	pcb_actualizada->stack=pcb->stack;
+	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
+	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
+	socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
+
+	free(pcb_actualizada);
+
 	printf("\ntermino ejecucion \n");
 	break;
 
 	case QUANTUM:
-	socket_and_pcb(sockKernel,pcb);//enviar por socket pcb a kernel para notificar que termino quantum y me tiene que mandar otro
+
+	pcb_actualizada->c_stack=pcb->c_stack;
+	pcb_actualizada->codigo=pcb->codigo;
+	pcb_actualizada->index_codigo=pcb->index_codigo;
+	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
+	pcb_actualizada->pid=pcb->pid;
+	pcb_actualizada->program_counter=pcb->program_counter;
+	pcb_actualizada->stack=pcb->stack;
+	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
+	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
+	socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
+
+	free(pcb_actualizada);
+
 	printf("\nsalgo por quantum\n");
 	break;
 	}
