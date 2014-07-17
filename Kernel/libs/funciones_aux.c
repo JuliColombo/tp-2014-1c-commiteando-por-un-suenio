@@ -388,20 +388,20 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	paquete->numero=k;
 	for(n=0; estado_cpu[n]!=LIBRE;n++){
 	}
-	printf("Pasa el for\n");
 	if(n<MAX_EVENTS_EPOLL){
-		printf("entra al if\n");
 		fd_aceptado=socket_aceptarCliente(data.fd);
-		epoll_agregarSocketCliente(efd_cpu,fd_aceptado);
-		pthread_mutex_lock(mutex_array);
-		fds_conectados_cpu[n]=fd_aceptado;
-		estado_cpu[n]=LIBRE;
-		pthread_mutex_unlock(mutex_array);
-		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-		k=configuracion_kernel.retardo_quantum;
-		paquete->numero=k;
-		socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-		sem_post(&sem_cpu);
+		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
+			log_escribir(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
+			pthread_mutex_lock(mutex_array);
+			fds_conectados_cpu[n]=fd_aceptado;
+			estado_cpu[n]=LIBRE;
+			pthread_mutex_unlock(mutex_array);
+			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			k=configuracion_kernel.retardo_quantum;
+			paquete->numero=k;
+			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			sem_post(&sem_cpu);
+		}
 	} else {
 		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 	}
@@ -423,8 +423,11 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 
 void handler_conexion_cpu(epoll_data_t data){
 	printf("Llega al handler\n");
-	t_struct_pcb* pcb = (t_struct_pcb*)data.ptr;
-	printf("pid recibido: %d\n", pcb->pid);
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j=socket_recibir(data.fd,&tipoRecibido,&structRecibida);
+	t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
+	printf("el pid recibido es: %d\n", pcb->pid);
 	pthread_mutex_lock(mutex_cola_exec);
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);
