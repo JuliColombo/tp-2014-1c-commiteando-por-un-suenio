@@ -247,7 +247,7 @@ void agregarHandshake(int id_prog, tipo_handshake tipo){
 	return;
 }
 
-//Comandos de consola:
+/*************************Comandos de Consola:*************************/
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
 	if(configuracion_UMV.algoritmo==worstfit){
@@ -343,12 +343,32 @@ void compactar(){/*
 }
 
 
-
+/*************************Dump: *************************/
 
 
 void dump(){
+	FILE* archivo;
+	int i=0;
+	archivo = fopen("/home/utnso/dump_config", "w");
+	if (archivo==NULL) {
+		fputs ("File error",stderr); exit (1);
+	}
+	//Va escribiendo en el archivo el contenido de las posiciones de la MP
+	fprintf(archivo, "%s", "El estado de la memoria principal:\n");
+	while(i<tamanioMP){
+		fprintf(archivo, "%s", "La posicion ");
+		fprintf(archivo, "%d", i);
+		fprintf(archivo, "%s", " contiene ");
+		fprintf(archivo, "%d", MP[i]);
+		fprintf(archivo, "%s", " \n");
+		i++;
+	}
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
+
+	fclose(archivo);
 }
+
+
 
 int validarPosicionVirtual(int posVirtual) {
 	int i=0,j=0;
@@ -364,6 +384,16 @@ int validarPosicionVirtual(int posVirtual) {
 	}
 	return 1;
 }
+
+/*
+ * Nombre: crearSegmentoPrograma
+ * Argumentos: id_prog, tamanio
+ *
+ *
+ * Devuelve: void
+ *
+ * Funcion: Dado un id_prog y un tamanio, reserva espacio en MP para el programa
+ */
 
 void crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion=-1;
@@ -527,6 +557,16 @@ int escogerUbicacionW(int tamanio){
 		return posicionFinal;
 }
 
+/*
+ * Nombre: destruirSegmentosPrograma
+ * Argumentos: id_prog
+ *
+ *
+ * Devuelve: void
+ *
+ * Funcion: Dado un id_prog, libera el espacio reservado para el programa
+ */
+
 void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTabla(id_prog);
 	printf("La posicion es: %d\n", pos);
@@ -549,6 +589,7 @@ void liberarMP(int pos){
 	int i,ubicacion,tam;
 	i=0;
 	while(i<tamanioMP){
+
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
 			ubicacion=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
@@ -570,9 +611,10 @@ void eliminarSegmentos(int pos){
 	i=0;
 	ultimaPos= (tablaDeSegmentos[pos].cant_segmentos-1);
 	//Recorro la tabla de segmentos del id_prog
-	while(i<ultimaPos){
+	while(i<=ultimaPos){
 		//Por cada posicion ocupada, libero el espacio de memoria
-		tablaDeSegmentos[pos].segmentos = NULL;
+		free(tablaDeSegmentos[pos].segmentos);
+		tablaDeSegmentos[pos].cant_segmentos=0;
 		i++;
 	}
 }
@@ -847,7 +889,7 @@ void *consola (void){
 			   }
 			   if (strcmp(comando,"dump") ==0){
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				 //dump();
+				   dump();
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
