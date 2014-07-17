@@ -386,6 +386,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	tablaDeSegmentos[pos].cant_segmentos++;
 	tablaDeSegmentos[pos].segmentos[num_segmento]=aux;
 	printf("El programa es : %d\n", tablaDeSegmentos[pos].id_prog);
+	printf("La cantidad de segmentos es: %d\n", tablaDeSegmentos[pos].cant_segmentos);
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
@@ -408,7 +409,6 @@ int inicializarTabla(int id_prog){
 	//Verifico si hay tablas
 
 	if(cant_tablas==0){
-		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
 		aux_tabla = malloc(sizeof(tablaSeg));
 			if(aux_tabla==NULL){
@@ -424,16 +424,16 @@ int inicializarTabla(int id_prog){
 						}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		cant_tablas++;
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		return i;
 	}
 	else{
-		printf("La cant de tablas es: %d\n", cant_tablas);
 		//Como hay tablas, busco si ya hay una para el prog correspondiente
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
 		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
 		//FIXME: no funciona bien este realloc
-		aux_tabla =realloc(tablaDeSegmentos, sizeof(sizeof(tablaDeSegmentos)+sizeof(tablaSeg)));
+		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
 		if(aux_tabla==NULL){
 						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
 						abort();
@@ -446,17 +446,19 @@ int inicializarTabla(int id_prog){
 									abort();
 								}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
+		tablaDeSegmentos[i].cant_segmentos=0;
 		cant_tablas++;
+		printf("La cant de tablas es: %d\n", cant_tablas);
 		return i;
 		} else {
-			tablaDeSegmentos[i].cant_segmentos++;
 			//FIXME: no funciona bien este realloc
-			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, (sizeof(tablaDeSegmentos[i].segmentos)+sizeof(segmentDescriptor)));
+			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, ((tablaDeSegmentos[i].cant_segmentos+1)*sizeof(segmentDescriptor)));
 									if(aux_segmentos==NULL){
 										log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
 										abort();
 									}
 			tablaDeSegmentos[i].segmentos = aux_segmentos;
+			printf("La cant de tablas es: %d\n", cant_tablas);
 			return i;
 		}
 	}
@@ -861,6 +863,7 @@ void *consola (void){
 		if(strcmp(comando,"exit") ==0){
 			destruirTodosLosSegmentos();
 			free(MP);
+			free(tablaDeSegmentos);
 		   	socket_cerrarConexion(sock_kernel_servidor);
 		   	socket_cerrarConexion(sock_cpu);
 		   	matarHilos();
