@@ -69,29 +69,29 @@ void core_conexion_kernel(void){
 	}
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb* pcb_actualizada;
-		//t_tipoEstructura tipoRecibido;
-		//void* structRecibida;
 	while(1){
 			j=socket_recibir(sock,&tipoRecibido,&structRecibida);
 			if(j==1){
-				printf("MUNDO FELIZ\n");
 				pcb_recibida = ((t_struct_pcb*)structRecibida);
 				t_pcb* pcb = malloc(sizeof(t_pcb));
 				pcb->pid=pcb_recibida->pid;
 
 				printf("el pid es: %d\n", pcb->pid);
-
+				pcb_actualizada = malloc(sizeof(t_struct_pcb));
 				pcb_actualizada->c_stack=pcb->c_stack;
 				pcb_actualizada->codigo=pcb->codigo;
 				pcb_actualizada->index_codigo=pcb->index_codigo;
 				pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
 				pcb_actualizada->pid=9;
-				printf("El pid que se manda en la pcb es: %d", pcb_actualizada->pid);
+				printf("El pid que se manda en la pcb es: %d\n", pcb_actualizada->pid);
 				pcb_actualizada->program_counter=pcb->program_counter;
 				pcb_actualizada->stack=pcb->stack;
 				pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
 				int i = socket_enviar(sock,D_STRUCT_PCB,pcb_actualizada);
+				if(i==1){
+					printf("Se mando bien el paquete\n");
+				}
 
 			}
 //			pcb->program_counter=pcb->program_counter+1;

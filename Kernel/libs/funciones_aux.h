@@ -32,7 +32,7 @@ void inicializarMutex(void);
 void crearSemaforos(void);
 void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
-void actualizarPCB(t_programa* programa, t_pcb* pcb);
+void actualizarPCB(t_programa* programa, t_struct_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista);
 void mandarAReady(t_programa* programa);
 int buscar_cpu_libre(void);

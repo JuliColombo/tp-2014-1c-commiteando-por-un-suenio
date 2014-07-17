@@ -62,7 +62,7 @@ void inicializarConfiguracion(void){
 		}
 	else{
 	leerConfiguracion();
-	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
+	//imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
 }
 
@@ -206,7 +206,9 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	}
 
 void enviar_pcb_a_cpu(void){
-	int fd_cpu_libre = buscar_cpu_libre();
+	pthread_mutex_lock(mutex_array);
+	int pos = buscar_cpu_libre();
+	int fd_cpu_libre = fds_conectados_cpu[pos];
 	t_struct_pcb* paquete = malloc(sizeof(t_struct_pcb));
 	pthread_mutex_lock(mutex_cola_ready);
 	t_programa* programa = (t_programa*)list_remove(cola.ready,0);
@@ -216,14 +218,13 @@ void enviar_pcb_a_cpu(void){
 	paquete->index_codigo=programa->pcb->index_codigo;
 	paquete->index_etiquetas=programa->pcb->index_etiquetas;
 	paquete->pid=programa->pcb->pid;
-	printf("El pid que se manda en la pcb es: %d", paquete->pid);
 	paquete->program_counter=programa->pcb->program_counter;
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
 	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
 	if(i==1){
-		printf("Se envia bien la pcb\n");
+		estado_cpu[pos]=USADA;
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,(void*)programa);
 		pthread_mutex_unlock(mutex_cola_exec);
@@ -232,6 +233,7 @@ void enviar_pcb_a_cpu(void){
 		free(paquete);
 		enviar_pcb_a_cpu();
 	}
+	pthread_mutex_unlock(mutex_array);
 	return;
 }
 
@@ -291,14 +293,13 @@ void core_pcp(void){
 				mostrarColasPorPantalla(cola.ready,"Ready");
 				pthread_mutex_unlock(mutex_cola_ready);
 
-
 				enviar_pcb_a_cpu();
 
 				pthread_mutex_lock(mutex_cola_exec);
 				mostrarColasPorPantalla(cola.exec, "Exec");
 				pthread_mutex_unlock(mutex_cola_exec);
 
-
+				break;
 
 				if(programa->flag_bloqueado==1){
 					pthread_mutex_lock(mutex_cola_block);
@@ -383,10 +384,12 @@ void core_conexion_pcp_cpu(void){
 	pthread_mutex_unlock(mutex_array);
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	int efd_cpu=epoll_crear();
-	epoll_agregarSocketCliente(efd_cpu,sock_cpu);
+	epoll_agregarSocketServidor(efd_cpu,sock_cpu);
 
 	while(1){
+		printf("Llega al escuchar\n");
 		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*)&handler_conexion_cpu, (void*) &desconexion_cpu);
+		printf("Se escucho un epollcpu\n");
 		if(i==-1){
 			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}

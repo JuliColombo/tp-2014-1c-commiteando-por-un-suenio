@@ -260,9 +260,9 @@ void agregarNuevoPrograma(char* codigo, int fd){
  *
  * Funcion: actualiza el pcb recibido de una cpu y libera la memoria en que estaba la pcb vieja
  */
-void actualizarPCB(t_programa* programa, t_pcb* pcb ){
+void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
 	t_pcb* aux = programa->pcb;
-	programa->pcb = pcb;
+	programa->pcb->pid = pcb->pid;
 
 	free(aux);
 	return;
@@ -337,8 +337,7 @@ int buscar_cpu_libre(void){
 	while(estado_cpu[i]!=LIBRE){
 		i++;
 	}
-	int fd = fds_conectados_cpu[i];
-	return fd;
+	return i;
 }
 
 
@@ -420,12 +419,14 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
  */
 
 void handler_conexion_cpu(epoll_data_t data){
-	t_pcb* pcb = (t_pcb*)data.ptr;
+	printf("Llega al handler\n");
+	t_struct_pcb* pcb = (t_struct_pcb*)data.ptr;
+	printf("pid recibido: %d\n", pcb->pid);
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 	actualizarPCB(programa, pcb);
 	mandarAReady(programa);
 	sem_post(&sem_cpu);
-
+	return;
 }
 
 /*
