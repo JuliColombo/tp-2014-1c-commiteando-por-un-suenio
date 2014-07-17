@@ -67,11 +67,13 @@ int* crearMP();
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
 int inicializarTabla(int id_prog);
+void inicializarListaHandshakes(void);
 void reservarEspacioMP(int ubicacion, int tamanio);
 int getPosTabla(int id_prog);
 void agregarHandshake(int id_prog, tipo_handshake tipo);
 void inicializarYAgregar(int id_prog, tipo_handshake tipo);
-
+int traducirPosicion(int base);
+int validarPosicionVirtual(int posVirtual);
 
 
 /*Operaciones de Consola*/

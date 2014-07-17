@@ -34,6 +34,7 @@ int main (int argc, char **argv){
 
 	//Crear estructuras administrativas
 
+	inicializarListaHandshakes();
 	inicializarMutex();
 	inicializarHilos();
 
