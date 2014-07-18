@@ -17,25 +17,6 @@ char* proximaInstruccion;
 char* indiceEtiquetas;
 int esConRetorno;
 
-
-void generarIndiceEtiquetas(t_puntero index_etiquetas,t_size etiquetas_size){
-
-	socket_and_indice_etiquetas(sockUMV,index_etiquetas,etiquetas_size);
-
-	t_tipoEstructura tipoRecibido;
-		void* structRecibida;
-		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
-		if(j==1){
-			t_struct_string* k = ((t_struct_string*)structRecibida);
-			proximaInstruccion= k->string;
-			free(k);
-		}
-
-
-	//SE DEBERIA HACER UN MALLOC EN PROXIMAINSTRUCCION Y DESPUES ACA HACER UN MEMCPY?
-}
-
-
 void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
 	const char* str = convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str, posicion);
@@ -50,7 +31,11 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 }
 
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
-	socket_and_number(sockUMV,instruccion);
+
+	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+	estructura->numero = instruccion;
+	socket_enviar(sockUMV, D_STRUCT_NUMERO, estructura);
+	free(estructura);
 
 	t_intructions inst;
 
@@ -152,12 +137,22 @@ void reservarContextoSinRetorno() {
 	posicionContextoViejo = calcularPosicionAsignacion(top_index);
 
 	//Pushear cursor de stack
-	socket_and_push(sockUMV,posicionContextoViejo,cursorrr);
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion = posicionContextoViejo;
+	estructura->valor = cursorrr;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
+
 	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
 	int pc  = pcb->program_counter + 1;
-	socket_and_push(sockUMV,top_index,pc);
+
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion = top_index;
+	estructura->valor = pc;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
@@ -172,7 +167,12 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 	top_index += 1;
 
 	//Socket a UMV para que haga: PUSH_SIZE_CHECK(&posicionVar,pila,posicionAVariable);
-	socket_and_push(sockUMV,retornar,top_index);
+
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion = top_index;
+	estructura->valor = retornar;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
 
 	esConRetorno = 1;
 }
@@ -186,7 +186,10 @@ void recuperarPosicionDeDirecciones() {
 
 void recuperarProgramCounter(t_puntero* program_counter) {
 
-	socket_and_pop_position(sockUMV,top_index);
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion = top_index;
+	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
+	free(estructura);
 
 	t_tipoEstructura tipoRecibido;
 		void* structRecibida;
@@ -202,7 +205,10 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 
-	socket_and_pop_position(sockUMV,top_index);
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion = top_index;
+	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
+	free(estructura);
 
 	t_tipoEstructura tipoRecibido;
 		void* structRecibida;
@@ -230,10 +236,11 @@ void volverAContextoAnterior(t_puntero* c_stack_viejo) {
 }
 
 void guardarAlternado () {
-	//Socket a UMV para que haga TOP(pila) HACEEEEEEEERRRRRR
-	//socket_enviarSignal(sockUMV, TOP);
 
-	socket_and_pop_position(sockUMV,top_index);
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion = top_index;
+	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
+	free(estructura);
 
 	t_valor_variable identificador_variable;
 
@@ -280,7 +287,11 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
 
 /******************** RECUPERAR CONTEXTO CON RETORNO***********************/
 void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
-	socket_and_pop_position(sockUMV,top_index);
+
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion = top_index;
+	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
+	free(estructura);
 
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;

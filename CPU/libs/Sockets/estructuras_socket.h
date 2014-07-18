@@ -215,7 +215,7 @@ typedef struct struct_etiquetas{
 	t_size etiquetas_size;
 }__attribute__ ((__packed__)) t_struct_indice_etiquetas;
 
-/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+/* Estructura tipo STRUCT_PEDIR_SEMAFORO
  *
  */
 
@@ -228,6 +228,7 @@ typedef struct struct_semaforo{
  */
 
 typedef struct struct_io{
+	uint32_t pid;
 	t_nombre_dispositivo dispositivo;
 	int32_t tiempo;
 }__attribute__ ((__packed__)) t_struct_io;
