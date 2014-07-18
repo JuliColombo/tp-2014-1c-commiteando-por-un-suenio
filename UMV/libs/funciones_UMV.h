@@ -75,6 +75,8 @@ void agregarHandshake(tipo_handshake tipo);
 void inicializarYAgregar(tipo_handshake tipo);
 int traducirPosicion(int base);
 int validarPosicionVirtual(int posVirtual);
+void imprimirEstadoMP(FILE* archivo);
+void imprimirEstadoTablaSeg(FILE* archivo);
 
 
 /*Operaciones de Consola*/
@@ -85,7 +87,7 @@ void dump();
 t_buffer solicitarDesdePosicionDeMemoria(uint32_t base,uint32_t offset, uint32_t longitud);
 t_buffer obtenerBytesDesdeHasta(uint32_t posicionReal,uint32_t longitud);
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer);
-void crearSegmentoPrograma(int id_prog, int tamanio);
+int crearSegmentoPrograma(int id_prog, int tamanio);
 void destruirSegmentos(int id_prog);
 
 /*Funciones del archivo Config*/
