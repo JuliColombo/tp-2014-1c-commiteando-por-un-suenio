@@ -50,7 +50,7 @@ void core_conexion_kernel(void){
 		abort();
 	}
 	printf("se conecto al kernel\n");
-	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
+	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
 
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -138,7 +138,26 @@ void core_conexion_umv(void){
 	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
 	//CODEO ACA
-	//generarIndiceEtiquetas(pcb->index_etiquetas,pcb->tamanio_indice);
+
+	/*t_pcb* pcb_actualizada = malloc(sizeof(t_pcb));
+	pcb_actualizada->index_etiquetas = &a;
+	pcb_actualizada->tamanio_indice = 3;*/
+	/*t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+	estructura->index_etiquetas = pcb->index_etiquetas;
+	estructura->etiquetas_size = pcb->tamanio_indice;
+	socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
+
+
+	free(estructura);
+	//free(pcb_actualizada);
+
+	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
+		if(j==1){
+			t_struct_string* k = ((t_struct_string*)structRecibida);
+			proximaInstruccion= k->string;
+			free(k);}*/
 
 
 	if(socket_cerrarConexion(sockUMV)==-1){

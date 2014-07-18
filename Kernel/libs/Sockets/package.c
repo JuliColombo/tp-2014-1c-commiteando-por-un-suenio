@@ -43,10 +43,12 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCB:
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
-			case D_STRUCT_GRADOMP:
+			case D_STRUCT_SOLICITARMEMORIA:
+			//case D_STRUCT_GRADOMP:
 				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
 				break;
-			case D_STRUCT_PIDYCODIGO:
+			case D_STRUCT_GRABARBYTES:
+		//	case D_STRUCT_PIDYCODIGO:
 				paquete = paquetizarStruct_pidycodigo((t_struct_pidycodigo*) estructuraOrigen);
 				break;
 			case D_STRUCT_PUSH:
@@ -369,7 +371,8 @@ t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
 
 	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
 
-	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
+	char* data = crearDataConHeader(D_STRUCT_GRABARBYTES, paquete->length);
+	//char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
 
 	int tamanoTotal = sizeof(t_header);
 
@@ -646,7 +649,8 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PCB:
 				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
 				break;
-			case D_STRUCT_PIDYCODIGO:
+			case D_STRUCT_GRABARBYTES:
+		//	case D_STRUCT_PIDYCODIGO:
 				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
 				break;
 			case D_STRUCT_PUSH:

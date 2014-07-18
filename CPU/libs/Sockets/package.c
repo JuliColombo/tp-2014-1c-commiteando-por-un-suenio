@@ -437,7 +437,7 @@ t_stream * paquetizarStruct_indiceEtiquetas(t_struct_indice_etiquetas * estructu
 	int tamanioTotal = sizeof(t_header);
 	int tamanioDato = 0;
 
-	memcpy(data + tamanioTotal, &estructuraOrigen->index_etiquetas ,tamanioDato = sizeof(uint32_t));
+	memcpy(data + tamanioTotal, estructuraOrigen->index_etiquetas ,tamanioDato = sizeof(uint32_t));
 
 	tamanioTotal += tamanioDato;
 
