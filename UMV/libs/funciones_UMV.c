@@ -47,6 +47,7 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
 		abort();
 	}
+	aux_MP[251]=NULL;
 	return aux_MP;
 }
 
@@ -273,21 +274,28 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 //****************************************Compactacion*****************************************
 
 void compactar(){
-	int posicionFinal;
+	int posicionFinal=0;
 	int i,j,k,l=0;
 	int posicionSegmento,tamanio;
 	//Recorre la MP
 	while(l<tamanioMP){
 	//Encuentra la primera posicion libre
-	posicionFinal=l;
 	while(MP[posicionFinal]!=NULL){
 		posicionFinal++;
 	}
+	printf("La posicion a reubicar es: %d\n", posicionFinal);
 	posicionSegmento=posicionFinal;
 		//Encuentra la primera posicion ocupada
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
+		if(posicionSegmento == tamanioMP){
+			printf("Compactacion finalizada\n");
+			return;
+		}
+		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
 		i=ubicarEnTabla(posicionSegmento);
+		printf("La tabla correspondiente es: %d\n",i);
 		j=ubicarPosiconRealEnTabla(posicionSegmento);
+		printf("El segmento correspondiente es: %d\n",j);
 		tamanio=tablaDeSegmentos[i].segmentos[j].tamanio;
 		k=posicionFinal;
 		//Traslado el segmento
@@ -299,27 +307,33 @@ void compactar(){
 			tamanio--;
 	}
 	tablaDeSegmentos[i].segmentos[j].ubicacionMP = posicionFinal;
+	posicionFinal = posicionFinal+tamanio;
 	l++;
 	}
 }
 
 int ubicarEnTabla(int posicionR){
-	int i=0,j=0;
+	int i=0,j;
 	while(i<cant_tablas){
+		j=0;
 		while(j<tablaDeSegmentos[i].cant_segmentos){
 			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
 				return i;
-			}
+			} else {
 			j++;
+				}
 		}
 		i++;
 	}
 	return -1;
 }
 
+
+
 int ubicarPosiconRealEnTabla(int posicionR){
-	int i=0,j=0;
+	int i=0,j;
 	while(i<cant_tablas){
+		j=0;
 		while(j<tablaDeSegmentos[i].cant_segmentos){
 			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
 							return j;
@@ -611,11 +625,8 @@ int escogerUbicacionW(int tamanio){
 
 void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTabla(id_prog);
-	printf("La posicion es: %d\n", pos);
 	liberarMP(pos);
-	printf("Se libera el espacio de memoria\n");
 	eliminarSegmentos(pos);
-	printf("Se libera el espacio de los segmentos\n");
 	return;
 
 }
