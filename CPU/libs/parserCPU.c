@@ -5,6 +5,7 @@
  *      Author: utnso
  */
 #include "parserCPU.h"
+char* variables = "";
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariable,
@@ -107,8 +108,8 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 		}
 
 	//imprimir(valor_variable);
-	char* str = convertirAStringNumero(valor_variable);
-	strcat(variables,str);
+	char* str = string_itoa(valor_variable);
+	string_append(&variables,str);
 
 }
 

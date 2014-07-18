@@ -50,6 +50,7 @@ void core_conexion_kernel(void){
 		abort();
 	}
 	printf("se conecto al kernel\n");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
 
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -120,7 +121,7 @@ void core_conexion_kernel(void){
 
 
 	if(socket_cerrarConexion(sockKernel)==-1){
-		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar al Kernel");
+		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar al Kernel");
 	}
 	return;
 }
@@ -130,16 +131,18 @@ void core_conexion_kernel(void){
 
 void core_conexion_umv(void){
 	//int sock;
-	if ((sockUMV=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))>0){
+	if ((sockUMV=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))<0){
 		log_error_socket();
-		printf("Conectado a la UMV\n");
+	} else {
+	printf("Conectado a la UMV\n");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
-
 	//CODEO ACA
+	//generarIndiceEtiquetas(pcb->index_etiquetas,pcb->tamanio_indice);
 
 
 	if(socket_cerrarConexion(sockUMV)==-1){
-		log_escribir(archLog,"Conexion",ERROR,"No se pudo conectar a la UMV");
+		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar a la UMV");
 	}
 	return;
 }

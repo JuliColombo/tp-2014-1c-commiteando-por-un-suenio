@@ -130,14 +130,6 @@ char* convertirAString(t_nombre_variable c) {
 	return str;
 }
 
-char* convertirAStringNumero(int n) {
-	static char str[2];
-	str[0] = n;
-	str[1] = '\0';
-	return str;
-}
-
-
 t_elemento* elemento_create(const char* name, t_puntero pos){
 	t_elemento *new = malloc(sizeof(t_elemento));
 	new->name = strdup(name);
