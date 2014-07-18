@@ -352,25 +352,63 @@ void compactar(){/*
 
 
 void dump(){
-	FILE* archivo;
-	int i=0;
-	archivo = fopen("/home/utnso/dump_file", "w");
-	if (archivo==NULL) {
+	FILE* archivo_MP;
+	FILE* archivo_TS;
+	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
+	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
+	if (archivo_MP==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
+	if (archivo_TS==NULL) {
+			fputs ("File error",stderr); exit (1);
+		}
 	//Va escribiendo en el archivo el contenido de las posiciones de la MP
-	fprintf(archivo, "%s", "El estado de la memoria principal:\n");
-	while(i<tamanioMP){
-		fprintf(archivo, "%s", "La posicion ");
-		fprintf(archivo, "%d", i);
-		fprintf(archivo, "%s", " contiene ");
-		fprintf(archivo, "%d", MP[i]);
-		fprintf(archivo, "%s", " \n");
-		i++;
-	}
+	imprimirEstadoMP(archivo_MP);
+	imprimirEstadoTablaSeg(archivo_TS);
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
 
-	fclose(archivo);
+	fclose(archivo_MP);
+	fclose(archivo_TS);
+}
+
+void imprimirEstadoMP(FILE* archivo){
+	int i=0;
+	fprintf(archivo, "%s", "El estado de la memoria principal:\n");
+		while(i<tamanioMP){
+			fprintf(archivo, "%s", "La posicion ");
+			fprintf(archivo, "%d", i);
+			fprintf(archivo, "%s", " contiene ");
+			fprintf(archivo, "%d", MP[i]);
+			fprintf(archivo, "%s", " \n");
+			i++;
+		}
+}
+
+void imprimirEstadoTablaSeg(FILE* archivo){
+	int i=0,j;
+	fprintf(archivo, "%s", "El estado de la tabla de segmentos:\n\n");
+			while(i<cant_tablas){
+				j=0;
+				fprintf(archivo, "%s", "La tabla ");
+				fprintf(archivo, "%d", i);
+				fprintf(archivo, "%s", ":\n Corresponde al programa ");
+				fprintf(archivo, "%d", tablaDeSegmentos[i].id_prog);
+				fprintf(archivo, "%s", "\n Cantidad de segmentos ");
+				fprintf(archivo, "%d", tablaDeSegmentos[i].cant_segmentos);
+				while(j<tablaDeSegmentos[i].cant_segmentos){
+				fprintf(archivo, "%s", "\n Segmento ");
+				fprintf(archivo, "%d", j);
+				fprintf(archivo, "%s", ":\n Posicion real ");
+				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
+				fprintf(archivo, "%s", "\n Posicion virtual ");
+				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].inicio);
+				fprintf(archivo, "%s", "\n Tamanio ");
+				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].tamanio);
+				j++;
+				}
+				fprintf(archivo, "%s", " \n\n");
+				i++;
+			}
 }
 
 

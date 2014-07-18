@@ -75,6 +75,8 @@ void agregarHandshake(tipo_handshake tipo);
 void inicializarYAgregar(tipo_handshake tipo);
 int traducirPosicion(int base);
 int validarPosicionVirtual(int posVirtual);
+void imprimirEstadoMP(FILE* archivo);
+void imprimirEstadoTablaSeg(FILE* archivo);
 
 
 /*Operaciones de Consola*/
