@@ -630,7 +630,7 @@ int getPosTabla(int id_prog){
 void liberarMP(int pos){
 	int i,ubicacion,tam;
 	i=0;
-	while(i<tamanioMP){
+	while(i<tablaDeSegmentos[pos].cant_segmentos){
 
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
@@ -649,16 +649,8 @@ void liberarMP(int pos){
 }
 
 void eliminarSegmentos(int pos){
-	int i,ultimaPos;
-	i=0;
-	ultimaPos= (tablaDeSegmentos[pos].cant_segmentos-1);
-	//Recorro la tabla de segmentos del id_prog
-	while(i<=ultimaPos){
-		//Por cada posicion ocupada, libero el espacio de memoria
-		free(tablaDeSegmentos[pos].segmentos);
-		tablaDeSegmentos[pos].cant_segmentos=0;
-		i++;
-	}
+	free(tablaDeSegmentos[pos].segmentos);
+	tablaDeSegmentos[pos].cant_segmentos=0;
 }
 
 
