@@ -148,7 +148,7 @@ void reservarContextoSinRetorno() {
 	//Pushear Program Counter de proxima instruccion:
 	int pc  = pcb->program_counter + 1;
 
-	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion = top_index;
 	estructura->valor = pc;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);

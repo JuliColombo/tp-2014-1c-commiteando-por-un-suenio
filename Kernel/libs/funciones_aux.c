@@ -435,11 +435,12 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 	uint32_t k=configuracion_kernel.quantum;
 	paquete->numero=k;
-	for(n=0; estado_cpu[n]!=LIBRE;n++){
+	for(n=0; fds_conectados_cpu[n]!=0;n++){
 	}
 	if(n<MAX_EVENTS_EPOLL){
 		fd_aceptado=socket_aceptarCliente(data.fd);
 		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
+			printf("La posicion es: %d\nEl fd aceptado es: %d\n", n, fd_aceptado);
 			log_escribir(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
 			pthread_mutex_lock(mutex_array);
 			fds_conectados_cpu[n]=fd_aceptado;

@@ -89,6 +89,7 @@ void core_conexion_kernel(void){
 				darValoresDeStackYCursor(pcb);
 				//Esto va a aca? O lo pongo en parserCPU cuando devuelvo el pcb?
 				printf("el pid es: %d\n", pcb->pid);
+				sleep(3);
 				pcb_actualizada = malloc(sizeof(t_struct_pcb));
 				pcb_actualizada->pid=pcb->pid;
 				pcb_actualizada->c_stack=pcb->c_stack;
