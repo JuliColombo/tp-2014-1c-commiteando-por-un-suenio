@@ -215,7 +215,7 @@ typedef struct struct_etiquetas{
 	t_size etiquetas_size;
 }__attribute__ ((__packed__)) t_struct_indice_etiquetas;
 
-/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+/* Estructura tipo STRUCT_PEDIR_SEMAFORO
  *
  */
 

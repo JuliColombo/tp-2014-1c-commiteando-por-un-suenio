@@ -129,6 +129,7 @@ t_struct_io* crear_struct_io(char* string, int32_t valor){
 	t_struct_io* estructura = malloc(sizeof(t_struct_io));
 	estructura->dispositivo = string;
 	estructura->tiempo = valor;
+	//estructura->pid = pcb->pid;
 	return estructura;
 }
 

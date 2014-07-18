@@ -29,7 +29,11 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	t_puntero posicion = calcularPosicionAsignacion(top_index);
 
-	socket_and_push(sockUMV,posicion,id);
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion=posicion;
+	estructura->valor = id;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
 
 	top_index = posicion;
 
@@ -60,7 +64,11 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
-	socket_and_pop_position(sockUMV,direccion_variable + 1);
+
+	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
+	estructura->posicion=direccion_variable +1;
+	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
+	free(estructura);
 
 	t_valor_variable valor_variable;
 
@@ -84,7 +92,11 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	int top = top_index;
 
-	socket_and_push(sockUMV,direccion_variable,valor);
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion=direccion_variable;
+	estructura->valor = valor;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
 
 	int posibleTop = direccion_variable + 1;
 
@@ -101,7 +113,10 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
-	socket_and_obtener_compartida(sockKernel, variable);
+	t_struct_string* estructura = malloc(sizeof(t_struct_string));
+	estructura->string = variable;
+	socket_enviar(sockKernel, D_STRUCT_OBTENERCOMPARTIDA, estructura);
+	free(estructura);
 
 	t_valor_variable valor;
 
@@ -126,6 +141,11 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"
 	socket_and_asignar_compartida(sockKernel,variable,valor);
+	t_struct_asignar_compartida* estructura = malloc(sizeof(t_struct_asignar_compartida));
+	estructura->nombre = variable;
+	estructura->valor = valor;
+	socket_enviar(sockKernel, D_STRUCT_ASIGNARCOMPARTIDA, estructura);
+	free(estructura);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a variable compartida %s",valor, variable);
 
@@ -139,6 +159,10 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(instruccion);
 
 	socket_and_instruccion(sockUMV,inst);
+	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
+	estructura->inst = inst;
+	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
+	free(estructura);
 
 	recibirProximaInstruccion(sockUMV);
 
@@ -225,7 +249,11 @@ void retornar(t_valor_variable retorno) {
 
 	t_puntero posicionAsignacion = direccionRetorno + 1;
 
-	socket_and_push(sockUMV,posicionAsignacion,retorno);
+	t_struct_push* estructura = malloc(sizeof(t_struct_push));
+	estructura->posicion=posicionAsignacion;
+	estructura->valor = retorno;
+	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
+	free(estructura);
 
 	esConRetorno = 0;
 
@@ -237,6 +265,10 @@ void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
 	socket_and_number(sockKernel, valor_mostrar);
+	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+	estructura->numero = valor_mostrar;
+	socket_enviar(sockKernel, D_STRUCT_NUMERO, estructura);
+	free(estructura);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %d para imprimirlo por pantalla",valor_mostrar);
 
@@ -245,15 +277,24 @@ void imprimir(t_valor_variable valor_mostrar) {
 void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
-	socket_and_string(sockKernel,texto);
+	t_struct_string* estructura = malloc(sizeof(t_struct_string));
+	estructura->string = texto;
+	socket_enviar(sockKernel, D_STRUCT_STRING, estructura);
+	free(estructura);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %s para imprimirlo por pantalla",texto);
 
 }
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
-	//Informa al Kernel que el Programa actual pretende usar el dispositivo tiempo unidades de tiempo.
-	socket_and_io(sockKernel,dispositivo,tiempo);
+
+	t_struct_io* estructura = malloc(sizeof(t_struct_io));
+	estructura->dispositivo = dispositivo;
+	estructura->pid = pcb->pid;
+	estructura->tiempo = tiempo;
+	socket_enviar(sockKernel, D_STRUCT_IO, estructura);
+	free(estructura);
+
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se envia conecto %s por %d tiempo",dispositivo,tiempo);
 
@@ -264,7 +305,12 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 
-	socket_and_wait(sockKernel,identificador_semaforo);
+	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
+	estructura->nombre_semaforo = identificador_semaforo;
+	socket_enviar(sockKernel, D_STRUCT_WAIT, estructura);
+	free(estructura);
+
+	//ACA AGREGO UN SOCKET DONDE ME LLEGA EL VALOR DEL SEMAFORO
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (wait)",identificador_semaforo);
 
@@ -272,7 +318,10 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 
 void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 
-	socket_and_signal_semaforo(sockKernel,identificador_semaforo);
+	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
+	estructura->nombre_semaforo = identificador_semaforo;
+	socket_enviar(sockKernel, D_STRUCT_SIGNALSEMAFORO, estructura);
+	free(estructura);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (signal)",identificador_semaforo);
 }
