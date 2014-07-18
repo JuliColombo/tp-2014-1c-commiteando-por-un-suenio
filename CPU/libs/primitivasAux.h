@@ -69,5 +69,7 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno);
 
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion);
 
+void chequearSiHuboSF();
+
 
 #endif /* PRIMITIVASAUX_H_ */
