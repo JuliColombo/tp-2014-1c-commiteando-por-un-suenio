@@ -107,7 +107,8 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 		}
 
 	//imprimir(valor_variable);
-	variables += valor_variable;
+	char* str = convertirAStringNumero(valor_variable);
+	strcat(variables,str);
 
 }
 
