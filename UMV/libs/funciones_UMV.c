@@ -697,6 +697,7 @@ void core_conexion_cpu(void){
 			pthread_mutex_unlock(mutex_log);
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
 			}
+	}
 	if(socket_cerrarConexion(sock_cpu)==0){
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
@@ -707,7 +708,7 @@ void core_conexion_cpu(void){
 			log_escribir(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
 			pthread_mutex_unlock(mutex_log);
 		}
-	}
+
 
 	return;
 }
