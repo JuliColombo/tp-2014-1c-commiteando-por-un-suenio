@@ -237,7 +237,7 @@ void enviar_pcb_a_cpu(void){
 	if(i==1){
 		estado_cpu[pos]=USADA;
 		pthread_mutex_lock(mutex_cola_exec);
-		list_add(cola.exec,(void*)programa);
+		list_add(cola.exec,programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		free(paquete);
 	}else{

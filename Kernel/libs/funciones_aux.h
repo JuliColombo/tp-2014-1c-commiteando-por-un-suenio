@@ -33,7 +33,7 @@ void crearSemaforos(void);
 void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
 void actualizarPCB(t_programa* programa, t_struct_pcb* pcb);
-void* buscarPrograma(int pid, t_list* lista);
+void* buscarPrograma(int pid, t_list* lista,pthread_mutex_t *mutex);
 void mandarAReady(t_programa* programa);
 int buscar_cpu_libre(void);
 int buscar_cpu_por_fd(int fd);

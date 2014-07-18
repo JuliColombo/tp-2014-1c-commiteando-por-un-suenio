@@ -87,10 +87,10 @@ void core_conexion_kernel(void){
 				pcb->tamanio_indice = pcb_recibida->tamanio_indice;
 
 				darValoresDeStackYCursor(pcb);
-
 				//Esto va a aca? O lo pongo en parserCPU cuando devuelvo el pcb?
 				printf("el pid es: %d\n", pcb->pid);
 				pcb_actualizada = malloc(sizeof(t_struct_pcb));
+				pcb_actualizada->pid=pcb->pid;
 				pcb_actualizada->c_stack=pcb->c_stack;
 				pcb_actualizada->codigo=pcb->codigo;
 				pcb_actualizada->index_codigo=pcb->index_codigo;
@@ -101,8 +101,9 @@ void core_conexion_kernel(void){
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
 				int i = socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
 				if(i==1){
-				printf("Se mando bien el paquete\n");
-				free(pcb_actualizada);
+					printf("Se mando bien el paquete\n");
+					free(pcb_actualizada);
+					free(pcb);
 				}
 			}
 //			pcb->program_counter=pcb->program_counter+1;
@@ -160,7 +161,7 @@ void core_conexion_umv(void){
 		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
 		if(j==1){
 			t_struct_string* k = ((t_struct_string*)structRecibida);
-			indiceEtiquetas= k->string;
+			char* indiceEtiquetas= k->string;
 			printf("me llego %s\n",indiceEtiquetas);
 			free(k);}
 

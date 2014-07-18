@@ -263,7 +263,6 @@ void agregarNuevoPrograma(char* codigo, int fd){
  * Funcion: actualiza el pcb recibido de una cpu y libera la memoria en que estaba la pcb vieja
  */
 void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
-	programa->pcb->pid = pcb->pid;
 	programa->pcb->c_stack=pcb->c_stack;
 	programa->pcb->codigo=pcb->codigo;
 	programa->pcb->index_codigo=pcb->index_codigo;
@@ -282,6 +281,7 @@ void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
  * Argumentos:
  * 		- pid
  * 		- lista
+ * 		- mutex de la lista
  *
  * Devuelve:
  * 		la data de la pcb que se busca
@@ -289,14 +289,16 @@ void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
  * Funcion: recorre la lista buscando el programa con el pid que recibe por parametro
  */
 
-void* buscarPrograma(int pid, t_list* lista){
+void* buscarPrograma(int pid, t_list* lista, pthread_mutex_t *mutex){
+	pthread_mutex_lock(mutex);
 	if(lista->head==NULL){
 		return NULL;
 	}
 	t_link_element* element = lista->head;
-	while( (element!=NULL) && (((t_programa*)element->data)->pcb->pid!=pid)){
+	while((element!=NULL) && ((t_programa*)element->data)->pcb->pid!= pid){
 		element = element->next;
 	}
+	pthread_mutex_unlock(mutex);
 	if(element == NULL){
 		perror("No esta el elemento en la lista");
 	}
@@ -481,14 +483,15 @@ void handler_conexion_cpu(epoll_data_t data){
 			estado_cpu[pos]=LIBRE;
 			pthread_mutex_unlock(mutex_array);
 			t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
-			pthread_mutex_lock(mutex_cola_exec);
-			t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
-
+			t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			if(programa != NULL){
 			actualizarPCB(programa, pcb);
-			pthread_mutex_unlock(mutex_cola_exec);
 			mandarAReady(programa);
 			sem_post(&sem_cpu);
 			sem_post(&sem_multiProg);
+			}else{
+				log_escribir(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
+			}
 			break;
 		case D_STRUCT_STRING:
 
