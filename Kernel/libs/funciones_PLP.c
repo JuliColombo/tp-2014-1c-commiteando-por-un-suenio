@@ -270,7 +270,6 @@ void core_plp(void){
 
 			pthread_mutex_unlock(mutex_cola_new);
 			list_add(cola.ready, (void*) programa);
-			mostrarColasPorPantalla(cola.ready,"Ready");
 			pthread_mutex_unlock(mutex_cola_ready);
 			sem_post(&sem_multiProg);
 
@@ -296,6 +295,9 @@ void core_pcp(void){
 		sem_wait(&sem_cpu);
 
 		sleep(2);
+		pthread_mutex_lock(mutex_cola_ready);
+		mostrarColasPorPantalla(cola.ready,"Ready");
+		pthread_mutex_unlock(mutex_cola_ready);
 
 		enviar_pcb_a_cpu();
 
