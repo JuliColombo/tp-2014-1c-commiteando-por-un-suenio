@@ -350,6 +350,15 @@ void compactar(){/*
 
 /*************************Dump: *************************/
 
+/*
+ * Nombre:dump
+ * Argumentos: void
+ *
+ *
+ * Devuelve: void
+ *
+ * Funcion: Genera archivos con el estado de la MP y la tabla de segmentos
+ */
 
 void dump(){
 	FILE* archivo_MP;
@@ -433,18 +442,19 @@ int validarPosicionVirtual(int posVirtual) {
  * Argumentos: id_prog, tamanio
  *
  *
- * Devuelve: void
+ * Devuelve: int (se pudo crear o no)
  *
  * Funcion: Dado un id_prog y un tamanio, reserva espacio en MP para el programa
  */
 
-void crearSegmentoPrograma(int id_prog, int tamanio){
+int crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion=-1;
 	segmentDescriptor aux;
 	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
 	if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
 	if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
+	if(ubicacion==-1) return 0;
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
@@ -463,6 +473,7 @@ void crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
+	return 1;
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
