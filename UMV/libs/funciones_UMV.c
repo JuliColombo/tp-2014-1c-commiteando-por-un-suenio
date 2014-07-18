@@ -40,14 +40,14 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
+
 	tamanioMP = configuracion_UMV.memSize;
 	int* aux_MP;
-	aux_MP = malloc(tamanioMP);
+	aux_MP = malloc(tamanioMP*(sizeof(t_memoria_principal)));
 	if(aux_MP==NULL){
 		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
 		abort();
 	}
-	aux_MP[251]=NULL;
 	return aux_MP;
 }
 
@@ -454,8 +454,15 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	segmentDescriptor aux;
 	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
-	if(configuracion_UMV.algoritmo == firstfit)ubicacion = escogerUbicacionF(tamanio);
-	if(configuracion_UMV.algoritmo == worstfit)ubicacion = escogerUbicacionW(tamanio);
+	if(configuracion_UMV.algoritmo == firstfit){
+		ubicacion = escogerUbicacionF(tamanio);
+	} else{
+		if(configuracion_UMV.algoritmo == worstfit){
+			printf("Va a elegir por Worst");
+			ubicacion = escogerUbicacionW(tamanio);
+			printf("La ubicacion es: %d", ubicacion);
+		}
+	}
 	if(ubicacion==-1) return 0;
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
@@ -606,6 +613,7 @@ int escogerUbicacionW(int tamanio){
 							max=aux;
 							posicionFinal=posicionDeDestino;
 						}
+						posicionFinal=posicionDeDestino;
 				}
 		}
 
@@ -803,6 +811,7 @@ void core_conexion_kernel(void){
 
 		while(1){
 
+			atender_kernel();
 
 		}
 	if(socket_cerrarConexion(sock_kernel_servidor)==0){
