@@ -50,7 +50,7 @@ extern lista_handshake lista_handshakes;
 
 int asignarFisicamente();
 void log_error_socket(void);
-_Bool solicitarMemoria(t_programa prgrama);
+int solicitarMemoria(int tamanio);
 _Bool memoryOverload(int longitud);
 _Bool segmentationFault(int base,int offset,int longitud);
 _Bool validarSolicitud(int base, int offset, int longitud);

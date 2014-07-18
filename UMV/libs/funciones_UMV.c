@@ -738,18 +738,13 @@ void core_conexion_kernel(void){
 	if((sock_aceptado=socket_aceptarCliente(sock_kernel_servidor))>0){
 			printf("Acepta conexion");
 			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se acepta la conexion del Kernel", INFO, "");
+			log_escribir(archLog, "Conexion", INFO, "Se acepta conexion del kernel");
 			pthread_mutex_unlock(mutex_log);
 		}
-		int* tipoRecibido;
-		void* structRecibida;
-		int j=socket_recibir(sock_aceptado,&tipoRecibido,&structRecibida);
-		if(j==1){
-		printf("Se recibio bien el paquete\n");
-		int* k = ((int*)structRecibida);
-		printf("%d\n", *k);
-		}
+
 		while(1){
+
+
 		}
 	if(socket_cerrarConexion(sock_kernel_servidor)==0){
 		pthread_mutex_lock(mutex_log);
@@ -766,14 +761,34 @@ void core_conexion_kernel(void){
 }
 
 void atender_kernel(void){
-	/*UNSOLVED:
-	 * int programaEnHilo;
-	 * void* estructura;
-	 * t_tipoEstructura tipo_estructura;
-	 * socket_recibir(sock, &tipo_estructura, &estructura);
-	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
-	 * send(sock, &tipo_estructura, &estructura);
-	 */
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	t_struct_numero* tamanio;
+	int i,memoriaSuficiente=0;
+	for(i=0; i<4 && memoriaSuficiente==0;i++){
+		socket_recibir(sock_kernel_servidor, &tipoRecibido,&structRecibida);
+		tamanio = ((t_struct_numero*)structRecibida);
+		int tamanioSolicitado = tamanio->numero;
+		//memoriaSuficiente = solicitarMemoria(tamanio); //TODO acá falta modificar el solicitarMemoria, devuelve 0 cuando hay lugar y devuelve 1 si no hay lugar.
+	}
+	t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+	respuesta->numero=memoriaSuficiente;
+	socket_enviar(sock_kernel_servidor, D_STRUCT_NUMERO, respuesta);
+	if(memoriaSuficiente!=0){
+		for(i=0;i<4;i++){
+			socket_recibir(sock_kernel_servidor,&tipoRecibido,&structRecibida);
+			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
+			//grabarbytes();
+		}
+	}
+
+
+
+	//FALTA QUE SOLICITAR MEMORIA DEVUELVA SI HAY O NO MEMORIA DISPONIBLE PARA LOS 4 SEGMENTOS, VEASE QUE LOS TIENE QUE RESERVAR!
+
+
+	free(respuesta);
+	return;
 }
 
 
