@@ -523,12 +523,14 @@ t_stream * paquetizarStruct_io(t_struct_io * estructuraOrigen){
 
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->dispositivo) + 1 + sizeof(int32_t);
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->dispositivo) + 1 + sizeof(int32_t) +sizeof(uint32_t);
 
 	char * data = crearDataConHeader(D_STRUCT_IO, paquete->length); //creo el data.
 
 	int tamanoTotal = sizeof(t_header);
 	int tamanioDato = 0;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->pid , sizeof(uint32_t));
 
 	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, tamanioDato = strlen(estructuraOrigen->dispositivo)+1);		//copio a data el nombre de la variable.
 
@@ -1030,6 +1032,8 @@ t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length){
 	tamanoTotal = tamanoDato;
 
 	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	memcpy(estructuraDestino->pid, dataPaquete, sizeof(uint32_t));
 
 	estructuraDestino->dispositivo = malloc(tamanoDato);
 	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura

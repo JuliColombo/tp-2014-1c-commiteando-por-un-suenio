@@ -101,6 +101,7 @@ void inicializarMutex(void){
 	mutex_pid=malloc(sizeof(pthread_mutex_t));
 	mutex_solicitarMemoria=malloc(sizeof(pthread_mutex_t));
 	mutex_array=malloc(sizeof(pthread_mutex_t));
+	mutex_semaforos=malloc(sizeof(pthread_mutex_t));
 
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
@@ -110,6 +111,7 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_pid,NULL);
 	pthread_mutex_init(mutex_solicitarMemoria,NULL);
 	pthread_mutex_init(mutex_array,NULL);
+	pthread_mutex_init(mutex_semaforos,NULL);
 }
 
 /*
@@ -470,19 +472,44 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
-	pthread_mutex_lock(mutex_array);
-	int pos = buscar_cpu_por_fd(data.fd);
-	estado_cpu[pos]=LIBRE;
-	pthread_mutex_unlock(mutex_array);
-	t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
-	pthread_mutex_lock(mutex_cola_exec);
-	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
+	switch(tipoRecibido){
+		case D_STRUCT_PCB:
+			pthread_mutex_lock(mutex_array);
+			int pos = buscar_cpu_por_fd(data.fd);
+			estado_cpu[pos]=LIBRE;
+			pthread_mutex_unlock(mutex_array);
+			t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
+			pthread_mutex_lock(mutex_cola_exec);
+			t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
 
-	actualizarPCB(programa, pcb);
-	pthread_mutex_unlock(mutex_cola_exec);
-	mandarAReady(programa);
-	sem_post(&sem_cpu);
-	sem_post(&sem_multiProg);
+			actualizarPCB(programa, pcb);
+			pthread_mutex_unlock(mutex_cola_exec);
+			mandarAReady(programa);
+			sem_post(&sem_cpu);
+			sem_post(&sem_multiProg);
+			break;
+		case D_STRUCT_STRING:
+
+			break;
+
+		case D_STRUCT_SIGNALSEMAFORO:
+			t_struct_semaforo* semaforo = ((t_struct_semaforo*)structRecibida);
+			pthread_mutex_lock(mutex_semaforos);
+			int i;
+			for(i=0; configuracion_kernel.semaforos.id[i]!=semaforo->nombre_semaforo;i++){
+			}
+			semaforo = malloc(sizeof(t_struct_semaforo));
+			semaforo->nombre_semaforo=configuracion_kernel.semaforos.id[i];
+			socket_enviar(data.fd,D_STRUCT_SIGNALSEMAFORO,semaforo);
+			pthread_mutex_unlock(mutex_semaforos);
+			break;
+		case D_STRUCT_IO:
+			t_struct_io* bloqueo = ((t_struct_io*)structRecibida);
+			pthread_detach(pthread_create(&io, NULL, (void*) &core_io(bloqueo->pid,bloqueo->tiempo,bloqueo->dispositivo), NULL));
+
+			break;
+	}
+	free(structRecibida);
 	return;
 }
 

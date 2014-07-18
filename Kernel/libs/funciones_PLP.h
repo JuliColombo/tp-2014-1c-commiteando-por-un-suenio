@@ -38,6 +38,7 @@ extern pthread_mutex_t* mutex_cola_exit;
 extern pthread_mutex_t* mutex_pid;
 extern pthread_mutex_t* mutex_solicitarMemoria;
 extern pthread_mutex_t* mutex_array;
+extern pthread_mutex_t* mutex_semaforos;
 extern int sock_programas;
 extern int sock_cpu;
 extern int sock_umv;

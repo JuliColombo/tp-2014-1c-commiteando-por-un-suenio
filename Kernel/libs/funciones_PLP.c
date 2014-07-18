@@ -83,8 +83,10 @@ void leerConfiguracion(void){
 	configuracion_kernel.quantum = config_get_int_value(config,"Quantum de tiempo para algoritmos expropiativos");
 	configuracion_kernel.retardo_quantum = config_get_long_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
+	pthread_mutex_lock(mutex_semaforos);
 	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
 	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
+	pthread_mutex_unlock(mutex_semaforos);
 	configuracion_kernel.hio.id = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
@@ -328,13 +330,13 @@ void core_pcp(void){
 
 
 
-void core_io(t_programa programa, int retardo, char* dispositivo){
+void core_io(int pid, int retardo, char* dispositivo){
 	int i;
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
 		if((strcmp(dispositivo,configuracion_kernel.hio.id[i]))==0){
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block);
-			bloquearPrograma(programa.pcb->pid);
+			bloquearPrograma(pid);
 			pthread_mutex_unlock(mutex_cola_exec);
 
 			mostrarColasPorPantalla(cola.block,"block");
