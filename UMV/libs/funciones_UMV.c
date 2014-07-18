@@ -299,7 +299,7 @@ void compactar(){
 		tamanio=tablaDeSegmentos[i].segmentos[j].tamanio;
 		k=posicionFinal;
 		//Traslado el segmento
-	while(tamanio>=0){
+	while(tamanio>0){
 			MP[k]=MP[posicionSegmento];
 			MP[posicionSegmento]=NULL;
 			k++;
