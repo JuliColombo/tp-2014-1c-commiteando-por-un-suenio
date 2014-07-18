@@ -30,12 +30,12 @@ AnSISOP_kernel funciones_kernel = {
 };
 
 void darValoresDeStackYCursor(t_pcb* pcb){
-	if(pcb->c_stack == pcb->stack){
+	if(*pcb->c_stack == *pcb->stack){
 		cursor = 0;
 		stack = 0;
 	} else {
 		stack = 0;
-		cursor = pcb->c_stack - pcb->stack;
+		cursor = *pcb->c_stack - *pcb->stack;
 	}
 }
 
@@ -166,6 +166,7 @@ void salir(int termino) {
 	pcbQ->stack=pcb->stack;
 	pcbQ->tamanio_contexto=pcb->tamanio_contexto;
 	pcbQ->tamanio_indice=pcb->tamanio_indice;
+
 	socket_enviar(sockKernel,D_STRUCT_PCBQUANTUM,pcbQ);
 
 	free(pcbQ);
@@ -174,6 +175,8 @@ void salir(int termino) {
 	break;
 
 	case SEG_FAULT:
+
+	log_escribir(archLog,"Ejecucion",ERROR,"Segmentation Fault. No se puede seguir con la ejecucion");
 
 	pcb_actualizada->c_stack=pcb->c_stack;
 	pcb_actualizada->codigo=pcb->codigo;
@@ -193,12 +196,11 @@ void salir(int termino) {
 }
 
 void correrParser() {
+	termino = CONTINUES;
+
 	signal(SIGUSR1,hot_plug);
 
 	for(i=0;i<=quantum;i++){
-
-		if(termino != SEG_FAULT){
-		termino = CONTINUES;
 
 		parsear();
 
@@ -206,8 +208,8 @@ void correrParser() {
 
 		if((i == quantum) && (termino == CONTINUES)){
 			termino = QUANTUM;
-			pcb->c_stack += cursor;
-			pcb->stack += stack;
+			*pcb->c_stack += cursor;
+			*pcb->stack += stack;
 		}
 
 		if (termino != CONTINUES) {
@@ -217,9 +219,5 @@ void correrParser() {
 			break;
 		}
 
-	} else {
-		salir(termino);
-		log_escribir(archLog,"Ejecucion",ERROR,"Segmentation Fault. No se puede seguir con la ejecucion");
-		break;}
 	}
 }

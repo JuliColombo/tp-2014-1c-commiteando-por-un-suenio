@@ -71,5 +71,7 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 
 void chequearSiHuboSF();
 
+void controlarBloqueo(int sockKernel, int termino);
+
 
 #endif /* PRIMITIVASAUX_H_ */

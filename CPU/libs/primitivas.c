@@ -313,7 +313,6 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 }
 
-
 /****************************** OPERACIONES DE KERNEL ************************************************/
 
 void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
@@ -324,6 +323,7 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 	free(estructura);
 
 	//ACA AGREGO UN SOCKET DONDE ME LLEGA EL VALOR DEL SEMAFORO
+	controlarBloqueo(sockKernel, termino);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (wait)",identificador_semaforo);
 
@@ -335,6 +335,8 @@ void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 	estructura->nombre_semaforo = identificador_semaforo;
 	socket_enviar(sockKernel, D_STRUCT_SIGNALSEMAFORO, estructura);
 	free(estructura);
+
+	controlarBloqueo(sockKernel, termino);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (signal)",identificador_semaforo);
 }
