@@ -162,7 +162,7 @@ void core_conexion_umv(void){
 		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
 		if(j==1){
 			t_struct_string* k = ((t_struct_string*)structRecibida);
-			char* indiceEtiquetas= k->string;
+			indiceEtiquetas= k->string;
 			printf("me llego %s\n",indiceEtiquetas);
 			free(k);}
 
