@@ -472,6 +472,8 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
+	t_struct_semaforo* semaforo;
+	t_struct_io* bloqueo;
 	switch(tipoRecibido){
 		case D_STRUCT_PCB:
 			pthread_mutex_lock(mutex_array);
@@ -493,7 +495,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 
 		case D_STRUCT_SIGNALSEMAFORO:
-			t_struct_semaforo* semaforo = ((t_struct_semaforo*)structRecibida);
+			semaforo = ((t_struct_semaforo*)structRecibida);
 			pthread_mutex_lock(mutex_semaforos);
 			int i;
 			for(i=0; configuracion_kernel.semaforos.id[i]!=semaforo->nombre_semaforo;i++){
@@ -504,12 +506,11 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
 		case D_STRUCT_IO:
-			t_struct_io* bloqueo = ((t_struct_io*)structRecibida);
-			pthread_detach(pthread_create(&io, NULL, (void*) &core_io(bloqueo->pid,bloqueo->tiempo,bloqueo->dispositivo), NULL));
-
+			bloqueo = ((t_struct_io*)structRecibida);
+			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 			break;
+
 	}
-	free(structRecibida);
 	return;
 }
 

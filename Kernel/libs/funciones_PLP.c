@@ -330,19 +330,20 @@ void core_pcp(void){
 
 
 
-void core_io(int pid, int retardo, char* dispositivo){
+void core_io(t_struct_io* bloqueo){
+	pthread_detach(pthread_self());
 	int i;
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
-		if((strcmp(dispositivo,configuracion_kernel.hio.id[i]))==0){
+		if((strcmp(bloqueo->dispositivo,configuracion_kernel.hio.id[i]))==0){
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block);
-			bloquearPrograma(pid);
+			bloquearPrograma(bloqueo->pid);
 			pthread_mutex_unlock(mutex_cola_exec);
 
 			mostrarColasPorPantalla(cola.block,"block");
 			pthread_mutex_unlock(mutex_cola_block);
 
-			sleep(retardo*configuracion_kernel.hio.retardo[i]);
+			sleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]);
 
 		}
 	}
