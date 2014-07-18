@@ -722,7 +722,6 @@ void atender_cpu(void){
 	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
 	 * send(sock, &tipo_estructura, &estructura);
 	 */
-
 }
 
 
