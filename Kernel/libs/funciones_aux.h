@@ -28,6 +28,7 @@ int cant_identificadores(char**);
 void log_error_socket(void);
 int posicion_Variable_Global(char*);
 int valor_Variable_Global(char* variable);
+int posicion_Semaforo(char* semaforo);
 void agregarNuevoPrograma(char* codigo, int fd);
 void inicializarMutex(void);
 void crearSemaforos(void);

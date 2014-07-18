@@ -106,6 +106,25 @@ int valor_Variable_Global(char* variable){
 }
 
 /*
+ * Nombre:posicion_Semaforo/1
+ * Argumentos:
+ * 		-identif semaforo
+ *
+ * Devuelve:
+ *		posicion en el array
+ *
+ * Funcion:
+ */
+
+int posicion_Semaforo(char* semaforo){
+	int pos;
+	for(pos=0;configuracion_kernel.semaforos.id[pos]!=semaforo;pos++){
+	}
+	return pos;
+}
+
+
+/*
  * Nombre: inicializarSemaforos/0
  * Argumentos:
  * 		-
@@ -504,6 +523,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_semaforo* semaforo;
 	t_struct_io* bloqueo;
 	t_struct_string* string;
+	t_struct_asignar_compartida* compartida;
 	switch(tipoRecibido){
 		case D_STRUCT_PCB:
 			pthread_mutex_lock(mutex_array);
@@ -523,9 +543,10 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 		case D_STRUCT_STRING:
 
+
+
+
 			break;
-
-
 		case D_STRUCT_OBTENERCOMPARTIDA:
 
 			string = ((t_struct_string*)structRecibida);
@@ -538,16 +559,40 @@ void handler_conexion_cpu(epoll_data_t data){
 
 
 			break;
+
+		case D_STRUCT_ASIGNARCOMPARTIDA:
+			compartida = ((t_struct_asignar_compartida*)structRecibida);
+			int posicion = posicion_Variable_Global(compartida->nombre);
+			pthread_mutex_lock(mutex_var_compartidas);
+			configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
+			pthread_mutex_unlock(mutex_var_compartidas);
+
+			break;
+		case D_STRUCT_WAIT:
+			semaforo = ((t_struct_semaforo*)structRecibida);
+			t_struct_numero* senial = malloc(sizeof(t_struct_numero));
+			pthread_mutex_lock(mutex_semaforos);
+			int pos_sem_wait = posicion_Semaforo(semaforo->nombre_semaforo);
+			if(configuracion_kernel.semaforos.valor[pos_sem_wait]>0){
+				senial->numero=0;
+			}else{
+				senial->numero=1;
+			}
+			socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
+			configuracion_kernel.semaforos.valor[pos_sem_wait]-=1;
+			pthread_mutex_unlock(mutex_semaforos);
+			free(senial);
+			break;
 		case D_STRUCT_SIGNALSEMAFORO:
 			semaforo = ((t_struct_semaforo*)structRecibida);
 			pthread_mutex_lock(mutex_semaforos);
-			int i;
-			for(i=0; configuracion_kernel.semaforos.id[i]!=semaforo->nombre_semaforo;i++){
+			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
+			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
+			if(configuracion_kernel.semaforos.valor[pos_sem_signal]>0){
+				//TODO FALTA ARREGLAR ACA
+
 			}
-			semaforo = malloc(sizeof(t_struct_semaforo));
-			semaforo->nombre_semaforo=configuracion_kernel.semaforos.id[i];
-			socket_enviar(data.fd,D_STRUCT_SIGNALSEMAFORO,semaforo);
-			free(semaforo);
+
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
 		case D_STRUCT_IO:
