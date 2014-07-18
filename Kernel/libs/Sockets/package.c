@@ -43,10 +43,10 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCB:
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
-			case D_STRUCT_SOLICITARMEMORIA:
+			case D_STRUCT_GRADOMP:
 				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
 				break;
-			case D_STRUCT_GRABARBYTES:
+			case D_STRUCT_PIDYCODIGO:
 				paquete = paquetizarStruct_pidycodigo((t_struct_pidycodigo*) estructuraOrigen);
 				break;
 			case D_STRUCT_PUSH:
@@ -68,11 +68,13 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				paquete = paquetizarStruct_wait((t_struct_semaforo*) estructuraOrigen);
 				break;
 			case D_STRUCT_SIGNALSEMAFORO:
-				paquete = paquetizarStruct_signal((t_struct_semaforo*) estructuraOrigen);
+				paquete = paquetizarStruct_signalSemaforo((t_struct_semaforo*) estructuraOrigen);
 				break;
 			case D_STRUCT_IO:
 				paquete = paquetizarStruct_io((t_struct_io*) estructuraOrigen);
 				break;
+			case D_STRUCT_VARIABLES:
+				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 		}
 
 
@@ -193,6 +195,33 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_string/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(18, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_variables(t_struct_string * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->string) + 1;
+
+	char * data = crearDataConHeader(D_STRUCT_VARIABLES, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->string, strlen(estructuraOrigen->string)+1);		//copio a data el string.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: paquetizarStruct_wait/1
  * Argumentos:
  * 		- estructuraOrigen
@@ -200,7 +229,7 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen){
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(15, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen){
 
@@ -227,7 +256,7 @@ t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen){
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(16, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream * paquetizarStruct_signalSemaforo(t_struct_semaforo * estructuraOrigen){
 
@@ -254,7 +283,7 @@ t_stream * paquetizarStruct_signalSemaforo(t_struct_semaforo * estructuraOrigen)
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(3, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(14, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream * paquetizarStruct_obtenerCompartida(t_struct_string * estructuraOrigen){
 
@@ -340,7 +369,7 @@ t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen){
 
 	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->codigo) + sizeof(estructuraOrigen->pid);
 
-	char* data = crearDataConHeader(D_STRUCT_GRABARBYTES, paquete->length);
+	char* data = crearDataConHeader(D_STRUCT_PIDYCODIGO, paquete->length);
 
 	int tamanoTotal = sizeof(t_header);
 
@@ -617,7 +646,7 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PCB:
 				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
 				break;
-			case D_STRUCT_GRABARBYTES:
+			case D_STRUCT_PIDYCODIGO:
 				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
 				break;
 			case D_STRUCT_PUSH:
@@ -644,6 +673,8 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_IO:
 				estructuraDestino = despaquetizarStruct_io(dataPaquete, length);
 				break;
+			case D_STRUCT_VARIABLES:
+				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
 
 		}
 
@@ -751,6 +782,31 @@ t_struct_string * despaquetizarStruct_string(char * dataPaquete, uint16_t length
 }
 
 /*
+ * Nombre: despaquetizarStruct_variables/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_VARIABLES.
+ *
+ */
+t_struct_string * despaquetizarStruct_variables(char * dataPaquete, uint16_t length){
+	t_struct_string * estructuraDestino = malloc(sizeof(t_struct_string));
+
+	int tamanoTotal = 0, tamanoDato = 0;
+
+	tamanoTotal = tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->string = malloc(tamanoDato);
+	memcpy(estructuraDestino->string, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+
+	return estructuraDestino;
+}
+
+/*
  * Nombre: despaquetizarStruct_obtenerCompartida/2
  * Argumentos:
  * 		- char * dataPaquete
@@ -771,7 +827,7 @@ t_struct_string * despaquetizarStruct_obtenerCompartida(char * dataPaquete, uint
  * 		- length
  *
  * Devuelve:
- * 		una estructura de tipo D_STRUCT_SIGNAL.
+ * 		una estructura de tipo D_STRUCT_SIGNALSEMAFORO.
  *
  */
 t_struct_semaforo * despaquetizarStruct_signalSemaforo(char * dataPaquete, uint16_t length){

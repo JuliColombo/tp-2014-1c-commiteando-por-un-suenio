@@ -27,6 +27,7 @@ char* proximaInstruccion;
 int termino;
 int sockUMV;
 int sockKernel;
+int* variables = "";
 
 void proximaInst();
 void parsear();

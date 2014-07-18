@@ -35,6 +35,7 @@ t_stream * paquetizarStruct_obtenerCompartida(t_struct_string * estructuraOrigen
 t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen);
 t_stream * paquetizarStruct_signalSemaforo(t_struct_semaforo * estructuraOrigen);
 t_stream * paquetizarStruct_io(t_struct_io * estructuraOrigen);
+t_stream * paquetizarStruct_variables(t_struct_string * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -59,6 +60,8 @@ t_struct_string * despaquetizarStruct_obtenerCompartida(char * dataPaquete, uint
 t_struct_semaforo * despaquetizarStruct_signalSemaforo(char * dataPaquete, uint16_t length);
 t_struct_semaforo * despaquetizarStruct_wait(char * dataPaquete, uint16_t length);
 t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length);
+t_struct_string * despaquetizarStruct_variables(char * dataPaquete, uint16_t length);
+
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR

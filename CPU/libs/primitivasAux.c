@@ -233,6 +233,8 @@ void guardarAlternado () {
 	//Socket a UMV para que haga TOP(pila) HACEEEEEEEERRRRRR
 	//socket_enviarSignal(sockUMV, TOP);
 
+	socket_and_pop_position(sockUMV,top_index);
+
 	t_valor_variable identificador_variable;
 
 	t_tipoEstructura tipoRecibido;

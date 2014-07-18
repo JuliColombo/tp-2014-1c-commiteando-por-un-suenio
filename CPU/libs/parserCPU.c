@@ -80,13 +80,15 @@ void hot_plug(int signum) {
 		termino = DONE;
 		i = 0;
 		if(socket_cerrarConexion(sockKernel)==-1){
-			log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar conexion");
+			log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar conexion del Kernel");
+		if(socket_cerrarConexion(sockKernel)==-1){
+			log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar conexion de UMV");
+			}
 		}
 	}
 }
 
 void destruirEstructuras(){
-	//SOCKET A UMV PARA QUE DESTRUYA STACK Y/O INDICE DE CODIGO Y/O INDICE DE ETIQUETAS
 	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
 }
 
@@ -104,7 +106,9 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 			free(k);
 		}
 
-	imprimir(valor_variable);
+	//imprimir(valor_variable);
+	variables += valor_variable;
+
 }
 
 void mostrarEstadoVariables(){

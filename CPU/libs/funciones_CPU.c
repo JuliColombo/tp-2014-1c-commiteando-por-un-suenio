@@ -72,6 +72,7 @@ void core_conexion_kernel(void){
 	while(1){
 			j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 			if(j==1){
+				//habria que hacer el free de este pcb cuando se lo mando al kernel
 				pcb_recibida = ((t_struct_pcb*)structRecibida);
 				t_pcb* pcb = malloc(sizeof(t_pcb));
 				pcb->pid=pcb_recibida->pid;
@@ -86,6 +87,7 @@ void core_conexion_kernel(void){
 
 				darValoresDeStackYCursor(pcb);
 
+				//Esto va a aca? O lo pongo en parserCPU cuando devuelvo el pcb?
 				printf("el pid es: %d\n", pcb->pid);
 				pcb_actualizada = malloc(sizeof(t_struct_pcb));
 				pcb_actualizada->c_stack=pcb->c_stack;
