@@ -282,10 +282,11 @@ void salir(int termino) {
 }
 
 void integracionCorrerParser() {
+	termino = CONTINUES;
 	signal(SIGINT,hot_plug);
 
 	for(i=0;i<=quantum;i++){
-		termino = 0;
+		//termino = CONTINUES;
 
 		parsear();
 

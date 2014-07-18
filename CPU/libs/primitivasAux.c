@@ -29,6 +29,21 @@ void chequearSiHuboSF(){
 	}
 }
 
+void controlarBloqueo(int sockKernel, extern int termino) {
+	unsigned int valor_semaforo;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int j = socket_recibir(sockKernel, &tipoRecibido, &structRecibida);
+	if (j == 1) {
+		t_struct_numero* k = ((t_struct_numero*) structRecibida);
+		valor_semaforo = k->numero;
+		free(k);
+	}
+	if (valor_semaforo == 1) {
+		termino = BLOQUEADO;
+	}
+}
+
 void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
 	const char* str = convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str, posicion);
