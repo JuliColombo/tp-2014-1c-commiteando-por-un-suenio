@@ -126,12 +126,14 @@ void mostrarEstadoVariables(){
 void salirPorFinalizacion(){
 	mostrarEstadoVariables();
 	destruirEstructuras();
+	log_escribir(archLog,"Ejecucion",INFO,"Termino de ejecutarse el programa");
 
 }
 
 void salir(int termino) {
 	t_struct_pcb* pcb_actualizada=malloc(sizeof(t_struct_pcb));
 	t_struct_pcb_quantum* pcbQ;
+
 	switch (termino) {
 	case DONE:
 	salirPorFinalizacion();
