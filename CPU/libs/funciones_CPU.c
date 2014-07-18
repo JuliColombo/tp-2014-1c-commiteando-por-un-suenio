@@ -119,7 +119,6 @@ void core_conexion_kernel(void){
 	}
 	//CODEO ACA
 
-
 	if(socket_cerrarConexion(sockKernel)==-1){
 		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar al Kernel");
 	}
@@ -135,30 +134,39 @@ void core_conexion_umv(void){
 		log_error_socket();
 	} else {
 	printf("Conectado a la UMV\n");
-	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
+	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
-	//CODEO ACA
+	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
+	int a= 5;
+	t_pcb* pcb = malloc(sizeof(t_pcb));
+	pcb->index_etiquetas = &a;
+	pcb->tamanio_indice = 3;
 
-	/*t_pcb* pcb_actualizada = malloc(sizeof(t_pcb));
-	pcb_actualizada->index_etiquetas = &a;
-	pcb_actualizada->tamanio_indice = 3;*/
-	/*t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+	//ENVIO PEDIDO DE INDICE DE ETIQUETAS
+	t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
 	estructura->index_etiquetas = pcb->index_etiquetas;
 	estructura->etiquetas_size = pcb->tamanio_indice;
-	socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
-
+	int k=socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
+	if(k==1){
+		printf("se le mando pedido de indice de etiquetas a umv \n");
+	}
 
 	free(estructura);
-	//free(pcb_actualizada);
+	free(pcb);
 
+	//RECIBO INDICE
 	t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
 		if(j==1){
 			t_struct_string* k = ((t_struct_string*)structRecibida);
-			proximaInstruccion= k->string;
-			free(k);}*/
+			indiceEtiquetas= k->string;
+			printf("me llego %s\n",indiceEtiquetas);
+			free(k);}
 
+		while(1){
+
+		}
 
 	if(socket_cerrarConexion(sockUMV)==-1){
 		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar a la UMV");

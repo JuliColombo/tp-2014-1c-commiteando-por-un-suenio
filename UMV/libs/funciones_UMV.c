@@ -696,6 +696,22 @@ void core_conexion_cpu(void){
 			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_mutex_unlock(mutex_log);
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
+
+			//RECIBO PEDIDO DE INDICE DE ETIQUETAS
+			t_tipoEstructura tipoRecibido;
+			void* structRecibida;
+			t_struct_indice_etiquetas* indice;
+			socket_recibir(sock, &tipoRecibido,&structRecibida);
+			indice = ((t_struct_indice_etiquetas*)structRecibida);
+			//printf("me llego esto %d y %d\n",tamanio->etiquetas_size, *tamanio->index_etiquetas);
+
+			t_struct_string* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+			estructura->string = "hola wachada";		//ACA MANDAN EL INDICE DE ETIQUETAS EN BASE A LO RECIBIDO
+
+			int j=socket_enviar(sock,D_STRUCT_STRING,estructura);
+			if(j == 1){
+			printf("se envio el intento de indice de etiquetas\n");
+			free(estructura);
 			}
 	}
 	if(socket_cerrarConexion(sock_cpu)==0){
@@ -712,6 +728,7 @@ void core_conexion_cpu(void){
 
 	return;
 }
+}
 
 
 void atender_cpu(void){
@@ -723,7 +740,9 @@ void atender_cpu(void){
 	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
 	 * send(sock, &tipo_estructura, &estructura);
 	 */
+
 }
+
 
 
 
