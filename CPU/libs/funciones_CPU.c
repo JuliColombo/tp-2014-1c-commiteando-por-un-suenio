@@ -75,6 +75,14 @@ void core_conexion_kernel(void){
 				pcb_recibida = ((t_struct_pcb*)structRecibida);
 				t_pcb* pcb = malloc(sizeof(t_pcb));
 				pcb->pid=pcb_recibida->pid;
+				pcb->c_stack = pcb_recibida->c_stack;
+				pcb->codigo = pcb_recibida->codigo;
+				pcb->index_codigo = pcb_recibida->index_codigo;
+				pcb->index_etiquetas = pcb_recibida->index_etiquetas;
+				pcb->program_counter = pcb_recibida->program_counter;
+				pcb->stack = pcb_recibida->stack;
+				pcb->tamanio_contexto = pcb_recibida->tamanio_contexto;
+				pcb->tamanio_indice = pcb_recibida->tamanio_indice;
 
 				darValoresDeStackYCursor(pcb);
 
