@@ -36,6 +36,8 @@ void actualizarPCB(t_programa* programa, t_struct_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista);
 void mandarAReady(t_programa* programa);
 int buscar_cpu_libre(void);
+int buscar_cpu_por_fd(int fd);
+void finalizarPrograma(t_programa* programa, char*);
 
 
 /************************* FUNCIONES AUXILIARES PARA EL MANEJO DE EPOLL *************************/

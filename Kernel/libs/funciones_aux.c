@@ -124,7 +124,7 @@ void inicializarMutex(void){
  */
 
 void crearSemaforos(void){
-	if((sem_init(&sem_multiProg, 1, configuracion_kernel.multiprogramacion))==-1){
+	if((sem_init(&sem_multiProg, 1, 0))==-1){
 			perror("No se puede crear el semáforo");
 			exit(1);
 	}
@@ -347,7 +347,43 @@ int buscar_cpu_libre(void){
 	return i;
 }
 
+int buscar_cpu_por_fd(int fd){
+	int i=0;
+	while(fds_conectados_cpu[i]!=fd){
+		i++;
+	}
 
+	return i;
+}
+
+
+/*
+ * Nombre: finalizarPrograma
+ * Argumentos:
+ * 		- programa
+ *
+ * Devuelve:
+ * 		nada
+ *
+ * Funcion: manda al programa
+ */
+
+void finalizarPrograma(t_programa* programa, char* variablesAImprimir){
+	pthread_mutex_lock(mutex_cola_exec);
+	pthread_mutex_lock(mutex_cola_exit);
+	t_struct_string* paquete = malloc(sizeof(t_struct_string));
+	paquete->string=variablesAImprimir;
+	socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_STRING, paquete);
+	paquete->string=0;
+	socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, paquete);
+	free(paquete);
+	sem_post(&sem_multiProg);
+	list_add(cola.exit,(void*)programa);
+	pthread_mutex_unlock(mutex_cola_exec);
+	mostrarColasPorPantalla(cola.exit, "Exit");
+	pthread_mutex_unlock(mutex_cola_exit);
+	return;
+}
 
 /************************* FUNCIONES PARA EL MANEJO DE EPOLL *************************/
 
@@ -433,14 +469,20 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 void handler_conexion_cpu(epoll_data_t data){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	int j=socket_recibir(data.fd,&tipoRecibido,&structRecibida);
+	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
+	pthread_mutex_lock(mutex_array);
+	int pos = buscar_cpu_por_fd(data.fd);
+	estado_cpu[pos]=LIBRE;
+	pthread_mutex_unlock(mutex_array);
 	t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
 	pthread_mutex_lock(mutex_cola_exec);
 	t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec);
+
 	actualizarPCB(programa, pcb);
 	pthread_mutex_unlock(mutex_cola_exec);
 	mandarAReady(programa);
 	sem_post(&sem_cpu);
+	sem_post(&sem_multiProg);
 	return;
 }
 

@@ -57,7 +57,7 @@ void mostrarColasPorPantalla(t_list*, char*); //Muestra los programas que estan 
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente
 void leerConfiguracion(void); //Lee la config del archivo y la asigna la struct correspondiente
 void imprimirConfiguracion(void);
-int cantidadProgramasEnEjecucion(void); //Retorna la cantidad de programas que estan en el pcp actualmente
+int cantidadProgramasEnPCP(void); //Retorna la cantidad de programas que estan en el pcp actualmente
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos

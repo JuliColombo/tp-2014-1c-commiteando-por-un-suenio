@@ -39,8 +39,17 @@ void mostrarColasPorPantalla(t_list* lista, char* nombreLista){
 	return;
 }
 
-int cantidadProgramasEnEjecucion(void){
-	return (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block));
+int cantidadProgramasEnPCP(void){
+	pthread_mutex_lock(mutex_cola_ready);
+	pthread_mutex_lock(mutex_cola_exec);
+	pthread_mutex_lock(mutex_cola_block);
+
+	int cantidad = (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block));
+
+	pthread_mutex_unlock(mutex_cola_ready);
+	pthread_mutex_unlock(mutex_cola_exec);
+	pthread_mutex_unlock(mutex_cola_block);
+	return cantidad;
 }
 
 
@@ -243,26 +252,35 @@ pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 
 void core_plp(void){
 
-
+	t_programa* programa;
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
 	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
-	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-	while (1){
+	while(1){
 		sem_wait(&sem_new);
-
 		pthread_mutex_lock(mutex_cola_new);
 		mostrarColasPorPantalla(cola.new,"New");
 		pthread_mutex_unlock(mutex_cola_new);
 
+		if(configuracion_kernel.multiprogramacion > cantidadProgramasEnPCP()){
+			pthread_mutex_lock(mutex_cola_new);
+			pthread_mutex_lock(mutex_cola_ready);
+
+			programa = (t_programa*)list_remove(cola.new,0);
+
+			pthread_mutex_unlock(mutex_cola_new);
+			list_add(cola.ready, (void*) programa);
+			mostrarColasPorPantalla(cola.ready,"Ready");
+			pthread_mutex_unlock(mutex_cola_ready);
+			sem_post(&sem_multiProg);
+
+		}
 
 
-		sem_post(&sem_pcp);
 	}
 
 	pthread_join(conexion_plp_programas,NULL);
 	pthread_join(conexion_plp_umv,NULL);
-	pthread_join(conexion_plp_cpu,NULL);
 
 
 	return;
@@ -270,66 +288,42 @@ void core_plp(void){
 
 void core_pcp(void){
 
+	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 	t_programa* programa;
 
 	while(1){
 		sem_wait(&sem_multiProg);
-		sem_wait(&sem_pcp);
+		sem_wait(&sem_cpu);
 
-		pthread_mutex_lock(mutex_cola_new);
-		pthread_mutex_lock(mutex_cola_ready);
+		sleep(2);
 
-		if((programa = (t_programa*)list_remove(cola.new,0))!=NULL){
+		enviar_pcb_a_cpu();
 
-
-
-		pthread_mutex_unlock(mutex_cola_new);
-
-		list_add(cola.ready, (void*) programa);
-		pthread_mutex_unlock(mutex_cola_ready);
-			while(1){
-				sem_wait(&sem_cpu);
-				pthread_mutex_lock(mutex_cola_ready);
-				mostrarColasPorPantalla(cola.ready,"Ready");
-				pthread_mutex_unlock(mutex_cola_ready);
-
-				enviar_pcb_a_cpu();
-
-				pthread_mutex_lock(mutex_cola_exec);
-				mostrarColasPorPantalla(cola.exec, "Exec");
-				pthread_mutex_unlock(mutex_cola_exec);
+		pthread_mutex_lock(mutex_cola_exec);
+		mostrarColasPorPantalla(cola.exec, "Exec");
+		pthread_mutex_unlock(mutex_cola_exec);
 
 
-				if(programa->flag_bloqueado==1){
-					pthread_mutex_lock(mutex_cola_block);
-					bloquearPrograma(programa->pcb->pid);
-					mostrarColasPorPantalla(cola.block,"Block");
-					pthread_mutex_unlock(mutex_cola_block);
+	/*	if(programa->flag_bloqueado==1){
+			pthread_mutex_lock(mutex_cola_block);
+			bloquearPrograma(programa->pcb->pid);
+			mostrarColasPorPantalla(cola.block,"Block");
+			pthread_mutex_unlock(mutex_cola_block);
 
-				}
-
-				if(programa->flag_terminado==1){
-					pthread_mutex_lock(mutex_cola_exec);
-					pthread_mutex_lock(mutex_cola_exit);
-					t_struct_string* paquete = malloc(sizeof(t_struct_string));
-					paquete->string="Aca iria como termina cada variable";
-					socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_STRING, paquete);
-					paquete->string=0;
-					socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, paquete);
-					free(paquete);
-					sem_post(&sem_multiProg);
-					list_add(cola.exit,(void*)programa);
-					pthread_mutex_unlock(mutex_cola_exec);
-					mostrarColasPorPantalla(cola.exit, "Exit");
-					pthread_mutex_unlock(mutex_cola_exit);
-					break;
-				}
-
-			}
 		}
+
+		if(programa->flag_terminado==1){
+
+		}*/
+
 	}
 
+	pthread_join(conexion_plp_cpu,NULL);
+
+
 }
+
+
 
 
 void core_io(t_programa programa, int retardo, char* dispositivo){
