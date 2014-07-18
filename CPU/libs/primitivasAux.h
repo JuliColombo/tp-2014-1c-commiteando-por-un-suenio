@@ -10,8 +10,8 @@
 
 #include <parser/metadata_program.h>
 #include <commons/collections/dictionary.h>
-#include "Sockets/crear_estructuras.h"
 #include "estructuras.h"
+#include <stdint.h>
 
 typedef struct{
 	char* name;
