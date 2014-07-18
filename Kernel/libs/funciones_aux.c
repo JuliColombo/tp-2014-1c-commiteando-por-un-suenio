@@ -82,6 +82,30 @@ int posicion_Variable_Global(char* variable){
 }
 
 /*
+ * Nombre: valor_Variable_Global
+ * Argumentos:
+ * 		- nombre de la variable
+ *
+ * Devuelve:
+ * 		- el valor de la variable global o -1 en caso de error
+ *
+ * Funcion:	busca una variable global en la configuracion y retorna su valor
+ */
+
+
+int valor_Variable_Global(char* variable){
+	pthread_mutex_lock(mutex_var_compartidas);
+	int pos = posicion_Variable_Global(variable);
+	if(pos!=-1){
+		int valor = configuracion_kernel.var_globales.valor[pos];
+		pthread_mutex_unlock(mutex_var_compartidas);
+		return valor;
+	}
+	pthread_mutex_unlock(mutex_var_compartidas);
+	return -1;
+}
+
+/*
  * Nombre: inicializarSemaforos/0
  * Argumentos:
  * 		-
@@ -102,6 +126,7 @@ void inicializarMutex(void){
 	mutex_solicitarMemoria=malloc(sizeof(pthread_mutex_t));
 	mutex_array=malloc(sizeof(pthread_mutex_t));
 	mutex_semaforos=malloc(sizeof(pthread_mutex_t));
+	mutex_var_compartidas=malloc(sizeof(pthread_mutex_t));
 
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
@@ -112,6 +137,7 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_solicitarMemoria,NULL);
 	pthread_mutex_init(mutex_array,NULL);
 	pthread_mutex_init(mutex_semaforos,NULL);
+	pthread_mutex_init(mutex_var_compartidas,NULL);
 }
 
 /*
@@ -477,6 +503,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
 	t_struct_semaforo* semaforo;
 	t_struct_io* bloqueo;
+	t_struct_string* string;
 	switch(tipoRecibido){
 		case D_STRUCT_PCB:
 			pthread_mutex_lock(mutex_array);
@@ -498,6 +525,19 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			break;
 
+
+		case D_STRUCT_OBTENERCOMPARTIDA:
+
+			string = ((t_struct_string*)structRecibida);
+			int valor = valor_Variable_Global(string->string);
+			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+			paquete->numero=valor;
+
+			socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
+			free(paquete);
+
+
+			break;
 		case D_STRUCT_SIGNALSEMAFORO:
 			semaforo = ((t_struct_semaforo*)structRecibida);
 			pthread_mutex_lock(mutex_semaforos);
@@ -507,6 +547,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			semaforo = malloc(sizeof(t_struct_semaforo));
 			semaforo->nombre_semaforo=configuracion_kernel.semaforos.id[i];
 			socket_enviar(data.fd,D_STRUCT_SIGNALSEMAFORO,semaforo);
+			free(semaforo);
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
 		case D_STRUCT_IO:

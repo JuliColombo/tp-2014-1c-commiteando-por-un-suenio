@@ -91,8 +91,10 @@ void leerConfiguracion(void){
 	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);
 	configuracion_kernel.ip_umv = config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_kernel.puerto_umv = config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
+	pthread_mutex_lock(mutex_var_compartidas);
 	configuracion_kernel.var_globales.identificador = config_get_array_value(config,"Variables globales");
 	configuracion_kernel.var_globales.valor = vector_num(NULL, configuracion_kernel.var_globales.identificador);
+	pthread_mutex_unlock(mutex_var_compartidas);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
 	}

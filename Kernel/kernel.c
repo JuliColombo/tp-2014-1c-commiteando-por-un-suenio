@@ -23,6 +23,7 @@ pthread_mutex_t* mutex_pid;
 pthread_mutex_t* mutex_solicitarMemoria;
 pthread_mutex_t* mutex_array;
 pthread_mutex_t* mutex_semaforos;
+pthread_mutex_t* mutex_var_compartidas;
 int sock_programas, sock_umv, sock_cpu, efd_cpu, efd_programas;
 int* fds_conectados_cpu;
 int* estado_cpu;
