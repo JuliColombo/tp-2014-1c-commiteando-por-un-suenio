@@ -79,6 +79,7 @@ void imprimirEstadoMP(FILE* archivo);
 void imprimirEstadoTablaSeg(FILE* archivo);
 int ubicarEnTabla(int posicionSegmento);
 int ubicarPosiconRealEnTabla(int posicionSegmento);
+t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio);
 
 
 /*Operaciones de Consola*/

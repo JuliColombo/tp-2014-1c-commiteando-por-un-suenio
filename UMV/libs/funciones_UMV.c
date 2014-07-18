@@ -87,20 +87,12 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	int i=0;
 	int j;
 	j=traducirPosicion(base)+offset;
+	printf("La posicion real es: %d",j);
 	while (i < longitud){
 		buffer[j]= MP[j];
+		printf("El valor de la posicion %d buffer es: %d\n",j,buffer[j]);
 		j++;
 		i++;
-	}
-	if (sizeof(buffer) != longitud){
-		printf("El buffer no se obtuvo completamente. Rechazarlo? S/N");//No se si es necesario, pero capaz ayuda
-		char respuesta;
-		scanf("%c",&respuesta);
-		if (respuesta=='N') return buffer;
-		else{
-			buffer=NULL;
-			return buffer;
-		}
 	}
 	return buffer;
 }
@@ -135,22 +127,28 @@ void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
 }
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int i=0;
+	int i=0,k=0;
 	int j,aux;
+	while(i<longitud){
+		printf("El valor de la posicion %d del buffer es: %d\n",i,buffer[i]);
+		i++;
+	}
 		if (validarSolicitud(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
-							printf("La direccion base es erronea");
+							printf("La direccion base es erronea\n");
 							return;
 						}
 			j=traducirPosicion(base)+offset;
 			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
 			printf("El resultado de la asignacion es:\n");
-			while(i<longitud){
+			i=0;
+			while(k<longitud){
 				MP[j]= buffer[i];
 				printf("Posicion %d de memoria principal = %d\n", j, MP[j]);
 				j++;
 				i++;
+				k++;
 			}
 			} else puts("No se pudo realizar la asignacion");
 }
@@ -933,7 +931,8 @@ void *consola (void){
 					 puts("\n Ingrese Tamanio de segmento");
 					 scanf("%d",&unTamanio);
 					 puts("\n Ingrese Buffer");
-					 scanf("%s",&buffer);
+					 buffer = malloc(unTamanio*(sizeof(t_buffer)));
+					 buffer = asignarPosicionesBuffer(buffer,unTamanio);
 					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					 enviarBytes(unaBase,unOffset,unTamanio,buffer);
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
@@ -1017,6 +1016,18 @@ void destruirTodosLosSegmentos(void){/*
 	int i=sizeof(tablaDeSegmentos);
 
 	return;*/
+}
+
+t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio){
+	int i=0;
+	uint32_t valor;
+	while(i<unTamanio){
+		printf("Ingresar el valor de la posicion %d ",i);
+		scanf("%d",&valor);
+		buffer[i]=valor;
+		i++;
+	}
+	return buffer;
 }
 
 
