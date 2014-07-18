@@ -47,6 +47,7 @@ int* crearMP(void) { // Cambie para que no reciba parametro, total la config es 
 		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
 		abort();
 	}
+	aux_MP[251]=NULL;
 	return aux_MP;
 }
 
@@ -272,79 +273,76 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 
 //****************************************Compactacion*****************************************
 
-void compactar(){/*
-	int sigSegmento=0;
-	int posicionDeDestino=0;
-	//Estructura auxiliar para obtener los datos de cada segmento en MP
-	typedef struct{
-		int posicion;
-		int numSegDesc;
-	}aux;
-
-	//Obtengo primer posicion libre en MP
-		int i=0;
-		while(MP[i]!=NULL){
-		i++;
-		posicionDeDestino= i;
-		sigSegmento=i;
-		}
-	while (sigSegmento != tamanioMP){
-		if(MP[sigSegmento] == NULL){
-			sigSegmento++;
-		}else{
-			aux* datos = getDatosSegmentDescriptorDe(sigSegmento);
-			int tamanio= tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].tamanio;
-
-			//desplazar (MP[sigSegmento] hasta MP[sigSegmento+tamanio]) a MP[posicionDeDestino]
-			int a = 0;
-			while (a <= tamanio){
-				MP[posicionDeDestino] = MP[sigSegmento+a];
-				MP[sigSegmento+a] = NULL;
-				a++;
-			}
-
-			tablaDeSegmentos[datos->posicion].segmentos[datos->numSegDesc].ubicacionMP = posicionDeDestino;
-			sigSegmento= sigSegmento+tamanio+1;
-			posicionDeDestino= MP[posicionDeDestino+tamanio+1];
-		}
+void compactar(){
+	int posicionFinal=0;
+	int i,j,k,l=0;
+	int posicionSegmento,tamanio;
+	//Recorre la MP
+	while(l<tamanioMP){
+	//Encuentra la primera posicion libre
+	while(MP[posicionFinal]!=NULL){
+		posicionFinal++;
 	}
+	printf("La posicion a reubicar es: %d\n", posicionFinal);
+	posicionSegmento=posicionFinal;
+		//Encuentra la primera posicion ocupada
+	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
+		if(posicionSegmento == tamanioMP){
+			printf("Compactacion finalizada\n");
+			return;
+		}
+		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
+		i=ubicarEnTabla(posicionSegmento);
+		printf("La tabla correspondiente es: %d\n",i);
+		j=ubicarPosiconRealEnTabla(posicionSegmento);
+		printf("El segmento correspondiente es: %d\n",j);
+		tamanio=tablaDeSegmentos[i].segmentos[j].tamanio;
+		k=posicionFinal;
+		//Traslado el segmento
+	while(tamanio>0){
+			MP[k]=MP[posicionSegmento];
+			MP[posicionSegmento]=NULL;
+			k++;
+			posicionSegmento++;
+			tamanio--;
+	}
+	tablaDeSegmentos[i].segmentos[j].ubicacionMP = posicionFinal;
+	posicionFinal = posicionFinal+tamanio;
+	l++;
+	}
+}
 
-		aux getDatosSegmentDescriptorDe(int ubicacion){//Recorrer la tablaDeSegmentos comparando la .ubicacionMP hasta encontrarlo
-			aux datos;
-
-			//Creo la estructura auxiliar para que list_size me devuelva el tamaño de la tablaDeSegmentos
-			t_list listaAux;
-			int contador;
-			listaAux.head= tablaDeSegmentos;
-			listaAux.elements_count= contador;
-			int i,j=0;
-			int tamanioTablaS = list_size(listaAux);
-
-			while(i < tamanioTablaS){//Recorro los programas
-
-				//Hago lo mismo pero para los segmentos de ese programa
-				t_list listaAux2;
-				int contador2;
-				listaAux2.head= tablaDeSegmentos[i].segmentos;
-				listaAux2.elements_count= contador2;
-				int tamanioSegmentosi = list_size(listaAux2);
-
-				while(j < tamanioSegmentosi){ //Recorro sus segmentos
-					if(tablaDeSegmentos[i].segmentos[j].ubicacionMP== ubicacion){ //Cargo en el de datos y return eso si es asi
-						datos.posicion= i;
-						datos.numSegDesc= j;
-						return datos;
-					}else{
-						j++;
-					}
+int ubicarEnTabla(int posicionR){
+	int i=0,j;
+	while(i<cant_tablas){
+		j=0;
+		while(j<tablaDeSegmentos[i].cant_segmentos){
+			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
+				return i;
+			} else {
+			j++;
 				}
-				j=0;
-			}
-			//Excepcion::: no se encuentra el segmento
-			datos.numSegDesc=-1;
-			datos.posicion=-1;
-			return datos;
-		}*/
+		}
+		i++;
+	}
+	return -1;
+}
+
+
+
+int ubicarPosiconRealEnTabla(int posicionR){
+	int i=0,j;
+	while(i<cant_tablas){
+		j=0;
+		while(j<tablaDeSegmentos[i].cant_segmentos){
+			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
+							return j;
+				}
+			j++;
+		}
+		i++;
+	}
+	return -1;
 }
 
 
@@ -387,7 +385,11 @@ void imprimirEstadoMP(FILE* archivo){
 			fprintf(archivo, "%s", "La posicion ");
 			fprintf(archivo, "%d", i);
 			fprintf(archivo, "%s", " contiene ");
+			if(MP[i]==NULL){
+				fprintf(archivo, "%s", "NULL");
+			} else{
 			fprintf(archivo, "%d", MP[i]);
+			}
 			fprintf(archivo, "%s", " \n");
 			i++;
 		}
@@ -623,11 +625,8 @@ int escogerUbicacionW(int tamanio){
 
 void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTabla(id_prog);
-	printf("La posicion es: %d\n", pos);
 	liberarMP(pos);
-	printf("Se libera el espacio de memoria\n");
 	eliminarSegmentos(pos);
-	printf("Se libera el espacio de los segmentos\n");
 	return;
 
 }
@@ -642,7 +641,7 @@ int getPosTabla(int id_prog){
 void liberarMP(int pos){
 	int i,ubicacion,tam;
 	i=0;
-	while(i<tamanioMP){
+	while(i<tablaDeSegmentos[pos].cant_segmentos){
 
 		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
 		//ubicacionMP y tamanio
@@ -661,16 +660,8 @@ void liberarMP(int pos){
 }
 
 void eliminarSegmentos(int pos){
-	int i,ultimaPos;
-	i=0;
-	ultimaPos= (tablaDeSegmentos[pos].cant_segmentos-1);
-	//Recorro la tabla de segmentos del id_prog
-	while(i<=ultimaPos){
-		//Por cada posicion ocupada, libero el espacio de memoria
-		free(tablaDeSegmentos[pos].segmentos);
-		tablaDeSegmentos[pos].cant_segmentos=0;
-		i++;
-	}
+	free(tablaDeSegmentos[pos].segmentos);
+	tablaDeSegmentos[pos].cant_segmentos=0;
 }
 
 
@@ -972,7 +963,7 @@ void *consola (void){
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
 				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				 //compactar();
+				   compactar();
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando,"dump") ==0){

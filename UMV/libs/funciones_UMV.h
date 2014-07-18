@@ -77,6 +77,8 @@ int traducirPosicion(int base);
 int validarPosicionVirtual(int posVirtual);
 void imprimirEstadoMP(FILE* archivo);
 void imprimirEstadoTablaSeg(FILE* archivo);
+int ubicarEnTabla(int posicionSegmento);
+int ubicarPosiconRealEnTabla(int posicionSegmento);
 
 
 /*Operaciones de Consola*/

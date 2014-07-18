@@ -35,6 +35,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	top_index = posicion;
 
 	insertarEnDiccionario(identificador_variable, posicion); //Elimino elementos junto con diccio despues
@@ -70,6 +72,8 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_valor_variable valor_variable;
 
 	t_tipoEstructura tipoRecibido;
@@ -81,6 +85,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 		free(k);
 	}
 
+	chequearSiHuboSF();
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
 
@@ -97,6 +102,8 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	estructura->valor = valor;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
+
+	chequearSiHuboSF();
 
 	int posibleTop = direccion_variable + 1;
 
@@ -163,6 +170,8 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	estructura->inst = inst;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
 	free(estructura);
+
+	chequearSiHuboSF();
 
 	recibirProximaInstruccion(sockUMV);
 
@@ -255,6 +264,8 @@ void retornar(t_valor_variable retorno) {
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	esConRetorno = 0;
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se retorna el valor %d",retorno);
@@ -270,6 +281,7 @@ void imprimir(t_valor_variable valor_mostrar) {
 	socket_enviar(sockKernel, D_STRUCT_NUMERO, estructura);
 	free(estructura);
 
+
 	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %d para imprimirlo por pantalla",valor_mostrar);
 
 }
@@ -281,6 +293,7 @@ void imprimirTexto(char* texto) {
 	estructura->string = texto;
 	socket_enviar(sockKernel, D_STRUCT_STRING, estructura);
 	free(estructura);
+
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %s para imprimirlo por pantalla",texto);
 

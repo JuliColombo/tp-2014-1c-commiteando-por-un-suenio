@@ -17,6 +17,18 @@ char* proximaInstruccion;
 char* indiceEtiquetas;
 int esConRetorno;
 
+void chequearSiHuboSF(){
+	t_signal* senial;
+	void* structRecibida;
+	socket_recibirSignal(sockUMV,senial);
+
+	if(*senial == D_STRUCT_SEGFAULT){
+		termino = SEG_FAULT;
+	} else {
+		termino = CONTINUES;
+	}
+}
+
 void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero posicion) {
 	const char* str = convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str, posicion);
@@ -37,6 +49,8 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 	socket_enviar(sockUMV, D_STRUCT_NUMERO, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_intructions inst;
 
 	t_tipoEstructura tipoRecibido;
@@ -47,6 +61,9 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 		inst= k->inst;
 		free(k);
 	}
+
+	chequearSiHuboSF();
+
 	return inst;
 }
 
@@ -62,6 +79,8 @@ void recibirProximaInstruccion(int sockUMV) {
 		string= k->string;
 		free(k);
 	}
+
+	chequearSiHuboSF();
 
 	proximaInstruccion = strdup(string); //que onde el const?
 }
@@ -143,6 +162,8 @@ void reservarContextoSinRetorno() {
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	top_index = posicionContextoViejo +1;
 
 	//Pushear Program Counter de proxima instruccion:
@@ -174,6 +195,8 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	esConRetorno = 1;
 }
 
@@ -191,6 +214,8 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
@@ -199,6 +224,8 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 			*program_counter= k->numero;
 			free(k);
 		}
+
+	chequearSiHuboSF();
 
 	top_index -= 1;
 }
@@ -210,6 +237,8 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
@@ -218,6 +247,8 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 			*cursor_stack_viejo= k->numero;
 			free(k);
 		}
+
+	chequearSiHuboSF();
 
 	top_index -= 1;
 
@@ -242,6 +273,8 @@ void guardarAlternado () {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_valor_variable identificador_variable;
 
 	t_tipoEstructura tipoRecibido;
@@ -252,6 +285,8 @@ void guardarAlternado () {
 			identificador_variable= k->numero;
 			free(k);
 		}
+
+	chequearSiHuboSF();
 
 	insertarEnDiccionario(identificador_variable, top_index);
 
@@ -293,6 +328,8 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
@@ -301,6 +338,8 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 		*direccion_retorno= k->numero;
 		free(k);
 	}
+
+	chequearSiHuboSF();
 
 	top_index -= 1;
 }
