@@ -4,17 +4,14 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../libs/Sockets/crear_estructuras.c \
 ../libs/Sockets/package.c \
 ../libs/Sockets/socket.c 
 
 OBJS += \
-./libs/Sockets/crear_estructuras.o \
 ./libs/Sockets/package.o \
 ./libs/Sockets/socket.o 
 
 C_DEPS += \
-./libs/Sockets/crear_estructuras.d \
 ./libs/Sockets/package.d \
 ./libs/Sockets/socket.d 
 

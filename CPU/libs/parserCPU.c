@@ -131,7 +131,7 @@ void salirPorFinalizacion(){
 
 void salir(int termino) {
 	t_struct_pcb* pcb_actualizada=malloc(sizeof(t_struct_pcb));
-
+	t_struct_pcb_quantum* pcbQ;
 	switch (termino) {
 	case DONE:
 	salirPorFinalizacion();
@@ -154,6 +154,25 @@ void salir(int termino) {
 
 	case QUANTUM:
 
+	pcbQ = malloc(sizeof(t_struct_pcb_quantum));
+	pcbQ->c_stack=pcb->c_stack;
+	pcbQ->codigo=pcb->codigo;
+	pcbQ->index_codigo=pcb->index_codigo;
+	pcbQ->index_etiquetas=pcb->index_etiquetas;
+	pcbQ->pid=pcb->pid;
+	pcbQ->program_counter=pcb->program_counter;
+	pcbQ->stack=pcb->stack;
+	pcbQ->tamanio_contexto=pcb->tamanio_contexto;
+	pcbQ->tamanio_indice=pcb->tamanio_indice;
+	socket_enviar(sockKernel,D_STRUCT_PCBQUANTUM,pcbQ);
+
+	free(pcbQ);
+
+	printf("\nsalgo por quantum\n");
+	break;
+
+	case SEG_FAULT:
+
 	pcb_actualizada->c_stack=pcb->c_stack;
 	pcb_actualizada->codigo=pcb->codigo;
 	pcb_actualizada->index_codigo=pcb->index_codigo;
@@ -166,8 +185,7 @@ void salir(int termino) {
 	socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
 
 	free(pcb_actualizada);
-
-	printf("\nsalgo por quantum\n");
+	printf("\nsalgo por segmentation fault\n");
 	break;
 	}
 }
@@ -176,6 +194,8 @@ void correrParser() {
 	signal(SIGUSR1,hot_plug);
 
 	for(i=0;i<=quantum;i++){
+
+		if(termino != SEG_FAULT){
 		termino = CONTINUES;
 
 		parsear();
@@ -194,5 +214,10 @@ void correrParser() {
 			i = 0;
 			break;
 		}
+
+	} else {
+		salir(termino);
+		log_escribir(archLog,"Ejecucion",ERROR,"Segmentation Fault. No se puede seguir con la ejecucion");
+		break;}
 	}
 }
