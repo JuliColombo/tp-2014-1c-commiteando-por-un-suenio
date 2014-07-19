@@ -86,6 +86,9 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	printf("La posicion real es: %d\n",j);
 	memcpy(buffer, (char *) &MP[j], longitud);
 	printf("El buffer solicitado es: %s\"\n",(char*)buffer);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
+	pthread_mutex_unlock(mutex_log);
 	sleep(retardo);
 	return buffer;
 }
@@ -121,6 +124,9 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
+							pthread_mutex_lock(mutex_log);
+							log_escribir(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
+							pthread_mutex_unlock(mutex_log);
 							sleep(retardo);
 							return;
 						}
@@ -130,6 +136,9 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			i=0;
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
+			pthread_mutex_unlock(mutex_log);
 			} else puts("No se pudo realizar la asignacion");
 		sleep(retardo);
 }
@@ -235,11 +244,18 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
 		printf("El algoritmo se cambio a: firstfit\n");
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se cambia el algoritmo de seleccion", INFO, "De worst-fit a first-fit");
+		pthread_mutex_unlock(mutex_log);
 	}
 	else{
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
+		pthread_mutex_unlock(mutex_log);
 	}
+
 	sleep(retardo);
 }
 
@@ -266,6 +282,9 @@ void compactar(){
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
 		if(posicionSegmento == tamanioMP){
 			printf("Compactacion finalizada\n");
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Se termina de realizar la compactacion", INFO, "");
+			pthread_mutex_unlock(mutex_log);
 			sleep(retardo);
 			return;
 		}
@@ -350,7 +369,11 @@ void dump(){
 	//Va escribiendo en el archivo el contenido de las posiciones de la MP
 	imprimirEstadoMP(archivo_MP);
 	imprimirEstadoTablaSeg(archivo_TS);
-	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
+
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
+	pthread_mutex_unlock(mutex_log);
+
 	sleep(retardo);
 	fclose(archivo_MP);
 	fclose(archivo_TS);
@@ -442,8 +465,11 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	}
 	if(ubicacion==-1){
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Se trata de crear un segmento", ERROR, "No hay espacio para reservar en memoria");
+		pthread_mutex_unlock(mutex_log);
 		sleep(retardo);
-		return 0;
+		return -1;
 	}
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
@@ -463,6 +489,9 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
+	pthread_mutex_unlock(mutex_log);
 	sleep(retardo);
 	return 1;
 }
@@ -617,6 +646,9 @@ void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTabla(id_prog);
 	liberarMP(pos);
 	eliminarSegmentos(pos);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Se destruyen segmentos de un programa", INFO, "");
+	pthread_mutex_unlock(mutex_log);
 	sleep(retardo);
 	return;
 }
@@ -821,46 +853,49 @@ void atender_kernel(int sock){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	t_struct_numero* tamanio;
-	int i,memoriaSuficiente=0;
+	int i,id_prog,memoriaSuficiente=0;
+	int tamanioSolicitado;
+
+	socket_recibir(sock, &tipoRecibido, &structRecibida);
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		id_prog = ((t_struct_numero*)structRecibida)->numero;
+		free(structRecibida);
+	}
 	for(i=0; i<4 && memoriaSuficiente==0;i++){
 		socket_recibir(sock, &tipoRecibido,&structRecibida);
 		tamanio = ((t_struct_numero*)structRecibida);
-		int tamanioSolicitado = tamanio->numero;
-		//memoriaSuficiente = solicitarMemoria(tamanio); //TODO acá falta modificar el solicitarMemoria, devuelve 0 cuando hay lugar y devuelve 1 si no hay lugar.
+		tamanioSolicitado = tamanio->numero;
+		memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 	}
-	if (memoriaSuficiente==1){
+	if (memoriaSuficiente==-1){
+		pthread_mutex_lock(mutex_log);
 		log_escribir(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el paquete");
-		// Excepcion?
+		pthread_mutex_unlock(mutex_log);
+		destruirSegmentosPrograma(id_prog);
+		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+		respuesta->numero=memoriaSuficiente;
+		socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
+		free(respuesta);
 	}
-	t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-	respuesta->numero=memoriaSuficiente;
-	socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
-	if(memoriaSuficiente!=0){ //No seria == ?
+	if(memoriaSuficiente==1){
+		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+		respuesta->numero=memoriaSuficiente;
+		socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
+		free(respuesta);
 		for(i=0;i<4;i++){
 			socket_recibir(sock,&tipoRecibido,&structRecibida);
 			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
-			//grabarbytes();
+			//enviarBytes(base,offset,longitud,buffer);
 		}
 	}
 
 
 
-	//FALTA QUE SOLICITAR MEMORIA DEVUELVA SI HAY O NO MEMORIA DISPONIBLE PARA LOS 4 SEGMENTOS, VEASE QUE LOS TIENE QUE RESERVAR!
 
 
-	free(respuesta);
 	return;
 }
 
-/*int solicitarMemoria(int longitud){
-	int hayEspacioEnMemoriaPara();
-	if (hayEspacioEnMemoriaPara(longitud)){
-		//Como reservarlos?
-		return 0;
-	} else{
-		return 1;
-		}
-}*/
 
 //***********************************************Inicializacion de semaforos************************************
 
