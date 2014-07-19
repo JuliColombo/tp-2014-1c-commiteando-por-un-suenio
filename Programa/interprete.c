@@ -46,10 +46,11 @@ int main (int argc, char **argv){
 	}else{
 		log_escribir(archLog,"Envio paquete" ,ERROR,"no se pudo enviar");
 	}
-//	t_tipoEstructura tipoRecibido;
-//	void* structRecibida;
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	int i;
 	while(1){
-		/*socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
+		socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 		char* cadenaAImprimir = (char*) structRecibida;
 		if(cadenaAImprimir==0){
 			cerrarSocket(sock_kernel_servidor);
@@ -63,15 +64,10 @@ int main (int argc, char **argv){
 
 		for(i=0; cadenaAImprimir[i]!=NULL;i++){
 			printf("%c", cadenaAImprimir[i]);
-		}*/
+		}
 	}
 
 
 
-
-
-
-
-
-	return 0;
+	return EXIT_SUCCESS;
 }

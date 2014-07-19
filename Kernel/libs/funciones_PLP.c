@@ -290,7 +290,6 @@ void core_plp(void){
 void core_pcp(void){
 
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
-	t_programa* programa;
 
 	while(1){
 		sem_wait(&sem_multiProg);
