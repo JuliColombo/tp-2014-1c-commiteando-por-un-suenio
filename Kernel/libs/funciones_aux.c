@@ -574,8 +574,8 @@ void handler_conexion_cpu(epoll_data_t data){
 			string = ((t_struct_string*)structRecibida);
 			int valor = valor_Variable_Global(string->string);
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
-			paquete->numero=valor;
 
+			paquete->numero=valor;
 			socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
 			free(paquete);
 
