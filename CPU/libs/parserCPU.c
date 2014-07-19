@@ -102,6 +102,8 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
+	chequearSiHuboSF();
+
 	t_valor_variable valor_variable;
 
 	t_tipoEstructura tipoRecibido;
@@ -113,7 +115,8 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 			free(k);
 		}
 
-	//imprimir(valor_variable);
+	chequearSiHuboSF();
+
 	char* str = string_itoa(valor_variable);
 	string_append(&variables,str);
 
@@ -131,25 +134,28 @@ void salirPorFinalizacion(){
 }
 
 void salir(int termino) {
-	t_struct_pcb* pcb_actualizada=malloc(sizeof(t_struct_pcb));
-	t_struct_pcb_quantum* pcbQ;
+	t_struct_pcb_fin* pcbF;
+	t_struct_pcb* pcbQ;
+	t_struct_pcb_fin* pcbSF;
 
 	switch (termino) {
 	case DONE:
+	pcbF =malloc(sizeof(t_struct_pcb_fin));
 	salirPorFinalizacion();
 
-	pcb_actualizada->c_stack=pcb->c_stack;
-	pcb_actualizada->codigo=pcb->codigo;
-	pcb_actualizada->index_codigo=pcb->index_codigo;
-	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
-	pcb_actualizada->pid=pcb->pid;
-	pcb_actualizada->program_counter=pcb->program_counter;
-	pcb_actualizada->stack=pcb->stack;
-	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
-	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-	socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
+	pcbF->c_stack=pcb->c_stack;
+	pcbF->codigo=pcb->codigo;
+	pcbF->index_codigo=pcb->index_codigo;
+	pcbF->index_etiquetas=pcb->index_etiquetas;
+	pcbF->pid=pcb->pid;
+	pcbF->program_counter=pcb->program_counter;
+	pcbF->stack=pcb->stack;
+	pcbF->tamanio_contexto=pcb->tamanio_contexto;
+	pcbF->tamanio_indice=pcb->tamanio_indice;
+	pcbF->variables = variables;
+	socket_enviar(sockKernel,D_STRUCT_PCBFIN,pcbF);
 
-	free(pcb_actualizada);
+	free(pcbF);
 
 	printf("\ntermino ejecucion \n");
 	break;
@@ -158,7 +164,7 @@ void salir(int termino) {
 
 	log_escribir(archLog,"Ejecucion",INFO,"Sale por quantum");
 
-	pcbQ = malloc(sizeof(t_struct_pcb_quantum));
+	pcbQ = malloc(sizeof(t_struct_pcb));
 	pcbQ->c_stack=pcb->c_stack;
 	pcbQ->codigo=pcb->codigo;
 	pcbQ->index_codigo=pcb->index_codigo;
@@ -169,7 +175,7 @@ void salir(int termino) {
 	pcbQ->tamanio_contexto=pcb->tamanio_contexto;
 	pcbQ->tamanio_indice=pcb->tamanio_indice;
 
-	socket_enviar(sockKernel,D_STRUCT_PCBQUANTUM,pcbQ);
+	socket_enviar(sockKernel,D_STRUCT_PCB,pcbQ);
 
 	free(pcbQ);
 
@@ -180,24 +186,27 @@ void salir(int termino) {
 
 	log_escribir(archLog,"Ejecucion",ERROR,"Segmentation Fault. No se puede seguir con la ejecucion");
 
-	pcb_actualizada->c_stack=pcb->c_stack;
-	pcb_actualizada->codigo=pcb->codigo;
-	pcb_actualizada->index_codigo=pcb->index_codigo;
-	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
-	pcb_actualizada->pid=pcb->pid;
-	pcb_actualizada->program_counter=pcb->program_counter;
-	pcb_actualizada->stack=pcb->stack;
-	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
-	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-	socket_enviar(sockKernel,D_STRUCT_PCB,pcb_actualizada);
+	pcbSF =malloc(sizeof(t_struct_pcb));
 
-	free(pcb_actualizada);
+	pcbSF->c_stack=pcb->c_stack;
+	pcbSF->codigo=pcb->codigo;
+	pcbSF->index_codigo=pcb->index_codigo;
+	pcbSF->index_etiquetas=pcb->index_etiquetas;
+	pcbSF->pid=pcb->pid;
+	pcbSF->program_counter=pcb->program_counter;
+	pcbSF->stack=pcb->stack;
+	pcbSF->tamanio_contexto=pcb->tamanio_contexto;
+	pcbSF->tamanio_indice=pcb->tamanio_indice;
+	socket_enviar(sockKernel,D_STRUCT_PCBSF,pcbSF);
+
+	free(pcbSF);
+
 	printf("\nsalgo por segmentation fault\n");
 	break;
-	}
 
 	case IO:
 		break;
+}
 }
 
 void correrParser() {
