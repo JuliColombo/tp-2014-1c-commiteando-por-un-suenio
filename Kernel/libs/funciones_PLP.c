@@ -159,7 +159,6 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
  * 		- codigo
  * 		- metadata del programa
  * 		- fd del programa
- *
  * Devuelve:
  * 		- null si no hay espacio suficiente para los segmentos de codigo
  *		- la pcb creada si hay espacio
@@ -169,6 +168,12 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 
 	pthread_mutex_lock(mutex_solicitarMemoria);
+	pthread_mutex_lock(mutex_pid);
+	nuevoPCB->pid=program_pid;
+	t_struct_numero* id = malloc(sizeof(t_struct_numero));
+	id->numero = program_pid;
+	socket_enviar(sock_umv,D_STRUCT_NUMERO, id);
+	free(id);
 	//solicitarMemoriaUMV(1,2,3,4) va en el if
 	if(0==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
@@ -180,8 +185,6 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 		nuevoPCB->tamanio_contexto=0;
 		nuevoPCB->tamanio_indice=0;
 		pthread_mutex_unlock(mutex_solicitarMemoria);
-		pthread_mutex_lock(mutex_pid);
-		nuevoPCB->pid=program_pid;
 		program_pid+=1;
 		pthread_mutex_unlock(mutex_pid);
 	}else{	//Si no hay memoria suficiente, le avisa al programa
@@ -191,6 +194,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 		socket_enviar(fd, D_STRUCT_STRING, paquete);
 
 
+		pthread_mutex_unlock(mutex_pid);
 		free(paquete);
 		return NULL;
 	}

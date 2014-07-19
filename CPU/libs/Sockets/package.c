@@ -741,9 +741,6 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_WAIT:
 				estructuraDestino = despaquetizarStruct_wait(dataPaquete, length);
 				break;
-			case D_STRUCT_IO:
-				estructuraDestino = despaquetizarStruct_io(dataPaquete, length);
-				break;
 			case D_STRUCT_VARIABLES:
 				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
 				break;
@@ -1053,36 +1050,6 @@ t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
 	return estructuraDestino;
 }
 
-/*
- * Nombre: despaquetizarStruct_pidycodigo/2
- * Argumentos:
- * 		-paquete
- * 		-length
- *
- * Devuelve:
- *		estructura de tipo D_STRUCT_PIDYCODIGO
- *
- * Funcion:
- *
- */
-t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length){
-	t_struct_pidycodigo* estructuraDestino;
-
-
-	int tamanoTotal = 0, tamanoDato = 0;
-
-	tamanoTotal = tamanoDato;
-	estructuraDestino->pid = malloc(sizeof(int));
-	memcpy(&estructuraDestino->pid, dataPaquete, sizeof(int));
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != NULL;tamanoDato++);
-
-	estructuraDestino->codigo= malloc(tamanoDato);
-	memcpy(estructuraDestino->codigo, dataPaquete + tamanoTotal, tamanoDato);
-
-	return estructuraDestino;
-}
-
 
 /*
  * Nombre: despaquetizarStruct_push/2
@@ -1172,36 +1139,7 @@ t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataP
 	return estructuraDestino;
 }
 
-/*
- * Nombre: despaquetizarStruct_asignarCompartida/2
- * Argumentos:
- * 		- char * dataPaquete
- * 		- length
- *
- * Devuelve:
- * 		una estructura de tipo D_STRUCT_ASIGNARCOMPARTIDA.
- *
- */
-t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length){
-	t_struct_io * estructuraDestino = malloc(sizeof(t_struct_io));
 
-	int tamanoTotal = 0, tamanoDato = 0;
-
-	tamanoTotal = tamanoDato;
-
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
-
-	memcpy(estructuraDestino->pid, dataPaquete, sizeof(uint32_t));
-
-	estructuraDestino->dispositivo = malloc(tamanoDato);
-	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura
-
-	tamanoTotal += tamanoDato;
-
-	memcpy(&estructuraDestino->tiempo, dataPaquete + tamanoTotal, sizeof(int32_t));
-
-	return estructuraDestino;
-}
 
 /*
  * Nombre: despaquetizarStruct_instruccion/2
