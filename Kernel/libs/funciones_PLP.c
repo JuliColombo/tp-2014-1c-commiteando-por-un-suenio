@@ -142,15 +142,23 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
 	free(paquete);
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	int i=socket_recibir(sock_umv,&tipoRecibido,&structRecibida);
-	t_struct_numero* valor=malloc(sizeof(t_struct_numero));
-	valor->numero=1;
-	if(i==1){
+	socket_recibir(sock_umv,&tipoRecibido,&structRecibida);
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		t_struct_numero* valor;
 		valor = ((t_struct_numero*)structRecibida);
+
+		int i = valor->numero;
+		free(valor);
+		return i;
+	}
+	if(tipoRecibido==D_STRUCT_SF){
+		t_struct_numero* sig = ((t_struct_numero*)structRecibida);
+		free(sig);
+
+		return -1;
 	}
 
 
-	return valor->numero;
 }
 
 /*
@@ -189,13 +197,13 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 		pthread_mutex_unlock(mutex_pid);
 	}else{	//Si no hay memoria suficiente, le avisa al programa
 		pthread_mutex_unlock(mutex_solicitarMemoria);
-		t_struct_string* paquete = malloc(sizeof(t_struct_string));
-		paquete->string= (char*)1;
-		socket_enviar(fd, D_STRUCT_STRING, paquete);
-
+		t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+		paquete->numero= 0;
+		socket_enviar(fd, D_STRUCT_SF, paquete);
 
 		pthread_mutex_unlock(mutex_pid);
 		free(paquete);
+		free(nuevoPCB);
 		return NULL;
 	}
 	/*Esto es lo falta cargarle al PCB

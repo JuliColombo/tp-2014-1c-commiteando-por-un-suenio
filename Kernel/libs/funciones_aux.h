@@ -36,7 +36,8 @@ void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
 void actualizarPCB(t_programa* programa, t_struct_pcb* pcb);
 void* buscarPrograma(int pid, t_list* lista,pthread_mutex_t *mutex);
-void mandarAReady(t_programa* programa);
+void mandarAOtraCola(t_programa* programa, t_list* listaActual, pthread_mutex_t* mutexActual,
+		t_list* listaNueva, pthread_mutex_t* mutexNuevo);
 int buscar_cpu_libre(void);
 int buscar_cpu_por_fd(int fd);
 void finalizarPrograma(t_programa* programa, char*);

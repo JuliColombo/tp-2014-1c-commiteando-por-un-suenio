@@ -382,19 +382,19 @@ void* buscarPrograma(int pid, t_list* lista, pthread_mutex_t *mutex){
  * Funcion:envia un programa de exec a ready
  */
 
-void mandarAReady(t_programa* programa){
-	t_link_element* element=cola.exec->head;
+void mandarAOtraCola(t_programa* programa, t_list* listaActual, pthread_mutex_t* mutexActual, t_list* listaNueva, pthread_mutex_t* mutexNuevo){
+	t_link_element* element=listaActual->head;
 	int pos=0;
-	pthread_mutex_lock(mutex_cola_exec);
-	pthread_mutex_lock(mutex_cola_ready);
+	pthread_mutex_lock(mutexActual);
+	pthread_mutex_lock(mutexNuevo);
 	while((element != NULL) && ((((t_programa*)element->data)->pcb->pid) != (programa->pcb->pid))){
 		pos++;
 	}
 	if(element!=NULL){
-	list_remove(cola.exec,pos);
-	pthread_mutex_unlock(mutex_cola_exec);
-	list_add(cola.ready, programa);
-	pthread_mutex_unlock(mutex_cola_ready);
+	list_remove(listaActual,pos);
+	pthread_mutex_unlock(mutexActual);
+	list_add(listaNueva, programa);
+	pthread_mutex_unlock(mutexNuevo);
 	}
 	return;
 }
@@ -543,7 +543,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
 	t_struct_semaforo* semaforo;
-	t_struct_io* bloqueo;
+	t_struct_pcb_io* pcb_io;
 	t_struct_string* string;
 	t_struct_asignar_compartida* compartida;
 	switch(tipoRecibido){
@@ -556,7 +556,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			if(programa != NULL){
 			actualizarPCB(programa, pcb);
-			mandarAReady(programa);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 			sem_post(&sem_cpu);
 			sem_post(&sem_multiProg);
 			}else{
@@ -612,9 +612,26 @@ void handler_conexion_cpu(epoll_data_t data){
 			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
-		case D_STRUCT_IO:
-			bloqueo = ((t_struct_io*)structRecibida);
+		case D_STRUCT_PCBIO:
+			pcb_io = ((t_struct_pcb_io*)structRecibida);
+			t_struct_io* bloqueo = malloc(sizeof(t_struct_io));
+			bloqueo->dispositivo=pcb_io->dispositivo;
+			bloqueo->pid=pcb_io->pid;
+			bloqueo->tiempo=pcb_io->tiempo;
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
+			free(bloqueo);
+			t_struct_pcb* pcb = malloc(sizeof(t_struct_pcb));
+			pcb->c_stack=pcb_io->c_stack;
+			pcb->codigo=pcb_io->codigo;
+			pcb->index_codigo=pcb_io->index_codigo;
+			pcb->index_etiquetas=pcb_io->index_etiquetas;
+			pcb->program_counter=pcb_io->program_counter;
+			pcb->stack=pcb_io->stack;
+			pcb->tamanio_contexto=pcb_io->tamanio_contexto;
+			pcb->tamanio_indice=pcb_io->tamanio_indice;
+			t_programa* programa = ((t_programa*)buscarPrograma(pcb_io.pid,cola.exec,mutex_cola_exec));
+			actualizarPCB(programa, pcb);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block, mutex_cola_block);
 			break;
 
 	}

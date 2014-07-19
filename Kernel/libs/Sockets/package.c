@@ -80,7 +80,11 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_VARIABLES:
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 				break;
-		}
+			case D_STRUCT_SF:
+				paquete = paquetizarStruct_numero((t_struct_numero)estructuraOrigen);
+				break;
+	}
+
 
 
 	return paquete;
@@ -749,6 +753,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_VARIABLES:
 				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
+				break;
+			case D_STRUCT_SF:
+				estructuraDestino = despaquetizarStruct_numero(dataPaquete, length);
 				break;
 		}
 

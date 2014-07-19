@@ -63,6 +63,7 @@ enum{
 	D_STRUCT_NORMAL = 20,
 	D_STRUCT_PCBIO = 21,
 	D_STRUCT_PCBFIN= 22,
+	D_STRUCT_SF = 23,
 };
 
 
