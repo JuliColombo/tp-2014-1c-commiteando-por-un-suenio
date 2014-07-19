@@ -46,8 +46,11 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCBIO:
 				paquete = paquetizarStruct_pcbIO((t_struct_pcb_io *) estructuraOrigen);
 				break;
-			case D_STRUCT_PCBQUANTUM:
-				paquete = paquetizarStruct_pcbQuantum((t_struct_pcb_quantum *) estructuraOrigen);
+			case D_STRUCT_PCBSF:
+				paquete = paquetizarStruct_pcbSF((t_struct_pcb *) estructuraOrigen);
+				break;
+			case D_STRUCT_PCBFIN:
+				paquete = paquetizarStruct_pcbFin((t_struct_pcb_fin *) estructuraOrigen);
 				break;
 			case D_STRUCT_GRADOMP:
 				paquete = paquetizarStruct_numero((t_struct_gradoMP*) estructuraOrigen);
@@ -77,7 +80,7 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				paquete = paquetizarStruct_signalSemaforo((t_struct_semaforo*) estructuraOrigen);
 				break;
 			case D_STRUCT_IO:
-				paquete = paquetizarStruct_io((t_struct_pcb_io*) estructuraOrigen);
+				paquete = paquetizarStruct_io((t_struct_io*) estructuraOrigen);
 				break;
 			case D_STRUCT_VARIABLES:
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
@@ -361,7 +364,7 @@ t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
 }
 
 /*
- * Nombre: paquetizarStruct_pcbQuantum/1
+ * Nombre: paquetizarStruct_pcbSF/1
  * Argumentos:
  * 		- estructura de tipo pcb
  *
@@ -370,15 +373,40 @@ t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen){
  *
  * Funcion: crearDataConHeader(22, length)
  */
-t_stream* paquetizarStruct_pcbQuantum(t_struct_pcb_quantum* estructuraOrigen){
+t_stream* paquetizarStruct_pcbSF(t_struct_pcb* estructuraOrigen){
 
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_quantum);
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb);
 
-	char* data = crearDataConHeader(D_STRUCT_PCB, paquete->length);
+	char* data = crearDataConHeader(D_STRUCT_PCBSF, paquete->length);
 
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_quantum));
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_pcbFin/1
+ * Argumentos:
+ * 		- estructura de tipo pcb
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(22, length)
+ */
+t_stream* paquetizarStruct_pcbFin(t_struct_pcb_fin* estructuraOrigen){
+
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_fin);
+
+	char* data = crearDataConHeader(D_STRUCT_PCBFIN, paquete->length);
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_fin));
 
 	paquete->data = data;
 
@@ -588,7 +616,7 @@ t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 
 	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_io);
 
-	char* data = crearDataConHeader(D_STRUCT_PCB, paquete->length);
+	char* data = crearDataConHeader(D_STRUCT_PCBIO, paquete->length);
 
 	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_io));
 
@@ -708,8 +736,11 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PCBIO:
 				estructuraDestino = despaquetizarStruct_pcbIO(dataPaquete, length);
 				break;
-			case D_STRUCT_PCBQUANTUM:
-				estructuraDestino = despaquetizarStruct_pcbQuantum(dataPaquete, length);
+			case D_STRUCT_PCBSF:
+				estructuraDestino = despaquetizarStruct_pcbSF(dataPaquete, length);
+				break;
+			case D_STRUCT_PCBFIN:
+				estructuraDestino = despaquetizarStruct_pcbFin(dataPaquete, length);
 				break;
 			case D_STRUCT_PIDYCODIGO:
 				estructuraDestino = despaquetizarStruct_pidycodigo(dataPaquete, length);
@@ -954,21 +985,41 @@ t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t lenght){
 }
 
 /*
- * Nombre: despaquetizarStruct_pcbQuantum/1
+ * Nombre: despaquetizarStruct_pcbSF/1
  * Argumentos:
  * 		-paquete
  * 		-length
  *
  * Devuelve:
- *		estructura de tipo D_STRUCT_PCB_QUANTUM
+ *		estructura de tipo D_STRUCT_PCBSF
  *
  * Funcion:
  * 		recibe el paquete y lo despaquetiza
  */
-t_struct_pcb_quantum* despaquetizarStruct_pcbQuantum(char* dataPaquete, uint16_t lenght){
-	t_struct_pcb_quantum* estructuraDestino = malloc(sizeof(t_struct_pcb_quantum));
+t_struct_pcb* despaquetizarStruct_pcbSF(char* dataPaquete, uint16_t lenght){
+	t_struct_pcb* estructuraDestino = malloc(sizeof(t_struct_pcb));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_quantum));
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_pcbFin/1
+ * Argumentos:
+ * 		-paquete
+ * 		-length
+ *
+ * Devuelve:
+ *		estructura de tipo D_STRUCT_PCBFIN
+ *
+ * Funcion:
+ * 		recibe el paquete y lo despaquetiza
+ */
+t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght){
+	t_struct_pcb_fin* estructuraDestino = malloc(sizeof(t_struct_pcb_fin));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_fin));
 
 	return estructuraDestino;
 }
