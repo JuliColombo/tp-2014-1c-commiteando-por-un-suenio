@@ -10,7 +10,7 @@
 int* MP;
 int tamanioMP;
 char* PATH=PATHCONFIG;
-int retardo;
+int retardo=0;
 int procesoEnUso;
 tablaSeg* tablaDeSegmentos;
 int cant_tablas=0;

@@ -95,6 +95,7 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 		i++;
 	}
 	return buffer;
+	sleep(retardo);
 }
 
 int traducirPosicion(int base){
@@ -137,6 +138,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
+							sleep(retardo);
 							return;
 						}
 			j=traducirPosicion(base)+offset;
@@ -151,6 +153,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 				k++;
 			}
 			} else puts("No se pudo realizar la asignacion");
+		sleep(retardo);
 }
 
 
@@ -262,6 +265,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
 	}
+	sleep(retardo);
 }
 
 
@@ -287,6 +291,7 @@ void compactar(){
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
 		if(posicionSegmento == tamanioMP){
 			printf("Compactacion finalizada\n");
+			sleep(retardo);
 			return;
 		}
 		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
@@ -371,7 +376,7 @@ void dump(){
 	imprimirEstadoMP(archivo_MP);
 	imprimirEstadoTablaSeg(archivo_TS);
 	//obtenerDatosDeMemoria() y mostrar (y,opcional, guardar en archivo)
-
+	sleep(retardo);
 	fclose(archivo_MP);
 	fclose(archivo_TS);
 }
@@ -461,7 +466,10 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 			printf("La ubicacion es: %d", ubicacion);
 		}
 	}
-	if(ubicacion==-1) return 0;
+	if(ubicacion==-1){
+		sleep(retardo);
+		return 0;
+	}
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
@@ -480,6 +488,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
+	sleep(retardo);
 	return 1;
 }
 
@@ -633,8 +642,8 @@ void destruirSegmentosPrograma(int id_prog){
 	int pos= getPosTabla(id_prog);
 	liberarMP(pos);
 	eliminarSegmentos(pos);
+	sleep(retardo);
 	return;
-
 }
 
 int getPosTabla(int id_prog){
@@ -903,34 +912,37 @@ void *consola (void){
 	}
 
 	while(strcmp(comando, "exit") != 0){
+		system("clear");
 			if(strcmp(comando, "operacion") == 0){
 
 				char tipoOperacion[32];
-				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
+				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				scanf("%s",&tipoOperacion);
 				while(estaEnDicTOP(tipoOperacion)== 0){
-						puts("\nTipo de Operacion erronea, escriba el tipo de operacion de nuevo");
+						puts("Tipo de Operacion erronea, escriba el tipo de operacion de nuevo");
 						scanf("%s",&tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
-					  puts("\n Ingrese Base");
+					  system("clear");
+					  puts("Ingrese Base");
 					  scanf("%d",&unaBase);
-					  puts("\n Ingrese Offset");
+					  puts("Ingrese Offset");
 					  scanf("%d",&unOffset);
-					  puts("\n Ingrese Tamanio de segmento");
+					  puts("Ingrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  solicitarBytes(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
-					 puts("\n Ingrese Base");
+					 system("clear");
+					 puts("Ingrese Base");
 					 scanf("%d",&unaBase);
-					 puts("\n Ingrese Offset");
+					 puts("Ingrese Offset");
 					 scanf("%d",&unOffset);
-					 puts("\n Ingrese Tamanio de segmento");
+					 puts("Ingrese Tamanio de segmento");
 					 scanf("%d",&unTamanio);
-					 puts("\n Ingrese Buffer");
+					 puts("Ingrese Buffer");
 					 buffer = malloc(unTamanio*(sizeof(t_buffer)));
 					 buffer = asignarPosicionesBuffer(buffer,unTamanio);
 					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
@@ -938,6 +950,7 @@ void *consola (void){
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
+					  system("clear");
 					  puts("Ingrese el processID de programa a usar");
 				 	  scanf("%d",&procesoDelHilo);
 					  puts("Ingrese el tamaño del segmento");
@@ -948,6 +961,7 @@ void *consola (void){
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
+					  system("clear");
 					  puts("Ingrese el processID de programa a usar");
 					  scanf("%d",&procesoDelHilo);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
@@ -959,7 +973,7 @@ void *consola (void){
 	else { if (strcmp(comando, "retardo") == 0){
 				  puts("Ingrese el valor de retardo en Milisegundos");
 				  int valorRetardo;
-				  scanf("%d", valorRetardo);
+				  scanf("%d", &valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				  retardo= valorRetardo;
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
@@ -980,11 +994,12 @@ void *consola (void){
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
-
-		puts("\nEscriba la siguiente operacion");
+	    system("clear");
+		puts("Escriba la siguiente operacion");
 		scanf("%s",&comando);
 		while(estaEnDicOP(comando)== 0){
-			puts("\nOperacion erronea, escriba la operacion de nuevo");
+			system("clear");
+			puts("Operacion erronea, escriba la operacion de nuevo");
 			scanf("%s",&comando);
 			}
 
@@ -1006,15 +1021,18 @@ void *consola (void){
 
 }
 }
+
 void matarHilos(void){
 	pthread_cancel(CPU);
 	pthread_cancel(KERNEL);
 
 }
 
-void destruirTodosLosSegmentos(void){/*
-	int i=sizeof(tablaDeSegmentos);
-
+void destruirTodosLosSegmentos(void){
+	/*int i=0;
+	while(i<cant_tablas){
+	free(tablaDeSegmentos[i].segmentos);
+	}
 	return;*/
 }
 
