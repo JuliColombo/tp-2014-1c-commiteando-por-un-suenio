@@ -81,7 +81,7 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 				break;
 			case D_STRUCT_SF:
-				paquete = paquetizarStruct_numero((t_struct_numero)estructuraOrigen);
+				paquete = paquetizarStruct_numero((t_struct_numero*)estructuraOrigen);
 				break;
 	}
 

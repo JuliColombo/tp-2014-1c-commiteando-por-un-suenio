@@ -546,14 +546,16 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_pcb_io* pcb_io;
 	t_struct_string* string;
 	t_struct_asignar_compartida* compartida;
+	t_struct_pcb* pcb;
+	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_PCB:
 			pthread_mutex_lock(mutex_array);
 			int pos = buscar_cpu_por_fd(data.fd);
 			estado_cpu[pos]=LIBRE;
 			pthread_mutex_unlock(mutex_array);
-			t_struct_pcb* pcb = ((t_struct_pcb*)structRecibida);
-			t_programa* programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			pcb = ((t_struct_pcb*)structRecibida);
+			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			if(programa != NULL){
 			actualizarPCB(programa, pcb);
 			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
@@ -620,7 +622,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			bloqueo->tiempo=pcb_io->tiempo;
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 			free(bloqueo);
-			t_struct_pcb* pcb = malloc(sizeof(t_struct_pcb));
+			pcb = malloc(sizeof(t_struct_pcb));
 			pcb->c_stack=pcb_io->c_stack;
 			pcb->codigo=pcb_io->codigo;
 			pcb->index_codigo=pcb_io->index_codigo;
@@ -629,12 +631,15 @@ void handler_conexion_cpu(epoll_data_t data){
 			pcb->stack=pcb_io->stack;
 			pcb->tamanio_contexto=pcb_io->tamanio_contexto;
 			pcb->tamanio_indice=pcb_io->tamanio_indice;
-			t_programa* programa = ((t_programa*)buscarPrograma(pcb_io.pid,cola.exec,mutex_cola_exec));
+			programa = ((t_programa*)buscarPrograma(pcb_io->pid,cola.exec,mutex_cola_exec));
 			actualizarPCB(programa, pcb);
 			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block, mutex_cola_block);
 			break;
-
 	}
+	pthread_mutex_lock(mutex_cola_ready);
+	mostrarColasPorPantalla(cola.ready,"Ready");
+	pthread_mutex_unlock(mutex_cola_ready);
+
 	return;
 }
 

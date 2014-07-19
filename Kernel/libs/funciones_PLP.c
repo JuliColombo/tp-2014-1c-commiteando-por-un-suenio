@@ -307,9 +307,9 @@ void core_pcp(void){
 		sem_wait(&sem_multiProg);
 		sem_wait(&sem_cpu);
 
-		pthread_mutex_lock(mutex_cola_ready);
-		mostrarColasPorPantalla(cola.ready,"Ready");
-		pthread_mutex_unlock(mutex_cola_ready);
+//		pthread_mutex_lock(mutex_cola_ready);
+//		mostrarColasPorPantalla(cola.ready,"Ready");
+//		pthread_mutex_unlock(mutex_cola_ready);
 
 		enviar_pcb_a_cpu();
 
