@@ -22,7 +22,7 @@ enum{
 };
 
 
-
+int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format);
 int* vector_num(char**, char**);
 int cant_identificadores(char**);
 void log_error_socket(void);

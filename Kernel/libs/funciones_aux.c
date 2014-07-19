@@ -8,6 +8,23 @@
 #include "funciones_aux.h"
 
 /*
+ * Nombre: escribir_log/4
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format){
+	pthread_mutex_lock(mutex_log);
+	int i = log_escribir(log, program_name, type, format);
+	pthread_mutex_unlock(mutex_log);
+	return i;
+}
+/*
  * Nombre: vector_num/2
  * Argumentos:
  * 		- vector de strings
@@ -146,6 +163,7 @@ void inicializarMutex(void){
 	mutex_array=malloc(sizeof(pthread_mutex_t));
 	mutex_semaforos=malloc(sizeof(pthread_mutex_t));
 	mutex_var_compartidas=malloc(sizeof(pthread_mutex_t));
+	mutex_log=malloc(sizeof(pthread_mutex_t));
 
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
@@ -157,6 +175,9 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_array,NULL);
 	pthread_mutex_init(mutex_semaforos,NULL);
 	pthread_mutex_init(mutex_var_compartidas,NULL);
+	pthread_mutex_init(mutex_log,NULL);
+
+
 }
 
 /*
