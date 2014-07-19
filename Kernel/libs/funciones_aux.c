@@ -177,7 +177,7 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_var_compartidas,NULL);
 	pthread_mutex_init(mutex_log,NULL);
 
-	escribir_log(archLog, "Mutex", INFO, "Se correctamente los mutex");
+	//escribir_log(archLog, "Mutex", INFO, "Se correctamente los mutex");
 }
 
 /*
@@ -508,7 +508,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	if(n<MAX_EVENTS_EPOLL){
 		fd_aceptado=socket_aceptarCliente(data.fd);
 		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
-			escribir_log(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
+		//	escribir_log(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
 			pthread_mutex_lock(mutex_array);
 			fds_conectados_cpu[n]=fd_aceptado;
 			estado_cpu[n]=LIBRE;
@@ -637,7 +637,7 @@ void desconexion_cpu(epoll_data_t data){
 	for(pos=0; pos<MAX_EVENTS_EPOLL; pos++){
 		if(fds_conectados_cpu[pos]==data.fd){
 			estado_cpu[pos]=LIBRE;
-			escribir_log(archLog, "Conexiones CPU", INFO, "Se desconectó una cpu");
+		//	escribir_log(archLog, "Conexiones CPU", INFO, "Se desconectó una cpu");
 			fds_conectados_cpu[pos]=0;
 			break;
 		}
