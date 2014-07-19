@@ -588,11 +588,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_lock(mutex_semaforos);
 			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
 			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
-			if(configuracion_kernel.semaforos.valor[pos_sem_signal]>0){
-				//TODO FALTA ARREGLAR ACA
-
-			}
-
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
 		case D_STRUCT_IO:

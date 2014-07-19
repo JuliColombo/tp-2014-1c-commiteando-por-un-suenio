@@ -815,7 +815,14 @@ void core_conexion_kernel(void){
 			log_escribir(archLog, "Conexion", INFO, "Se acepta conexion del kernel");
 			pthread_mutex_unlock(mutex_log);
 		}
-
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
+	int tamanioMaxStack;
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
+		free(structRecibida);
+	}
 		while(1){
 
 			atender_kernel();

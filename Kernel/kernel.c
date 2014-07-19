@@ -11,6 +11,7 @@
 
 t_config_kernel configuracion_kernel;
 log_t* archLog;
+pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
 pthread_t pcp, plp, io;
 char* PATH_config;
 cola_procesos cola;
@@ -41,7 +42,7 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 	inicializarConfiguracion(); //Lee el archivo de configuracion y asigna las configuraciones a configuracion_kernel
 	inicializarColas();
 	crearSemaforos();
-
+	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&plp, NULL, (void*) &core_plp, NULL);
 	pthread_create(&pcp, NULL, (void*) &core_pcp, NULL);
 
@@ -50,6 +51,7 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 	cerrarSemaforos();
 	pthread_join(pcp, NULL);
 	pthread_join(plp, NULL);
+	pthread_join(conexion_plp_umv,NULL);
 
 	return EXIT_SUCCESS;
 }

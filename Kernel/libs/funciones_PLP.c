@@ -251,15 +251,13 @@ void enviar_pcb_a_cpu(void){
 }
 
 
-pthread_t conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
-
 
 void core_plp(void){
 
 	t_programa* programa;
 
 	pthread_create(&conexion_plp_programas, NULL, (void*) &core_conexion_plp_programas, NULL);
-	pthread_create(&conexion_plp_umv, NULL, (void*) &core_conexion_umv, NULL);
+
 	while(1){
 		sem_wait(&sem_new);
 		pthread_mutex_lock(mutex_cola_new);
@@ -283,7 +281,7 @@ void core_plp(void){
 	}
 
 	pthread_join(conexion_plp_programas,NULL);
-	pthread_join(conexion_plp_umv,NULL);
+
 
 
 	return;
@@ -370,8 +368,19 @@ void core_conexion_plp_programas(void){
 
 void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
-		printf("Conectado a la UMV\n");
+		log_escribir(archLog, "Conexion", ERROR, "Se conectó a la UMV");
+	}else{
+		log_escribir(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
+		//abort();
 	}
+	t_struct_numero* stack = malloc(sizeof(t_struct_numero));
+	stack->numero=configuracion_kernel.tamanio_stack;
+	socket_enviar(sock_umv,D_STRUCT_NUMERO,stack);
+	free(stack);
+
+
+
+
 
 
 	return;

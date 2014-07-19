@@ -28,7 +28,6 @@ extern log_t* archLog;
 extern char* PATH_config;
 extern pthread_t io;
 extern pthread_t plp, conexion_plp_programas, conexion_plp_umv, conexion_plp_cpu;
-extern pthread_t pcp, conexion_pcp_cpu;
 extern cola_procesos cola;
 extern pthread_mutex_t* mutex_cola_new;
 extern pthread_mutex_t* mutex_cola_ready;
