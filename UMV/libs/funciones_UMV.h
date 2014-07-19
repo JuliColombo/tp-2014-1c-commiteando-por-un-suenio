@@ -113,7 +113,7 @@ void crear_hilo_por_cpu(void);
 void atender_cpu(void);
 
 void core_conexion_kernel(void);
-void atender_kernel(void);
+void atender_kernel(int sock);
 
 #endif /* UMV_H_ */
 

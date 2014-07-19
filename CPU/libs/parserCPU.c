@@ -30,12 +30,12 @@ AnSISOP_kernel funciones_kernel = {
 };
 
 void darValoresDeStackYCursor(t_pcb* pcb){
-	if(*pcb->c_stack == *pcb->stack){
+	if(pcb->c_stack == pcb->stack){
 		cursor = 0;
-		stack = 0;
+		stack = 0;								//CON O SIN ASTERISCOS?
 	} else {
 		stack = 0;
-		cursor = *pcb->c_stack - *pcb->stack;
+		cursor = pcb->c_stack - pcb->stack;
 	}
 }
 
@@ -222,8 +222,8 @@ void correrParser() {
 
 		if((i == quantum) && (termino == CONTINUES)){
 			termino = QUANTUM;
-			*pcb->c_stack += cursor;
-			*pcb->stack += stack;
+			pcb->c_stack += cursor;
+			pcb->stack += stack;
 		}
 
 		if (termino != CONTINUES) {

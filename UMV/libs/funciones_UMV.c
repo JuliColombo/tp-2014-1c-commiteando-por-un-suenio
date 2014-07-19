@@ -819,7 +819,7 @@ void core_conexion_kernel(void){
 	}
 		while(1){
 
-			atender_kernel();
+			atender_kernel(sock_aceptado);
 
 		}
 	if(socket_cerrarConexion(sock_kernel_servidor)==0){
@@ -836,13 +836,13 @@ void core_conexion_kernel(void){
 	return;
 }
 
-void atender_kernel(void){
+void atender_kernel(int sock){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	t_struct_numero* tamanio;
 	int i,memoriaSuficiente=0;
 	for(i=0; i<4 && memoriaSuficiente==0;i++){
-		socket_recibir(sock_kernel_servidor, &tipoRecibido,&structRecibida);
+		socket_recibir(sock, &tipoRecibido,&structRecibida);
 		tamanio = ((t_struct_numero*)structRecibida);
 		int tamanioSolicitado = tamanio->numero;
 		//memoriaSuficiente = solicitarMemoria(tamanio); //TODO acá falta modificar el solicitarMemoria, devuelve 0 cuando hay lugar y devuelve 1 si no hay lugar.
@@ -853,10 +853,10 @@ void atender_kernel(void){
 	}
 	t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 	respuesta->numero=memoriaSuficiente;
-	socket_enviar(sock_kernel_servidor, D_STRUCT_NUMERO, respuesta);
+	socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
 	if(memoriaSuficiente!=0){ //No seria == ?
 		for(i=0;i<4;i++){
-			socket_recibir(sock_kernel_servidor,&tipoRecibido,&structRecibida);
+			socket_recibir(sock,&tipoRecibido,&structRecibida);
 			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
 			//grabarbytes();
 		}
