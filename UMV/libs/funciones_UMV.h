@@ -82,7 +82,7 @@ void imprimirEstadoTablaSeg(FILE* archivo);
 int ubicarEnTabla(int posicionSegmento);
 int ubicarPosiconRealEnTabla(int posicionSegmento);
 t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio);
-
+int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format);
 
 /*Operaciones de Consola*/
 void algoritmo(void);

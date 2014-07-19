@@ -53,6 +53,7 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 	pthread_mutex_unlock(mutex_log);
 }
+
 _Bool validacionSegFault(int base, int offset,int longitud){
 
 	int numSeg=traducirPosicion(base);
@@ -86,9 +87,7 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	printf("La posicion real es: %d\n",j);
 	memcpy(buffer, (char *) &MP[j], longitud);
 	printf("El buffer solicitado es: %s\"\n",(char*)buffer);
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
-	pthread_mutex_unlock(mutex_log);
+	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
 }
@@ -124,9 +123,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
-							pthread_mutex_lock(mutex_log);
-							log_escribir(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
-							pthread_mutex_unlock(mutex_log);
+							escribir_log(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
 							sleep(retardo);
 							return;
 						}
@@ -136,9 +133,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			i=0;
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
 			} else puts("No se pudo realizar la asignacion");
 		sleep(retardo);
 }
@@ -244,16 +239,12 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
 		printf("El algoritmo se cambio a: firstfit\n");
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se cambia el algoritmo de seleccion", INFO, "De worst-fit a first-fit");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De worst-fit a first-fit");
 	}
 	else{
 		configuracion_UMV.algoritmo=worstfit;
 		printf("El algoritmo se cambio a: worstfit\n");
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
 	}
 
 	sleep(retardo);
@@ -282,9 +273,7 @@ void compactar(){
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
 		if(posicionSegmento == tamanioMP){
 			printf("Compactacion finalizada\n");
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se termina de realizar la compactacion", INFO, "");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Se termina de realizar la compactacion", INFO, "");
 			sleep(retardo);
 			return;
 		}
@@ -370,9 +359,7 @@ void dump(){
 	imprimirEstadoMP(archivo_MP);
 	imprimirEstadoTablaSeg(archivo_TS);
 
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
-	pthread_mutex_unlock(mutex_log);
+	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 
 	sleep(retardo);
 	fclose(archivo_MP);
@@ -465,9 +452,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	}
 	if(ubicacion==-1){
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se trata de crear un segmento", ERROR, "No hay espacio para reservar en memoria");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Se trata de crear un segmento", ERROR, "No hay espacio para reservar en memoria");
 		sleep(retardo);
 		return -1;
 	}
@@ -489,9 +474,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
-	pthread_mutex_unlock(mutex_log);
+	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
 	return 1;
 }
@@ -726,15 +709,20 @@ void inicializarConfiguracion(void){
 	struct stat file_info;
 	int control = lstat(PATH, &file_info);
 	if (control == -1){
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 	}
 	else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	procesosActivos = malloc(gradoDeMultiprogramacion);
 	}
+}
+
+int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format){
+	pthread_mutex_lock(mutex_log);
+	int i = log_escribir(log, program_name, type, format);
+	pthread_mutex_unlock(mutex_log);
+	return i;
 }
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
@@ -745,18 +733,14 @@ void core_conexion_cpu(void){
 
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Escuchando en el socket de CPU's", INFO, "");
-	pthread_mutex_unlock(mutex_log);
+	escribir_log(archLog, "Escuchando en el socket de CPU's", INFO, "");
 
 	}
 
 	while(1){
 	if((sock=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se acepta la conexion de una CPU", INFO, "");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
 
 			//RECIBO PEDIDO DE INDICE DE ETIQUETAS
@@ -777,14 +761,10 @@ void core_conexion_cpu(void){
 			}
 	}
 	if(socket_cerrarConexion(sock_cpu)==0){
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
 			//Error cerrando el socket
 		} else {
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
 		}
 
 
@@ -811,16 +791,12 @@ void atender_cpu(void){
 void core_conexion_kernel(void){
 	if((sock_kernel_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
 	printf("Hilo de Kernel\n");
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Escuchando en el socket de Kernel", INFO, "");
-	pthread_mutex_unlock(mutex_log);
+	escribir_log(archLog, "Escuchando en el socket de Kernel", INFO, "");
 	}
 	int sock_aceptado;
 	if((sock_aceptado=socket_aceptarCliente(sock_kernel_servidor))>0){
 			printf("Acepta conexion");
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Conexion", INFO, "Se acepta conexion del kernel");
-			pthread_mutex_unlock(mutex_log);
+			escribir_log(archLog, "Conexion", INFO, "Se acepta conexion del kernel");
 		}
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -836,14 +812,10 @@ void core_conexion_kernel(void){
 
 		}
 	if(socket_cerrarConexion(sock_kernel_servidor)==0){
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
 		//Error cerrando el socket
 	} else {
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Se cierra el socket de Kernel", INFO, "No hay problemas para cerrar el socket");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Se cierra el socket de Kernel", INFO, "No hay problemas para cerrar el socket");
 	}
 
 	return;
@@ -865,12 +837,10 @@ void atender_kernel(int sock){
 		socket_recibir(sock, &tipoRecibido,&structRecibida);
 		tamanio = ((t_struct_numero*)structRecibida);
 		tamanioSolicitado = tamanio->numero;
-		memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+		//memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 	}
 	if (memoriaSuficiente==-1){
-		pthread_mutex_lock(mutex_log);
-		log_escribir(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el paquete");
-		pthread_mutex_unlock(mutex_log);
+		escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el paquete");
 		destruirSegmentosPrograma(id_prog);
 		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 		respuesta->numero=memoriaSuficiente;
@@ -1006,6 +976,7 @@ void *consola (void){
 				  scanf("%d", &valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				  retardo= valorRetardo;
+				  escribir_log(archLog, "Se cambia el valor del retardo", INFO, "");
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){

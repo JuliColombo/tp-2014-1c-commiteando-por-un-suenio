@@ -25,7 +25,6 @@ t_stream* paquetizarStruct_char(t_struct_char* estructuraOrigen); //E
 t_stream* paquetizarStruct_string(t_struct_string* estructuraOrigen); //D
 t_stream* paquetizarStruct_signal(t_struct_signal* estructuraOrigen); //E
 t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen);//E
-t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen);//D
 t_stream* paquetizarStruct_push(t_struct_push* estructuraOrigen);//E
 t_stream* paquetizarStruct_pop(t_struct_pop* estructuraOrigen);
 t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estructuraOrigen);

@@ -59,12 +59,10 @@ enum{
 	D_STRUCT_SIGNALSEMAFORO=16,
 	D_STRUCT_IO=17,
 	D_STRUCT_VARIABLES=18,
-	D_STRUCT_GRADOMP=19,
-	D_STRUCT_PIDYCODIGO=20,
-	D_STRUCT_PCBSF = 21,
-	D_STRUCT_NORMAL = 23,
-	D_STRUCT_PCBIO = 24,
-	D_STRUCT_PCBFIN= 25,
+	D_STRUCT_PCBSF = 19,
+	D_STRUCT_NORMAL = 20,
+	D_STRUCT_PCBIO = 21,
+	D_STRUCT_PCBFIN= 22,
 };
 
 
@@ -172,29 +170,7 @@ typedef struct struct_pcb_io{
 		uint32_t tiempo;
 } __attribute__ ((__packed__)) t_struct_pcb_io;
 
-/* Estructura tipo STRUCT_GRADOMP
- * envia el grado de multiprogramacion del sistema
- *
- */
 
-typedef int t_gradoMP;
-
-typedef struct struct_grado_MP{
-	t_gradoMP gradoMP;
-}__attribute__ ((__packed__)) t_struct_gradoMP;
-
-
-/* Estructura tipo STRUCT_PIDYCODIGO
- * envia el pid de un programa y su respectivo codigo ansisop
- */
-
-typedef int* pid;
-typedef char* t_codigo;
-
-typedef struct struct_pidycodigo{
-	t_pid pid;
-	t_codigo codigo;
-}__attribute__ ((__packed__)) t_struct_pidycodigo;
 
 /* Estructura tipo STRUCT_PUSH
  *
