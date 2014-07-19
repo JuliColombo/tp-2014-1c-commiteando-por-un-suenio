@@ -8,9 +8,6 @@
 
 #include "funciones_UMV.h"
 
-//#include "FuncionesPLP.h"
-//#include <Estructuras.h>
-
 
 
 
@@ -22,6 +19,7 @@ int estaEnDicOP(char palabra[]){
 		if(strcmp(dic_op[aux], palabra) == 0){
 			return 1;
 		}
+
 	}
 	return 0;
 }
@@ -39,6 +37,7 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
+
 	tamanioMP = configuracion_UMV.memSize;
 	int* aux_MP;
 	aux_MP = malloc(tamanioMP*(sizeof(t_memoria_principal)));
@@ -54,14 +53,13 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 	pthread_mutex_unlock(mutex_log);
 }
-
 _Bool validacionSegFault(int base, int offset,int longitud){
+
 	int numSeg=traducirPosicion(base);
 	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].inicio == NULL) return true;
 	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].tamanio < longitud) return true;
 	return false;
 }
-
 _Bool segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
 	if (validacionSegFault(base,offset,longitud) ) {
 		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
@@ -82,19 +80,14 @@ _Bool memoryOverload(int longitud){
 
 t_buffer solicitarBytes(int base,int offset, int longitud){
 	t_buffer buffer;
-	buffer = malloc(sizeof(longitud*sizeof(int)));
-	int i=0;
+	buffer = malloc((longitud+1)*sizeof(char));
 	int j;
 	j=traducirPosicion(base)+offset;
-	printf("La posicion real es: %d",j);
-	while (i < longitud){
-		buffer[j]= MP[j];
-		printf("El valor de la posicion %d buffer es: %d\n",j,buffer[j]);
-		j++;
-		i++;
-	}
-	return buffer;
+	printf("La posicion real es: %d\n",j);
+	memcpy(buffer, (char *) &MP[j], longitud);
+	printf("El buffer solicitado es: %s\"\n",(char*)buffer);
 	sleep(retardo);
+	return buffer;
 }
 
 int traducirPosicion(int base){
@@ -116,21 +109,12 @@ int traducirPosicion(int base){
 
 //****************************************enviarBytes*************************************
 
-void asignarFisicamenteDesde(int posicionReal,int longitud, t_buffer buffer){
-	int i=0;
-	while (i<longitud){
-		MP[posicionReal]=buffer[0];
-		i++;
-		posicionReal++;
-	}
-	if (sizeof(buffer) != i) printf("El buffer no se envio completamente"); //No se si es necesario, pero capaz ayuda
-}
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int i=0,k=0;
+	int i=0;
 	int j,aux;
 	while(i<longitud){
-		printf("El valor de la posicion %d del buffer es: %d\n",i,buffer[i]);
+		//printf("El valor de la posicion %d del buffer es: %d\n",i,*(int*)buffer[i]);
 		i++;
 	}
 		if (validarSolicitud(base,offset,longitud)){
@@ -144,21 +128,13 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
 			printf("El resultado de la asignacion es:\n");
 			i=0;
-			while(k<longitud){
-				MP[j]= buffer[i];
-				printf("Posicion %d de memoria principal = %d\n", j, MP[j]);
-				j++;
-				i++;
-				k++;
-			}
+			printf("%s\n",(char*)buffer);
+			memcpy(&MP[j], (int*) buffer, longitud);
 			} else puts("No se pudo realizar la asignacion");
 		sleep(retardo);
 }
 
 
-void cambioDeProcesoEnElHilo(int id_prog){
- //TODO
-}
 
 /*************************    Logica de validacion de solicitudes ***************************/
 //Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
@@ -190,7 +166,7 @@ _Bool hayEspacioEnMemoriaPara(uint32_t longitud){
 	}
 }
 
-_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
+_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reemplazar con las funciones de las commons si no funciona
 	int aux=0;
 	int contador=0;
 	while (aux < tamanioMP){
@@ -221,6 +197,7 @@ void inicializarListaHandshakes(void){
 	lista_handshakes.cantidad=0;
 	lista_handshakes.handshakes=NULL;
 }
+
 
 void inicializarYAgregar(tipo_handshake tipo){
 	tipo_handshake* aux_lista;
@@ -265,6 +242,11 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 	}
 	sleep(retardo);
 }
+
+
+
+
+
 
 //****************************************Compactacion*****************************************
 
@@ -325,7 +307,8 @@ int ubicarEnTabla(int posicionR){
 }
 
 
-int ubicarPosiconRealEnTabla(int posicionR){ //Ojo el nombre
+
+int ubicarPosiconRealEnTabla(int posicionR){
 	int i=0,j;
 	while(i<cant_tablas){
 		j=0;
@@ -555,8 +538,6 @@ int inicializarTabla(int id_prog){
 		}
 	}
 }
-
-//***********************************Algoritmos de eleccion de ubicacion*************************
 
 int escogerUbicacionF(int tamanio){
 	int posicionDeDestino;
@@ -914,8 +895,9 @@ void *core_consola(void) {
 
 void *consola (void){
 
-	//system("clear");
 	char comando[32];
+	char* aux_buffer;
+	aux_buffer= malloc(MAX_BUFFER);
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	t_buffer buffer;
 	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
@@ -945,7 +927,7 @@ void *consola (void){
 					  puts("Ingrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					  solicitarBytes(unaBase,unOffset,unTamanio);
+					  aux_buffer = solicitarBytes(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
@@ -954,13 +936,12 @@ void *consola (void){
 					 scanf("%d",&unaBase);
 					 puts("Ingrese Offset");
 					 scanf("%d",&unOffset);
-					 puts("Ingrese Tamanio de segmento");
-					 scanf("%d",&unTamanio);
 					 puts("Ingrese Buffer");
-					 buffer = malloc(unTamanio*(sizeof(t_buffer)));
-					 buffer = asignarPosicionesBuffer(buffer,unTamanio);
+					 scanf("%s",aux_buffer);
+					 unTamanio=strlen(aux_buffer+1);
+					 printf("El tamanio es: %d\n",unTamanio);
 					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-					 enviarBytes(unaBase,unOffset,unTamanio,buffer);
+					 enviarBytes(unaBase,unOffset,unTamanio,aux_buffer);
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
@@ -1050,17 +1031,6 @@ void destruirTodosLosSegmentos(void){
 	return;*/
 }
 
-t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio){
-	int i=0;
-	uint32_t valor;
-	while(i<unTamanio){
-		printf("Ingresar el valor de la posicion %d ",i);
-		scanf("%d",&valor);
-		buffer[i]=valor;
-		i++;
-	}
-	return buffer;
-}
 
 
 
