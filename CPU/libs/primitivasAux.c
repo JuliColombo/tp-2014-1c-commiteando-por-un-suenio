@@ -19,7 +19,6 @@ int esConRetorno;
 
 void chequearSiHuboSF(){
 	t_signal* senial;
-	void* structRecibida;
 	socket_recibirSignal(sockUMV,senial);
 
 	if(*senial == D_STRUCT_SEGFAULT){
@@ -29,7 +28,7 @@ void chequearSiHuboSF(){
 	}
 }
 
-void controlarBloqueo(int sockKernel, extern int termino) {
+void controlarBloqueo(int sockKernel, int termino) {
 	unsigned int valor_semaforo;
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;

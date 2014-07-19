@@ -19,8 +19,18 @@ typedef struct{
 	t_puntero pos;
 }t_elemento;
 
+enum{
+	CONTINUES = 0,
+	DONE = 5,
+	QUANTUM = 3,
+	SEG_FAULT = 4,
+	IO = 6,
+	BLOQUEADO = 7,
+}numeros_utiles;
+
 extern int stack;
 extern int cursor;
+extern int termino; //tiene que ser extern??
 
 t_pcb* pcb;
 

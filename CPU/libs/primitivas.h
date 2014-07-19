@@ -11,15 +11,6 @@
 #include "primitivasAux.h"
 #include "log.h"
 
-enum{
-	CONTINUES = 0,
-	DONE = 5,
-	QUANTUM = 3,
-	SEG_FAULT = 4,
-	IO = 6,
-	BLOQUEADO = 7,
-}numeros_utiles;
-
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
