@@ -18,7 +18,6 @@ t_intructions* indiceCodigo;
 
 char* proximaInstruccion;
 
-extern int termino; //tiene que ser extern??
 int esConRetorno = 0;
 int cursor;
 int stack;
@@ -147,7 +146,6 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
 
 	//Socket enviando Kernel para que asignNe el "valor" a "variable"
-	socket_and_asignar_compartida(sockKernel,variable,valor);
 	t_struct_asignar_compartida* estructura = malloc(sizeof(t_struct_asignar_compartida));
 	estructura->nombre = variable;
 	estructura->valor = valor;
@@ -165,7 +163,6 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(instruccion);
 
-	socket_and_instruccion(sockUMV,inst);
 	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
 	estructura->inst = inst;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
@@ -275,7 +272,6 @@ void retornar(t_valor_variable retorno) {
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
-	socket_and_number(sockKernel, valor_mostrar);
 	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 	estructura->numero = valor_mostrar;
 	socket_enviar(sockKernel, D_STRUCT_NUMERO, estructura);

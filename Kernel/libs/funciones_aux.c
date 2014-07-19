@@ -74,7 +74,7 @@ return a;
 
 
 void log_error_socket(void){
-	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
+	escribir_log(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 }
 
 /*
@@ -507,7 +507,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 		fd_aceptado=socket_aceptarCliente(data.fd);
 		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
 			printf("La posicion es: %d\nEl fd aceptado es: %d\n", n, fd_aceptado);
-			log_escribir(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
+			escribir_log(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
 			pthread_mutex_lock(mutex_array);
 			fds_conectados_cpu[n]=fd_aceptado;
 			estado_cpu[n]=LIBRE;
@@ -519,7 +519,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			sem_post(&sem_cpu);
 		}
 	} else {
-		log_escribir(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
+		escribir_log(archLog,"Conexion",ERROR,"Ya no se pueden conectar mas CPUs");
 	}
 	free(paquete);
 
@@ -559,7 +559,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			sem_post(&sem_cpu);
 			sem_post(&sem_multiProg);
 			}else{
-				log_escribir(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
+				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
 			break;
 		case D_STRUCT_STRING:

@@ -67,7 +67,7 @@ void inicializarConfiguracion(void){
 	struct stat file_info;
 	int control = lstat(PATH_config, &file_info);
 	if (control == -1){
-		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
+		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 		}
 	else{
 	leerConfiguracion();
@@ -360,7 +360,7 @@ void core_conexion_plp_programas(void){
 	while(1){
 		int i = epoll_escucharGeneral(efd_programas,sock_programas,(void*) &manejar_ConexionNueva_Programas, NULL, NULL);
 		if(i==-1){
-			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
+			escribir_log(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
 	}
 	return;
@@ -368,9 +368,9 @@ void core_conexion_plp_programas(void){
 
 void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
-		log_escribir(archLog, "Conexion", ERROR, "Se conectó a la UMV");
+		escribir_log(archLog, "Conexion", ERROR, "Se conectó a la UMV");
 	}else{
-		log_escribir(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
+		escribir_log(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
 		//abort();
 	}
 	t_struct_numero* stack = malloc(sizeof(t_struct_numero));
@@ -404,7 +404,7 @@ void core_conexion_pcp_cpu(void){
 	while(1){
 		i = epoll_escucharGeneral(efd_cpu,sock_cpu,(void*) &manejar_ConexionNueva_CPU, (void*)&handler_conexion_cpu, (void*) &desconexion_cpu);
 		if(i==-1){
-			log_escribir(archLog, "Epoll", ERROR, "Error al recibir evento");
+			escribir_log(archLog, "Epoll", ERROR, "Error al recibir evento");
 		}
 	}
 	free(fds_conectados_cpu);
