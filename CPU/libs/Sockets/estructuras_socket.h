@@ -61,10 +61,11 @@ enum{
 	D_STRUCT_VARIABLES=18,
 	D_STRUCT_GRADOMP=19,
 	D_STRUCT_PIDYCODIGO=20,
-	D_STRUCT_PCBQUANTUM = 21,
+	D_STRUCT_PCBSF = 21,
 	D_STRUCT_SEGFAULT=22,
 	D_STRUCT_NORMAL = 23,
 	D_STRUCT_PCBIO = 24,
+	D_STRUCT_PCBFIN= 25,
 };
 
 
@@ -145,7 +146,7 @@ typedef struct struct_pcb{
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } __attribute__ ((__packed__)) t_struct_pcb;
 
-typedef struct struct_pcb_quantum{
+typedef struct struct_pcb_fin{
 		t_pid pid;								//Identificador único del Programa en el sistema
 		t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
 		t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
@@ -155,7 +156,9 @@ typedef struct struct_pcb_quantum{
 		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
-} __attribute__ ((__packed__)) t_struct_pcb_quantum;
+		char* variables;
+} __attribute__ ((__packed__)) t_struct_pcb_fin;
+
 
 typedef struct struct_pcb_io{
 		t_pid pid;								//Identificador único del Programa en el sistema
