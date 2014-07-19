@@ -81,9 +81,6 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SIGNALSEMAFORO:
 				paquete = paquetizarStruct_signalSemaforo((t_struct_semaforo*) estructuraOrigen);
 				break;
-			case D_STRUCT_IO:
-				paquete = paquetizarStruct_io((t_struct_io*) estructuraOrigen);
-				break;
 			case D_STRUCT_VARIABLES:
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 				break;
@@ -411,13 +408,21 @@ t_stream* paquetizarStruct_pcbFin(t_struct_pcb_fin* estructuraOrigen){
 	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
 
 	memcpy(data + tamanoTotal, estructuraOrigen->c_stack, tamanoDato += sizeof(estructuraOrigen->c_stack));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, estructuraOrigen->codigo, tamanoDato += sizeof(estructuraOrigen->codigo));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, estructuraOrigen->index_codigo, tamanoDato += sizeof(estructuraOrigen->index_codigo));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, estructuraOrigen->index_etiquetas, tamanoDato += sizeof(estructuraOrigen->index_etiquetas));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, &estructuraOrigen->pid, tamanoDato += sizeof(estructuraOrigen->pid));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, &estructuraOrigen->program_counter, tamanoDato += sizeof(estructuraOrigen->program_counter));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, estructuraOrigen->stack, tamanoDato += sizeof(estructuraOrigen->stack));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_contexto, tamanoDato += sizeof(estructuraOrigen->tamanio_contexto));
+	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_indice, tamanoDato += sizeof(estructuraOrigen->tamanio_indice));
 
 	tamanoTotal += tamanoDato;
@@ -592,51 +597,43 @@ t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estr
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(11, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-t_stream * paquetizarStruct_io(t_struct_io * estructuraOrigen){
-
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
-
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->dispositivo) + 1 + sizeof(int32_t) +sizeof(uint32_t);
-
-	char * data = crearDataConHeader(D_STRUCT_IO, paquete->length); //creo el data.
-
-	int tamanoTotal = sizeof(t_header);
-	int tamanioDato = 0;
-
-	memcpy(data + tamanoTotal, &estructuraOrigen->pid , sizeof(uint32_t));
-
-	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, tamanioDato = strlen(estructuraOrigen->dispositivo)+1);		//copio a data el nombre de la variable.
-
-	tamanoTotal += tamanioDato;
-
-	memcpy(data + tamanoTotal, &estructuraOrigen->tiempo, sizeof(int32_t));  //copio a data el valor de la variable.
-
-	paquete->data = data;
-
-	return paquete;
-}
-
-/*
- * Nombre: paquetizarStruct_pcbIO/1
- * Argumentos:
- * 		- estructura de tipo pcb
- *
- * Devuelve:
- * 		paquete
- *
- * Funcion: crearDataConHeader(22, length)
+ * Funcion: crearDataConHeader(22, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_io);
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb) + strlen(estructuraOrigen->dispositivo)+1+ sizeof(estructuraOrigen->tiempo);
 
 	char* data = crearDataConHeader(D_STRUCT_PCBIO, paquete->length);
 
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_io));
+	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->c_stack, tamanoDato += sizeof(estructuraOrigen->c_stack));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, estructuraOrigen->codigo, tamanoDato += sizeof(estructuraOrigen->codigo));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, estructuraOrigen->index_codigo, tamanoDato += sizeof(estructuraOrigen->index_codigo));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, estructuraOrigen->index_etiquetas, tamanoDato += sizeof(estructuraOrigen->index_etiquetas));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->pid, tamanoDato += sizeof(estructuraOrigen->pid));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->program_counter, tamanoDato += sizeof(estructuraOrigen->program_counter));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, estructuraOrigen->stack, tamanoDato += sizeof(estructuraOrigen->stack));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_contexto, tamanoDato += sizeof(estructuraOrigen->tamanio_contexto));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_indice, tamanoDato += sizeof(estructuraOrigen->tamanio_indice));
+	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->tiempo, tamanoDato += sizeof(estructuraOrigen->tiempo));
+
+	tamanoTotal += tamanoDato;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, tamanoDato = strlen(estructuraOrigen->dispositivo)+1);		//copio a data el mensaje.
+
+	tamanoTotal += tamanoDato;
 
 	paquete->data = data;
 
@@ -1074,7 +1071,24 @@ t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght)
 t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
 	t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_io));
+	int tamanoTotal = 0;
+
+	memcpy(estructuraDestino->c_stack, dataPaquete, tamanoTotal += sizeof(estructuraDestino->c_stack));
+	memcpy(estructuraDestino->codigo, dataPaquete, tamanoTotal += sizeof(estructuraDestino->codigo));
+	memcpy(estructuraDestino->index_codigo, dataPaquete, tamanoTotal += sizeof(estructuraDestino->index_codigo));
+	memcpy(estructuraDestino->index_etiquetas, dataPaquete, tamanoTotal += sizeof(estructuraDestino->index_etiquetas));
+	memcpy(&estructuraDestino->pid, dataPaquete, tamanoTotal += sizeof(estructuraDestino->pid));
+	memcpy(&estructuraDestino->program_counter, dataPaquete, tamanoTotal += sizeof(estructuraDestino->program_counter));
+	memcpy(&estructuraDestino->tamanio_contexto, dataPaquete, tamanoTotal += sizeof(estructuraDestino->tamanio_contexto));
+	memcpy(&estructuraDestino->tamanio_indice, dataPaquete, tamanoTotal += sizeof(estructuraDestino->tamanio_indice));
+	memcpy(&estructuraDestino->tiempo, dataPaquete, tamanoTotal += sizeof(estructuraDestino->tiempo));
+
+	int tamanoDato = 0;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++);
+
+	estructuraDestino->dispositivo = malloc(tamanoDato);
+	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
 
 	return estructuraDestino;
 }
