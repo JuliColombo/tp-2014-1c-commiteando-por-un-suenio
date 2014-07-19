@@ -22,7 +22,6 @@ int estaEnDicOP(char palabra[]){
 		if(strcmp(dic_op[aux], palabra) == 0){
 			return 1;
 		}
-
 	}
 	return 0;
 }
@@ -40,7 +39,6 @@ int estaEnDicTOP(char palabra[]){
 
 
 int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
-
 	tamanioMP = configuracion_UMV.memSize;
 	int* aux_MP;
 	aux_MP = malloc(tamanioMP*(sizeof(t_memoria_principal)));
@@ -56,13 +54,14 @@ void log_error_socket(void){
 	log_escribir(archLog, "Abrir conexion", ERROR, "No se pudo abrir la conexion");
 	pthread_mutex_unlock(mutex_log);
 }
-_Bool validacionSegFault(int base, int offset,int longitud){
 
+_Bool validacionSegFault(int base, int offset,int longitud){
 	int numSeg=traducirPosicion(base);
 	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].inicio == NULL) return true;
 	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].tamanio < longitud) return true;
 	return false;
 }
+
 _Bool segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
 	if (validacionSegFault(base,offset,longitud) ) {
 		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
@@ -191,7 +190,7 @@ _Bool hayEspacioEnMemoriaPara(uint32_t longitud){
 	}
 }
 
-_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reemplazar con las funciones de las commons si no funciona
+_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){
 	int aux=0;
 	int contador=0;
 	while (aux < tamanioMP){
@@ -222,7 +221,6 @@ void inicializarListaHandshakes(void){
 	lista_handshakes.cantidad=0;
 	lista_handshakes.handshakes=NULL;
 }
-
 
 void inicializarYAgregar(tipo_handshake tipo){
 	tipo_handshake* aux_lista;
@@ -267,11 +265,6 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 	}
 	sleep(retardo);
 }
-
-
-
-
-
 
 //****************************************Compactacion*****************************************
 
@@ -332,8 +325,7 @@ int ubicarEnTabla(int posicionR){
 }
 
 
-
-int ubicarPosiconRealEnTabla(int posicionR){
+int ubicarPosiconRealEnTabla(int posicionR){ //Ojo el nombre
 	int i=0,j;
 	while(i<cant_tablas){
 		j=0;
@@ -563,6 +555,8 @@ int inicializarTabla(int id_prog){
 		}
 	}
 }
+
+//***********************************Algoritmos de eleccion de ubicacion*************************
 
 int escogerUbicacionF(int tamanio){
 	int posicionDeDestino;
@@ -853,10 +847,14 @@ void atender_kernel(void){
 		int tamanioSolicitado = tamanio->numero;
 		//memoriaSuficiente = solicitarMemoria(tamanio); //TODO acá falta modificar el solicitarMemoria, devuelve 0 cuando hay lugar y devuelve 1 si no hay lugar.
 	}
+	if (memoriaSuficiente==1){
+		log_escribir(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el paquete");
+		// Excepcion?
+	}
 	t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 	respuesta->numero=memoriaSuficiente;
 	socket_enviar(sock_kernel_servidor, D_STRUCT_NUMERO, respuesta);
-	if(memoriaSuficiente!=0){
+	if(memoriaSuficiente!=0){ //No seria == ?
 		for(i=0;i<4;i++){
 			socket_recibir(sock_kernel_servidor,&tipoRecibido,&structRecibida);
 			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
@@ -873,6 +871,15 @@ void atender_kernel(void){
 	return;
 }
 
+/*int solicitarMemoria(int longitud){
+	int hayEspacioEnMemoriaPara();
+	if (hayEspacioEnMemoriaPara(longitud)){
+		//Como reservarlos?
+		return 0;
+	} else{
+		return 1;
+		}
+}*/
 
 //***********************************************Inicializacion de semaforos************************************
 

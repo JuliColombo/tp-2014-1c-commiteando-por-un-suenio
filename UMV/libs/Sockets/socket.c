@@ -185,21 +185,14 @@ int socket_crearServidorPuertoRandom(char *ip, int * port){
 int socket_aceptarCliente(int socketEscucha){
 	int socketNuevaConexion;
 	unsigned int size_sockAddrIn;
-
 	struct sockaddr_in suSocket;
-
 	size_sockAddrIn = sizeof(struct sockaddr_in);
 	socketNuevaConexion = accept(socketEscucha, (struct sockaddr *)&suSocket, &size_sockAddrIn);
-
 	if(socketNuevaConexion < 0) {
-
 		perror("Error al aceptar conexion entrante");
 		return -1;
-
 	}
-
 	return socketNuevaConexion;
-
 }
 
 /*
@@ -218,7 +211,6 @@ int epoll_crear(void) {
 		perror("Creacion de epoll"); 	// CAMBIAR POR UN LOG
 		return -1;
 	}
-
 	return epollfd;
 }
 
