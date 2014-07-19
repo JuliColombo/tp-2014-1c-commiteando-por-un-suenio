@@ -44,7 +44,7 @@ extern int cant_tablas;
 extern int sock_kernel_servidor;
 extern int sock_cpu;
 extern int retardo;
-extern int* procesosActivos;
+extern int procesoActivo;
 extern int gradoDeMultiprogramacion;
 extern lista_handshake lista_handshakes;
 
@@ -52,12 +52,8 @@ extern lista_handshake lista_handshakes;
 
 int asignarFisicamente();
 void log_error_socket(void);
-int solicitarMemoria(int tamanio);
-_Bool memoryOverload(int longitud);
-_Bool segmentationFault(int base,int offset,int longitud);
-_Bool validarSolicitud(int base, int offset, int longitud);
-_Bool hayEspacioEnMemoriaPara(uint32_t longitud);
-_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud);
+int segmentationFault(int base,int offset,int longitud);
+int validacionSegFault(int base, int offset,int longitud);
 
 void destruirTodosLosSegmentos(void);
 void matarHilos(void);
@@ -80,9 +76,10 @@ int validarPosicionVirtual(int posVirtual);
 void imprimirEstadoMP(FILE* archivo);
 void imprimirEstadoTablaSeg(FILE* archivo);
 int ubicarEnTabla(int posicionSegmento);
-int ubicarPosiconRealEnTabla(int posicionSegmento);
+int ubicarSegmentoEnTabla(int posicionSegmento);
 t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio);
 int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format);
+void cambioProcesoActivo(int);
 
 /*Operaciones de Consola*/
 void algoritmo(void);

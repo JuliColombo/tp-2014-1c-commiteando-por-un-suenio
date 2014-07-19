@@ -21,7 +21,7 @@ pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
 int sock_kernel_servidor;
 int sock_cpu;
-int* procesosActivos;
+int procesoActivo;
 int gradoDeMultiprogramacion;
 lista_handshake lista_handshakes;
 

@@ -54,27 +54,21 @@ void log_error_socket(void){
 	pthread_mutex_unlock(mutex_log);
 }
 
-_Bool validacionSegFault(int base, int offset,int longitud){
+int validacionSegFault(int base, int offset,int longitud){
 
-	int numSeg=traducirPosicion(base);
-	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].inicio == NULL) return true;
-	if (tablaDeSegmentos[procesoEnUso].segmentos[numSeg].tamanio < longitud) return true;
-	return false;
+	int numTabla=ubicarEnTabla(base);
+	int numSeg=ubicarSegmentoEnTabla(base);
+	if (tablaDeSegmentos[numTabla].segmentos[numSeg].tamanio > (offset+longitud)) return 0;
+	return 1;
 }
-_Bool segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
+
+int segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
 	if (validacionSegFault(base,offset,longitud) ) {
-		log_escribir(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
+		escribir_log(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
 		return true;
 	} else return false;
 }
 
-_Bool memoryOverload(int longitud){
-	int tamanioLibre= tamanioMP - list_count_satisfying(MP, &MP != NULL);
-	if (longitud < tamanioLibre) {
-		    log_escribir(archLog, "Memory Overload", ERROR, "Memory Overload al intentar acceder a la posicion");
-			return true;
-		} else return false;
-}
 
 
 // ***********************************Solicitar bytes en memoria*******************
@@ -119,7 +113,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 		//printf("El valor de la posicion %d del buffer es: %d\n",i,*(int*)buffer[i]);
 		i++;
 	}
-		if (validarSolicitud(base,offset,longitud)){
+		if (segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
@@ -140,53 +134,8 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 
 
 
-/*************************    Logica de validacion de solicitudes ***************************/
-//Dada una solicitud (solo necesita longitud?) responde True o genera Excepcion - REVISAR
-_Bool validarSolicitud(int base, int offset,int longitud){
-	if(hayEspacioEnMemoriaPara(longitud)){
-		return true;
-	} else{
-		if(segmentationFault(base,offset,longitud)){
-			return false;
-		}else{
-			if(memoryOverload(longitud)){
-				return false;
-			}else{
-				//log("Excepcion Desconocida"); ???
-				return false;
-				}
-			}
-		return false; //pongo esto para que no joda
-		}
-}
 
-_Bool hayEspacioEnMemoriaPara(uint32_t longitud){
-	if( tamanioSuficienteEnMemoriaPara(longitud) ){
-		return true;
-	}else{
-		compactar();
-		if( tamanioSuficienteEnMemoriaPara(longitud) ) return true;
-		else return false;
-	}
-}
 
-_Bool tamanioSuficienteEnMemoriaPara(uint32_t longitud){ //Esto se puede reemplazar con las funciones de las commons si no funciona
-	int aux=0;
-	int contador=0;
-	while (aux < tamanioMP){
-			if (MP[aux] != NULL){
-				aux++;
-			} else{
-				while (MP[aux] == NULL && contador < longitud){
-					contador++;
-					aux++;
-				}
-				if (contador == longitud)return true;
-				else contador=0;
-			}
-	}
-	return false;
-}
 
 /*************************Handshake*************************/
 
@@ -280,7 +229,7 @@ void compactar(){
 		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
 		i=ubicarEnTabla(posicionSegmento);
 		printf("La tabla correspondiente es: %d\n",i);
-		j=ubicarPosiconRealEnTabla(posicionSegmento);
+		j=ubicarSegmentoEnTabla(posicionSegmento);
 		printf("El segmento correspondiente es: %d\n",j);
 		tamanio=tablaDeSegmentos[i].segmentos[j].tamanio;
 		k=posicionFinal;
@@ -316,7 +265,7 @@ int ubicarEnTabla(int posicionR){
 
 
 
-int ubicarPosiconRealEnTabla(int posicionR){
+int ubicarSegmentoEnTabla(int posicionR){
 	int i=0,j;
 	while(i<cant_tablas){
 		j=0;
@@ -452,10 +401,23 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	}
 	if(ubicacion==-1){
-		escribir_log(archLog, "Se trata de crear un segmento", ERROR, "No hay espacio para reservar en memoria");
-		sleep(retardo);
-		return -1;
+		compactar();
 	}
+	if(configuracion_UMV.algoritmo == firstfit){
+			ubicacion = escogerUbicacionF(tamanio);
+		} else{
+			if(configuracion_UMV.algoritmo == worstfit){
+				printf("Va a elegir por Worst");
+				ubicacion = escogerUbicacionW(tamanio);
+				printf("La ubicacion es: %d", ubicacion);
+			}
+		}
+	if(ubicacion==-1){
+			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
+			compactar();
+			sleep(retardo);
+			return -1;
+		}
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
@@ -669,6 +631,10 @@ void eliminarSegmentos(int pos){
 	tablaDeSegmentos[pos].cant_segmentos=0;
 }
 
+void cambioProcesoActivo(int id_prog){
+	procesoActivo = id_prog;
+}
+
 
 //Funciones para lectura del archivo config y una funcion que imprime dichos campos para testear la lectura
 
@@ -714,7 +680,6 @@ void inicializarConfiguracion(void){
 	else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
-	procesosActivos = malloc(gradoDeMultiprogramacion);
 	}
 }
 
