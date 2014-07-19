@@ -12,6 +12,7 @@
 #include <commons/collections/dictionary.h>
 #include "estructuras.h"
 #include <stdint.h>
+#include "Sockets/socket.h"
 
 typedef struct{
 	char* name;
