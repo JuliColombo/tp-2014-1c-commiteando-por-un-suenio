@@ -301,15 +301,34 @@ void imprimirTexto(char* texto) {
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
-	t_struct_io* estructura = malloc(sizeof(t_struct_io));
+	/*t_struct_io* estructura = malloc(sizeof(t_struct_io));
 	estructura->dispositivo = dispositivo;
 	estructura->pid = pcb->pid;
 	estructura->tiempo = tiempo;
 	socket_enviar(sockKernel, D_STRUCT_IO, estructura);
-	free(estructura);
+	free(estructura);*/
 
+	termino = IO;
 
-	log_escribir(archLog, "Ejecucion", INFO, "Se envia conecto %s por %d tiempo",dispositivo,tiempo);
+	t_struct_pcb_io* pcb_actualizada=malloc(sizeof(t_struct_pcb_io));
+
+	pcb_actualizada->c_stack=pcb->c_stack;
+	pcb_actualizada->codigo=pcb->codigo;
+	pcb_actualizada->index_codigo=pcb->index_codigo;
+	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
+	pcb_actualizada->pid=pcb->pid;
+	pcb_actualizada->program_counter=pcb->program_counter;
+	pcb_actualizada->stack=pcb->stack;
+	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
+	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
+	pcb_actualizada->tiempo = tiempo;
+	pcb_actualizada->dispositivo = dispositivo;
+
+	socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
+
+	free(pcb_actualizada);
+
+	log_escribir(archLog, "Ejecucion", INFO, "Se conecto %s por %d tiempo",dispositivo,tiempo);
 
 }
 

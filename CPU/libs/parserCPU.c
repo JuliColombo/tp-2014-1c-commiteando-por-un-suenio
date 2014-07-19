@@ -156,6 +156,8 @@ void salir(int termino) {
 
 	case QUANTUM:
 
+	log_escribir(archLog,"Ejecucion",INFO,"Sale por quantum");
+
 	pcbQ = malloc(sizeof(t_struct_pcb_quantum));
 	pcbQ->c_stack=pcb->c_stack;
 	pcbQ->codigo=pcb->codigo;
@@ -193,6 +195,9 @@ void salir(int termino) {
 	printf("\nsalgo por segmentation fault\n");
 	break;
 	}
+
+	case IO:
+		break;
 }
 
 void correrParser() {
