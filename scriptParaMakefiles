@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#Para levantar el script hay que usar el comando chmod +x scriptParaMakefiles
+#Despues ./scriptParaMakefiles y ya lo corre
+
+#git clone https://github.com/sisoputnfrba/tp-2014-1c-commiteando-por-un-suenio
+cd CPU
+pwd
+#make all
+cd ..
+cd Kernel
+pwd
+#make all
+cd ..
+cd Programa 
+pwd
+#make all
+cd ..
+cd UMV
+pwd
+#make all
