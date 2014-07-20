@@ -620,7 +620,10 @@ void handler_conexion_cpu(epoll_data_t data){
 			bloqueo->dispositivo=pcb_io->dispositivo;
 			bloqueo->pid=pcb_io->pid;
 			bloqueo->tiempo=pcb_io->tiempo;
-			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
+
+			printf("llego %s y %d\n",bloqueo->dispositivo,bloqueo->tiempo);
+
+			/*pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 			free(bloqueo);
 			pcb = malloc(sizeof(t_struct_pcb));
 			pcb->c_stack=pcb_io->c_stack;
@@ -633,7 +636,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			pcb->tamanio_indice=pcb_io->tamanio_indice;
 			programa = ((t_programa*)buscarPrograma(pcb_io->pid,cola.exec,mutex_cola_exec));
 			actualizarPCB(programa, pcb);
-			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block, mutex_cola_block);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block, mutex_cola_block);*/
 			break;
 	}
 	pthread_mutex_lock(mutex_cola_ready);

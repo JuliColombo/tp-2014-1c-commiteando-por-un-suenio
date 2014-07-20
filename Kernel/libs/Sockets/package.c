@@ -1172,7 +1172,7 @@ t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length){
 
 	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
 
-	memcpy(estructuraDestino->pid, dataPaquete, sizeof(uint32_t));
+	memcpy(&estructuraDestino->pid, dataPaquete, sizeof(uint32_t));
 
 	estructuraDestino->dispositivo = malloc(tamanoDato);
 	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura

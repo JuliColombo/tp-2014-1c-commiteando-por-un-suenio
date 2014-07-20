@@ -565,13 +565,13 @@ t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb) + strlen(estructuraOrigen->dispositivo)+1+ sizeof(estructuraOrigen->tiempo);
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_io) + strlen(estructuraOrigen->dispositivo)+1+ sizeof(estructuraOrigen->tiempo);
 
 	char* data = crearDataConHeader(D_STRUCT_PCBIO, paquete->length);
 
 	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->c_stack, tamanoDato += sizeof(estructuraOrigen->c_stack));
+/*	memcpy(data + tamanoTotal, estructuraOrigen->c_stack, tamanoDato += sizeof(estructuraOrigen->c_stack));
 	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, estructuraOrigen->codigo, tamanoDato += sizeof(estructuraOrigen->codigo));
 	tamanoTotal += tamanoDato;
@@ -588,7 +588,7 @@ t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_contexto, tamanoDato += sizeof(estructuraOrigen->tamanio_contexto));
 	tamanoTotal += tamanoDato;
 	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio_indice, tamanoDato += sizeof(estructuraOrigen->tamanio_indice));
-	tamanoTotal += tamanoDato;
+	tamanoTotal += tamanoDato;*/
 	memcpy(data + tamanoTotal, &estructuraOrigen->tiempo, tamanoDato += sizeof(estructuraOrigen->tiempo));
 
 	tamanoTotal += tamanoDato;
