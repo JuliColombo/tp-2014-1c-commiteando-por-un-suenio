@@ -1,0 +1,22 @@
+RM:=rm -rf
+CC:=gcc
+FLAGS:= -Wall -ansi
+C_SRCS=$(shell find . -iname "*.c" | tr '\n' ' ')
+H_SRCS=$(shell find . -iname "*.h" | tr '\n' ' ')
+OBJS:=$(C_SRCS:./%.c=build/%.o)
+
+
+
+#All
+all: programa
+
+#Programa
+programa: $(OBJS)
+	$(CC) $(FLAGS) -o programa $(OBJS)
+
+build/%.o:
+
+#Clean
+clean:
+	$(RM) build
+
