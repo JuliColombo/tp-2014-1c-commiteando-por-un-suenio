@@ -310,6 +310,7 @@ void dump(){
 	if(procesoAVer == -1){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
+
 		int tablaFinal= procesoAVer++;
 		imprimirEstadoTablaSeg(archivo_TS,procesoAVer,tablaFinal);
 	}
@@ -609,7 +610,11 @@ void destruirSegmentosPrograma(int id_prog){
 
 int getPosTabla(int id_prog){
 	int i=0;
-	while(tablaDeSegmentos[i].id_prog != id_prog) i++;
+	while(tablaDeSegmentos[i].id_prog != id_prog && i<cant_tablas) i++;
+	if(i==cant_tablas){
+		log_escribir(archLog, "Id_prog no encontrado", ERROR, "El id_prog no se encuentra en la tabla de segmentos");
+		return -1;
+	}
 	return i;
 }
 
