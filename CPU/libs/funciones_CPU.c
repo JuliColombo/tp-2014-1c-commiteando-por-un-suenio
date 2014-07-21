@@ -69,7 +69,7 @@ void core_conexion_kernel(void){
 		free(k);
 	}
 	t_struct_pcb* pcb_recibida;
-	t_struct_pcb_io* pcb_actualizada;
+	t_struct_pcb_fin* pcb_actualizada;
 	while(1){
 			j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 			if(j==1){
@@ -90,8 +90,8 @@ void core_conexion_kernel(void){
 				//Esto va a aca? O lo pongo en parserCPU cuando devuelvo el pcb?
 				printf("el pid es: %d\n", pcb->pid);
 				sleep(3);
-				char* str = "impresora";
-				int tam = sizeof(t_struct_pcb_io);//+strlen(str)+1;//+sizeof(int);
+				char* str = "543";
+				int tam = sizeof(t_struct_pcb_fin);//+strlen(str)+1;//+sizeof(int);
 				pcb_actualizada = malloc(tam);
 				pcb_actualizada->pid=pcb->pid;
 				pcb_actualizada->c_stack=pcb->c_stack;
@@ -102,9 +102,8 @@ void core_conexion_kernel(void){
 				pcb_actualizada->stack=pcb->stack;
 				pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-				pcb_actualizada->tiempo = 5;
-				pcb_actualizada->dispositivo=str;
-				int i = socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
+				pcb_actualizada->variables = str;
+				int i = socket_enviar(sockKernel,D_STRUCT_PCBFIN,pcb_actualizada);
 				if(i==1){
 					printf("Se mando bien el paquete\n");
 					free(pcb_actualizada);
