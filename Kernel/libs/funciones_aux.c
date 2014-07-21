@@ -165,6 +165,9 @@ int valor_Variable_Global(char* variable){
 	if(pos!=-1){
 		int valor = configuracion_kernel.var_globales.valor[pos];
 		pthread_mutex_unlock(mutex_var_compartidas);
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Variable Global", ERROR, "Se solicitó la variable global: %s, pero esta no existe", variable);
+		pthread_mutex_unlock(mutex_log);
 		return valor;
 	}
 	pthread_mutex_unlock(mutex_var_compartidas);
@@ -226,7 +229,6 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_var_compartidas,NULL);
 	pthread_mutex_init(mutex_log,NULL);
 
-	//escribir_log(archLog, "Mutex", INFO, "Se correctamente los mutex");
 }
 
 /*
@@ -332,7 +334,7 @@ void bloquearPrograma(int pid){
 
 /*
  * Nombre: agregarNuevoPrograma/2
- * Argumentos:
+ * Argumentos:core_io
  * 		- codigo ansisop del programa nuevo conectado
  * 		- fd donde el Kernel se comunica con el programa
  *
