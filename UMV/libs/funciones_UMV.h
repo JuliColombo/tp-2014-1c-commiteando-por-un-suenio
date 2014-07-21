@@ -74,7 +74,7 @@ void inicializarYAgregar(tipo_handshake tipo);
 int traducirPosicion(int base);
 int validarPosicionVirtual(int posVirtual);
 void imprimirEstadoMP(FILE* archivo);
-void imprimirEstadoTablaSeg(FILE* archivo);
+void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal);
 int ubicarEnTabla(int posicionSegmento);
 int ubicarSegmentoEnTabla(int posicionSegmento);
 t_buffer asignarPosicionesBuffer(t_buffer buffer, int unTamanio);

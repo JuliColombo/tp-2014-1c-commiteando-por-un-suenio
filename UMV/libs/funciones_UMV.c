@@ -143,7 +143,7 @@ void hacerHandshake(tipo_handshake tipo){
 	if(lista_handshakes.cantidad == 0){
 		inicializarYAgregar(tipo);
 	} else { agregarHandshake(tipo);
-	}
+	  }
 }
 
 void inicializarListaHandshakes(void){
@@ -157,13 +157,12 @@ void inicializarYAgregar(tipo_handshake tipo){
 	tipo_handshake aux_handshake;
 	aux_lista = malloc(sizeof(tipo_handshake));
 	if(aux_lista==NULL){
-					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
-					abort();
-				}
+		log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
+		abort();
+	}
 	lista_handshakes.cantidad ++;
 	aux_handshake = tipo;
 	lista_handshakes.handshakes[0] = aux_handshake;
-
 }
 
 void agregarHandshake(tipo_handshake tipo){
@@ -172,9 +171,9 @@ void agregarHandshake(tipo_handshake tipo){
 	int aux=lista_handshakes.cantidad;
 	aux_lista = realloc(lista_handshakes.handshakes,(sizeof(lista_handshakes.handshakes)+sizeof(tipo_handshake)));
 	if(aux_lista==NULL){
-					log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
-					abort();
-				}
+		log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
+		abort();
+	}
 	lista_handshakes.handshakes = aux_lista;
 	aux_handshake=tipo;
 	lista_handshakes.handshakes[aux] = aux_handshake;
@@ -296,6 +295,7 @@ int ubicarSegmentoEnTabla(int posicionR){
 void dump(){
 	FILE* archivo_MP;
 	FILE* archivo_TS;
+	int procesoAVer;
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
 	if (archivo_MP==NULL) {
@@ -304,9 +304,18 @@ void dump(){
 	if (archivo_TS==NULL) {
 			fputs ("File error",stderr); exit (1);
 		}
+
+	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o 'T' para verlos todos");
+	scanf("%d",&procesoAVer);
+	if(procesoAVer == 'T'){
+		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
+	}else {
+		int tablaFinal= procesoAVer++;
+		imprimirEstadoTablaSeg(archivo_TS,procesoAVer,tablaFinal);
+	}
+
 	//Va escribiendo en el archivo el contenido de las posiciones de la MP
 	imprimirEstadoMP(archivo_MP);
-	imprimirEstadoTablaSeg(archivo_TS);
 
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 
@@ -332,10 +341,10 @@ void imprimirEstadoMP(FILE* archivo){
 		}
 }
 
-void imprimirEstadoTablaSeg(FILE* archivo){
-	int i=0,j;
+void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
+	int j;
 	fprintf(archivo, "%s", "El estado de la tabla de segmentos:\n\n");
-			while(i<cant_tablas){
+			while(i<tablaFinal){
 				j=0;
 				fprintf(archivo, "%s", "La tabla ");
 				fprintf(archivo, "%d", i);
@@ -703,7 +712,7 @@ void core_conexion_cpu(void){
 	}
 
 	while(1){
-	if((sock=socket_aceptarCliente(sock_cpu))>0){
+		if((sock=socket_aceptarCliente(sock_cpu))>0){
 			printf("Acepta conexion");
 			escribir_log(archLog, "Se acepta la conexion de una CPU", INFO, "");
 			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
@@ -724,17 +733,15 @@ void core_conexion_cpu(void){
 			printf("se envio el intento de indice de etiquetas\n");
 			free(estructura);
 			}
-	}
-	if(socket_cerrarConexion(sock_cpu)==0){
-			escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
-			//Error cerrando el socket
-		} else {
-			escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
 		}
-
-
+		if(socket_cerrarConexion(sock_cpu)==0){
+				escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
+				//Error cerrando el socket
+			} else {
+				escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
+			}
 	return;
-}
+	}
 }
 
 
