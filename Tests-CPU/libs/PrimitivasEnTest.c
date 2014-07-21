@@ -20,6 +20,7 @@ int quantum = 155;
 int i;
 extern int stack;
 extern int cursor;
+char* variables = "";
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -257,7 +258,18 @@ void destruirEstructuras(){
 void closureMostrarEstado(char* key, t_elemento* elem) {
 	printf("\n\naca viene lo del closure\n\n ");
 	t_puntero i = elem->pos;
-	imprimir(pila->elementos[i+1]);
+	//imprimir(pila->elementos[i+1]);
+
+	char* var = strdup(variables);
+	char* barraN = "\n";
+	char* str = string_itoa(pila->elementos[i+1]);
+	printf("el string_itoa queda %s\n",str);
+	string_append(&str,barraN);
+	string_append(&var,str);
+	variables = var;
+	printf("por ahora variables esta %s\n",variables);
+	//free(var);
+	//printf("%shola",str);
 }
 
 void mostrarEstadoVariables(){
@@ -266,6 +278,8 @@ void mostrarEstadoVariables(){
 
 void salirPorFinalizacion(){
 	mostrarEstadoVariables();
+	printf("variables queda %s\n",variables);
+	//destruirEstructuras();
 }
 
 

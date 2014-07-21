@@ -49,6 +49,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCBSF:
 				paquete = paquetizarStruct_pcbSF((t_struct_pcb *) estructuraOrigen);
 				break;
+			case D_STRUCT_PCBSEM:
+				paquete = paquetizarStruct_pcbSem((t_struct_pcb *) estructuraOrigen);
+				break;
 			case D_STRUCT_PCBFIN:
 				paquete = paquetizarStruct_pcbFin((t_struct_pcb_fin *) estructuraOrigen);
 				break;
@@ -380,6 +383,31 @@ t_stream* paquetizarStruct_pcbSF(t_struct_pcb* estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_pcbSem/1
+ * Argumentos:
+ * 		- estructura de tipo pcb
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: crearDataConHeader(24, length)
+ */
+t_stream* paquetizarStruct_pcbSem(t_struct_pcb* estructuraOrigen){
+
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb);
+
+	char* data = crearDataConHeader(D_STRUCT_PCBSEM, paquete->length);
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
  * Nombre: paquetizarStruct_pcbFin/1
  * Argumentos:
  * 		- estructura de tipo pcb
@@ -676,6 +704,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PCBSF:
 				estructuraDestino = despaquetizarStruct_pcbSF(dataPaquete, length);
 				break;
+			case D_STRUCT_PCBSEM:
+				estructuraDestino = despaquetizarStruct_pcbSF(dataPaquete, length);
+				break;
 			case D_STRUCT_PCBFIN:
 				estructuraDestino = despaquetizarStruct_pcbFin(dataPaquete, length);
 				break;
@@ -928,6 +959,26 @@ t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t lenght){
  * 		recibe el paquete y lo despaquetiza
  */
 t_struct_pcb* despaquetizarStruct_pcbSF(char* dataPaquete, uint16_t lenght){
+	t_struct_pcb* estructuraDestino = malloc(sizeof(t_struct_pcb));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_pcbSem/1
+ * Argumentos:
+ * 		-paquete
+ * 		-length
+ *
+ * Devuelve:
+ *		estructura de tipo D_STRUCT_PCBSEM
+ *
+ * Funcion:
+ * 		recibe el paquete y lo despaquetiza
+ */
+t_struct_pcb* despaquetizarStruct_pcbSem(char* dataPaquete, uint16_t lenght){
 	t_struct_pcb* estructuraDestino = malloc(sizeof(t_struct_pcb));
 
 	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb));

@@ -159,7 +159,7 @@ void pasarScript(char* str) {
 }
 
 void crearPrograma () {
-	pasarScript("# primero declaro las variables \nbegin \n		variables a, b \n	a = 20 \n	b <- doble a \n end \n function doble \n variables f \n		f = $0 + $0 \n		return f \n end\n");
+	pasarScript("# primero declaro las variables \nbegin \n		variables a, b \n	a = 20 \n	b <- doble a \n		print b \n	 end \n function doble \n variables f \n		f = $0 + $0 \n		return f \n end\n");
 	auxiliarCrearPrograma();
 }
 
