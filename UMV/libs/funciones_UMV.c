@@ -305,9 +305,9 @@ void dump(){
 			fputs ("File error",stderr); exit (1);
 		}
 
-	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o 'T' para verlos todos");
+	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
-	if(procesoAVer == 'T'){
+	if(procesoAVer == -1){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
 		int tablaFinal= procesoAVer++;
