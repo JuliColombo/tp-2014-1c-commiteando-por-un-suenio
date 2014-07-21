@@ -40,6 +40,7 @@ void controlarBloqueo(int sockKernel, int termino) {
 	}
 	if (valor_semaforo == 1) {
 		termino = BLOQUEADO;
+		//mando un pcbSem a kernel
 	}
 }
 

@@ -90,7 +90,6 @@ void insertarEnDiccionario(t_nombre_variable identificador_variable,t_puntero po
 	const char* str = convertirAString(identificador_variable);
 	t_elemento* elem = elemento_create(str, posicion);
 	dictionary_put(diccionario, elem->name, elem);
-
 }
 
 /******************************************** RESERVAR CONTEXTO ***********************************************************/
@@ -204,10 +203,13 @@ void guardarAlternado () {
 //Una vez que regenere el diccionario, pongo el top_index en la posicion del valor de la ultima variable, cosa que si se quieren definir nuevas con la funcion
 //calcularPosicion, no tire error.
 void regenerarDiccionario(int tamanio_contexto) {
+
 	int i = 0;
 	int top = top_index;
+	printf("top %d\n",top);
 
 	top_index -=1;
+
 	while (i < tamanio_contexto) {
 		guardarAlternado();
 		i++;
