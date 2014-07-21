@@ -311,8 +311,9 @@ void dump(){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
 
-		int tablaFinal= procesoAVer++;
-		imprimirEstadoTablaSeg(archivo_TS,procesoAVer,tablaFinal);
+		int ubicacion= getPosTabla(procesoAVer);
+		int tablaFinal=ubicacion+1;
+		imprimirEstadoTablaSeg(archivo_TS,ubicacion,tablaFinal);
 	}
 
 	//Va escribiendo en el archivo el contenido de las posiciones de la MP
@@ -347,13 +348,30 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 	fprintf(archivo, "%s", "El estado de la tabla de segmentos:\n\n");
 			while(i<tablaFinal){
 				j=0;
+				printf("La tabla ");
+				printf("%d", i);
+				printf(":\n Corresponde al programa ");
+				printf("%d", tablaDeSegmentos[i].id_prog);
+				printf("\n Cantidad de segmentos ");
+				printf("%d", tablaDeSegmentos[i].cant_segmentos);
+
 				fprintf(archivo, "%s", "La tabla ");
 				fprintf(archivo, "%d", i);
 				fprintf(archivo, "%s", ":\n Corresponde al programa ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].id_prog);
 				fprintf(archivo, "%s", "\n Cantidad de segmentos ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].cant_segmentos);
+
 				while(j<tablaDeSegmentos[i].cant_segmentos){
+				printf("\n Segmento ");
+				printf("%d", j);
+				printf(":\n Posicion real ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
+				printf("\n Posicion virtual ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].inicio);
+				printf("\n Tamanio ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].tamanio);
+
 				fprintf(archivo, "%s", "\n Segmento ");
 				fprintf(archivo, "%d", j);
 				fprintf(archivo, "%s", ":\n Posicion real ");
@@ -362,13 +380,15 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].inicio);
 				fprintf(archivo, "%s", "\n Tamanio ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].tamanio);
+
 				j++;
 				}
 				fprintf(archivo, "%s", " \n\n");
+				printf("\n\n");
 				i++;
 			}
+		sleep(retardo);
 }
-
 
 
 int validarPosicionVirtual(int posVirtual) {
