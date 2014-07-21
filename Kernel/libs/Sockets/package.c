@@ -567,11 +567,11 @@ t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estr
  * Devuelve:
  * 		paquete (buffer con la estructura paquetizada).
  *
- * Funcion: crearDataConHeader(22, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ * Funcion: crearDataConHeader(21, length) -> reserva la memoria para el data del paquete, y le agrega el header.
  */
 t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 
-	t_stream* paquete = malloc(sizeof(t_stream));
+	/*t_stream* paquete = malloc(sizeof(t_stream));
 
 	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb) + strlen(estructuraOrigen->dispositivo)+1+ sizeof(estructuraOrigen->tiempo);
 
@@ -604,6 +604,18 @@ t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, tamanoDato = strlen(estructuraOrigen->dispositivo)+1);		//copio a data el mensaje.
 
 	tamanoTotal += tamanoDato;
+
+	paquete->data = data;
+
+	return paquete;*/
+
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_pcb_io);
+
+	char* data = crearDataConHeader(D_STRUCT_PCBIO, paquete->length);
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_io));
 
 	paquete->data = data;
 
@@ -1039,7 +1051,7 @@ t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght)
  * 		recibe el paquete y lo despaquetiza
  */
 t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
-	t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
+	/*t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
 
 	int tamanoTotal = 0;
 
@@ -1059,6 +1071,12 @@ t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
 
 	estructuraDestino->dispositivo = malloc(tamanoDato);
 	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
+
+	return estructuraDestino;*/
+
+	t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_io));
 
 	return estructuraDestino;
 }

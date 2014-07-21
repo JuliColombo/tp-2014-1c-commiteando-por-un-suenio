@@ -593,6 +593,9 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
+	if(tipoRecibido == D_STRUCT_PCBIO){
+		printf("me llego D_STRUCT_PCBIO\n");
+	}
 	t_struct_semaforo* semaforo;
 	t_struct_pcb_io* pcb_io;
 	t_struct_string* string;
@@ -671,12 +674,13 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 		case D_STRUCT_PCBIO:
 			pcb_io = ((t_struct_pcb_io*)structRecibida);
+			printf("llego %s y %d\n",pcb_io->dispositivo,pcb_io->tiempo);
 			t_struct_io* bloqueo = malloc(sizeof(t_struct_io));
 			bloqueo->dispositivo=pcb_io->dispositivo;
 			bloqueo->pid=pcb_io->pid;
 			bloqueo->tiempo=pcb_io->tiempo;
 
-			printf("llego %s y %d\n",bloqueo->dispositivo,bloqueo->tiempo);
+			printf("bloqueo tiene %s y %d\n",bloqueo->dispositivo,bloqueo->tiempo);
 
 			/*pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 			free(bloqueo);
