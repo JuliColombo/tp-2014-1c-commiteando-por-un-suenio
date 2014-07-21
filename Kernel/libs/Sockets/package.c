@@ -1076,7 +1076,13 @@ t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
 
 	t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_io));
+	int tamanoDato = 0, tamanoTotal = 0;
+	memcpy(estructuraDestino, dataPaquete, tamanoTotal = sizeof(t_struct_pcb_io));
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->dispositivo = malloc(tamanoDato);
+	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
 
 	return estructuraDestino;
 }

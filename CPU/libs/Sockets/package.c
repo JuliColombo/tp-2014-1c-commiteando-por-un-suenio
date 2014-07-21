@@ -609,6 +609,10 @@ t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen){
 
 	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pcb_io));
 
+	int tamanoTotal = sizeof(t_header) + sizeof(t_struct_pcb_io);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->dispositivo, strlen(estructuraOrigen->dispositivo)+1);
+
 	paquete->data = data;
 
 	return paquete;
@@ -1040,7 +1044,13 @@ t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght)
 t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght){
 	t_struct_pcb_io* estructuraDestino = malloc(sizeof(t_struct_pcb_io));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb_io));
+	int tamanoDato = 0, tamanoTotal = 0;
+	memcpy(estructuraDestino, dataPaquete, tamanoTotal = sizeof(t_struct_pcb_io));
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->dispositivo = malloc(tamanoDato);
+	memcpy(estructuraDestino->dispositivo, dataPaquete + tamanoTotal, tamanoDato); //copio el string a la estructura
 
 	return estructuraDestino;
 }

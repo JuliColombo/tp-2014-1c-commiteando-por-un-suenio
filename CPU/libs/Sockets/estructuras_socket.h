@@ -168,8 +168,8 @@ typedef struct struct_pcb_io{
 		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
-		t_nombre_dispositivo dispositivo;
 		uint32_t tiempo;
+		t_nombre_dispositivo dispositivo;
 } __attribute__ ((__packed__)) t_struct_pcb_io;
 
 
