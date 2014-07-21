@@ -24,6 +24,8 @@ enum{
 
 int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format);
 int* vector_num(char**, char**);
+int validarSemaforo(char* semaforo);
+int validarVarGlobal(char* var_global);
 int cant_identificadores(char**);
 void log_error_socket(void);
 int posicion_Variable_Global(char*);

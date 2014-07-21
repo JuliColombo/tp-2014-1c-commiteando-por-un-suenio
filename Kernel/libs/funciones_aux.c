@@ -53,6 +53,51 @@ int* vector_num(char** vector_string_num, char** config_ids){
 }
 
 /*
+ * Nombre: validarSemaforo
+ * Argumentos:
+ * 		- semaforo(string)
+ *
+ * Devuelve:
+ * 		0 si es valido, -1 si es invalido
+ *
+ * Funcion: busca si el semaforo existe
+ */
+
+int validarSemaforo(char* semaforo){
+	int i=0;
+	while(configuracion_kernel.semaforos.id[i]!=semaforo){
+		i++;
+	}
+	if(cant_identificadores(configuracion_kernel.semaforos.id)<i){
+		return 0;
+	}
+	return -1;
+}
+
+/*
+ * Nombre: validarVarGlobal
+ * Argumentos:
+ * 		- variable global(string)
+ *
+ * Devuelve:
+ * 		0 si es valido, -1 si es invalido
+ *
+ * Funcion: busca si la variable global existe
+ */
+
+int validarVarGlobal(char* var_global){
+	int i=0;
+	while(configuracion_kernel.var_globales.identificador[i]!=var_global){
+		i++;
+	}
+	if(cant_identificadores(configuracion_kernel.var_globales.identificador)<i){
+		return 0;
+	}
+	return -1;
+}
+
+
+/*
  * Nombre: cant_identificadores/1
  * Argumentos:
  * 		- array de string
@@ -557,30 +602,31 @@ void handler_conexion_cpu(epoll_data_t data){
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			if(programa != NULL){
-			actualizarPCB(programa, pcb);
-			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
-			sem_post(&sem_cpu);
-			sem_post(&sem_multiProg);
+				actualizarPCB(programa, pcb);
+				mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
+				sem_post(&sem_cpu);
+				sem_post(&sem_multiProg);
 			}else{
 				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
 			break;
-		case D_STRUCT_STRING:
-
-
-
-
-			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
-
 			string = ((t_struct_string*)structRecibida);
-			int valor = valor_Variable_Global(string->string);
-			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+			if((validarVarGlobal(string->string))==0){
+				int valor = valor_Variable_Global(string->string);
+				t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+				paquete->numero=valor;
+				socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
+				free(paquete);
+			}else{
+				pthread_mutex_lock(mutex_log);
+				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
+				pthread_mutex_unlock(mutex_log);
+				//FINALIZAR PROGRAMA
 
-			paquete->numero=valor;
-			socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
-			free(paquete);
 
+
+			}
 
 			break;
 
