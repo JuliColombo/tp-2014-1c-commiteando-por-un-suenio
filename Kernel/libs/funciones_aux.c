@@ -65,9 +65,11 @@ int* vector_num(char** vector_string_num, char** config_ids){
 
 int validarSemaforo(char* semaforo){
 	int i=0;
+	pthread_mutex_lock(mutex_semaforos);
 	while(configuracion_kernel.semaforos.id[i]!=semaforo){
 		i++;
 	}
+	pthread_mutex_unlock(mutex_semaforos);
 	if(cant_identificadores(configuracion_kernel.semaforos.id)<i){
 		return 0;
 	}
@@ -87,9 +89,11 @@ int validarSemaforo(char* semaforo){
 
 int validarVarGlobal(char* var_global){
 	int i=0;
+	pthread_mutex_lock(mutex_var_compartidas);
 	while(configuracion_kernel.var_globales.identificador[i]!=var_global){
 		i++;
 	}
+	pthread_mutex_unlock(mutex_var_compartidas);
 	if(cant_identificadores(configuracion_kernel.var_globales.identificador)<i){
 		return 0;
 	}
@@ -622,22 +626,24 @@ void handler_conexion_cpu(epoll_data_t data){
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
 				pthread_mutex_unlock(mutex_log);
-				//FINALIZAR PROGRAMA
-
-
-
 			}
-
 			break;
 
 		case D_STRUCT_ASIGNARCOMPARTIDA:
 			compartida = ((t_struct_asignar_compartida*)structRecibida);
-			int posicion = posicion_Variable_Global(compartida->nombre);
-			pthread_mutex_lock(mutex_var_compartidas);
-			configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
-			pthread_mutex_unlock(mutex_var_compartidas);
+			if((validarVarGlobal(string->string))==0){
+				int posicion = posicion_Variable_Global(compartida->nombre);
+				pthread_mutex_lock(mutex_var_compartidas);
+				configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
+				pthread_mutex_unlock(mutex_var_compartidas);
+			}else{
+				pthread_mutex_lock(mutex_log);
+				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
+				pthread_mutex_unlock(mutex_log);
 
+			}
 			break;
+
 		case D_STRUCT_WAIT:
 			semaforo = ((t_struct_semaforo*)structRecibida);
 			t_struct_numero* senial = malloc(sizeof(t_struct_numero));
@@ -653,6 +659,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_unlock(mutex_semaforos);
 			free(senial);
 			break;
+
 		case D_STRUCT_SIGNALSEMAFORO:
 			semaforo = ((t_struct_semaforo*)structRecibida);
 			pthread_mutex_lock(mutex_semaforos);
