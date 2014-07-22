@@ -117,7 +117,7 @@ int traducirPosicion(int base){
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
-		if (!segmentationFault(base,offset,longitud)){
+		//if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
@@ -131,11 +131,11 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			} else {
+			/*} else {
 				printf("Seg fault\n");
 				sleep(retardo);
 				return;
-			}
+			}*/
 }
 
 
@@ -294,6 +294,35 @@ int getEspacioLibreMP(void){
 	}
 	return libre;
 }
+
+void imprimirBuffer(t_buffer buffer){
+	int tamanioBuffer= sizeof(buffer);
+	int i=0;
+	while (i<tamanioBuffer){
+		if(buffer[i] != NULL){
+		printf("%c", (char)buffer[i]);
+		}	else{
+			printf(" (NULL) ");
+		}
+		i++;
+	}
+	printf("\n");
+}
+
+void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){
+	int tamanioBuffer= sizeof(buffer);
+	int i=0;
+	while (i<tamanioBuffer){
+		if(buffer[i] != NULL){
+		fprintf(archivo,"%c",(char)buffer[i]);
+		} else{
+			fprintf(archivo," (NULL) ");
+		}
+		i++;
+	}
+	fprintf(archivo,"\n");
+}
+
 /*************************Dump: *************************/
 
 /*
@@ -311,6 +340,8 @@ void dump(){
 	FILE* archivo_TS;
 	int procesoAVer;
 	int getEspacioLibreMP(void);
+	void imprimirBuffer(t_buffer);
+	void imprimirBufferEnArchivo(t_buffer,FILE*);
 
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
@@ -348,13 +379,15 @@ void dump(){
 	//Contenido de la memoria principal
 	int offset,tamanio;
 	t_buffer buffer;
-	puts("\n Ingrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer \n");
+	puts("\n Ingrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer");
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
 	buffer = malloc((tamanio+1)*sizeof(char));
 	memcpy(buffer, (char *) &MP[offset], tamanio);
-	printf("La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);
-	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+	printf("La posicion de memoria %d contiene: \n", offset);
+	imprimirBuffer(buffer);
+	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: \n", offset);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+	imprimirBufferEnArchivo(buffer,archivo_MP); //Revisar si en archivo_MP, capaz tendria que ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 
@@ -661,6 +694,7 @@ void destruirSegmentosPrograma(int id_prog){
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Se destruyen segmentos de un programa", INFO, "");
 	pthread_mutex_unlock(mutex_log);
+	printf("Segmentos del programa %d destruidos con exito",id_prog);
 	sleep(retardo);
 	return;
 }
