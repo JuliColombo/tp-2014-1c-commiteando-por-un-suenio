@@ -283,7 +283,7 @@ int getEspacioLibreMP(void){
 	int libre=0;
 	int i=0;
 	while (i<tamanioMP){
-		if (&MP[i] == NULL) libre++;
+		if (MP[i] == NULL) libre++;
 		i++;
 	}
 	return libre;
@@ -304,6 +304,8 @@ void dump(){
 	FILE* archivo_MP;
 	FILE* archivo_TS;
 	int procesoAVer;
+	int getEspacioLibreMP(void);
+
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
 	if (archivo_MP==NULL) {
@@ -312,6 +314,7 @@ void dump(){
 	if (archivo_TS==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
+
 
 	//Estructuras de memoria
 	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
@@ -329,11 +332,11 @@ void dump(){
 	//Segmentos de los programas TODO
 
 	//Espacio libre
-	int getEspacioLibreMP(void);
+
 	int espacioLibre= getEspacioLibreMP();
 	printf("\n El espacio libre en la memoria principal es: \n");
 	printf("%d",espacioLibre);
-	fprintf(archivo_MP,"%s", "\n El espacio libre en la memoria principal es: \n");
+	fprintf(archivo_MP,"%s", "\n El espacio libre en la memoria principal es:");
 	fprintf(archivo_MP,"%d",espacioLibre);
 
 	//Contenido de la memoria principal
@@ -344,8 +347,8 @@ void dump(){
 	scanf("%d", &tamanio);
 	buffer = malloc((tamanio+1)*sizeof(char));
 	memcpy(buffer, (char *) &MP[offset], tamanio);
-	printf("La posicion de memoria %d contiene: %s\"\n", offset,(char*)buffer);
-	fprintf(archivo_MP, "La posicion de memoria %d contiene: %s\"\n", offset,(char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+	printf("La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);
+	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 
@@ -377,13 +380,6 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 	fprintf(archivo, "%s", "El estado de la tabla de segmentos:\n\n");
 			while(i<tablaFinal){
 				j=0;
-				printf("La tabla ");
-				printf("%d", i);
-				printf(":\n Corresponde al programa ");
-				printf("%d", tablaDeSegmentos[i].id_prog);
-				printf("\n Cantidad de segmentos ");
-				printf("%d", tablaDeSegmentos[i].cant_segmentos);
-
 				fprintf(archivo, "%s", "La tabla ");
 				fprintf(archivo, "%d", i);
 				fprintf(archivo, "%s", ":\n Corresponde al programa ");
@@ -391,15 +387,14 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 				fprintf(archivo, "%s", "\n Cantidad de segmentos ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].cant_segmentos);
 
+				printf("La tabla ");
+				printf("%d", i);
+				printf(":\n Corresponde al programa ");
+				printf("%d", tablaDeSegmentos[i].id_prog);
+				printf("\n Cantidad de segmentos ");
+				printf("%d", tablaDeSegmentos[i].cant_segmentos);
+
 				while(j<tablaDeSegmentos[i].cant_segmentos){
-				printf("\n Segmento ");
-				printf("%d", j);
-				printf(":\n Posicion real ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
-				printf("\n Posicion virtual ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].inicio);
-				printf("\n Tamanio ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].tamanio);
 
 				fprintf(archivo, "%s", "\n Segmento ");
 				fprintf(archivo, "%d", j);
@@ -410,13 +405,21 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 				fprintf(archivo, "%s", "\n Tamanio ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].tamanio);
 
+				printf("\n Segmento ");
+				printf("%d", j);
+				printf(":\n Posicion real ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
+				printf("\n Posicion virtual ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].inicio);
+				printf("\n Tamanio ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].tamanio);
+
 				j++;
 				}
 				fprintf(archivo, "%s", " \n\n");
-				printf("\n\n");
+				printf("\n");
 				i++;
 			}
-		sleep(retardo);
 }
 
 
