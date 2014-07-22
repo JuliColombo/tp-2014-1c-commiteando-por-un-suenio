@@ -42,13 +42,15 @@ void mostrarColasPorPantalla(t_list* lista, char* nombreLista){
 int cantidadProgramasEnPCP(void){
 	pthread_mutex_lock(mutex_cola_ready);
 	pthread_mutex_lock(mutex_cola_exec);
-	pthread_mutex_lock(mutex_cola_block);
+	pthread_mutex_lock(mutex_cola_block_io);
+	pthread_mutex_lock(mutex_cola_block_sem);
 
-	int cantidad = (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block));
+	int cantidad = (list_size(cola.ready)+list_size(cola.exec)+list_size(cola.block.io)+list_size(cola.block.sem));
 
 	pthread_mutex_unlock(mutex_cola_ready);
 	pthread_mutex_unlock(mutex_cola_exec);
-	pthread_mutex_unlock(mutex_cola_block);
+	pthread_mutex_unlock(mutex_cola_block_io);
+	pthread_mutex_unlock(mutex_cola_block_sem);
 	return cantidad;
 }
 
@@ -58,7 +60,8 @@ void inicializarColas(void){
 	cola.new=list_create();
 	cola.ready=list_create();
 	cola.exec=list_create();
-	cola.block=list_create();
+	cola.block.io=list_create();
+	cola.block.sem=list_create();
 	cola.exit=list_create();
 }
 
@@ -340,23 +343,38 @@ void core_pcp(void){
 
 
 
-void core_io(t_struct_io* bloqueo){
+void core_io(t_struct_pcb_io* bloqueo){
 	pthread_detach(pthread_self());
 	int i;
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
 		if((strcmp(bloqueo->dispositivo,configuracion_kernel.hio.id[i]))==0){
 			pthread_mutex_lock(mutex_cola_exec);
-			pthread_mutex_lock(mutex_cola_block);
+			pthread_mutex_lock(mutex_cola_block_io);
 			bloquearPrograma(bloqueo->pid);
 			pthread_mutex_unlock(mutex_cola_exec);
 
-			mostrarColasPorPantalla(cola.block,"block");
-			pthread_mutex_unlock(mutex_cola_block);
+			mostrarColasPorPantalla(cola.block.io,"block I/O");
+			pthread_mutex_unlock(mutex_cola_block_io);
 
-			sleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]);
-
+			sleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]*0.001);
+			printf("Pasa el bloqueo\n");
+			break;
 		}
 	}
+
+		t_struct_pcb* pcb = malloc(sizeof(t_struct_pcb));
+		pcb->c_stack=bloqueo->c_stack;
+		pcb->codigo=bloqueo->codigo;
+		pcb->index_codigo=bloqueo->index_codigo;
+		pcb->index_etiquetas=bloqueo->index_etiquetas;
+		pcb->program_counter=bloqueo->program_counter;
+		pcb->stack=bloqueo->stack;
+		pcb->tamanio_contexto=bloqueo->tamanio_contexto;
+		pcb->tamanio_indice=bloqueo->tamanio_indice;
+		t_programa* programa = ((t_programa*)buscarPrograma(bloqueo->pid,cola.exec,mutex_cola_exec));
+		actualizarPCB(programa, pcb);
+		mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.io, mutex_cola_block_io);
+		free(bloqueo);
 
 	return;
 }

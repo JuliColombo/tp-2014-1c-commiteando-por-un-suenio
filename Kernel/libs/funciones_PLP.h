@@ -32,7 +32,8 @@ extern cola_procesos cola;
 extern pthread_mutex_t* mutex_cola_new;
 extern pthread_mutex_t* mutex_cola_ready;
 extern pthread_mutex_t* mutex_cola_exec;
-extern pthread_mutex_t* mutex_cola_block;
+extern pthread_mutex_t* mutex_cola_block_io;
+extern pthread_mutex_t* mutex_cola_block_sem;
 extern pthread_mutex_t* mutex_cola_exit;
 extern pthread_mutex_t* mutex_pid;
 extern pthread_mutex_t* mutex_solicitarMemoria;
@@ -70,7 +71,7 @@ void enviar_pcb_a_cpu(void);
 /************************* HILOS *************************/
 void core_plp(void);
 void core_pcp(void);
-void core_io(t_struct_io* bloqueo);
+void core_io(t_struct_pcb_io* bloqueo);
 void core_conexion_plp_programas(void);
 void core_conexion_umv(void);
 void core_conexion_pcp_cpu(void);

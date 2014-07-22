@@ -90,7 +90,6 @@ void core_conexion_kernel(void){
 				//Esto va a aca? O lo pongo en parserCPU cuando devuelvo el pcb?
 				printf("el pid es: %d\n", pcb->pid);
 				sleep(3);
-				char* str = "impresora";
 				int tam = sizeof(t_struct_pcb_io);//+strlen(str)+1;//+sizeof(int);
 				pcb_actualizada = malloc(tam);
 				pcb_actualizada->pid=pcb->pid;
@@ -102,8 +101,9 @@ void core_conexion_kernel(void){
 				pcb_actualizada->stack=pcb->stack;
 				pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-				pcb_actualizada->tiempo = 5;
-				pcb_actualizada->dispositivo=str;
+				pcb_actualizada->dispositivo="HDD1";
+				pcb_actualizada->tiempo=5;
+
 				int i = socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
 				if(i==1){
 					printf("Se mando bien el paquete\n");

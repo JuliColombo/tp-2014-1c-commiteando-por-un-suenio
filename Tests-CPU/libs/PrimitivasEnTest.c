@@ -20,6 +20,7 @@ int quantum = 155;
 int i;
 extern int stack;
 extern int cursor;
+char* variables = "";
 
 AnSISOP_funciones funciones_parser = {
 			.AnSISOP_definirVariable		= definirVariableTest,
@@ -250,14 +251,22 @@ void esperar_retardo(int tiempo){
 
 
 void destruirEstructuras(){
-	//SOCKET A UMV PARA QUE DESTRUYA STACK Y/O INDICE DE CODIGO Y/O INDICE DE ETIQUETAS
-	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+	//ME CUESTA ELIMINARLO, ESPEROOOO, QUE POR UN PRBLEMA DE LOS TESTS.
+	//dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+	free(variables);
 }
 
 void closureMostrarEstado(char* key, t_elemento* elem) {
 	printf("\n\naca viene lo del closure\n\n ");
 	t_puntero i = elem->pos;
-	imprimir(pila->elementos[i+1]);
+
+	char* var = strdup(variables);
+	char* barraN = "\n";
+	char* str = string_itoa(pila->elementos[i+1]);
+	string_append(&str,barraN);
+	string_append(&var,str);
+	variables = strdup(var);
+	free(var);
 }
 
 void mostrarEstadoVariables(){
@@ -266,6 +275,8 @@ void mostrarEstadoVariables(){
 
 void salirPorFinalizacion(){
 	mostrarEstadoVariables();
+	printf("variables queda %s\n",variables);
+	destruirEstructuras();
 }
 
 

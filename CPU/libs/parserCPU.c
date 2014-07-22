@@ -117,8 +117,13 @@ void closureMostrarEstado(char* key, t_elemento* elem) {
 
 	chequearSiHuboSF();
 
+	char* var = strdup(variables);
+	char* barraN = "\n";
 	char* str = string_itoa(valor_variable);
-	string_append(&variables,str);
+	string_append(&str,barraN);
+	string_append(&var,str);
+	variables = strdup(var);
+	free(var);
 
 }
 
