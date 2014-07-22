@@ -279,7 +279,15 @@ int ubicarSegmentoEnTabla(int posicionR){
 	return -1;
 }
 
-
+int getEspacioLibreMP(void){
+	int libre=0;
+	int i=0;
+	while (i<tamanioMP){
+		if (MP[i] == NULL) libre++;
+		i++;
+	}
+	return libre;
+}
 /*************************Dump: *************************/
 
 /*
@@ -296,34 +304,58 @@ void dump(){
 	FILE* archivo_MP;
 	FILE* archivo_TS;
 	int procesoAVer;
+	int getEspacioLibreMP(void);
+
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
 	if (archivo_MP==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
 	if (archivo_TS==NULL) {
-			fputs ("File error",stderr); exit (1);
-		}
+		fputs ("File error",stderr); exit (1);
+	}
 
+
+	//Estructuras de memoria
 	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
-
 		int ubicacion= getPosTabla(procesoAVer);
 		int tablaFinal=ubicacion+1;
 		imprimirEstadoTablaSeg(archivo_TS,ubicacion,tablaFinal);
 	}
 
-	//Va escribiendo en el archivo el contenido de las posiciones de la MP
-	imprimirEstadoMP(archivo_MP);
+	//Memoria Principal
+
+	//Segmentos de los programas TODO
+
+	//Espacio libre
+
+	int espacioLibre= getEspacioLibreMP();
+	printf("\n El espacio libre en la memoria principal es: \n");
+	printf("%d",espacioLibre);
+	fprintf(archivo_MP,"%s", "\n El espacio libre en la memoria principal es:");
+	fprintf(archivo_MP,"%d",espacioLibre);
+
+	//Contenido de la memoria principal
+	int offset,tamanio;
+	t_buffer buffer;
+	puts("\n Ingrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer \n");
+	scanf("%d", &offset);
+	scanf("%d", &tamanio);
+	buffer = malloc((tamanio+1)*sizeof(char));
+	memcpy(buffer, (char *) &MP[offset], tamanio);
+	printf("La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);
+	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: %s \n", offset,(char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+
+	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
-
-	sleep(retardo);
 	fclose(archivo_MP);
 	fclose(archivo_TS);
+	sleep(retardo); //O dejarlo hasta que apreten algo
 }
 
 void imprimirEstadoMP(FILE* archivo){
@@ -348,13 +380,6 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 	fprintf(archivo, "%s", "El estado de la tabla de segmentos:\n\n");
 			while(i<tablaFinal){
 				j=0;
-				printf("La tabla ");
-				printf("%d", i);
-				printf(":\n Corresponde al programa ");
-				printf("%d", tablaDeSegmentos[i].id_prog);
-				printf("\n Cantidad de segmentos ");
-				printf("%d", tablaDeSegmentos[i].cant_segmentos);
-
 				fprintf(archivo, "%s", "La tabla ");
 				fprintf(archivo, "%d", i);
 				fprintf(archivo, "%s", ":\n Corresponde al programa ");
@@ -362,15 +387,14 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 				fprintf(archivo, "%s", "\n Cantidad de segmentos ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].cant_segmentos);
 
+				printf("La tabla ");
+				printf("%d", i);
+				printf(":\n Corresponde al programa ");
+				printf("%d", tablaDeSegmentos[i].id_prog);
+				printf("\n Cantidad de segmentos ");
+				printf("%d", tablaDeSegmentos[i].cant_segmentos);
+
 				while(j<tablaDeSegmentos[i].cant_segmentos){
-				printf("\n Segmento ");
-				printf("%d", j);
-				printf(":\n Posicion real ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
-				printf("\n Posicion virtual ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].inicio);
-				printf("\n Tamanio ");
-				printf("%d", tablaDeSegmentos[i].segmentos[j].tamanio);
 
 				fprintf(archivo, "%s", "\n Segmento ");
 				fprintf(archivo, "%d", j);
@@ -381,13 +405,21 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 				fprintf(archivo, "%s", "\n Tamanio ");
 				fprintf(archivo, "%d", tablaDeSegmentos[i].segmentos[j].tamanio);
 
+				printf("\n Segmento ");
+				printf("%d", j);
+				printf(":\n Posicion real ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].ubicacionMP);
+				printf("\n Posicion virtual ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].inicio);
+				printf("\n Tamanio ");
+				printf("%d", tablaDeSegmentos[i].segmentos[j].tamanio);
+
 				j++;
 				}
 				fprintf(archivo, "%s", " \n\n");
-				printf("\n\n");
+				printf("\n");
 				i++;
 			}
-		sleep(retardo);
 }
 
 
@@ -514,16 +546,16 @@ int inicializarTabla(int id_prog){
 		//FIXME: no funciona bien este realloc
 		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
 		if(aux_tabla==NULL){
-						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-						abort();
-					}
+			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+			abort();
+		}
 		tablaDeSegmentos = aux_tabla;
 		i=cant_tablas;
 		aux_segmentos = malloc(sizeof(segmentDescriptor));
-								if(aux_segmentos==NULL){
-									log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-									abort();
-								}
+			if(aux_segmentos==NULL){
+			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+			abort();
+			}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		tablaDeSegmentos[i].cant_segmentos=0;
 		cant_tablas++;
@@ -710,8 +742,7 @@ void inicializarConfiguracion(void){
 	int control = lstat(PATH, &file_info);
 	if (control == -1){
 		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-	}
-	else{
+	}else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
@@ -733,7 +764,6 @@ void core_conexion_cpu(void){
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	escribir_log(archLog, "Escuchando en el socket de CPU's", INFO, "");
-
 	}
 
 	while(1){
@@ -972,7 +1002,7 @@ void *consola (void){
 				  int valorRetardo;
 				  scanf("%d", &valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				  retardo= valorRetardo;
+				  retardo= valorRetardo/1000;
 				  escribir_log(archLog, "Se cambia el valor del retardo", INFO, "");
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
