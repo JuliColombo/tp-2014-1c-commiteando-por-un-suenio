@@ -55,18 +55,22 @@ void log_error_socket(void){
 }
 
 int validacionSegFault(int base, int offset,int longitud){
-
-	int numTabla=ubicarEnTabla(base);
-	int numSeg=ubicarSegmentoEnTabla(base);
-	if (tablaDeSegmentos[numTabla].segmentos[numSeg].tamanio > (offset+longitud)) return 0;
+	int pos=traducirPosicion(base);
+	int numTabla=ubicarEnTabla(pos);
+	int numSeg=ubicarSegmentoEnTabla(pos);
+	printf("El numero de tabla es: %d y el numero de segmento es: %d\n", numTabla, numSeg);
+	if (tablaDeSegmentos[numTabla].segmentos[numSeg].tamanio >= (offset+longitud)){
+		return 0;
+	} else {
 	return 1;
+	}
 }
 
-int segmentationFault(int base,int offset,int longitud){// TODO Revisar bien esto y el memOverload de abajo
+int segmentationFault(int base,int offset,int longitud){
 	if (validacionSegFault(base,offset,longitud) ) {
-		escribir_log(archLog, "SegmentationFault", ERROR, "Segmentation fault al intentar acceder a la posicion");
-		return true;
-	} else return false;
+		escribir_log(archLog, "Segmentation Fault", ERROR, "Segmentation fault al intentar acceder a la posicion");
+		return 1;
+	} else return 0;
 }
 
 
@@ -75,6 +79,7 @@ int segmentationFault(int base,int offset,int longitud){// TODO Revisar bien est
 
 t_buffer solicitarBytes(int base,int offset, int longitud){
 	t_buffer buffer;
+	if(!segmentationFault(base, offset, longitud)){
 	buffer = malloc((longitud+1)*sizeof(char));
 	int j;
 	j=traducirPosicion(base)+offset;
@@ -84,6 +89,10 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
+	} else {
+		printf("Seg fault\n");
+		return NULL;
+	}
 }
 
 int traducirPosicion(int base){
@@ -107,13 +116,8 @@ int traducirPosicion(int base){
 
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int i=0;
 	int j,aux;
-	while(i<longitud){
-		//printf("El valor de la posicion %d del buffer es: %d\n",i,*(int*)buffer[i]);
-		i++;
-	}
-		if (segmentationFault(base,offset,longitud)){
+		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
@@ -124,12 +128,14 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			j=traducirPosicion(base)+offset;
 			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
 			printf("El resultado de la asignacion es:\n");
-			i=0;
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			} else puts("No se pudo realizar la asignacion");
-		sleep(retardo);
+			} else {
+				printf("Seg fault\n");
+				sleep(retardo);
+				return;
+			}
 }
 
 
@@ -476,7 +482,6 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	if(ubicacion==-1){
 			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
-			compactar();
 			sleep(retardo);
 			return -1;
 		}
