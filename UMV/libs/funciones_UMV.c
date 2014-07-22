@@ -279,7 +279,14 @@ int ubicarSegmentoEnTabla(int posicionR){
 	return -1;
 }
 
-
+int getEspacioLibreMP(void){
+	int libre,i=0;
+	while (i<tamanioMP){
+		if (MP[i]==NULL) libre++;
+		i++;
+	}
+	return libre;
+}
 /*************************Dump: *************************/
 
 /*
@@ -319,7 +326,7 @@ void dump(){
 
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 
-	sleep(retardo);
+	getch();
 	fclose(archivo_MP);
 	fclose(archivo_TS);
 }
