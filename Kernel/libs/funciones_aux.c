@@ -629,11 +629,11 @@ void handler_conexion_cpu(epoll_data_t data){
 			if(programa != NULL){
 				actualizarPCB(programa, pcb);
 				mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
-				sem_post(&sem_cpu);
-				sem_post(&sem_multiProg);
 			}else{
 				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
+			sem_post(&sem_cpu);
+			sem_post(&sem_multiProg);
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
 			string = ((t_struct_string*)structRecibida);
@@ -706,6 +706,8 @@ void handler_conexion_cpu(epoll_data_t data){
 			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
 
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
+
+			sem_post(&sem_cpu);
 
 			break;
 		case D_STRUCT_PCBFIN:

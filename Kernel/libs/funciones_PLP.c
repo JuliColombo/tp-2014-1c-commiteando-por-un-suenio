@@ -306,19 +306,20 @@ void core_pcp(void){
 
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 
+
+	pthread_mutex_lock(mutex_cola_ready);
+	mostrarColasPorPantalla(cola.ready,"Ready");
+	pthread_mutex_unlock(mutex_cola_ready);
 	while(1){
 		sem_wait(&sem_multiProg);
 		sem_wait(&sem_cpu);
 
-//		pthread_mutex_lock(mutex_cola_ready);
-//		mostrarColasPorPantalla(cola.ready,"Ready");
-//		pthread_mutex_unlock(mutex_cola_ready);
-
-		enviar_pcb_a_cpu();
-
-		pthread_mutex_lock(mutex_cola_exec);
-		mostrarColasPorPantalla(cola.exec, "Exec");
-		pthread_mutex_unlock(mutex_cola_exec);
+		if(list_size(cola.ready)!=0){
+			enviar_pcb_a_cpu();
+			pthread_mutex_lock(mutex_cola_exec);
+			mostrarColasPorPantalla(cola.exec, "Exec");
+			pthread_mutex_unlock(mutex_cola_exec);
+		}
 
 
 	/*	if(programa->flag_bloqueado==1){
@@ -357,11 +358,9 @@ void core_io(t_struct_pcb_io* bloqueo){
 			pthread_mutex_unlock(mutex_cola_block_io);
 
 			sleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]*0.001);
-			printf("Pasa el bloqueo\n");
 			break;
 		}
 	}
-
 		t_struct_pcb* pcb = malloc(sizeof(t_struct_pcb));
 		pcb->c_stack=bloqueo->c_stack;
 		pcb->codigo=bloqueo->codigo;
@@ -371,9 +370,14 @@ void core_io(t_struct_pcb_io* bloqueo){
 		pcb->stack=bloqueo->stack;
 		pcb->tamanio_contexto=bloqueo->tamanio_contexto;
 		pcb->tamanio_indice=bloqueo->tamanio_indice;
-		t_programa* programa = ((t_programa*)buscarPrograma(bloqueo->pid,cola.exec,mutex_cola_exec));
+		t_programa* programa = buscarPrograma(bloqueo->pid,cola.block.io,mutex_cola_block_io);
 		actualizarPCB(programa, pcb);
-		mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.io, mutex_cola_block_io);
+		mandarAOtraCola(programa, cola.block.io, mutex_cola_block_io, cola.ready, mutex_cola_ready);
+//		pthread_mutex_lock(mutex_cola_ready);
+//		mostrarColasPorPantalla(cola.ready, "Ready");
+//		pthread_mutex_unlock(mutex_cola_ready);
+		sem_post(&sem_multiProg);
+
 		free(bloqueo);
 
 	return;
