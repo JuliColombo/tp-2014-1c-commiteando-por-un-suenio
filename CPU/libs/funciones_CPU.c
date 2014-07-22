@@ -102,14 +102,19 @@ void core_conexion_kernel(void){
 				pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
 				pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
 				pcb_actualizada->dispositivo="HDD1";
-				pcb_actualizada->tiempo=5;
+				pcb_actualizada->tiempo=10;
 
-				int i = socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
-				if(i==1){
-					printf("Se mando bien el paquete\n");
-					free(pcb_actualizada);
-					free(pcb);
+				if(pcb_recibida->pid==0){
+
+					int i = socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
+					if(i==1){
+						printf("Se mando bien la actualizada\n");
+					}
+				}else{
+					socket_enviar(sockKernel,D_STRUCT_PCB,pcb_recibida);
 				}
+						free(pcb_actualizada);
+						free(pcb);
 			}
 //			pcb->program_counter=pcb->program_counter+1;
 //			pcb_actualizada=pcb_recibida;

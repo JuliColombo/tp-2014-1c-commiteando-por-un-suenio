@@ -704,7 +704,12 @@ void handler_conexion_cpu(epoll_data_t data){
 		case D_STRUCT_PCBIO:
 			liberarCPU(data.fd);
 			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
-
+			pthread_mutex_lock(mutex_cola_exec);
+			pthread_mutex_lock(mutex_cola_block_io);
+			bloquearPrograma(bloqueo->pid);
+			pthread_mutex_unlock(mutex_cola_exec);
+			mostrarColasPorPantalla(cola.block.io,"block I/O");
+			pthread_mutex_unlock(mutex_cola_block_io);
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 
 			sem_post(&sem_cpu);
@@ -717,9 +722,7 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			printf("llego %s\n",pcb_fin->variables);
 	}
-	pthread_mutex_lock(mutex_cola_ready);
-	mostrarColasPorPantalla(cola.ready,"Ready");
-	pthread_mutex_unlock(mutex_cola_ready);
+
 
 	return;
 }

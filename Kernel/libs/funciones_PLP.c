@@ -257,6 +257,7 @@ void enviar_pcb_a_cpu(void){
 		list_add(cola.exec,programa);
 		pthread_mutex_unlock(mutex_cola_exec);
 		free(paquete);
+
 	}else{
 		free(paquete);
 		enviar_pcb_a_cpu();
@@ -307,11 +308,11 @@ void core_pcp(void){
 	pthread_create(&conexion_plp_cpu, NULL, (void*) &core_conexion_pcp_cpu, NULL);
 
 
-	pthread_mutex_lock(mutex_cola_ready);
-	mostrarColasPorPantalla(cola.ready,"Ready");
-	pthread_mutex_unlock(mutex_cola_ready);
 	while(1){
 		sem_wait(&sem_multiProg);
+		pthread_mutex_lock(mutex_cola_ready);
+		mostrarColasPorPantalla(cola.ready,"Ready");
+		pthread_mutex_unlock(mutex_cola_ready);
 		sem_wait(&sem_cpu);
 
 		if(list_size(cola.ready)!=0){
@@ -321,18 +322,6 @@ void core_pcp(void){
 			pthread_mutex_unlock(mutex_cola_exec);
 		}
 
-
-	/*	if(programa->flag_bloqueado==1){
-			pthread_mutex_lock(mutex_cola_block);
-			bloquearPrograma(programa->pcb->pid);
-			mostrarColasPorPantalla(cola.block,"Block");
-			pthread_mutex_unlock(mutex_cola_block);
-
-		}
-
-		if(programa->flag_terminado==1){
-
-		}*/
 
 	}
 
@@ -349,14 +338,6 @@ void core_io(t_struct_pcb_io* bloqueo){
 	int i;
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
 		if((strcmp(bloqueo->dispositivo,configuracion_kernel.hio.id[i]))==0){
-			pthread_mutex_lock(mutex_cola_exec);
-			pthread_mutex_lock(mutex_cola_block_io);
-			bloquearPrograma(bloqueo->pid);
-			pthread_mutex_unlock(mutex_cola_exec);
-
-			mostrarColasPorPantalla(cola.block.io,"block I/O");
-			pthread_mutex_unlock(mutex_cola_block_io);
-
 			sleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]*0.001);
 			break;
 		}
