@@ -280,9 +280,10 @@ int ubicarSegmentoEnTabla(int posicionR){
 }
 
 int getEspacioLibreMP(void){
-	int libre,i=0;
+	int libre=0;
+	int i=0;
 	while (i<tamanioMP){
-		if (MP[i]==NULL) libre++;
+		if (&MP[i] == NULL) libre++;
 		i++;
 	}
 	return libre;
@@ -311,6 +312,8 @@ void dump(){
 	if (archivo_TS==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
+
+	//Estructuras de memoria
 	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
@@ -321,14 +324,35 @@ void dump(){
 		imprimirEstadoTablaSeg(archivo_TS,ubicacion,tablaFinal);
 	}
 
-	//Va escribiendo en el archivo el contenido de las posiciones de la MP
-	imprimirEstadoMP(archivo_MP);
+	//Memoria Principal
+
+	//Segmentos de los programas TODO
+
+	//Espacio libre
+	int getEspacioLibreMP(void);
+	int espacioLibre= getEspacioLibreMP();
+	printf("\n El espacio libre en la memoria principal es: \n");
+	printf("%d",espacioLibre);
+	fprintf(archivo_MP,"%s", "\n El espacio libre en la memoria principal es: \n");
+	fprintf(archivo_MP,"%d",espacioLibre);
+
+	//Contenido de la memoria principal
+	int offset,tamanio;
+	t_buffer buffer;
+	puts("\n Ingrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer \n");
+	scanf("%d", &offset);
+	scanf("%d", &tamanio);
+	buffer = malloc((tamanio+1)*sizeof(char));
+	memcpy(buffer, (char *) &MP[offset], tamanio);
+	printf("La posicion de memoria %d contiene: %s\"\n", offset,(char*)buffer);
+	fprintf(archivo_MP, "La posicion de memoria %d contiene: %s\"\n", offset,(char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+
+	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
-
-	getch();
 	fclose(archivo_MP);
 	fclose(archivo_TS);
+	sleep(retardo); //O dejarlo hasta que apreten algo
 }
 
 void imprimirEstadoMP(FILE* archivo){
