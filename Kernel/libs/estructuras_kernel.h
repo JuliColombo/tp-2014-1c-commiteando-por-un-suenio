@@ -71,11 +71,17 @@ typedef struct{
 	t_nombre_cola nombre_de_la_Cola;
 } t_lista_programas;
 
+
+typedef struct{
+	t_list* io;
+	t_list* sem;
+}t_block;
+
 typedef struct{
 	t_list* new;
 	t_list* ready;
 	t_list* exec;
-	t_list* block;
+	t_block* block;
 	t_list* exit;
 } cola_procesos;
 

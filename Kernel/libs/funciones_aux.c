@@ -194,6 +194,25 @@ int posicion_Semaforo(char* semaforo){
 
 
 /*
+ * Nombre: liberarCPU/1
+ * Argumentos:
+ * 		- fd
+ *
+ * Devuelve: nada
+ *
+ *
+ * Funcion: libera un cpu
+ */
+
+void liberarCPU(int fd){
+	pthread_mutex_lock(mutex_array);
+	int pos = buscar_cpu_por_fd(fd);
+	estado_cpu[pos]=LIBRE;
+	pthread_mutex_unlock(mutex_array);
+	return;
+}
+
+/*
  * Nombre: inicializarSemaforos/0
  * Argumentos:
  * 		-
@@ -208,7 +227,8 @@ void inicializarMutex(void){
 	mutex_cola_new=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_ready=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_exec=malloc(sizeof(pthread_mutex_t));
-	mutex_cola_block=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_block_io=malloc(sizeof(pthread_mutex_t));
+	mutex_cola_block_sem=malloc(sizeof(pthread_mutex_t));
 	mutex_cola_exit=malloc(sizeof(pthread_mutex_t));
 	mutex_pid=malloc(sizeof(pthread_mutex_t));
 	mutex_solicitarMemoria=malloc(sizeof(pthread_mutex_t));
@@ -220,7 +240,8 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_cola_new,NULL);
 	pthread_mutex_init(mutex_cola_ready,NULL);
 	pthread_mutex_init(mutex_cola_exec,NULL);
-	pthread_mutex_init(mutex_cola_block,NULL);
+	pthread_mutex_init(mutex_cola_block_io,NULL);
+	pthread_mutex_init(mutex_cola_block_sem,NULL);
 	pthread_mutex_init(mutex_cola_exit,NULL);
 	pthread_mutex_init(mutex_pid,NULL);
 	pthread_mutex_init(mutex_solicitarMemoria,NULL);
@@ -602,10 +623,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_PCB:
-			pthread_mutex_lock(mutex_array);
-			int pos = buscar_cpu_por_fd(data.fd);
-			estado_cpu[pos]=LIBRE;
-			pthread_mutex_unlock(mutex_array);
+			liberarCPU(data.fd);
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			if(programa != NULL){
@@ -670,31 +688,31 @@ void handler_conexion_cpu(epoll_data_t data){
 			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
 			pthread_mutex_unlock(mutex_semaforos);
 			break;
-		case D_STRUCT_PCBIO:
-			pcb_io = ((t_struct_pcb_io*)structRecibida);
-			t_struct_io* bloqueo = malloc(sizeof(t_struct_io));
-			bloqueo->dispositivo=pcb_io->dispositivo;
-			bloqueo->pid=pcb_io->pid;
-			bloqueo->tiempo=pcb_io->tiempo;
 
-
-			/*pthread_create(&io, NULL, (void*) &core_io, bloqueo);
-			free(bloqueo);
-			pcb = malloc(sizeof(t_struct_pcb));
-			pcb->c_stack=pcb_io->c_stack;
-			pcb->codigo=pcb_io->codigo;
-			pcb->index_codigo=pcb_io->index_codigo;
-			pcb->index_etiquetas=pcb_io->index_etiquetas;
-			pcb->program_counter=pcb_io->program_counter;
-			pcb->stack=pcb_io->stack;
-			pcb->tamanio_contexto=pcb_io->tamanio_contexto;
-			pcb->tamanio_indice=pcb_io->tamanio_indice;
-			programa = ((t_programa*)buscarPrograma(pcb_io->pid,cola.exec,mutex_cola_exec));
+		case D_STRUCT_PCBSEM:
+			liberarCPU(data.fd);
+			pcb = ((t_struct_pcb*)structRecibida);
+			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			actualizarPCB(programa, pcb);
-			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block, mutex_cola_block);*/
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block->sem, mutex_cola_block_sem);
+			pthread_mutex_lock(mutex_cola_block_sem);
+			mostrarColasPorPantalla(cola.block->sem, "Block por Semaforos");
+			pthread_mutex_unlock(mutex_cola_block_sem);
+
+
+			break;
+		case D_STRUCT_PCBIO:
+			liberarCPU(data.fd);
+			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
+
+			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
+
 			break;
 		case D_STRUCT_PCBFIN:
+			liberarCPU(data.fd);
 			pcb_fin = ((t_struct_pcb_fin*)structRecibida);
+
+
 			printf("llego %s\n",pcb_fin->variables);
 	}
 	pthread_mutex_lock(mutex_cola_ready);
