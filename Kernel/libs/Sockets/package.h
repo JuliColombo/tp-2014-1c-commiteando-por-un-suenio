@@ -52,7 +52,6 @@ t_struct_char* despaquetizarStruct_char(char * dataPaquete, uint16_t length);
 t_struct_string* despaquetizarStruct_string(char * dataPaquete, uint16_t length);
 t_struct_signal* despaquetizarStruct_signal(char * dataPaquete, uint16_t length);
 t_struct_pcb* despaquetizarStruct_pcb(char* dataPaquete, uint16_t length);
-t_struct_pidycodigo* despaquetizarStruct_pidycodigo(char* dataPaquete, uint16_t length);
 t_struct_push* despaquetizarStruct_push(char* dataPaquete, uint16_t length);
 t_struct_pop* despaquetizarStruct_pop(char* dataPaquete, uint16_t length);
 t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataPaquete, uint16_t length);

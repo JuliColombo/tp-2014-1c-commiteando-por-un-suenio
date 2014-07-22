@@ -345,7 +345,7 @@ void bloquearPrograma(int pid){
 	}
 	t_programa* programa;
 	programa = (t_programa*) list_remove(cola.exec,position);
-	list_add(cola.block,(void*)programa);
+	list_add(cola.block.io,(void*)programa);
 
 	return;
 }
@@ -694,9 +694,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			actualizarPCB(programa, pcb);
-			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block->sem, mutex_cola_block_sem);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
 			pthread_mutex_lock(mutex_cola_block_sem);
-			mostrarColasPorPantalla(cola.block->sem, "Block por Semaforos");
+			mostrarColasPorPantalla(cola.block.sem, "Block por Semaforos");
 			pthread_mutex_unlock(mutex_cola_block_sem);
 
 

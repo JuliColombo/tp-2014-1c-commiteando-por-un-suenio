@@ -81,7 +81,7 @@ typedef struct{
 	t_list* new;
 	t_list* ready;
 	t_list* exec;
-	t_block* block;
+	t_block block;
 	t_list* exit;
 } cola_procesos;
 
