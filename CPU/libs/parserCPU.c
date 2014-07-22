@@ -32,7 +32,7 @@ AnSISOP_kernel funciones_kernel = {
 void darValoresDeStackYCursor(t_pcb* pcb){
 	if(pcb->c_stack == pcb->stack){
 		cursor = 0;
-		stack = 0;								//CON O SIN ASTERISCOS?
+		stack = 0;								//CON ASTERISCOS
 	} else {
 		stack = 0;
 		cursor = pcb->c_stack - pcb->stack;
@@ -94,6 +94,7 @@ void hot_plug(int signum) {
 
 void destruirEstructuras(){
 	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+	free(variables);
 }
 
 void closureMostrarEstado(char* key, t_elemento* elem) {
@@ -210,6 +211,28 @@ void salir(int termino) {
 	break;
 
 	case IO:
+		break;
+	case BLOQUEADO:
+		log_escribir(archLog,"Ejecucion",INFO,"Se bloquea");
+
+		t_struct_pcb* pcb_actualizada;
+		int tam = sizeof(t_struct_pcb);
+		pcb_actualizada = malloc(tam);
+		pcb_actualizada->pid=pcb->pid;
+		pcb_actualizada->c_stack=pcb->c_stack;
+		pcb_actualizada->codigo=pcb->codigo;
+		pcb_actualizada->index_codigo=pcb->index_codigo;
+		pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
+		pcb_actualizada->program_counter=pcb->program_counter;
+		pcb_actualizada->stack=pcb->stack;
+		pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
+		pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
+		int i = socket_enviar(sockKernel,D_STRUCT_PCBSEM,pcb_actualizada);
+		if(i==1){
+			printf("Se mando bien el paquete\n");
+			free(pcb_actualizada);
+			free(pcb);
+			}
 		break;
 }
 }

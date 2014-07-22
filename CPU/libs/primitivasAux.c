@@ -40,26 +40,6 @@ void controlarBloqueo(int sockKernel, int termino) {
 	}
 	if (valor_semaforo == 1) {
 		termino = BLOQUEADO;
-
-		t_struct_pcb* pcb_actualizada;
-		printf("el pid es: %d\n", pcb->pid);
-		int tam = sizeof(t_struct_pcb);//+strlen(str)+1;//+sizeof(int);
-		pcb_actualizada = malloc(tam);
-		pcb_actualizada->pid=pcb->pid;
-		pcb_actualizada->c_stack=pcb->c_stack;
-		pcb_actualizada->codigo=pcb->codigo;
-		pcb_actualizada->index_codigo=pcb->index_codigo;
-		pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
-		pcb_actualizada->program_counter=pcb->program_counter;
-		pcb_actualizada->stack=pcb->stack;
-		pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
-		pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-		int i = socket_enviar(sockKernel,D_STRUCT_PCBSEM,pcb_actualizada);
-		if(i==1){
-			printf("Se mando bien el paquete\n");
-			free(pcb_actualizada);
-			free(pcb);
-			}
 	}
 }
 

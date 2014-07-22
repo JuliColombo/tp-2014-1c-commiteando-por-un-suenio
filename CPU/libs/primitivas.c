@@ -323,6 +323,7 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 	socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
 
 	free(pcb_actualizada);
+	free(pcb);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se conecto %s por %d tiempo",dispositivo,tiempo);
 
@@ -337,7 +338,6 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 	socket_enviar(sockKernel, D_STRUCT_WAIT, estructura);
 	free(estructura);
 
-	//ACA AGREGO UN SOCKET DONDE ME LLEGA EL VALOR DEL SEMAFORO
 	controlarBloqueo(sockKernel, termino);
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (wait)",identificador_semaforo);
