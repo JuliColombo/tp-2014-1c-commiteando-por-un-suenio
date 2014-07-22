@@ -302,15 +302,13 @@ void dump(){
 		fputs ("File error",stderr); exit (1);
 	}
 	if (archivo_TS==NULL) {
-			fputs ("File error",stderr); exit (1);
-		}
-
+		fputs ("File error",stderr); exit (1);
+	}
 	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
-
 		int ubicacion= getPosTabla(procesoAVer);
 		int tablaFinal=ubicacion+1;
 		imprimirEstadoTablaSeg(archivo_TS,ubicacion,tablaFinal);
@@ -514,16 +512,16 @@ int inicializarTabla(int id_prog){
 		//FIXME: no funciona bien este realloc
 		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
 		if(aux_tabla==NULL){
-						log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-						abort();
-					}
+			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+			abort();
+		}
 		tablaDeSegmentos = aux_tabla;
 		i=cant_tablas;
 		aux_segmentos = malloc(sizeof(segmentDescriptor));
-								if(aux_segmentos==NULL){
-									log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-									abort();
-								}
+			if(aux_segmentos==NULL){
+			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
+			abort();
+			}
 		tablaDeSegmentos[i].segmentos = aux_segmentos;
 		tablaDeSegmentos[i].cant_segmentos=0;
 		cant_tablas++;
@@ -710,8 +708,7 @@ void inicializarConfiguracion(void){
 	int control = lstat(PATH, &file_info);
 	if (control == -1){
 		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-	}
-	else{
+	}else{
 	leerConfiguracion();
 	imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
 	}
@@ -733,7 +730,6 @@ void core_conexion_cpu(void){
 	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	escribir_log(archLog, "Escuchando en el socket de CPU's", INFO, "");
-
 	}
 
 	while(1){
@@ -972,7 +968,7 @@ void *consola (void){
 				  int valorRetardo;
 				  scanf("%d", &valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
-				  retardo= valorRetardo;
+				  retardo= valorRetardo/1000;
 				  escribir_log(archLog, "Se cambia el valor del retardo", INFO, "");
 				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
