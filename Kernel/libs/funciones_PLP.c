@@ -320,6 +320,8 @@ void core_pcp(void){
 			pthread_mutex_lock(mutex_cola_exec);
 			mostrarColasPorPantalla(cola.exec, "Exec");
 			pthread_mutex_unlock(mutex_cola_exec);
+		}else{
+			printf("No quedan más programas en la cola Ready\n");
 		}
 
 

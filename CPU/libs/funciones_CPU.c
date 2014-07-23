@@ -58,14 +58,12 @@ void core_conexion_kernel(void){
 	if(j==1){
 		t_struct_numero* k = ((t_struct_numero*)structRecibida);
 		quantum = k->numero;
-		printf("me llego quantum %d\n",quantum);
 		free(k);
 	}
 	j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 	if(j==1){
 		t_struct_numero* k = ((t_struct_numero*)structRecibida);
 		retardo = k->numero;
-		printf("me llego retardo %li\n",retardo);
 		free(k);
 	}
 	t_struct_pcb* pcb_recibida;

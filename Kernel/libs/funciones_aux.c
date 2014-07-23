@@ -632,8 +632,8 @@ void handler_conexion_cpu(epoll_data_t data){
 			}else{
 				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
-			sem_post(&sem_cpu);
-			sem_post(&sem_multiProg);
+			//sem_post(&sem_cpu);
+			//sem_post(&sem_multiProg);
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
 			string = ((t_struct_string*)structRecibida);
@@ -712,16 +712,18 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_unlock(mutex_cola_block_io);
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
 
-			sem_post(&sem_cpu);
+			//sem_post(&sem_cpu);
 
 			break;
 		case D_STRUCT_PCBFIN:
 			liberarCPU(data.fd);
 			pcb_fin = ((t_struct_pcb_fin*)structRecibida);
-
+			sem_post(&sem_new);
 
 			printf("llego %s\n",pcb_fin->variables);
 	}
+	sem_post(&sem_multiProg);
+	sem_post(&sem_cpu);
 
 
 	return;
