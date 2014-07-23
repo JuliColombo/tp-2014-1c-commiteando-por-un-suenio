@@ -21,6 +21,7 @@ typedef struct{
 }config_cpu;
 
 /************** VARIABLES GLOBALES **************/
+extern t_config* config;
 extern config_cpu configuracion_CPU;
 extern char* PATH;
 extern int termino;

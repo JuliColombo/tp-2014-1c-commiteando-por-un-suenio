@@ -6,7 +6,7 @@
  */
 #include "cpu.h"
 
-t_dictionary* diccionario;
+//t_dictionary* diccionario;
 int top_index = -1;
 config_cpu configuracion_cpu;
 char* PATH;
@@ -15,6 +15,7 @@ log_t* archLog;
 t_quantum quantum;
 t_retardo_quantum retardo;
 t_pcb* pcb;
+t_config* config;
 
 int main (int argc, char **argv){
 	PATH=argv[1];
@@ -28,6 +29,10 @@ int main (int argc, char **argv){
 
 	//pthread_join(conexion_umv, NULL);
 	pthread_join(conexion_kernel,NULL);
+
+	free(config->path);
+	dictionary_destroy(config->properties);
+	free(config);
 
 	return 0;
 }

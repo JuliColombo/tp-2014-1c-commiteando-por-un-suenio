@@ -234,6 +234,7 @@ void salir(int termino) {
 }
 
 void correrParser() {
+	dictionary_create(diccionario);
 	termino = CONTINUES;
 
 	signal(SIGUSR1,hot_plug);

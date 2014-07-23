@@ -23,7 +23,7 @@ void inicializarConfiguracion(void){
 }
 
 void leerConfiguracion(void){
-	t_config* config=config_create(PATH);
+	config=config_create(PATH);
 
 	configuracion_cpu.ip_kernel=config_get_string_value(config,"Direccion IP para conectarse al Kernel");
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
@@ -68,7 +68,7 @@ void core_conexion_kernel(void){
 	}
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;
-	while(1){
+	//while(1){
 			j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 			if(j==1){
 				//habria que hacer el free de este pcb cuando se lo mando al kernel
@@ -111,9 +111,12 @@ void core_conexion_kernel(void){
 				}else{
 					socket_enviar(sockKernel,D_STRUCT_PCB,pcb_recibida);
 				}
+
 						free(pcb_actualizada);
 						free(pcb);
-			}
+						free(pcb_recibida);
+
+		//	}
 //			pcb->program_counter=pcb->program_counter+1;
 //			pcb_actualizada=pcb_recibida;
 //			pcb_actualizada->program_counter=(pcb_recibida->program_counter +1);
