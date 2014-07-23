@@ -360,12 +360,12 @@ void bloquearPrograma(int pid){
  * 		- fd donde el Kernel se comunica con el programa
  *
  * Devuelve:
- * 		Nada
+ * 		0 si se pudieron crear bien los segmentos y -1 si no hubo espacio
  *
  * Funcion: encola un nuevo programa en la cola de new
  */
 
-void agregarNuevoPrograma(char* codigo, int fd){
+int agregarNuevoPrograma(char* codigo, int fd){
 	t_programa* programa=malloc(sizeof(t_programa));
 	programa->peso=0;
 	programa->codigo=codigo;
@@ -380,12 +380,11 @@ void agregarNuevoPrograma(char* codigo, int fd){
 		pthread_mutex_lock(mutex_cola_new);
 		agregarAColaSegunPeso(programa,cola.new);
 		pthread_mutex_unlock(mutex_cola_new);
+		return 0;
 	}else{
 		free(programa);
+		return -1;
 	}
-
-
-	return;
 
 }
 
@@ -542,7 +541,7 @@ void finalizarPrograma(t_programa* programa, char* variablesAImprimir){
  */
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
-	int fd_aceptado,j;
+	int fd_aceptado,j, i;
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	fd_aceptado=socket_aceptarCliente(data.fd);
@@ -550,10 +549,14 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	j=socket_recibir(fd_aceptado,&tipoRecibido,&structRecibida);
 	if(j==1){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
-		agregarNuevoPrograma(k->string, fd_aceptado);
+		i = agregarNuevoPrograma(k->string, fd_aceptado);
+		if(i==0){
+			sem_post(&sem_new);
+			escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
+		}else{
+			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
+		}
 		free(k);
-		sem_post(&sem_new);
-		escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
 	}
 }
 
@@ -615,7 +618,6 @@ void handler_conexion_cpu(epoll_data_t data){
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
 	t_struct_semaforo* semaforo;
-	t_struct_pcb_io* pcb_io;
 	t_struct_string* string;
 	t_struct_asignar_compartida* compartida;
 	t_struct_pcb* pcb;
@@ -632,8 +634,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			}else{
 				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
-			//sem_post(&sem_cpu);
-			//sem_post(&sem_multiProg);
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
 			string = ((t_struct_string*)structRecibida);
@@ -711,8 +711,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			mostrarColasPorPantalla(cola.block.io,"block I/O");
 			pthread_mutex_unlock(mutex_cola_block_io);
 			pthread_create(&io, NULL, (void*) &core_io, bloqueo);
-
-			//sem_post(&sem_cpu);
 
 			break;
 		case D_STRUCT_PCBFIN:

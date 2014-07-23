@@ -32,7 +32,7 @@ int posicion_Variable_Global(char*);
 int valor_Variable_Global(char* variable);
 int posicion_Semaforo(char* semaforo);
 void liberarCPU(int fd);
-void agregarNuevoPrograma(char* codigo, int fd);
+int agregarNuevoPrograma(char* codigo, int fd);
 void inicializarMutex(void);
 void crearSemaforos(void);
 void cerrarSemaforos(void);
