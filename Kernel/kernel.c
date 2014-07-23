@@ -54,6 +54,9 @@ int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion 
 	pthread_join(pcp, NULL);
 	pthread_join(plp, NULL);
 	pthread_join(conexion_plp_umv,NULL);
+	destruirColas();
+	liberarMutex();
+
 
 	return EXIT_SUCCESS;
 }

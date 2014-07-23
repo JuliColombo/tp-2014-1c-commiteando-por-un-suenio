@@ -71,10 +71,8 @@ void inicializarConfiguracion(void){
 	int control = lstat(PATH_config, &file_info);
 	if (control == -1){
 		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
-		}
-	else{
-	leerConfiguracion();
-	//imprimirConfiguracion(); //Imprime las configuraciones actuales por pantalla
+	}else{
+		leerConfiguracion();
 	}
 }
 
@@ -100,6 +98,7 @@ void leerConfiguracion(void){
 	pthread_mutex_unlock(mutex_var_compartidas);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
+	free(config);
 	}
 
 void imprimirConfiguracion() { // Funcion para testear que lee correctamente el archivo de configuracion
@@ -231,7 +230,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
 
 	return nuevoPCB;
-	}
+}
 
 void enviar_pcb_a_cpu(void){
 	pthread_mutex_lock(mutex_array);

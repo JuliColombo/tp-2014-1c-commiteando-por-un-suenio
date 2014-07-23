@@ -48,7 +48,7 @@ int* vector_num(char** vector_string_num, char** config_ids){
 			vector[n]=0;
 		}
 	}
-
+	free(vector_string_num);
 	return vector;
 }
 
@@ -115,7 +115,7 @@ int validarVarGlobal(char* var_global){
 int cant_identificadores(char** config_ids){
 	int i,a=0;
 	for(i=0;config_ids[i]!=NULL;i++){
-	a+=1;
+		a+=1;
 	}
 return a;
 }
@@ -250,6 +250,54 @@ void inicializarMutex(void){
 	pthread_mutex_init(mutex_var_compartidas,NULL);
 	pthread_mutex_init(mutex_log,NULL);
 
+}
+
+/*
+ * Nombre:liberarMutex/0
+ * Argumentos:
+ * 		-nada
+ *
+ * Devuelve:
+ *		nada
+ *
+ * Funcion: libera la memoria de los mutex
+ */
+void liberarMutex(void){
+	free(mutex_cola_new);
+	free(mutex_cola_ready);
+	free(mutex_cola_exec);
+	free(mutex_cola_block_io);
+	free(mutex_cola_block_sem);
+	free(mutex_cola_exit);
+	free(mutex_pid);
+	free(mutex_solicitarMemoria);
+	free(mutex_array);
+	free(mutex_semaforos);
+	free(mutex_var_compartidas);
+	free(mutex_log);
+
+	return;
+}
+
+/*
+ * Nombre:detruirColas/0
+ * Argumentos:
+ * 		-nada
+ *
+ * Devuelve:
+ *		nada
+ *
+ * Funcion: destruye las colas para liberar memoria
+ */
+void destruirColas(void){
+	list_destroy(cola.new);
+	list_destroy(cola.ready);
+	list_destroy(cola.exec);
+	list_destroy(cola.block.io);
+	list_destroy(cola.block.sem);
+	list_destroy(cola.exit);
+
+	return;
 }
 
 /*
@@ -462,10 +510,10 @@ void mandarAOtraCola(t_programa* programa, t_list* listaActual, pthread_mutex_t*
 		pos++;
 	}
 	if(element!=NULL){
-	list_remove(listaActual,pos);
-	pthread_mutex_unlock(mutexActual);
-	list_add(listaNueva, programa);
-	pthread_mutex_unlock(mutexNuevo);
+		list_remove(listaActual,pos);
+		pthread_mutex_unlock(mutexActual);
+		list_add(listaNueva, programa);
+		pthread_mutex_unlock(mutexNuevo);
 	}
 	return;
 }
@@ -722,7 +770,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	}
 	sem_post(&sem_multiProg);
 	sem_post(&sem_cpu);
-
+	free(structRecibida);
 
 	return;
 }

@@ -34,6 +34,8 @@ int posicion_Semaforo(char* semaforo);
 void liberarCPU(int fd);
 int agregarNuevoPrograma(char* codigo, int fd);
 void inicializarMutex(void);
+void liberarMutex(void);
+void destruirColas(void);
 void crearSemaforos(void);
 void cerrarSemaforos(void);
 void bloquearPrograma(int pid);
