@@ -162,8 +162,7 @@ void salir(int termino) {
 	socket_enviar(sockKernel,D_STRUCT_PCBFIN,pcbF);
 
 	free(pcbF);
-
-	printf("\ntermino ejecucion \n");
+	free(pcb);
 	break;
 
 	case QUANTUM:
@@ -184,8 +183,7 @@ void salir(int termino) {
 	socket_enviar(sockKernel,D_STRUCT_PCB,pcbQ);
 
 	free(pcbQ);
-
-	printf("\nsalgo por quantum\n");
+	free(pcb);
 	break;
 
 	case SEG_FAULT:
@@ -206,8 +204,7 @@ void salir(int termino) {
 	socket_enviar(sockKernel,D_STRUCT_PCBSF,pcbSF);
 
 	free(pcbSF);
-
-	printf("\nsalgo por segmentation fault\n");
+	free(pcb);
 	break;
 
 	case IO:
@@ -229,7 +226,6 @@ void salir(int termino) {
 		pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
 		int i = socket_enviar(sockKernel,D_STRUCT_PCBSEM,pcb_actualizada);
 		if(i==1){
-			printf("Se mando bien el paquete\n");
 			free(pcb_actualizada);
 			free(pcb);
 			}
