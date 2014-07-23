@@ -49,8 +49,7 @@ void core_conexion_kernel(void){
 		log_error_socket();
 		abort();
 	}
-	printf("se conecto al kernel\n");
-	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
 
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -68,7 +67,7 @@ void core_conexion_kernel(void){
 	}
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;
-	//while(1){
+	while(1){
 			j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 			if(j==1){
 				//habria que hacer el free de este pcb cuando se lo mando al kernel
@@ -116,7 +115,7 @@ void core_conexion_kernel(void){
 						free(pcb);
 						free(pcb_recibida);
 
-		//	}
+			}
 //			pcb->program_counter=pcb->program_counter+1;
 //			pcb_actualizada=pcb_recibida;
 //			pcb_actualizada->program_counter=(pcb_recibida->program_counter +1);
@@ -146,7 +145,7 @@ void core_conexion_umv(void){
 		log_error_socket();
 	} else {
 	printf("Conectado a la UMV\n");
-	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
 	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
 	int a= 5;

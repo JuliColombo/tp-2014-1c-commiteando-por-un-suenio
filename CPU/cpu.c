@@ -27,7 +27,7 @@ int main (int argc, char **argv){
 	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
 
 
-	//pthread_join(conexion_umv, NULL);
+//	pthread_join(conexion_umv, NULL);
 	pthread_join(conexion_kernel,NULL);
 
 	free(config->path);
