@@ -117,7 +117,7 @@ int traducirPosicion(int base){
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
-		//if (!segmentationFault(base,offset,longitud)){
+		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
@@ -131,11 +131,11 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			/*} else {
+			} else {
 				printf("Seg fault\n");
 				sleep(retardo);
 				return;
-			}*/
+			}
 }
 
 
@@ -383,7 +383,7 @@ void dump(){
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
 	buffer = malloc((tamanio+1)*sizeof(char));
-	memcpy(buffer, (char *) &MP[offset], tamanio);
+	memcpy(buffer, (char*) &MP[offset], tamanio);
 	printf("La posicion de memoria %d contiene: \n", offset);
 	imprimirBuffer(buffer);
 	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: \n", offset);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
@@ -521,7 +521,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
-	while(!validarPosicionVirtual(i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	while(!validarPosicionVirtual(i)) rand();//-Lei que esto es innecesario, pero bueno,ya esta- Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
