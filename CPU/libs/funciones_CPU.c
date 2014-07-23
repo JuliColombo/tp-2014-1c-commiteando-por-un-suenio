@@ -144,7 +144,6 @@ void core_conexion_umv(void){
 	if ((sockUMV=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))<0){
 		log_error_socket();
 	} else {
-	printf("Conectado a la UMV\n");
 	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
 	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
