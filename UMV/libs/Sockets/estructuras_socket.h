@@ -57,13 +57,16 @@ enum{
 	D_STRUCT_OBTENERCOMPARTIDA=14,
 	D_STRUCT_WAIT=15,
 	D_STRUCT_SIGNALSEMAFORO=16,
-	D_STRUCT_IO=17,
-	D_STRUCT_VARIABLES=18,
-	D_STRUCT_GRADOMP=19,
-	D_STRUCT_PIDYCODIGO=20,
-	D_STRUCT_SEGFAULT=22,
-	D_STRUCT_NORMAL = 23,
-	D_STRUCT_PIDBLOQUEADO = 24,
+	D_STRUCT_VARIABLES=17,
+	D_STRUCT_PCBSF = 18,
+	D_STRUCT_SEGFAULT=19,
+	D_STRUCT_NORMAL = 20,
+	D_STRUCT_PCBIO = 21,
+	D_STRUCT_PCBFIN= 22,
+	D_STRUCT_SF=23,
+	D_STRUCT_PCBSEM = 24,
+	D_STRUCT_SEGCODIGO = 25,
+	D_STRUCT_PIDYCODIGO = 26,
 };
 
 
@@ -87,7 +90,7 @@ typedef struct {
 
 //Estructura tipo STRUCT_NOMBREMENSAJE(0)
 typedef struct struct_nombreMensaje {
-	char * nombre;
+	int pid;
 	char * mensaje;
 } __attribute__ ((__packed__)) t_struct_nombreMensaje;
 
@@ -122,14 +125,14 @@ typedef struct struct_signal {
  */
 
 typedef unsigned int t_pid;
-typedef int* t_segmento_codigo;
-typedef int* t_segmento_stack;
-typedef int* t_cursor_stack;
-typedef int* t_index_codigo;
-typedef int* t_index_etiquetas;
 typedef int t_program_counter;
 typedef int t_tamanio_contexto;
 typedef int t_tamanio_indice;
+typedef uint32_t* t_segmento_codigo;
+typedef uint32_t* t_segmento_stack;
+typedef uint32_t* t_cursor_stack;
+typedef uint32_t* t_index_codigo;
+typedef uint32_t* t_index_etiquetas;
 
 
 typedef struct struct_pcb{
@@ -143,6 +146,35 @@ typedef struct struct_pcb{
 		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } __attribute__ ((__packed__)) t_struct_pcb;
+
+typedef struct struct_pcb_fin{
+		t_pid pid;								//Identificador único del Programa en el sistema
+		t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
+		t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
+		t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
+		t_index_codigo index_codigo;			//Dirección del primer byte en la UMV del Índice de Código
+		t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
+		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
+		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
+		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
+		char* variables;
+} __attribute__ ((__packed__)) t_struct_pcb_fin;
+
+
+typedef struct struct_pcb_io{
+		t_pid pid;								//Identificador único del Programa en el sistema
+		t_segmento_codigo codigo;				//Dirección del primer byte en la UMV del segmento de código
+		t_segmento_stack stack;					//Dirección del primer byte en la UMV del segmento de stack
+		t_cursor_stack c_stack;					//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
+		t_index_codigo index_codigo;			//Dirección del primer byte en la UMV del Índice de Código
+		t_index_etiquetas index_etiquetas;		//Dirección del primer byte en la UMV del Índice de Etiquetas
+		t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
+		t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
+		t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
+		uint32_t tiempo;
+		t_nombre_dispositivo dispositivo;
+} __attribute__ ((__packed__)) t_struct_pcb_io;
+
 
 /* Estructura tipo STRUCT_GRADOMP
  * envia el grado de multiprogramacion del sistema
@@ -178,6 +210,7 @@ typedef int32_t t_valor;
 typedef struct struct_push{
 	t_posicion posicion;
 	t_valor valor;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_push;
 
 
@@ -187,6 +220,8 @@ typedef struct struct_push{
 
 typedef struct struct_pop{
 	t_posicion posicion;
+	t_size tamanio;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_pop;
 
 
@@ -206,8 +241,20 @@ typedef struct struct_asignar_compartida{
  */
 
 typedef struct struct_instruccion{
-	t_intructions inst;
+	t_puntero inst;
+	t_puntero indice_codigo;
 }__attribute__ ((__packed__)) t_struct_instruccion;
+
+/* Estructura tipo STRUCT_SEGCODIGO
+ *
+ */
+
+typedef struct struct_seg_codigo{
+	t_puntero inst;
+	t_puntero seg_codigo;
+}__attribute__ ((__packed__)) t_struct_seg_codigo;
+
+
 
 /* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
  *
@@ -218,7 +265,7 @@ typedef struct struct_etiquetas{
 	t_size etiquetas_size;
 }__attribute__ ((__packed__)) t_struct_indice_etiquetas;
 
-/* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
+/* Estructura tipo STRUCT_PEDIR_SEMAFORO
  *
  */
 
