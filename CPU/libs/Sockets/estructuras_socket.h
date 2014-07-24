@@ -240,7 +240,7 @@ typedef struct struct_asignar_compartida{
  */
 
 typedef struct struct_instruccion{
-	t_intructions inst;
+	t_puntero inst;
 	t_puntero indice_codigo;
 }__attribute__ ((__packed__)) t_struct_instruccion;
 

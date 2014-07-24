@@ -79,6 +79,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_VARIABLES:
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 				break;
+			case D_STRUCT_SEGCODIGO:
+				paquete = paquetizarStruct_segCodigo((t_struct_seg_codigo*) estructuraOrigen);
+				break;
 		}
 
 
@@ -619,13 +622,40 @@ t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen)
 
 	t_stream * paquete = malloc(sizeof(t_stream));	//creo el paquete
 
-	paquete->length = sizeof(t_header) + sizeof(t_struct_instruccion);
+	paquete->length = sizeof(t_header) + sizeof(uint32_t)+ sizeof(uint32_t);
 
 	char * data = crearDataConHeader(D_STRUCT_INSTRUCCION, paquete->length); 	//creo el data
 
+	memcpy(data + sizeof(t_header), &estructuraOrigen->inst, sizeof(uint32_t));		//copio a data el numero.
+
+	memcpy(data+sizeof(t_header)+sizeof(uint32_t), &estructuraOrigen->indice_codigo, sizeof(uint32_t));
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_segCodigo/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete .
+ *
+ * Funcion: crearDataConHeader(25, length)
+ */
+t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));	//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(t_intructions) + sizeof(uint32_t);
+
+	char * data = crearDataConHeader(D_STRUCT_SEGCODIGO, paquete->length); 	//creo el data
+
 	memcpy(data + sizeof(t_header), &estructuraOrigen->inst, sizeof(t_intructions));		//copio a data el numero.
 
-	memcpy(data+sizeof(t_header)+sizeof(t_intructions), &estructuraOrigen->indice_codigo, sizeof(uint32_t));
+	memcpy(data+sizeof(t_header)+sizeof(t_intructions), &estructuraOrigen->seg_codigo, sizeof(uint32_t));
 
 	paquete->data = data;
 
@@ -751,6 +781,8 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_VARIABLES:
 				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
 				break;
+			case D_STRUCT_SEGCODIGO:
+				estructuraDestino = despaquetizarStruct_segCodigo(dataPaquete, length);
 		}
 
 	return estructuraDestino;
@@ -1166,9 +1198,31 @@ t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataP
 t_struct_instruccion * despaquetizarStruct_instruccion(char * dataPaquete, uint16_t length){
 	t_struct_instruccion * estructuraDestino = malloc(sizeof(t_struct_instruccion));
 
+	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(uint32_t)); //copio el data del paquete a la estructura.
+
+	memcpy(&estructuraDestino->indice_codigo, dataPaquete + sizeof(uint32_t),sizeof(uint32_t));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_segCodigo/2
+ * EJEMPLO DESPAQUETIZAR ESTRUCTURA ESTATICA
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_SEGCODIGO.
+ *
+ */
+
+t_struct_seg_codigo * despaquetizarStruct_segCodigo(char * dataPaquete, uint16_t length){
+	t_struct_seg_codigo * estructuraDestino = malloc(sizeof(t_struct_seg_codigo));
+
 	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(t_intructions)); //copio el data del paquete a la estructura.
 
-	memcpy(&estructuraDestino->indice_codigo, dataPaquete + sizeof(t_intructions),sizeof(uint32_t));
+	memcpy(&estructuraDestino->seg_codigo, dataPaquete + sizeof(t_intructions),sizeof(uint32_t));
 
 	return estructuraDestino;
 }
