@@ -425,13 +425,11 @@ int agregarNuevoPrograma(char* codigo, int fd){
 	if(programa->pcb!=0){
 		programa->peso=calcularPeso(programa);
 		programa->socket_descriptor_conexion=fd;
-		printf("Entra al calcular\n");
 		pthread_mutex_lock(mutex_cola_new);
 		agregarAColaSegunPeso(programa,cola.new);
 		pthread_mutex_unlock(mutex_cola_new);
 		return 0;
 	}else{
-		printf("Entra al else\n");
 		free(programa);
 		return -1;
 	}
@@ -673,6 +671,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	void* structRecibida;
 	socket_recibir(data.fd,&tipoRecibido,&structRecibida);
 	t_struct_semaforo* semaforo;
+	t_struct_nombreMensaje* mensaje;
 	t_struct_string* string;
 	t_struct_asignar_compartida* compartida;
 	t_struct_pcb* pcb;
@@ -680,8 +679,8 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
-			t_struct_nombreMensaje* mensaje = ((t_struct_nombreMensaje*)structRecibida);
-			programa = (t_programa*)buscarPrograma(mensaje->nombre,cola.exec, mutex_cola_exec);
+			mensaje = ((t_struct_nombreMensaje*)structRecibida);
+			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
 			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING,mensaje->mensaje);
 			break;
 		case D_STRUCT_PCB:

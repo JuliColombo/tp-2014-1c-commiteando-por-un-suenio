@@ -100,13 +100,13 @@ t_stream * paquetizarStruct_nombreMensaje(t_struct_nombreMensaje * estructuraOri
 
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
-	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->nombre) + strlen(estructuraOrigen->mensaje) + 2;
+	paquete->length = sizeof(t_header) + sizeof(int) + strlen(estructuraOrigen->mensaje) + 1;
 
 	char * data = crearDataConHeader(D_STRUCT_NOMBREMENSAJE, paquete->length); //creo el data
 
 	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->nombre, tamanoDato = strlen(estructuraOrigen->nombre)+1);		//copio a data el nombre.
+	memcpy(data + tamanoTotal, estructuraOrigen->pid, tamanoDato = (sizeof(int)));		//copio a data el nombre.
 
 	tamanoTotal += tamanoDato;
 
@@ -758,10 +758,7 @@ t_struct_nombreMensaje * despaquetizarStruct_nombreMensaje(char * dataPaquete, u
 
 	tamanoTotal = tamanoDato;
 
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
-
-	estructuraDestino->nombre = malloc(tamanoDato);
-	memcpy(estructuraDestino->nombre, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura
+	memcpy(estructuraDestino->pid, dataPaquete + tamanoTotal, tamanoDato = sizeof(int)); //copio el nombre a la estructura
 
 	tamanoTotal += tamanoDato;
 

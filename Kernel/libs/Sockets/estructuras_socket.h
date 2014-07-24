@@ -89,7 +89,7 @@ typedef struct {
 
 //Estructura tipo STRUCT_NOMBREMENSAJE(0)
 typedef struct struct_nombreMensaje {
-	char * nombre;
+	int pid;
 	char * mensaje;
 } __attribute__ ((__packed__)) t_struct_nombreMensaje;
 

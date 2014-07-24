@@ -102,8 +102,11 @@ void core_conexion_kernel(void){
 				pcb_actualizada->tiempo=10;
 
 				if(pcb_recibida->pid==0){
-
-					int i = socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
+					t_struct_nombreMensaje* mensaje = malloc(sizeof(t_struct_nombreMensaje));
+					mensaje->pid=pcb->pid;
+					mensaje->mensaje= "Esto anda bien\n";
+					int i = socket_enviar(sockKernel,D_STRUCT_NOMBREMENSAJE,mensaje);
+					free(mensaje);
 					if(i==1){
 						printf("Se mando bien la actualizada\n");
 					}
