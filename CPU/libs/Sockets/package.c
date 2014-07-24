@@ -100,19 +100,18 @@ t_stream * paquetizarStruct_nombreMensaje(t_struct_nombreMensaje * estructuraOri
 
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
-	paquete->length = sizeof(t_header) + sizeof(int) + strlen(estructuraOrigen->mensaje) + 1;
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->mensaje) + 1 + sizeof(int32_t);
 
-	char * data = crearDataConHeader(D_STRUCT_NOMBREMENSAJE, paquete->length); //creo el data
+	char * data = crearDataConHeader(D_STRUCT_NOMBREMENSAJE, paquete->length); //creo el data.
 
-	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
+	int tamanoTotal = sizeof(t_header);
+	int tamanioDato = 0;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->pid, tamanoDato = (sizeof(int)));		//copio a data el nombre.
+	memcpy(data + tamanoTotal, estructuraOrigen->mensaje, tamanioDato = strlen(estructuraOrigen->mensaje)+1);		//copio a data el nombre de la variable.
 
-	tamanoTotal += tamanoDato;
+	tamanoTotal += tamanioDato;
 
-	memcpy(data + tamanoTotal, estructuraOrigen->mensaje, tamanoDato = strlen(estructuraOrigen->mensaje)+1);		//copio a data el mensaje.
-
-	tamanoTotal += tamanoDato;
+	memcpy(data + tamanoTotal, &estructuraOrigen->pid, sizeof(int32_t));  //copio a data el valor de la variable.
 
 	paquete->data = data;
 
@@ -752,20 +751,21 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
  * Funcion: Según el tipo de estructura, va a distintas funciones que las despaquetizan.
  */
 t_struct_nombreMensaje * despaquetizarStruct_nombreMensaje(char * dataPaquete, uint16_t length){
+
 	t_struct_nombreMensaje * estructuraDestino = malloc(sizeof(t_struct_nombreMensaje));
 
 	int tamanoTotal = 0, tamanoDato = 0;
 
 	tamanoTotal = tamanoDato;
 
-	memcpy(estructuraDestino->pid, dataPaquete + tamanoTotal, tamanoDato = sizeof(int)); //copio el nombre a la estructura
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->mensaje = malloc(tamanoDato);
+	memcpy(estructuraDestino->mensaje, dataPaquete + tamanoTotal, tamanoDato); //copio el nombre a la estructura
 
 	tamanoTotal += tamanoDato;
 
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); //incremento tamanoDato, hasta el tamaño del mensaje.
-
-	estructuraDestino->mensaje = malloc(tamanoDato);
-	memcpy(estructuraDestino->mensaje, dataPaquete + tamanoTotal, tamanoDato); //copio el mensaje a la estructura
+	memcpy(&estructuraDestino->pid, dataPaquete + tamanoTotal, sizeof(int32_t));
 
 	return estructuraDestino;
 }

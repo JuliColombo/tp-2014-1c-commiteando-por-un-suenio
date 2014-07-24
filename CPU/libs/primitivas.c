@@ -270,9 +270,17 @@ void retornar(t_valor_variable retorno) {
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
-	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+	/*t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 	estructura->numero = valor_mostrar;
 	socket_enviar(sockKernel, D_STRUCT_NUMERO, estructura);
+	free(estructura);*/
+
+	const char* valor_variable= convertirAString(valor_mostrar);
+
+	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
+	estructura->mensaje = valor_variable;
+	estructura->pid = pcb->pid;
+	socket_enviar(sockKernel,D_STRUCT_NOMBREMENSAJE,estructura);
 	free(estructura);
 
 
@@ -283,9 +291,15 @@ void imprimir(t_valor_variable valor_mostrar) {
 void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
-	t_struct_string* estructura = malloc(sizeof(t_struct_string));
+	/*t_struct_string* estructura = malloc(sizeof(t_struct_string));
 	estructura->string = texto;
 	socket_enviar(sockKernel, D_STRUCT_STRING, estructura);
+	free(estructura);*/
+
+	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
+	estructura->mensaje = texto;
+	estructura->pid = pcb->pid;
+	socket_enviar(sockKernel,D_STRUCT_NOMBREMENSAJE,estructura);
 	free(estructura);
 
 
