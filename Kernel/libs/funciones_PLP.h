@@ -64,7 +64,7 @@ int cantidadProgramasEnPCP(void); //Retorna la cantidad de programas que estan e
 void inicializarColas(void); //Inicializa las colas de new, ready, block, exec y exit
 void crearPCB(t_programa); //Recive un programa y crea su PCB
 void esperarYCerrarConexiones(void); //Espera a que terminen las conexiones y cierra sus hilos
-t_pcb* crearPcb(char*,t_medatada_program*, int);
+t_pcb* crearPcb(char*,t_medatada_program*);
 int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4);
 void enviar_pcb_a_cpu(void);
 

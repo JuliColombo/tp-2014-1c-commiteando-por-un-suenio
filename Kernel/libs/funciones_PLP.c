@@ -173,7 +173,7 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
  *		- la pcb creada si hay espacio
  * Funcion:
  */
-t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
+t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 	pthread_mutex_lock(mutex_solicitarMemoria);
 	pthread_mutex_lock(mutex_pid);

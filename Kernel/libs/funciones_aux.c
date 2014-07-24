@@ -421,7 +421,7 @@ int agregarNuevoPrograma(char* codigo, int fd){
 	programa->flag_terminado=0;
 	programa->metadata=malloc(sizeof(t_medatada_program));
 	programa->metadata=metadata_desde_literal(codigo);
-	programa->pcb=crearPcb(codigo, programa->metadata, fd);
+	programa->pcb=crearPcb(codigo, programa->metadata);
 	if(programa->pcb!=0){
 		programa->peso=calcularPeso(programa);
 		programa->socket_descriptor_conexion=fd;
@@ -598,6 +598,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	if(j==1){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
 		i = agregarNuevoPrograma(k->string, fd_aceptado);
+		printf("el fd aceptado es %d\n", fd_aceptado);
 		if(i==0){
 			sem_post(&sem_new);
 			escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
@@ -680,9 +681,12 @@ void handler_conexion_cpu(epoll_data_t data){
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
 			mensaje = ((t_struct_nombreMensaje*)structRecibida);
-			printf("%s\n",mensaje->mensaje);
 			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
-			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING,mensaje->mensaje);
+			t_struct_string* textoAImprimir = malloc(sizeof(t_struct_string));
+			textoAImprimir->string = mensaje->mensaje;
+			int fd = programa->socket_descriptor_conexion;
+			socket_enviar(fd,D_STRUCT_STRING,textoAImprimir);
+			free(textoAImprimir);
 			break;
 		case D_STRUCT_PCB:
 			liberarCPU(data.fd);
