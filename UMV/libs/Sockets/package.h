@@ -25,7 +25,6 @@ t_stream* paquetizarStruct_char(t_struct_char* estructuraOrigen); //E
 t_stream* paquetizarStruct_string(t_struct_string* estructuraOrigen); //D
 t_stream* paquetizarStruct_signal(t_struct_signal* estructuraOrigen); //E
 t_stream* paquetizarStruct_pcb(t_struct_pcb* estructuraOrigen);//E
-t_stream* paquetizarStruct_pidycodigo(t_struct_pidycodigo* estructuraOrigen);//D
 t_stream* paquetizarStruct_push(t_struct_push* estructuraOrigen);//E
 t_stream* paquetizarStruct_pop(t_struct_pop* estructuraOrigen);
 t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estructuraOrigen);
@@ -34,8 +33,12 @@ t_stream * paquetizarStruct_indiceEtiquetas(t_struct_indice_etiquetas * estructu
 t_stream * paquetizarStruct_obtenerCompartida(t_struct_string * estructuraOrigen);
 t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen);
 t_stream * paquetizarStruct_signalSemaforo(t_struct_semaforo * estructuraOrigen);
-t_stream * paquetizarStruct_io(t_struct_io * estructuraOrigen);
 t_stream * paquetizarStruct_variables(t_struct_string * estructuraOrigen);
+t_stream* paquetizarStruct_pcbFin(t_struct_pcb_fin* estructuraOrigen);
+t_stream* paquetizarStruct_pcbSF(t_struct_pcb* estructuraOrigen);
+t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen);
+t_stream* paquetizarStruct_pcbSem(t_struct_pcb* estructuraOrigen);
+t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -59,9 +62,12 @@ t_struct_indice_etiquetas* despaquetizarStruct_indiceEtiquetas(char * dataPaquet
 t_struct_string * despaquetizarStruct_obtenerCompartida(char * dataPaquete, uint16_t length);
 t_struct_semaforo * despaquetizarStruct_signalSemaforo(char * dataPaquete, uint16_t length);
 t_struct_semaforo * despaquetizarStruct_wait(char * dataPaquete, uint16_t length);
-t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length);
 t_struct_string * despaquetizarStruct_variables(char * dataPaquete, uint16_t length);
-
+t_struct_pcb* despaquetizarStruct_pcbSF(char* dataPaquete, uint16_t lenght);
+t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght);
+t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght);
+t_struct_pcb* despaquetizarStruct_pcbSem(char* dataPaquete, uint16_t lenght);
+t_struct_seg_codigo * despaquetizarStruct_segCodigo(char * dataPaquete, uint16_t length);
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR

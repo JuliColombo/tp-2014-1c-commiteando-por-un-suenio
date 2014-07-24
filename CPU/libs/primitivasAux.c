@@ -83,6 +83,8 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 
 void recibirProximaInstruccion(int sockUMV) {
 
+	chequearSiHuboSF();
+
 	char* string;
 
 	t_tipoEstructura tipoRecibido;
@@ -93,8 +95,6 @@ void recibirProximaInstruccion(int sockUMV) {
 		string= k->string;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	proximaInstruccion = strdup(string); //que onde el const?
 }
@@ -239,8 +239,6 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 			free(k);
 		}
 
-	chequearSiHuboSF();
-
 	top_index -= 1;
 }
 
@@ -261,8 +259,6 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 			*cursor_stack_viejo= k->numero;
 			free(k);
 		}
-
-	chequearSiHuboSF();
 
 	top_index -= 1;
 
@@ -299,8 +295,6 @@ void guardarAlternado () {
 			identificador_variable= k->numero;
 			free(k);
 		}
-
-	chequearSiHuboSF();
 
 	insertarEnDiccionario(identificador_variable, top_index);
 
@@ -352,8 +346,6 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 		*direccion_retorno= k->numero;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	top_index -= 1;
 }

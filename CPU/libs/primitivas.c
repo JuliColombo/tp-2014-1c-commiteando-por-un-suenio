@@ -84,8 +84,6 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 		free(k);
 	}
 
-	chequearSiHuboSF();
-
 	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
 
 	return valor_variable;

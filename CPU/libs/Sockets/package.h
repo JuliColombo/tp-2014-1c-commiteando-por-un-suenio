@@ -38,6 +38,7 @@ t_stream* paquetizarStruct_pcbFin(t_struct_pcb_fin* estructuraOrigen);
 t_stream* paquetizarStruct_pcbSF(t_struct_pcb* estructuraOrigen);
 t_stream* paquetizarStruct_pcbIO(t_struct_pcb_io* estructuraOrigen);
 t_stream* paquetizarStruct_pcbSem(t_struct_pcb* estructuraOrigen);
+t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -66,7 +67,7 @@ t_struct_pcb* despaquetizarStruct_pcbSF(char* dataPaquete, uint16_t lenght);
 t_struct_pcb_fin* despaquetizarStruct_pcbFin(char* dataPaquete, uint16_t lenght);
 t_struct_pcb_io* despaquetizarStruct_pcbIO(char* dataPaquete, uint16_t lenght);
 t_struct_pcb* despaquetizarStruct_pcbSem(char* dataPaquete, uint16_t lenght);
-
+t_struct_seg_codigo * despaquetizarStruct_segCodigo(char * dataPaquete, uint16_t length);
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR
