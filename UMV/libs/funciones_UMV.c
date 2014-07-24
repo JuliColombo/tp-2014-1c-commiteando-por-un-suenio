@@ -795,28 +795,38 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 }
 
 void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
-	/*void enviarBytes(int,int,int,t_buffer);
-	int baseStack; //Esto deberia ser una variable global que se crea en atender_kernel?
-	switch(tipo_estructura){
-	case D_STRUCT_PUSH:
-		t_struct_push* structPush= estructura;
-		int pos= structPush->posicion;
-		int valor= structPush->valor;
-		enviarBytes(baseStack,pos,sizeof(valor),(int*)valor);
-		break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
-	case D_STRUCT_POP:
-		t_struct_pop* structPop= estructura;
-		pos= structPop->posicion;
-		int tamanio= sizeof(int);// De este tamaño seria lo del pop?
-		t_buffer valor = solicitarBytes(baseStack,pos,tamanio);
-		void* estructura= valor;
-		break;
+		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
+		t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		t_struct_push* structPush;
+		t_struct_pop* structPop;
+		socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
+		switch(tipoRecibido){
+		case D_STRUCT_PUSH:
+			structPush= ((t_struct_push*)structRecibida);
+			int pos= structPush->posicion;
+			int valor= structPush->valor;
+			enviarBytes(baseStack,pos,sizeof(valor),(int*)valor);
+			free(structRecibida);
+			break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
 
-	default:
-		escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
-		break;
-	//Etc
-	}*/
+		case D_STRUCT_POP:
+			structPop= ((t_struct_pop*)structRecibida);
+			pos= structPop->posicion;
+			int tamanio= sizeof(int);// De este tamaño seria lo del pop?
+			t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
+			t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+			estructura->numero = valor_a_enviar;
+			socket_enviar(sock_cpu, D_STRUCT_NUMERO, estructura);
+			free(estructura);
+			break;
+
+		default:
+			escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
+			break;
+		//Etc
+
+		}
 }
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
@@ -872,44 +882,8 @@ void atender_cpu(void){
 	  t_tipoEstructura tipo_estructura;
 	  socket_recibir(sock, &tipo_estructura, &estructura);
 	  ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
-	  send(sock, &tipo_estructura, &estructura);
+	  send(sock, &tipo_estructura, &estructura); //Esto no deberia ir, que se envie durante la ejecucion
 	 */
-
-
-	/************** APORTE JULI :) ************************************/
-
-
-	/*t_tipoEstructura tipoRecibido;
-	void* structRecibida;
-	t_struct_push* structPush;
-	t_struct_pop* structPop;
-	socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
-	switch(tipoRecibido){
-	case D_STRUCT_PUSH:
-		structPush= ((t_struct_push*)structRecibida);
-		int pos= structPush->posicion;
-		int valor= structPush->valor;
-		enviarBytes(baseStack,pos,sizeof(valor),(int*)valor);
-		//creo que aca viene free(structRecibida)
-		break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
-
-	case D_STRUCT_POP:
-		structPop= ((t_struct_pop*)structRecibida);
-		pos= structPop->posicion;
-		int tamanio= sizeof(int);// De este tamaño seria lo del pop?
-		t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
-		t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-		estructura->numero = valor_a_enviar;
-		socket_enviar(sock_cpu, D_STRUCT_NUMERO, estructura);
-		free(estructura);
-		break;
-
-	default:
-		escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
-		break;
-	//Etc
-
-	}*/
 
 }
 
