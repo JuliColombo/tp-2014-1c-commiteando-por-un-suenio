@@ -117,7 +117,7 @@ int traducirPosicion(int base){
 
 void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
-		//if (!segmentationFault(base,offset,longitud)){
+		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
@@ -131,11 +131,11 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("%s\n",(char*)buffer);
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			/*} else {
+			} else {
 				printf("Seg fault\n");
 				sleep(retardo);
 				return;
-			}*/
+			}
 }
 
 
@@ -354,7 +354,7 @@ void dump(){
 
 
 	//Estructuras de memoria
-	puts("Ingrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
+	puts("\nIngrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
 		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
@@ -371,22 +371,22 @@ void dump(){
 	//Espacio libre
 
 	int espacioLibre= getEspacioLibreMP();
-	printf("\n El espacio libre en la memoria principal es: \n");
+	printf("\nEl espacio libre en la memoria principal es: \n");
 	printf("%d",espacioLibre);
-	fprintf(archivo_MP,"%s", "\n El espacio libre en la memoria principal es:");
+	fprintf(archivo_MP,"%s", "\nEl espacio libre en la memoria principal es:\n");
 	fprintf(archivo_MP,"%d",espacioLibre);
 
 	//Contenido de la memoria principal
 	int offset,tamanio;
 	t_buffer buffer;
-	puts("\n Ingrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer");
+	printf("\nIngrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer\n");
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
 	buffer = malloc((tamanio+1)*sizeof(char));
-	memcpy(buffer, (char *) &MP[offset], tamanio);
-	printf("La posicion de memoria %d contiene: \n", offset);
+	memcpy(buffer, (char*) &MP[offset], tamanio);
+	printf("\nLa posicion de memoria %d contiene: \n", offset);
 	imprimirBuffer(buffer);
-	fprintf(archivo_MP, "\n La posicion de memoria %d contiene: \n", offset);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
+	fprintf(archivo_MP, "\nLa posicion de memoria %d contiene: \n", offset);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 	imprimirBufferEnArchivo(buffer,archivo_MP); //Revisar si en archivo_MP, capaz tendria que ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
@@ -521,7 +521,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	reservarEspacioMP(ubicacion, tamanio);
 	int pos=inicializarTabla(id_prog);
 	i=rand();
-	while(!validarPosicionVirtual(i)) rand();//Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
+	while(!validarPosicionVirtual(i)) rand();//-Lei que esto es innecesario, pero bueno,ya esta- Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
 	//Armado del segmento creado
 	aux.ubicacionMP=ubicacion;
 	aux.inicio=i;
@@ -828,6 +828,7 @@ void core_conexion_cpu(void){
 			free(estructura);
 			}
 		}
+	}
 		if(socket_cerrarConexion(sock_cpu)==0){
 				escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
 				//Error cerrando el socket
@@ -835,7 +836,7 @@ void core_conexion_cpu(void){
 				escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
 			}
 	return;
-	}
+
 }
 
 
@@ -971,7 +972,7 @@ void *consola (void){
 	aux_buffer= malloc(MAX_BUFFER);
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	t_buffer buffer;
-	puts("Ingrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
+	puts("\nIngrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);
 	while(estaEnDicOP(comando)== 0){
 		puts("\nOperacion erronea, escriba la operacion de nuevo");
@@ -979,35 +980,31 @@ void *consola (void){
 	}
 
 	while(strcmp(comando, "exit") != 0){
-		system("clear");
 			if(strcmp(comando, "operacion") == 0){
-
 				char tipoOperacion[32];
-				puts("Desea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
+				puts("\nDesea solicitar posicion de memoria (solicitar) o escribir buffer por teclado (escribir) o crear segmento de programa (crear)o destruir segmento de programa (destruir)?");
 				scanf("%s",&tipoOperacion);
 				while(estaEnDicTOP(tipoOperacion)== 0){
-						puts("Tipo de Operacion erronea, escriba el tipo de operacion de nuevo");
+						puts("\nTipo de Operacion erronea, escriba el tipo de operacion de nuevo");
 						scanf("%s",&tipoOperacion);
 					}
 				if(strcmp(tipoOperacion, "solicitar") == 0){
-					  system("clear");
-					  puts("Ingrese Base");
+					  puts("\nIngrese Base");
 					  scanf("%d",&unaBase);
-					  puts("Ingrese Offset");
+					  puts("\nIngrese Offset");
 					  scanf("%d",&unOffset);
-					  puts("Ingrese Tamanio de segmento");
+					  puts("\nIngrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  aux_buffer = solicitarBytes(unaBase,unOffset,unTamanio);
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
-					 system("clear");
-					 puts("Ingrese Base");
+					 puts("\nIngrese Base");
 					 scanf("%d",&unaBase);
-					 puts("Ingrese Offset");
+					 puts("\nIngrese Offset");
 					 scanf("%d",&unOffset);
-					 puts("Ingrese Buffer");
+					 puts("\nIngrese Buffer");
 					 scanf("%s",aux_buffer);
 					 unTamanio=strlen(aux_buffer+1);
 					 printf("El tamanio es: %d\n",unTamanio);
@@ -1016,10 +1013,9 @@ void *consola (void){
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
-					  system("clear");
-					  puts("Ingrese el processID de programa a usar");
+					    puts("\nIngrese el processID de programa a usar");
 				 	  scanf("%d",&procesoDelHilo);
-					  puts("Ingrese el tamaño del segmento");
+					  puts("\nIngrese el tamaño del segmento");
 					  int tamanio;
 					  scanf("%d",&tamanio);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
@@ -1027,8 +1023,7 @@ void *consola (void){
 					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
-					  system("clear");
-					  puts("Ingrese el processID de programa a usar");
+					  puts("\nIngrese el processID de programa a usar");
 					  scanf("%d",&procesoDelHilo);
 					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  destruirSegmentosPrograma(procesoDelHilo);
@@ -1037,7 +1032,7 @@ void *consola (void){
 			}
 
 	else { if (strcmp(comando, "retardo") == 0){
-				  puts("Ingrese el valor de retardo en Milisegundos");
+				  puts("\nIngrese el valor de retardo en Milisegundos");
 				  int valorRetardo;
 				  scanf("%d", &valorRetardo);
 				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
@@ -1061,12 +1056,10 @@ void *consola (void){
 				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
-	    system("clear");
-		puts("Escriba la siguiente operacion");
+	    puts("\nEscriba la siguiente operacion");
 		scanf("%s",&comando);
 		while(estaEnDicOP(comando)== 0){
-			system("clear");
-			puts("Operacion erronea, escriba la operacion de nuevo");
+			puts("\nOperacion erronea, escriba la operacion de nuevo");
 			scanf("%s",&comando);
 			}
 
@@ -1078,15 +1071,11 @@ void *consola (void){
 		   	socket_cerrarConexion(sock_kernel_servidor);
 		   	socket_cerrarConexion(sock_cpu);
 		   	matarHilos();
-			if(pthread_kill(CPU,0)==0){
-			printf("Muere el hilo cpu\n");
-			}
-			if(pthread_kill(KERNEL,0)==0){
-			printf("Muere el hilo Kernel\n");
-
-			}
-
-}
+			if(pthread_kill(CPU,0)==0) printf("Muere el hilo cpu\n");
+			if(pthread_kill(KERNEL,0)==0) printf("Muere el hilo Kernel\n");
+			sleep(retardo);
+			system("clear");
+		}
 }
 
 void matarHilos(void){
@@ -1095,8 +1084,8 @@ void matarHilos(void){
 
 }
 
-void destruirTodosLosSegmentos(void){
-	/*int i=0;
+void destruirTodosLosSegmentos(void){/*
+	int i=0;
 	while(i<cant_tablas){
 	free(tablaDeSegmentos[i].segmentos);
 	}

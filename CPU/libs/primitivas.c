@@ -224,8 +224,6 @@ void finalizar() {
 	}
 
 	if(esPrimerContexto()) {
-		//Hay que hacer funcion para empezar la limpieza para terminar con el programa en ejecucion
-		printf("\n\nllegamos al if!\n\n");
 		termino = DONE;
 		pcb->c_stack += cursor;
 		pcb->stack += stack;

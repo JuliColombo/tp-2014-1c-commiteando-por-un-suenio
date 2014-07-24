@@ -23,7 +23,7 @@ void inicializarConfiguracion(void){
 }
 
 void leerConfiguracion(void){
-	t_config* config=config_create(PATH);
+	config=config_create(PATH);
 
 	configuracion_cpu.ip_kernel=config_get_string_value(config,"Direccion IP para conectarse al Kernel");
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
@@ -49,8 +49,7 @@ void core_conexion_kernel(void){
 		log_error_socket();
 		abort();
 	}
-	printf("se conecto al kernel\n");
-	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
 
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -111,8 +110,11 @@ void core_conexion_kernel(void){
 				}else{
 					socket_enviar(sockKernel,D_STRUCT_PCB,pcb_recibida);
 				}
+
 						free(pcb_actualizada);
 						free(pcb);
+						free(pcb_recibida);
+
 			}
 //			pcb->program_counter=pcb->program_counter+1;
 //			pcb_actualizada=pcb_recibida;
@@ -142,8 +144,7 @@ void core_conexion_umv(void){
 	if ((sockUMV=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))<0){
 		log_error_socket();
 	} else {
-	printf("Conectado a la UMV\n");
-	//log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
+	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
 	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
 	int a= 5;
