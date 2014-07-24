@@ -208,6 +208,7 @@ typedef int32_t t_valor;
 typedef struct struct_push{
 	t_posicion posicion;
 	t_valor valor;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_push;
 
 
@@ -217,6 +218,8 @@ typedef struct struct_push{
 
 typedef struct struct_pop{
 	t_posicion posicion;
+	t_size tamanio;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_pop;
 
 

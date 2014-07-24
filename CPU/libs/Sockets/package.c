@@ -450,7 +450,7 @@ t_stream * paquetizarStruct_push(t_struct_push * estructuraOrigen){
 
 	t_stream * paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(int32_t);
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(int32_t) + sizeof(uint32_t);
 
 	char * data = crearDataConHeader(D_STRUCT_PUSH, paquete->length);
 
@@ -461,7 +461,12 @@ t_stream * paquetizarStruct_push(t_struct_push * estructuraOrigen){
 
 	tamanioTotal += tamanioDato;
 
-	memcpy(data + tamanioTotal, &estructuraOrigen->valor, sizeof(int32_t));
+	memcpy(data + tamanioTotal, &estructuraOrigen->valor, tamanioDato = sizeof(int32_t));
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->stack_base, tamanioDato = sizeof(uint32_t));
+
 
 	paquete->data = data;
 
@@ -515,11 +520,22 @@ t_stream * paquetizarStruct_pop(t_struct_pop * estructuraOrigen){
 
 	t_stream * paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+	paquete->length = sizeof(t_header) + sizeof(uint32_t)+ sizeof(uint32_t)+ sizeof(uint32_t);
 
 	char * data = crearDataConHeader(D_STRUCT_POP, paquete->length);
 
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_pop));
+	int tamanioTotal = sizeof(t_header);
+	int tamanioDato = 0;
+
+	memcpy(data + sizeof(t_header), &estructuraOrigen->posicion, tamanioDato = sizeof(uint32_t));
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->stack_base, tamanioDato = sizeof(uint32_t));
+
+	tamanioTotal += tamanioDato;
+
+	memcpy(data + tamanioTotal, &estructuraOrigen->tamanio, tamanioDato = sizeof(uint32_t));
 
 	paquete->data = data;
 
@@ -1054,6 +1070,8 @@ t_struct_push * despaquetizarStruct_push(char * dataPaquete, uint16_t length){//
 
 	memcpy(&estructuraDestino->valor, dataPaquete+ sizeof(uint32_t), sizeof(int32_t)); //copio el valor del paquete a la estructura.
 
+	memcpy(&estructuraDestino->stack_base, dataPaquete+ sizeof(uint32_t) + sizeof(int32_t), sizeof(uint32_t)); //copio el stack_base del paquete a la estructura.
+
 	return estructuraDestino;
 }
 
@@ -1091,7 +1109,11 @@ t_struct_indice_etiquetas * despaquetizarStruct_indiceEtiquetas(char * dataPaque
 t_struct_pop * despaquetizarStruct_pop(char * dataPaquete, uint16_t length){//
 	t_struct_pop * estructuraDestino = malloc(sizeof(t_struct_pop));
 
-	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+	memcpy(&estructuraDestino->posicion, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
+
+	memcpy(&estructuraDestino->stack_base, dataPaquete+ sizeof(uint32_t), sizeof(uint32_t)); //copio el valor del paquete a la estructura.
+
+	memcpy(&estructuraDestino->tamanio, dataPaquete+ sizeof(uint32_t) + sizeof(uint32_t), sizeof(uint32_t)); //copio el stack_base del paquete a la estructura.
 
 	return estructuraDestino;
 }
