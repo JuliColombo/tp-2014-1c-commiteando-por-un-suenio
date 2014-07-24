@@ -680,6 +680,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
 			mensaje = ((t_struct_nombreMensaje*)structRecibida);
+			printf("%s\n",mensaje->mensaje);
 			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
 			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING,mensaje->mensaje);
 			break;
