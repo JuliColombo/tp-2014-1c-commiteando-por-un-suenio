@@ -623,7 +623,9 @@ t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen)
 
 	char * data = crearDataConHeader(D_STRUCT_INSTRUCCION, paquete->length); 	//creo el data
 
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_instruccion));		//copio a data el numero.
+	memcpy(data + sizeof(t_header), &estructuraOrigen->inst, sizeof(t_intructions));		//copio a data el numero.
+
+	memcpy(data+sizeof(t_header)+sizeof(t_intructions), &estructuraOrigen->indice_codigo, sizeof(uint32_t));
 
 	paquete->data = data;
 
@@ -1164,7 +1166,9 @@ t_struct_asignar_compartida * despaquetizarStruct_asignarCompartida(char * dataP
 t_struct_instruccion * despaquetizarStruct_instruccion(char * dataPaquete, uint16_t length){
 	t_struct_instruccion * estructuraDestino = malloc(sizeof(t_struct_instruccion));
 
-	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(t_struct_instruccion)); //copio el data del paquete a la estructura.
+	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(t_intructions)); //copio el data del paquete a la estructura.
+
+	memcpy(&estructuraDestino->indice_codigo, dataPaquete + sizeof(t_intructions),sizeof(uint32_t));
 
 	return estructuraDestino;
 }
