@@ -679,6 +679,11 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_pcb_fin* pcb_fin;
 	t_programa* programa;
 	switch(tipoRecibido){
+		case D_STRUCT_NOMBREMENSAJE:
+			t_struct_nombreMensaje* mensaje = ((t_struct_nombreMensaje*)structRecibida);
+			programa = (t_programa*)buscarPrograma(mensaje->nombre,cola.exec, mutex_cola_exec);
+			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING,mensaje->mensaje);
+			break;
 		case D_STRUCT_PCB:
 			liberarCPU(data.fd);
 			pcb = ((t_struct_pcb*)structRecibida);
@@ -704,7 +709,6 @@ void handler_conexion_cpu(epoll_data_t data){
 				pthread_mutex_unlock(mutex_log);
 			}
 			break;
-
 		case D_STRUCT_ASIGNARCOMPARTIDA:
 			compartida = ((t_struct_asignar_compartida*)structRecibida);
 			if((validarVarGlobal(string->string))==0){
