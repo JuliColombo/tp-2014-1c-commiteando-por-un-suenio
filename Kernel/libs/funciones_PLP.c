@@ -22,7 +22,6 @@ void agregarAColaSegunPeso(t_programa* programa, t_list* lista){
 
 void mostrarColasPorPantalla(t_list* lista, char* nombreLista){
 	int peso, pid;
-	//system("clear");
 	if(lista->head==NULL){
 		printf("No hay programas en la cola %s\n", nombreLista);
 		return;
@@ -99,7 +98,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 
 	free(config);
-	}
+}
 
 void imprimirConfiguracion() { // Funcion para testear que lee correctamente el archivo de configuracion
 
@@ -176,17 +175,17 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
  */
 t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
-
 	pthread_mutex_lock(mutex_solicitarMemoria);
 	pthread_mutex_lock(mutex_pid);
 	nuevoPCB->pid=program_pid;
-	t_struct_numero* id = malloc(sizeof(t_struct_numero));
-	id->numero = program_pid;
-	socket_enviar(sock_umv,D_STRUCT_NUMERO, id);
-	free(id);
+	//t_struct_numero* id = malloc(sizeof(t_struct_numero));
+	//id->numero = program_pid;
+	//socket_enviar(sock_umv,D_STRUCT_NUMERO, id);
+//	free(id);
 	//solicitarMemoriaUMV(1,2,3,4) va en el if
 	if(0==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
+		printf("Print");
 		nuevoPCB->stack=NULL;
 		nuevoPCB->c_stack=NULL;
 		nuevoPCB->index_codigo=NULL;
@@ -199,14 +198,11 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
 		pthread_mutex_unlock(mutex_pid);
 	}else{	//Si no hay memoria suficiente, le avisa al programa
 		pthread_mutex_unlock(mutex_solicitarMemoria);
-		t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
-		paquete->numero= 0;
-		socket_enviar(fd, D_STRUCT_SF, paquete);
+
 
 		pthread_mutex_unlock(mutex_pid);
-		free(paquete);
 		free(nuevoPCB);
-		return NULL;
+		return 0;
 	}
 	/*Esto es lo falta cargarle al PCB
 	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código

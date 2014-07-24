@@ -853,6 +853,7 @@ void core_conexion_cpu(void){
 			free(estructura);
 			}
 		}
+	}
 		if(socket_cerrarConexion(sock_cpu)==0){
 				escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
 				//Error cerrando el socket
@@ -860,7 +861,7 @@ void core_conexion_cpu(void){
 				escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
 			}
 	return;
-	}
+
 }
 
 
