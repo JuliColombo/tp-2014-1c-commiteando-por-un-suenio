@@ -421,15 +421,17 @@ int agregarNuevoPrograma(char* codigo, int fd){
 	programa->flag_terminado=0;
 	programa->metadata=malloc(sizeof(t_medatada_program));
 	programa->metadata=metadata_desde_literal(codigo);
-	if((programa->pcb=crearPcb(codigo, programa->metadata, fd))!=NULL){
+	programa->pcb=crearPcb(codigo, programa->metadata, fd);
+	if(programa->pcb!=0){
 		programa->peso=calcularPeso(programa);
 		programa->socket_descriptor_conexion=fd;
-
+		printf("Entra al calcular\n");
 		pthread_mutex_lock(mutex_cola_new);
 		agregarAColaSegunPeso(programa,cola.new);
 		pthread_mutex_unlock(mutex_cola_new);
 		return 0;
 	}else{
+		printf("Entra al else\n");
 		free(programa);
 		return -1;
 	}
@@ -603,10 +605,16 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 			escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
 		}else{
 			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
+			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
+			paquete->numero= 0;
+			sleep(5);
+			i=socket_enviar(fd_aceptado, D_STRUCT_PROGFIN, paquete);
+			free(paquete);
 		}
 		free(k);
 	}
 }
+
 
 
 /*
@@ -626,8 +634,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 	uint32_t k=configuracion_kernel.quantum;
 	paquete->numero=k;
-	for(n=0; fds_conectados_cpu[n]!=0;n++){
-	}
+	for(n=0; fds_conectados_cpu[n]!=0;n++);
 	if(n<MAX_EVENTS_EPOLL){
 		fd_aceptado=socket_aceptarCliente(data.fd);
 		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){

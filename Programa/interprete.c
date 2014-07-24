@@ -48,26 +48,36 @@ int main (int argc, char **argv){
 	}
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	int i;
+	int q=0;
+	socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 	while(1){
-		socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
-		char* cadenaAImprimir = (char*) structRecibida;
-		if(cadenaAImprimir==0){
-			cerrarSocket(sock_kernel_servidor);
-			return EXIT_SUCCESS;
+		t_struct_numero* num = ((t_struct_numero*)structRecibida);
+		if(tipoRecibido==D_STRUCT_PROGFIN){
+			log_escribir(archLog, "Termino el programa", INFO, "Se finalizo correctamente el programa");
+			free(structRecibida);
+			break;
 		}
-		if(cadenaAImprimir==1){
-			printf("No hay memoria suficiente para el programa\n");
+		if(tipoRecibido==D_STRUCT_SF){
+			log_escribir(archLog, "Termino el programa", INFO, "No hubo suficiente memoria para el programa");
+			free(structRecibida);
 			cerrarSocket(sock_kernel_servidor);
+			break;
 			return EXIT_FAILURE;
 		}
-
-		for(i=0; cadenaAImprimir[i]!=NULL;i++){
-			printf("%c", cadenaAImprimir[i]);
+		if(tipoRecibido==D_STRUCT_STRING){
+			q+=3;
+			int i;
+			char* cadenaAImprimir = (char*) structRecibida;
+			for(i=0; cadenaAImprimir[i]!=NULL;i++){
+				printf("%c", cadenaAImprimir[i]);
+			}
 		}
+		free(structRecibida);
+
+		socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 	}
 
-
+	cerrarSocket(sock_kernel_servidor);
 
 	return EXIT_SUCCESS;
 }
