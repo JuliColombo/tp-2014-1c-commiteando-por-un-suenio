@@ -115,7 +115,7 @@ int traducirPosicion(int base){
 //****************************************enviarBytes*************************************
 
 
-void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
+int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
 		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
@@ -123,7 +123,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 							printf("La direccion base es erronea\n");
 							escribir_log(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
 							sleep(retardo);
-							return;
+							return -1;
 						}
 			j=traducirPosicion(base)+offset;
 			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
@@ -131,10 +131,11 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("%s\n",(char*)buffer);//TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
+			return 0;
 			} else {
 				printf("Seg fault\n");
 				sleep(retardo);
-				return;
+				return -1;
 			}
 }
 
@@ -806,7 +807,11 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			structPush= ((t_struct_push*)structRecibida);
 			int pos= structPush->posicion;
 			int valor= structPush->valor;
-			enviarBytes(baseStack,pos,sizeof(valor),(int*)valor);
+			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
+				//signaltodopiola
+			}else{
+				//signaltodomal
+			}
 			free(structRecibida);
 			break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
 
@@ -1046,6 +1051,7 @@ void *consola (void){
 					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					 enviarBytes(unaBase,unOffset,unTamanio,aux_buffer);
 					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
+
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
 					    puts("\nIngrese el processID de programa a usar");
