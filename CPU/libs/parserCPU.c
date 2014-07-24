@@ -44,9 +44,10 @@ void proximaInst() {
 
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
 
-	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
+	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_instruccion));
 	estructura->inst = inst;
-	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
+	estructura->seg_codigo = *pcb->codigo;
+	socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura);
 	free(estructura);
 
 	recibirProximaInstruccion(sockUMV);

@@ -58,9 +58,10 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
 
-	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-	estructura->numero = instruccion;
-	socket_enviar(sockUMV, D_STRUCT_NUMERO, estructura);
+	t_struct_instruccion* estructura = malloc(sizeof(t_struct_seg_codigo));
+	estructura->inst = instruccion;
+	estructura->indice_codigo = *pcb->index_codigo;
+	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
 	free(estructura);
 
 	chequearSiHuboSF();
@@ -71,12 +72,10 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 	void* structRecibida;
 	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
 	if(j==1){
-		t_struct_instruccion* k = ((t_struct_instruccion*)structRecibida);
+		t_struct_seg_codigo* k = ((t_struct_seg_codigo*)structRecibida);
 		inst= k->inst;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	return inst;
 }
