@@ -22,6 +22,7 @@
 #include "log.h"
 #include <semaphore.h>
 #include "Sockets/socket.h"
+#include "Sockets/estructuras_socket.h"
 
 /*Pathcongif*/
 

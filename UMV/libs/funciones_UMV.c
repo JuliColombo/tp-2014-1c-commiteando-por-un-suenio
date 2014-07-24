@@ -85,7 +85,7 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	j=traducirPosicion(base)+offset;
 	printf("La posicion real es: %d\n",j);
 	memcpy(buffer, (char *) &MP[j], longitud);
-	printf("El buffer solicitado es: %s\"\n",(char*)buffer);
+	printf("El buffer solicitado es: %s\"\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
@@ -128,7 +128,7 @@ void enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			j=traducirPosicion(base)+offset;
 			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
 			printf("El resultado de la asignacion es:\n");
-			printf("%s\n",(char*)buffer);
+			printf("%s\n",(char*)buffer);//TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 			memcpy(&MP[j], (int*) buffer, longitud);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
 			} else {
@@ -794,6 +794,31 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 	return i;
 }
 
+void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
+	/*void enviarBytes(int,int,int,t_buffer);
+	int baseStack; //Esto deberia ser una variable global que se crea en atender_kernel?
+	switch(tipo_estructura){
+	case D_STRUCT_PUSH:
+		t_struct_push* structPush= estructura;
+		int pos= structPush->posicion;
+		int valor= structPush->valor;
+		enviarBytes(baseStack,pos,sizeof(valor),(int*)valor);
+		break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
+	case D_STRUCT_POP:
+		t_struct_pop* structPop= estructura;
+		pos= structPop->posicion;
+		int tamanio= sizeof(int);// De este tamaño seria lo del pop?
+		t_buffer valor = solicitarBytes(baseStack,pos,tamanio);
+		void* estructura= valor;
+		break;
+
+	default:
+		escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
+		break;
+	//Etc
+	}*/
+}
+
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
 void core_conexion_cpu(void){
@@ -841,12 +866,12 @@ void core_conexion_cpu(void){
 
 void atender_cpu(void){
 	/*UNSOLVED:
-	 * int programaEnHilo;
-	 * void* estructura;
-	 * t_tipoEstructura tipo_estructura;
-	 * socket_recibir(sock, &tipo_estructura, &estructura);
-	 * ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
-	 * send(sock, &tipo_estructura, &estructura);
+	  int programaEnHilo;
+	  void* estructura;
+	  t_tipoEstructura tipo_estructura;
+	  socket_recibir(sock, &tipo_estructura, &estructura);
+	  ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
+	  send(sock, &tipo_estructura, &estructura);
 	 */
 
 }
