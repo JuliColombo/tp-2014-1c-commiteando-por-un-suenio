@@ -147,8 +147,20 @@ void core_conexion_umv(void){
 	if ((sockUMV=socket_crearYConectarCliente(configuracion_cpu.ip_umv, configuracion_cpu.puerto_umv))<0){
 		log_error_socket();
 	} else {
-	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
+		log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente a UMV");
 	}
+	t_struct_numero* num = malloc(sizeof(t_struct_numero));
+	num->numero=1;
+	socket_enviar(sockUMV, D_STRUCT_NUMERO, num);
+	free(num);
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	socket_recibir(sockUMV, &tipoRecibido, structRecibida);
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		log_escribir(archLog, "UMV", INFO, "La UMV reconoció la CPU");
+	}
+
+
 	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
 	int a= 5;
 	t_pcb* pcb = malloc(sizeof(t_pcb));

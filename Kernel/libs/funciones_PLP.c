@@ -384,10 +384,17 @@ void core_conexion_umv(void){
 		escribir_log(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
 		//abort();
 	}
-	t_struct_numero* stack = malloc(sizeof(t_struct_numero));
-	stack->numero=configuracion_kernel.tamanio_stack;
-	socket_enviar(sock_umv,D_STRUCT_NUMERO,stack);
-	free(stack);
+	t_struct_numero* num = malloc(sizeof(t_struct_numero));
+	num->numero=0;
+	socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		num->numero=configuracion_kernel.tamanio_stack;
+		socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
+	}
+	free(num);
 
 
 
