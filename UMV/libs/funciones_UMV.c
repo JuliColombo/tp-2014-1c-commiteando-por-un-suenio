@@ -837,32 +837,42 @@ void core_conexion(void){
 	escribir_log(archLog, "Escuchando en el socket de Conexiones", INFO, "");
 	}
 	int sock_aceptado;
-	if((sock_aceptado=socket_aceptarCliente(sock_servidor))>0){
-			printf("Acepta conexion");
-			escribir_log(archLog, "Conexion", INFO, "Se acepta una conexion");
-		}
 
 	//Recibir Handshake:
-	/*t_tipoEstructura tipoRecibido;
+	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
-
-
-	while(1){
 
 	pthread_t atender_pedido;
 
-	switch(structRecibida){
-		case 0: pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, &sock_aceptado);
-				pthread_join(atender_pedido,NULL);
-				break;
-		case 1: pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, &sock_aceptado);
-				pthread_join(atender_pedido,NULL);
-				break;
-		default:
-		}
+	t_struct_numero* numeroEnviado = malloc(sizeof(t_struct_numero));
 
-	}*/
+	while(1){
+		if((sock_aceptado=socket_aceptarCliente(sock_servidor))>0){
+			printf("Acepta conexion");
+			escribir_log(archLog, "Conexion", INFO, "Se acepta una conexion");
+		}
+		socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
+		t_struct_numero* numeroRecibido = ((t_struct_numero*)structRecibida);
+		switch(numeroRecibido->numero){
+			case 0:
+				numeroEnviado->numero=0;
+				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, &sock_aceptado);
+				pthread_join(atender_pedido,NULL);
+				break;
+			case 1:
+				numeroEnviado->numero=1;
+				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, &sock_aceptado);
+				pthread_join(atender_pedido,NULL);
+				break;
+
+		}
+		free(structRecibida);
+	}
+
+	free(numeroEnviado);
+
 
 	if(socket_cerrarConexion(sock_servidor)==0){
 		escribir_log(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
