@@ -31,6 +31,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion=posicion;
 	estructura->valor = id;
+	estructura->stack_base = *pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
@@ -68,6 +69,8 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion=direccion_variable +1;
+	estructura->stack_base = *pcb->stack;
+	estructura->tamanio = sizeof(t_valor_variable);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
@@ -97,6 +100,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion=direccion_variable;
 	estructura->valor = valor;
+	estructura->stack_base = *pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
@@ -164,7 +168,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
 	estructura->inst = inst;
 	estructura->seg_codigo = *pcb->codigo;
-	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
+	socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura);
 	free(estructura);
 
 	chequearSiHuboSF();
@@ -255,6 +259,7 @@ void retornar(t_valor_variable retorno) {
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion=posicionAsignacion;
 	estructura->valor = retorno;
+	estructura->stack_base = *pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 

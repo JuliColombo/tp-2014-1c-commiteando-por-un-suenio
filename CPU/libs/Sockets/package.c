@@ -752,7 +752,7 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				estructuraDestino = despaquetizarStruct_pcbSF(dataPaquete, length);
 				break;
 			case D_STRUCT_PCBSEM:
-				estructuraDestino = despaquetizarStruct_pcbSF(dataPaquete, length);
+				estructuraDestino = despaquetizarStruct_pcbSem(dataPaquete, length);
 				break;
 			case D_STRUCT_PCBFIN:
 				estructuraDestino = despaquetizarStruct_pcbFin(dataPaquete, length);

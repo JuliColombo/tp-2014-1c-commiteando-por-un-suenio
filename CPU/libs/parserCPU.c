@@ -44,7 +44,7 @@ void proximaInst() {
 
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
 
-	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_instruccion));
+	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
 	estructura->inst = inst;
 	estructura->seg_codigo = *pcb->codigo;
 	socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura);
@@ -101,6 +101,8 @@ void destruirEstructuras(){
 void closureMostrarEstado(char* key, t_elemento* elem) {
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = elem->pos+1;
+	estructura->stack_base = *pcb->stack;
+	estructura->tamanio = sizeof(t_valor_variable);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
 
