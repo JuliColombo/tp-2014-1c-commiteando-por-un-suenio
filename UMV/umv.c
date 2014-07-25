@@ -9,17 +9,18 @@
 
 int* MP;
 int tamanioMP;
+int tamanioMaxStack;
 char* PATH=PATHCONFIG;
 int retardo=0;
 int procesoEnUso;
 tablaSeg* tablaDeSegmentos;
 int cant_tablas=0;
 t_config_UMV configuracion_UMV;
-pthread_t CONSOLA, KERNEL, CPU;
+pthread_t CONSOLA, CONEXIONES, CPU;
 log_t* archLog;
 pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
-int sock_kernel_servidor;
+int sock_servidor;
 int sock_cpu;
 int procesoActivo;
 int gradoDeMultiprogramacion;
