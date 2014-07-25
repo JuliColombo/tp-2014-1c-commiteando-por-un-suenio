@@ -797,10 +797,12 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 
 void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
+		int base;
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		t_struct_push* structPush;
 		t_struct_pop* structPop;
+		t_struct_instruccion* structInstr;
 		socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
 		switch(tipoRecibido){
 		case D_STRUCT_PUSH:
@@ -825,7 +827,20 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			socket_enviar(sock_cpu, D_STRUCT_NUMERO, estructura);
 			free(estructura);
 			break;
+		case D_STRUCT_INSTRUCCION:
+			structInstr=(t_struct_instruccion*)structRecibida;
+			base=structInstr->indice_codigo; //El segmento almacenado que en realidad es indice de codigo
+			pos=structInstr->inst;//La instruccion correspondiente
+			tamanio=2*sizeof(int); //Tamaño fijo de cada lugar en el indice de codigo (4(indice)+4(longitud) bytes)
+			long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
+			posDelIndice=solicitarBytes(base,pos,tamanio);
+			t_struct_seg_codigo* segAEnviar;
+			//segAEnviar->inst=primeros4Bytes(posDelIndice);
+			//int longitudDeInstr=segundos4Bytes(posDelIndice); //Esta variable se va a usar en el pedido del codigo
+			//socket_enviar(sock_cpu,D_STRUCT_SEGCODIGO, segAEnviar);
+			//-------------------Aca se espera la devolucion del seg o es otro case? Preg a juli
 
+			break;
 		default:
 			escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
 			break;
