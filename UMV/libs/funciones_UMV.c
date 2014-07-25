@@ -798,21 +798,28 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
 		int base;
+		t_signal senial;
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		t_struct_push* structPush;
 		t_struct_pop* structPop;
 		t_struct_instruccion* structInstr;
+		t_struct_seg_codigo* structCodigo;
 		socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
 		switch(tipoRecibido){
 		case D_STRUCT_PUSH:
 			structPush= ((t_struct_push*)structRecibida);
 			int pos= structPush->posicion;
 			int valor= structPush->valor;
+			baseStack = structPush->stack_base;
 			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
 				//signaltodopiola
+				senial = D_STRUCT_NORMAL;
+				socket_enviarSignal(sock_cpu,senial);
 			}else{
 				//signaltodomal
+				senial = D_STRUCT_SEGFAULT;
+				socket_enviarSignal(sock_cpu,senial);
 			}
 			free(structRecibida);
 			break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
@@ -820,7 +827,11 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 		case D_STRUCT_POP:
 			structPop= ((t_struct_pop*)structRecibida);
 			pos= structPop->posicion;
-			int tamanio= sizeof(int);// De este tamaño seria lo del pop?
+			int tamanio = structPop->tamanio;
+			baseStack = structPop->stack_base;
+
+			//ACA VENDRIA UN IF CHEQUEANDO QUE SE PUEDE HACER LO QUE LA CPU ME PIDE Y MANDAN SIGNAL
+
 			t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
 			t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 			estructura->numero = valor_a_enviar;
@@ -831,14 +842,52 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			structInstr=(t_struct_instruccion*)structRecibida;
 			base=structInstr->indice_codigo; //El segmento almacenado que en realidad es indice de codigo
 			pos=structInstr->inst;//La instruccion correspondiente
-			tamanio=2*sizeof(int); //Tamaño fijo de cada lugar en el indice de codigo (4(indice)+4(longitud) bytes)
-			long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
-			posDelIndice=solicitarBytes(base,pos,tamanio);
-			t_struct_seg_codigo* segAEnviar;
+			//tamanio=2*sizeof(int); //Tamaño fijo de cada lugar en el indice de codigo (4(indice)+4(longitud) bytes)
+			//long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
+			//posDelIndice=solicitarBytes(base,pos,tamanio);
+			//t_struct_seg_codigo* segAEnviar;
+
+
+			tamanio = sizeof(int);
+			int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
+
+			pos += sizeof(int);
+			int offset = solicitarBytes(base,pos,tamanio); //busco el offset. Para eso, tengo que correr 4 bytes la posicion, porque sino
+															//les devuelvo nuevamente el start
+
+			t_intructions instruccion;
+			instruccion.start=start;
+			instruccion.offset=offset;
+
+			t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
+			estruc->inst = instruccion;
+			estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
+			socket_enviar(sock_cpu, D_STRUCT_SEGCODIGO, estruc);
+			free(estruc);
+
 			//segAEnviar->inst=primeros4Bytes(posDelIndice);
 			//int longitudDeInstr=segundos4Bytes(posDelIndice); //Esta variable se va a usar en el pedido del codigo
 			//socket_enviar(sock_cpu,D_STRUCT_SEGCODIGO, segAEnviar);
 			//-------------------Aca se espera la devolucion del seg o es otro case? Preg a juli
+
+			break;
+
+		case D_STRUCT_SEGCODIGO:
+			structCodigo = (t_struct_seg_codigo*)structRecibida;
+			t_intructions inst = structCodigo->inst;
+			base = structCodigo->seg_codigo;
+			char* linea = solicitarBytes(base,inst.start,inst.offset);
+
+			//CHEQUEAN QUE SE PUEDE HACER LO QUE PIDE LA CPU CON EL IF
+
+			t_struct_string* structure = malloc(sizeof(t_struct_string));
+			structure->string = linea;
+
+			int j=socket_enviar(sock_cpu,D_STRUCT_STRING,estructura);
+			if(j == 1){
+				free(structure);
+			}
+
 
 			break;
 		default:

@@ -250,7 +250,7 @@ typedef struct struct_instruccion{
  */
 
 typedef struct struct_seg_codigo{
-	t_puntero inst;
+	t_intructions inst;
 	t_puntero seg_codigo;
 }__attribute__ ((__packed__)) t_struct_seg_codigo;
 
