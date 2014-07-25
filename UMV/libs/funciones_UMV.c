@@ -836,6 +836,62 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
+void core_conexion(void){
+	if((sock_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
+	printf("Hilo de Conexiones\n");
+	escribir_log(archLog, "Escuchando en el socket de Conexiones", INFO, "");
+	}
+	int sock_aceptado;
+
+	//Recibir Handshake:
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+
+	pthread_t atender_pedido;
+
+	t_struct_numero* numeroEnviado = malloc(sizeof(t_struct_numero));
+
+	while(1){
+		if((sock_aceptado=socket_aceptarCliente(sock_servidor))>0){
+			printf("Acepta conexion");
+			escribir_log(archLog, "Conexion", INFO, "Se acepta una conexion");
+		}
+		socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
+		t_struct_numero* numeroRecibido = ((t_struct_numero*)structRecibida);
+		switch(numeroRecibido->numero){
+			case 0:
+				numeroEnviado->numero=0;
+				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, &sock_aceptado);
+				pthread_join(atender_pedido,NULL);
+				break;
+			case 1:
+				numeroEnviado->numero=1;
+				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, &sock_aceptado);
+				pthread_join(atender_pedido,NULL);
+				break;
+
+		}
+		free(structRecibida);
+	}
+
+	free(numeroEnviado);
+
+
+	if(socket_cerrarConexion(sock_servidor)==0){
+		escribir_log(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
+		//Error cerrando el socket
+	} else {
+		escribir_log(archLog, "Se cierra el socket de Kernel", INFO, "No hay problemas para cerrar el socket");
+	}
+
+	return;
+}
+
+
+
+
 void core_conexion_cpu(void){
 	int sock;
 	pthread_t atender_pedido;
@@ -880,7 +936,7 @@ void core_conexion_cpu(void){
 }
 
 
-void atender_cpu(void){
+void atender_cpu(int sock){
 	/*UNSOLVED:
 	  int programaEnHilo;
 	  void* estructura;
@@ -895,7 +951,7 @@ void atender_cpu(void){
 
 
 
-void core_conexion_kernel(void){
+/*void core_conexion_kernel(void){
 	if((sock_kernel_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
 	printf("Hilo de Kernel\n");
 	escribir_log(archLog, "Escuchando en el socket de Kernel", INFO, "");
@@ -908,10 +964,10 @@ void core_conexion_kernel(void){
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
-	int tamanioMaxStack;
 	if(tipoRecibido==D_STRUCT_NUMERO){
 		tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
 		free(structRecibida);
+
 	}
 		while(1){
 
@@ -926,7 +982,7 @@ void core_conexion_kernel(void){
 	}
 
 	return;
-}
+}*/
 
 void atender_kernel(int sock){
 	t_tipoEstructura tipoRecibido;
@@ -988,8 +1044,7 @@ void inicializarMutex(void){
 
 void inicializarHilos(void){
 	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
-	pthread_create(&KERNEL, NULL, (void*) &core_conexion_kernel, NULL);
-	pthread_create(&CPU, NULL, (void*) &core_conexion_cpu, NULL);
+	pthread_create(&CONEXIONES, NULL, (void*) &core_conexion, NULL);
 }
 
 void esperarHilos(void){
@@ -1109,11 +1164,11 @@ void *consola (void){
 			destruirTodosLosSegmentos();
 			free(MP);
 			free(tablaDeSegmentos);
-		   	socket_cerrarConexion(sock_kernel_servidor);
+		   	socket_cerrarConexion(sock_servidor);
 		   	socket_cerrarConexion(sock_cpu);
 		   	matarHilos();
 			if(pthread_kill(CPU,0)==0) printf("Muere el hilo cpu\n");
-			if(pthread_kill(KERNEL,0)==0) printf("Muere el hilo Kernel\n");
+			if(pthread_kill(CONEXIONES,0)==0) printf("Muere el hilo de Conexiones\n");
 			sleep(retardo);
 			system("clear");
 		}
@@ -1121,7 +1176,7 @@ void *consola (void){
 
 void matarHilos(void){
 	pthread_cancel(CPU);
-	pthread_cancel(KERNEL);
+	pthread_cancel(CONEXIONES);
 
 }
 

@@ -51,8 +51,8 @@ int main (int argc, char **argv){
 	int q=0;
 	socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 	while(1){
-		t_struct_numero* num = ((t_struct_numero*)structRecibida);
 		if(tipoRecibido==D_STRUCT_PROGFIN){
+			t_struct_numero* num = ((t_struct_numero*)structRecibida);
 			log_escribir(archLog, "Termino el programa", INFO, "Se finalizo correctamente el programa");
 			free(structRecibida);
 			break;
@@ -65,12 +65,8 @@ int main (int argc, char **argv){
 			return EXIT_FAILURE;
 		}
 		if(tipoRecibido==D_STRUCT_STRING){
-			q+=3;
-			int i;
-			char* cadenaAImprimir = (char*) structRecibida;
-			for(i=0; cadenaAImprimir[i]!=NULL;i++){
-				printf("%c", cadenaAImprimir[i]);
-			}
+			t_struct_string* cadenaAImprimir = ((t_struct_string*) structRecibida);
+			printf("%s", cadenaAImprimir->string);
 		}
 		free(structRecibida);
 

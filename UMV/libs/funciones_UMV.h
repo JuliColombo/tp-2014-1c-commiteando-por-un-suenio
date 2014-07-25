@@ -33,16 +33,17 @@
 
 extern t_config_UMV configuracion_UMV;
 extern int* MP;
-extern pthread_t CONSOLA,KERNEL,CPU;
+extern pthread_t CONSOLA,CONEXIONES,CPU;
 extern log_t* archLog;
 extern pthread_mutex_t* mutex;
 extern pthread_mutex_t* mutex_log;
 extern char* PATH;
 extern int tamanioMP;
+extern int tamanioMaxStack;
 extern int procesoEnUso;
 extern tablaSeg* tablaDeSegmentos;
 extern int cant_tablas;
-extern int sock_kernel_servidor;
+extern int sock_servidor;
 extern int sock_cpu;
 extern int retardo;
 extern int procesoActivo;
@@ -108,12 +109,14 @@ void inicializarMutex(void);
 void inicializarHilos(void);
 void esperarHilos(void);
 
+void core_conexiones(void);
+
 void* core_consola(void);
 void* consola(void);
 
 void core_conexion_cpu(void);
 void crear_hilo_por_cpu(void);
-void atender_cpu(void);
+void atender_cpu(int sock);
 
 void core_conexion_kernel(void);
 void atender_kernel(int sock);

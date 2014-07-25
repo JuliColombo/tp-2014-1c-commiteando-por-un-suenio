@@ -84,8 +84,6 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 		free(k);
 	}
 
-	chequearSiHuboSF();
-
 	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
 
 	return valor_variable;
@@ -163,8 +161,9 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(instruccion);
 
-	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
+	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
 	estructura->inst = inst;
+	estructura->seg_codigo = *pcb->codigo;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
 	free(estructura);
 
@@ -270,12 +269,8 @@ void retornar(t_valor_variable retorno) {
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
-	/*t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-	estructura->numero = valor_mostrar;
-	socket_enviar(sockKernel, D_STRUCT_NUMERO, estructura);
-	free(estructura);*/
-
-	const char* valor_variable= convertirAString(valor_mostrar);
+	//DESPUES SE HACE FREE DE ESTO?
+	char* valor_variable = string_itoa(valor_mostrar);
 
 	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
 	estructura->mensaje = valor_variable;
@@ -291,11 +286,6 @@ void imprimir(t_valor_variable valor_mostrar) {
 void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
 
-	/*t_struct_string* estructura = malloc(sizeof(t_struct_string));
-	estructura->string = texto;
-	socket_enviar(sockKernel, D_STRUCT_STRING, estructura);
-	free(estructura);*/
-
 	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
 	estructura->mensaje = texto;
 	estructura->pid = pcb->pid;
@@ -308,13 +298,6 @@ void imprimirTexto(char* texto) {
 }
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
-
-	/*t_struct_io* estructura = malloc(sizeof(t_struct_io));
-	estructura->dispositivo = dispositivo;
-	estructura->pid = pcb->pid;
-	estructura->tiempo = tiempo;
-	socket_enviar(sockKernel, D_STRUCT_IO, estructura);
-	free(estructura);*/
 
 	termino = IO;
 

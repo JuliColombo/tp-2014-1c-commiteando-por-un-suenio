@@ -58,9 +58,10 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
 
-	t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-	estructura->numero = instruccion;
-	socket_enviar(sockUMV, D_STRUCT_NUMERO, estructura);
+	t_struct_instruccion* estructura = malloc(sizeof(t_struct_seg_codigo));
+	estructura->inst = instruccion;
+	estructura->indice_codigo = *pcb->index_codigo;
+	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
 	free(estructura);
 
 	chequearSiHuboSF();
@@ -71,17 +72,17 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 	void* structRecibida;
 	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
 	if(j==1){
-		t_struct_instruccion* k = ((t_struct_instruccion*)structRecibida);
+		t_struct_seg_codigo* k = ((t_struct_seg_codigo*)structRecibida);
 		inst= k->inst;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	return inst;
 }
 
 void recibirProximaInstruccion(int sockUMV) {
+
+	chequearSiHuboSF();
 
 	char* string;
 
@@ -93,8 +94,6 @@ void recibirProximaInstruccion(int sockUMV) {
 		string= k->string;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	proximaInstruccion = strdup(string); //que onde el const?
 }
@@ -239,8 +238,6 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 			free(k);
 		}
 
-	chequearSiHuboSF();
-
 	top_index -= 1;
 }
 
@@ -261,8 +258,6 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 			*cursor_stack_viejo= k->numero;
 			free(k);
 		}
-
-	chequearSiHuboSF();
 
 	top_index -= 1;
 
@@ -299,8 +294,6 @@ void guardarAlternado () {
 			identificador_variable= k->numero;
 			free(k);
 		}
-
-	chequearSiHuboSF();
 
 	insertarEnDiccionario(identificador_variable, top_index);
 
@@ -352,8 +345,6 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 		*direccion_retorno= k->numero;
 		free(k);
 	}
-
-	chequearSiHuboSF();
 
 	top_index -= 1;
 }

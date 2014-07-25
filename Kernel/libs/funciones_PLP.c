@@ -173,7 +173,7 @@ int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int t
  *		- la pcb creada si hay espacio
  * Funcion:
  */
-t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa, int fd) {
+t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	t_pcb* nuevoPCB=malloc(sizeof(t_pcb));
 	pthread_mutex_lock(mutex_solicitarMemoria);
 	pthread_mutex_lock(mutex_pid);
@@ -384,10 +384,17 @@ void core_conexion_umv(void){
 		escribir_log(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
 		//abort();
 	}
-	t_struct_numero* stack = malloc(sizeof(t_struct_numero));
-	stack->numero=configuracion_kernel.tamanio_stack;
-	socket_enviar(sock_umv,D_STRUCT_NUMERO,stack);
-	free(stack);
+	t_struct_numero* num = malloc(sizeof(t_struct_numero));
+	num->numero=0;
+	socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+	if(tipoRecibido==D_STRUCT_NUMERO){
+		num->numero=configuracion_kernel.tamanio_stack;
+		socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
+	}
+	free(num);
 
 
 

@@ -65,6 +65,7 @@ enum{
 	D_STRUCT_PCBFIN= 22,
 	D_STRUCT_SF=23,
 	D_STRUCT_PCBSEM = 24,
+	D_STRUCT_SEGCODIGO = 25,
 };
 
 
@@ -208,6 +209,7 @@ typedef int32_t t_valor;
 typedef struct struct_push{
 	t_posicion posicion;
 	t_valor valor;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_push;
 
 
@@ -217,6 +219,8 @@ typedef struct struct_push{
 
 typedef struct struct_pop{
 	t_posicion posicion;
+	t_size tamanio;
+	t_puntero stack_base;
 }__attribute__ ((__packed__)) t_struct_pop;
 
 
@@ -236,8 +240,20 @@ typedef struct struct_asignar_compartida{
  */
 
 typedef struct struct_instruccion{
-	t_intructions inst;
+	t_puntero inst;
+	t_puntero indice_codigo;
 }__attribute__ ((__packed__)) t_struct_instruccion;
+
+/* Estructura tipo STRUCT_SEGCODIGO
+ *
+ */
+
+typedef struct struct_seg_codigo{
+	t_intructions inst;
+	t_puntero seg_codigo;
+}__attribute__ ((__packed__)) t_struct_seg_codigo;
+
+
 
 /* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
  *
