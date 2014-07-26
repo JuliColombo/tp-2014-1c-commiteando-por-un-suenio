@@ -7,17 +7,6 @@
 
 #include "primitivasAux.h"
 
-//Esto de aca es para probar. Despues se pasan por sockets y esas cosas.
-t_dictionary *diccionario;
-int sockfd;
-int sockUMV;
-int top_index;
-
-char* proximaInstruccion;
-char* indiceEtiquetas;
-int esConRetorno;
-int recienReserve;
-
 void chequearSiHuboSF(){
 	t_signal* senial;
 	socket_recibirSignal(sockUMV,senial);
@@ -65,7 +54,6 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 	estructura->inst = instruccion;
 	estructura->indice_codigo = *pcb->index_codigo;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
-	printf("a\n");
 	free(estructura);
 
 	printf("se envio\n");

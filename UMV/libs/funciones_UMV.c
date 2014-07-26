@@ -838,7 +838,6 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			//posDelIndice=solicitarBytes(base,pos,tamanio);
 			//t_struct_seg_codigo* segAEnviar;
 
-
 			tamanio = sizeof(int);
 			int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
 

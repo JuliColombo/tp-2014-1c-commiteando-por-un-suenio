@@ -82,6 +82,8 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SEGCODIGO:
 				paquete = paquetizarStruct_segCodigo((t_struct_seg_codigo*) estructuraOrigen);
 				break;
+			case D_STRUCT_INSTRUCCION:
+				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
 		}
 
 

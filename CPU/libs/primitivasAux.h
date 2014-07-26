@@ -32,6 +32,15 @@ extern int stack;
 extern int cursor;
 extern int termino; //tiene que ser extern??
 
+t_dictionary *diccionario;
+int sockUMV;
+int top_index;
+
+char* proximaInstruccion;
+char* indiceEtiquetas;
+int esConRetorno;
+int recienReserve;
+
 t_pcb* pcb;
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);

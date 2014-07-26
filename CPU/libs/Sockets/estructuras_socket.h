@@ -235,15 +235,6 @@ typedef struct struct_asignar_compartida{
 	t_valor valor;
 }__attribute__ ((__packed__)) t_struct_asignar_compartida;
 
-/* Estructura tipo STRUCT_INSTRUCCION
- *
- */
-
-typedef struct struct_instruccion{
-	t_puntero inst;
-	t_puntero indice_codigo;
-}__attribute__ ((__packed__)) t_struct_instruccion;
-
 /* Estructura tipo STRUCT_SEGCODIGO
  *
  */
@@ -253,7 +244,14 @@ typedef struct struct_seg_codigo{
 	t_puntero seg_codigo;
 }__attribute__ ((__packed__)) t_struct_seg_codigo;
 
+/* Estructura tipo STRUCT_INSTRUCCION
+ *
+ */
 
+typedef struct struct_instruccion{
+	t_puntero inst;
+	t_puntero indice_codigo;
+}__attribute__ ((__packed__)) t_struct_instruccion;
 
 /* Estructura tipo STRUCT_PEDIR_INDICE_ETIQUETAS
  *

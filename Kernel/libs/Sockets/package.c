@@ -82,6 +82,8 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SOLICITARMEMORIA:
 				paquete = paquetizarStruct_SolicitarMemoria((t_struct_memoria*) estructuraOrigen);
 				break;
+			case D_STRUCT_INSTRUCCION:
+				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
 		}
 
 
@@ -610,7 +612,7 @@ t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen)
 
 	char * data = crearDataConHeader(D_STRUCT_INSTRUCCION, paquete->length); 	//creo el data
 
-	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_instruccion));		//copio a data el numero.
+	memcpy(data + sizeof(t_header), &estructuraOrigen->inst, sizeof(uint32_t));		//copio a data el numero.
 
 	paquete->data = data;
 
