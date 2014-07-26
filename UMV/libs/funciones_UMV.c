@@ -923,6 +923,7 @@ void handshake_conexion(void){
 			case 1:
 				numeroEnviado->numero=1;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				printf("%d\n",sock->fd);
 				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, sock);
 				break;
 
@@ -946,18 +947,20 @@ void handshake_conexion(void){
 
 void atender_cpu(sock_struct* sock){
 	pthread_detach(pthread_self());
+
 	//RECIBO PEDIDO DE INDICE DE ETIQUETAS
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	t_struct_indice_etiquetas* indice;
-	socket_recibir(sock, &tipoRecibido,&structRecibida);
+
+	socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
 	indice = ((t_struct_indice_etiquetas*)structRecibida);
-	//printf("me llego esto %d y %d\n",tamanio->etiquetas_size, *tamanio->index_etiquetas);
+	//printf("me llego esto %d y %d\n",indice->etiquetas_size, *indice->index_etiquetas);
 
 	t_struct_string* estructura = malloc(sizeof(t_struct_indice_etiquetas));
 	estructura->string = "hola wachada";		//ACA MANDAN EL INDICE DE ETIQUETAS EN BASE A LO RECIBIDO
 
-	int j=socket_enviar(sock,D_STRUCT_STRING,estructura);
+	int j=socket_enviar(sock->fd,D_STRUCT_STRING,estructura);
 	if(j == 1){
 	printf("se envio el intento de indice de etiquetas\n");
 	free(estructura);
