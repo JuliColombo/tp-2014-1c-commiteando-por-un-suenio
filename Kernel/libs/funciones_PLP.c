@@ -130,9 +130,9 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 }
 
-int solicitarMemoriaUMV(int tamanioSeg1, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4){
+int solicitarMemoriaUMV(int tamanioScript, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4){
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
-	paquete->numero = tamanioSeg1;
+	paquete->numero = tamanioScript;
 	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
 	paquete->numero = tamanioSeg2;
 	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);

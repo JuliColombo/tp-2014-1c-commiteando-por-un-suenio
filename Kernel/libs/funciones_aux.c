@@ -674,6 +674,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_semaforo* semaforo;
 	t_struct_nombreMensaje* mensaje;
 	t_struct_string* string;
+	t_struct_numero* num;
 	t_struct_asignar_compartida* compartida;
 	t_struct_pcb* pcb;
 	t_struct_pcb_fin* pcb_fin;
@@ -780,6 +781,19 @@ void handler_conexion_cpu(epoll_data_t data){
 			liberarCPU(data.fd);
 			pcb_fin = ((t_struct_pcb_fin*)structRecibida);
 			sem_post(&sem_new);
+			programa = (t_programa*) buscarPrograma(pcb_fin->pid, cola.exec, mutex_cola_exec);
+			string = malloc(sizeof(t_struct_string));
+			string->string=pcb_fin->variables;
+			socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_STRING, string);
+			free(string);
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=0;
+			socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_PROGFIN,num);
+			free(num);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
+			pthread_mutex_lock(mutex_cola_exit);
+			mostrarColasPorPantalla(cola.exit, "Exit");
+			pthread_mutex_unlock(mutex_cola_exit);
 
 			printf("llego %s\n",pcb_fin->variables);
 	}
