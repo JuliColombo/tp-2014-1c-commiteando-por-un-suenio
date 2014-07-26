@@ -97,7 +97,7 @@ void hot_plug(int signum) {
 }
 
 void destruirEstructuras(){
-	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete);
+	dictionary_destroy_and_destroy_elements(diccionario,(void*)elemento_delete); //NO DEBERIA PONER ELIMINAR DICCIONARIO EN CPU.C ENTONCES NO?
 	free(variables);
 }
 

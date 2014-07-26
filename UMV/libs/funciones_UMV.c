@@ -951,10 +951,13 @@ void atender_cpu(sock_struct* sock){
 	t_struct_indice_etiquetas* indice;
 
 	socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
+	if(tipoRecibido==D_STRUCT_INDICE_ETIQUETAS){
+			printf("me llego un D_STRUCT_INDICE\n");
+		}
 	indice = ((t_struct_indice_etiquetas*)structRecibida);
-	//printf("me llego esto %d y %d\n",indice->etiquetas_size, *indice->index_etiquetas);
+	printf("me llego esto %d y %d\n",indice->etiquetas_size, indice->index_etiquetas);
 
-	t_struct_string* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+	t_struct_string* estructura = malloc(sizeof(t_struct_string));
 	estructura->string = "hola wachada";		//ACA MANDAN EL INDICE DE ETIQUETAS EN BASE A LO RECIBIDO
 
 	int j=socket_enviar(sock->fd,D_STRUCT_STRING,estructura);

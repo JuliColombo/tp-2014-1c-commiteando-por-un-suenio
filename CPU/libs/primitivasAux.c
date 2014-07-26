@@ -52,7 +52,7 @@ t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instrucc
 
 	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
 	estructura->inst = instruccion;
-	estructura->indice_codigo = *pcb->index_codigo;
+	estructura->indice_codigo = 6;//*pcb->index_codigo;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
 	free(estructura);
 

@@ -499,7 +499,7 @@ t_stream * paquetizarStruct_indiceEtiquetas(t_struct_indice_etiquetas * estructu
 	int tamanioTotal = sizeof(t_header);
 	int tamanioDato = 0;
 
-	memcpy(data + tamanioTotal, estructuraOrigen->index_etiquetas ,tamanioDato = sizeof(uint32_t));
+	memcpy(data + tamanioTotal, &estructuraOrigen->index_etiquetas ,tamanioDato = sizeof(uint32_t));
 
 	tamanioTotal += tamanioDato;
 
@@ -1124,7 +1124,7 @@ t_struct_push * despaquetizarStruct_push(char * dataPaquete, uint16_t length){//
 t_struct_indice_etiquetas * despaquetizarStruct_indiceEtiquetas(char * dataPaquete, uint16_t length){//
 	t_struct_indice_etiquetas * estructuraDestino = malloc(sizeof(t_struct_indice_etiquetas));
 
-	memcpy(estructuraDestino->index_etiquetas, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
+	memcpy(&estructuraDestino->index_etiquetas, dataPaquete, sizeof(uint32_t)); //copio la posicion del paquete a la estructura.
 
 	memcpy(&estructuraDestino->etiquetas_size, dataPaquete+ sizeof(uint32_t), sizeof(uint32_t)); //copio el valor del paquete a la estructura.
 

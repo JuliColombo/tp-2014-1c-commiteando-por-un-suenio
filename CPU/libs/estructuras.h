@@ -14,7 +14,7 @@
 typedef unsigned int t_pid;
 typedef int t_program_counter;
 typedef int t_tamanio_contexto;
-typedef int t_tamanio_indice;
+typedef uint32_t t_tamanio_indice;
 typedef uint32_t* t_segmento_codigo;
 typedef uint32_t* t_segmento_stack;
 typedef uint32_t* t_cursor_stack;

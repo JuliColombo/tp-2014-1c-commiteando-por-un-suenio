@@ -162,19 +162,19 @@ void core_conexion_umv(void){
 	void* structRecibida;
 	socket_recibir(sockUMV, &tipoRecibido, structRecibida);
 	if(tipoRecibido==D_STRUCT_NUMERO){
-		log_escribir(archLog, "UMV", INFO, "La UMV reconoció la CPU");
+		log_escribir(archLog, "Conexion", INFO, "La UMV reconoció la CPU");
 	}
 
 
 	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
-	int a= 5;
+	uint32_t a= 5;
 	t_pcb* pcb = malloc(sizeof(t_pcb));
 	pcb->index_etiquetas = &a;
 	pcb->tamanio_indice = 3;
 
 	//ENVIO PEDIDO DE INDICE DE ETIQUETAS
 	t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
-	estructura->index_etiquetas = pcb->index_etiquetas;
+	estructura->index_etiquetas = *pcb->index_etiquetas;
 	estructura->etiquetas_size = pcb->tamanio_indice;
 	int k=socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
 	if(k==1){

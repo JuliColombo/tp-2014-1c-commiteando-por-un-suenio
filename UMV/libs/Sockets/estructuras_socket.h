@@ -261,7 +261,7 @@ typedef struct struct_seg_codigo{
  */
 
 typedef struct struct_etiquetas{
-	t_puntero* index_etiquetas;
+	t_puntero index_etiquetas;
 	t_size etiquetas_size;
 }__attribute__ ((__packed__)) t_struct_indice_etiquetas;
 
