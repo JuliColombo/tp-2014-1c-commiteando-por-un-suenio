@@ -84,8 +84,8 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	int j;
 	j=traducirPosicion(base)+offset;
 	printf("La posicion real es: %d\n",j);
-	memcpy(buffer, (char *) &MP[j], longitud);
-	printf("El buffer solicitado es: %s\"\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
+	memcpy((char *) buffer,  &MP[j], longitud);
+	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
@@ -539,7 +539,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
-	return 0;
+	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
@@ -582,7 +582,6 @@ int inicializarTabla(int id_prog){
 	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
 	if (tablaDeSegmentos[i].id_prog != id_prog){
 		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
-		//FIXME: no funciona bien este realloc
 		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
 		if(aux_tabla==NULL){
 			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
@@ -601,7 +600,6 @@ int inicializarTabla(int id_prog){
 		printf("La cant de tablas es: %d\n", cant_tablas);
 		return i;
 		} else {
-			//FIXME: no funciona bien este realloc
 			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, ((tablaDeSegmentos[i].cant_segmentos+1)*sizeof(segmentDescriptor)));
 									if(aux_segmentos==NULL){
 										log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
@@ -923,7 +921,6 @@ void handshake_conexion(void){
 			case 1:
 				numeroEnviado->numero=1;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
-				printf("%d\n",sock->fd);
 				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, sock);
 				break;
 
@@ -1001,13 +998,13 @@ void atender_kernel(sock_struct* sock){
 
 
 			memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioMaxStack);
-			if(memoriaSuficiente==0){
+			if(memoriaSuficiente!=-1){
 				tamanioSolicitado = tamanio->tamanioScript;
 				memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
-				if(memoriaSuficiente==0){
+				if(memoriaSuficiente!=-1){
 					tamanioSolicitado = tamanio->tamanioIndiceCodigo;
 					memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
-					if(memoriaSuficiente==0){
+					if(memoriaSuficiente!=-1){
 						tamanioSolicitado = tamanio->tamanioIndiceEtiquetas;
 						memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 					}
@@ -1113,7 +1110,7 @@ void *consola (void){
 					 scanf("%d",&unOffset);
 					 puts("\nIngrese Buffer");
 					 scanf("%s",aux_buffer);
-					 unTamanio=strlen(aux_buffer+1);
+					 unTamanio=strlen(aux_buffer)+1;
 					 printf("El tamanio es: %d\n",unTamanio);
 					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					 enviarBytes(unaBase,unOffset,unTamanio,aux_buffer);
