@@ -19,6 +19,7 @@ t_intructions* indiceCodigo;
 char* proximaInstruccion;
 
 int esConRetorno = 0;
+int recienReserve = 0;
 int cursor;
 int stack;
 
@@ -95,10 +96,10 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
-	int top = top_index;
+	//int top = top_index;
 
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
-	estructura->posicion=direccion_variable;
+	estructura->posicion=direccion_variable+1;
 	estructura->valor = valor;
 	estructura->stack_base = *pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
@@ -106,13 +107,13 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 	chequearSiHuboSF();
 
-	int posibleTop = direccion_variable + 1;
+	/*int posibleTop = direccion_variable + 4;
 
 	if(top < posibleTop) {
 		top_index = posibleTop;
 	} else {
 		top_index = top;
-	}
+	}*/
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a direccion de variable %d",valor, direccion_variable);
 

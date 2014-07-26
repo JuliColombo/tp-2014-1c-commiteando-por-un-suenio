@@ -16,6 +16,7 @@ int top_index;
 char* proximaInstruccion;
 char* indiceEtiquetas;
 int esConRetorno;
+int recienReserve;
 
 void chequearSiHuboSF(){
 	t_signal* senial;
@@ -107,12 +108,13 @@ int esPrimerContexto(){
 	return a;
 }
 
-t_puntero calcularPosicionAsignacionCPU(int top_index) {
+/*t_puntero calcularPosicionAsignacionCPU(int top_index) {
 	t_puntero posicion=0;
 	if(top_index == -1) {
 		posicion = top_index +1;
 	} else {
-		posicion = top_index + 2;
+		//posicion = top_index + 2;
+		posicion = top_index + 5;
 	}
 	return posicion;}
 
@@ -138,7 +140,22 @@ t_puntero calcularPosicionAsignacion(int top_index) {
 			}
 	}
 	return posicion;
+}*/
+
+t_puntero calcularPosicionAsignacion(int top_index){
+	t_puntero pos;
+	if(top_index == -1){
+		pos = top_index + 1;
+	} else if(recienReserve){
+		recienReserve = 0;
+		pos =top_index + 1;
+	} else {
+		pos = top_index + 5;
+	}
+
+	return pos;
 }
+
 
 char* convertirAString(t_nombre_variable c) {
 	static char str[2];
@@ -178,7 +195,7 @@ void reservarContextoSinRetorno() {
 
 	chequearSiHuboSF();
 
-	top_index = posicionContextoViejo +1;
+	top_index = posicionContextoViejo +4;
 
 	//Pushear Program Counter de proxima instruccion:
 	int pc  = pcb->program_counter + 1;
@@ -192,6 +209,10 @@ void reservarContextoSinRetorno() {
 
 	//Borrar diccionario y todos los elementos. Cuando lo regenero, los vuelvo a crear.
 	dictionary_clean_and_destroy_elements(diccionario,(void*)elemento_delete);
+
+	recienReserve = 1;
+
+	top_index +=3;
 
 }
 
@@ -212,6 +233,8 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 	free(estructura);
 
 	chequearSiHuboSF();
+
+	top_index += 3;
 
 	esConRetorno = 1;
 }
@@ -243,7 +266,7 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 			free(k);
 		}
 
-	top_index -= 1;
+	top_index -= 4;
 }
 
 void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
@@ -266,7 +289,7 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 			free(k);
 		}
 
-	top_index -= 1;
+	top_index -= 4;
 
 }
 
@@ -330,7 +353,7 @@ uint32_t calcularTamanioContextoAnterior(t_puntero direccion_contexto_viejo) {
 	//uint32_t diferencia = (*pcb->c_stack) - direccion_contexto_viejo;
 	uint32_t diferencia = cursor - direccion_contexto_viejo;
 
-	float dif=(float)(diferencia / 2.5);
+	float dif=(float)(diferencia / 5);
 	int enteraDeDif = (int)dif;
 
 	return enteraDeDif; //Divido esa cantidad de bytes por 5 (1 byte de id de variable, y 4 bytes del valor) para saber cuantas variables habia.
@@ -357,5 +380,6 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 		free(k);
 	}
 
-	top_index -= 1;
+	//top_index -= 1;
+	top_index -= 4;
 }
