@@ -539,7 +539,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
-	return 1;
+	return 0;
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
@@ -1044,59 +1044,63 @@ void atender_kernel(sock_struct* sock){
 	pthread_detach(pthread_self());
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	t_struct_numero* tamanio;
+	t_struct_memoria* tamanio;
 	int i,id_prog,memoriaSuficiente=0;
 	int tamanioSolicitado;
 
-	/*socket_recibir(sock, &tipoRecibido, &structRecibida);
-	if(tipoRecibido==D_STRUCT_NUMERO){
-		id_prog = ((t_struct_numero*)structRecibida)->numero;
-		free(structRecibida);
-	}*/
-
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
-	if(tipoRecibido==D_STRUCT_SOLICITARMEMORIA){
-		t_struct_memoria* mem = ((t_struct_memoria*) structRecibida);
-		printf("El primero es: %d\n", mem->tamanioScript);
-		printf("El segundo es: %d\n", mem->tam2);
-		printf("El tercero es: %d\n", mem->tam3);
-
-		printf("anduvo bien\n");
+	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
+	free(structRecibida);
 
 
+	while(1){
 
-	}else{
-		printf("Anda mal\n");
-	}
-
-
-	for(i=0; i<4 && memoriaSuficiente==0;i++){
-		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
-		tamanio = ((t_struct_numero*)structRecibida);
-		tamanioSolicitado = tamanio->numero;
-		//memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
-	}
-	if (memoriaSuficiente==-1){
-		escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el paquete");
-		destruirSegmentosPrograma(id_prog);
-		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-		respuesta->numero=memoriaSuficiente;
-		socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
-		free(respuesta);
-	}
-	if(memoriaSuficiente==1){
-		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-		respuesta->numero=memoriaSuficiente;
-		socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
-		free(respuesta);
-		for(i=0;i<4;i++){
-			socket_recibir(sock->fd,&tipoRecibido,&structRecibida);
-			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
-			//enviarBytes(base,offset,longitud,buffer);
+		socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
+		if(tipoRecibido==D_STRUCT_NUMERO){
+			t_struct_numero* id = ((t_struct_numero*)structRecibida);
+			id_prog = id->numero;
+			free(id);
 		}
+		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
+		if(tipoRecibido==D_STRUCT_SOLICITARMEMORIA){
+			tamanio = ((t_struct_memoria*)structRecibida);
+
+
+			memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioMaxStack);
+			if(memoriaSuficiente==0){
+				tamanioSolicitado = tamanio->tamanioScript;
+				memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+				if(memoriaSuficiente==0){
+					tamanioSolicitado = tamanio->tam2;
+					memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+					if(memoriaSuficiente==0){
+						tamanioSolicitado = tamanio->tam3;
+						memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+					}
+				}
+			}
+
+		}
+		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+		if (memoriaSuficiente==-1){
+			escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
+			destruirSegmentosPrograma(id_prog);
+			respuesta->numero=1;
+			socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
+		}
+		if(memoriaSuficiente==0){
+			respuesta->numero=memoriaSuficiente;
+			socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
+			if(memoriaSuficiente==0){
+				for(i=0;i<4;i++){
+					//socket_recibir(sock->fd,&tipoRecibido,&structRecibida);
+					//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
+					//enviarBytes(base,offset,longitud,buffer);
+				}
+			}
+		}
+		free(respuesta);
 	}
-
-
 
 
 	free(sock);

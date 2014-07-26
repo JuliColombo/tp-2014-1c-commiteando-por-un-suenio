@@ -598,7 +598,6 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 	if(j==1){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
 		i = agregarNuevoPrograma(k->string, fd_aceptado);
-		printf("el fd aceptado es %d\n", fd_aceptado);
 		if(i==0){
 			sem_post(&sem_new);
 			escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
@@ -797,6 +796,9 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			printf("llego %s\n",pcb_fin->variables);
 	}
+	pthread_mutex_lock(mutex_cola_ready);
+	mostrarColasPorPantalla(cola.ready,"Ready");
+	pthread_mutex_unlock(mutex_cola_ready);
 	sem_post(&sem_multiProg);
 	sem_post(&sem_cpu);
 	free(structRecibida);

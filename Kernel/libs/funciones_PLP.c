@@ -130,17 +130,17 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 }
 
-int solicitarMemoriaUMV(int tamanioScript, int tamanioSeg2, int tamanioSeg3, int tamanioSeg4){
-	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
-	paquete->numero = tamanioScript;
-	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
-	paquete->numero = tamanioSeg2;
-	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
-	paquete->numero = tamanioSeg3 ;
-	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
-	paquete->numero = tamanioSeg4;
-	socket_enviar(sock_umv,D_STRUCT_SOLICITARMEMORIA, paquete);
-	free(paquete);
+int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioSeg2, int tamanioSeg3){
+
+	t_struct_numero* numpid = malloc(sizeof(t_struct_numero));
+	numpid->numero=pid;
+	socket_enviar(sock_umv, D_STRUCT_NUMERO, numpid);
+
+	t_struct_memoria* mem = malloc(sizeof(t_struct_memoria));
+	mem->tamanioScript=tamanioScript;
+	mem->tam2 = tamanioSeg2;
+	mem->tam3 = tamanioSeg3;
+	socket_enviar(sock_umv, D_STRUCT_SOLICITARMEMORIA, mem);
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(sock_umv,&tipoRecibido,&structRecibida);
@@ -158,7 +158,6 @@ int solicitarMemoriaUMV(int tamanioScript, int tamanioSeg2, int tamanioSeg3, int
 
 		return -1;
 	}
-
 
 }
 
@@ -182,8 +181,9 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	//id->numero = program_pid;
 	//socket_enviar(sock_umv,D_STRUCT_NUMERO, id);
 //	free(id);
-	//solicitarMemoriaUMV(1,2,3,4) va en el if
-	if(0==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
+	int tamanioScript = strlen(codigo)+1;
+	printf("El tamanio del script es: %d\n", tamanioScript);
+	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,2,3))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
 		printf("Print");
 		nuevoPCB->stack=NULL;
@@ -283,6 +283,7 @@ void core_plp(void){
 
 			pthread_mutex_unlock(mutex_cola_new);
 			list_add(cola.ready, (void*) programa);
+			mostrarColasPorPantalla(cola.ready,"Ready");
 			pthread_mutex_unlock(mutex_cola_ready);
 			sem_post(&sem_multiProg);
 
@@ -305,9 +306,6 @@ void core_pcp(void){
 
 	while(1){
 		sem_wait(&sem_multiProg);
-		pthread_mutex_lock(mutex_cola_ready);
-		mostrarColasPorPantalla(cola.ready,"Ready");
-		pthread_mutex_unlock(mutex_cola_ready);
 		sem_wait(&sem_cpu);
 
 		if(list_size(cola.ready)!=0){
@@ -389,20 +387,12 @@ void core_conexion_umv(void){
 	socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	/*socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+	socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
 	if(tipoRecibido==D_STRUCT_NUMERO){
 		num->numero=configuracion_kernel.tamanio_stack;
 		socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
-	}*/
+	}
 	free(num);
-	t_struct_memoria* mem = malloc(sizeof(t_struct_memoria));
-	mem->tamanioScript=100;
-	mem->tam2 = 50;
-	mem->tam3 = 25;
-	socket_enviar(sock_umv, D_STRUCT_SOLICITARMEMORIA, mem);
-
-
-
 
 
 
