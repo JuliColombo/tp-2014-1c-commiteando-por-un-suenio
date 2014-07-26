@@ -632,18 +632,21 @@ t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen){
 
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
 	char* data = crearDataConHeader(D_STRUCT_SOLICITARMEMORIA, paquete->length);
 
-	int i=0, tamanoTotal=sizeof(t_header), tamanoDato=0;
-	for(i=0; i<3; i++){
+	int tamanoTotal=sizeof(t_header), tamanoDato=0;
 
-		memcpy(data + tamanoTotal, estructuraOrigen, tamanoDato=sizeof(uint32_t));
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanioScript, tamanoDato=sizeof(uint32_t));
 
-		tamanoTotal+=tamanoDato;
+	tamanoTotal+=tamanoDato;
 
-	}
+	memcpy(data + tamanoTotal, &estructuraOrigen->tam2, tamanoDato=sizeof(uint32_t));
+
+	tamanoTotal+=tamanoDato;
+
+	memcpy(data + tamanoTotal, &estructuraOrigen->tam3, tamanoDato=sizeof(uint32_t));
 
 	paquete->data = data;
 
