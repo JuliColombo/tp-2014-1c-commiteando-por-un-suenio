@@ -79,6 +79,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_VARIABLES:
 				paquete = paquetizarStruct_variables((t_struct_string*) estructuraOrigen);
 				break;
+			case D_STRUCT_SOLICITARMEMORIA:
+				paquete = paquetizarStruct_SolicitarMemoria((t_struct_memoria*) estructuraOrigen);
+				break;
 		}
 
 
@@ -615,6 +618,40 @@ t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen)
 }
 
 /*
+ * Nombre: paquetizarStruct_SolicitarMemoria/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete
+ *
+ * Funcion: paquetiza la solicitud de tamanios memoria para la umv
+ */
+
+t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen){
+
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
+
+	char* data = crearDataConHeader(D_STRUCT_SOLICITARMEMORIA, paquete->length);
+
+	int i=0, tamanoTotal=sizeof(t_header), tamanoDato=0;
+	for(i=0; i<3; i++){
+
+		memcpy(data + tamanoTotal, estructuraOrigen, tamanoDato=sizeof(uint32_t));
+
+		tamanoTotal+=tamanoDato;
+
+	}
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
  * Nombre: crearDataConHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -732,6 +769,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_VARIABLES:
 				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
+				break;
+			case D_STRUCT_SOLICITARMEMORIA:
+				estructuraDestino = despaquetizarStruct_SolicitarMemoria(dataPaquete, length);
 				break;
 		}
 
@@ -1143,6 +1183,31 @@ t_struct_instruccion * despaquetizarStruct_instruccion(char * dataPaquete, uint1
 	t_struct_instruccion * estructuraDestino = malloc(sizeof(t_struct_instruccion));
 
 	memcpy(&estructuraDestino->inst, dataPaquete, sizeof(t_struct_instruccion)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+
+/*
+ * Nombre: despaquetizarStruct_SolicitarMemoria/2
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_struct_memoria* despaquetizarStruct_SolicitarMemoria(char* dataPaquete, uint16_t length){
+
+	t_struct_memoria * estructuraDestino = malloc(sizeof(t_struct_memoria));
+
+	memcpy(&estructuraDestino->tamanioScript, dataPaquete, sizeof(uint32_t));
+
+	memcpy(&estructuraDestino->tam2, dataPaquete+ sizeof(uint32_t), sizeof(int32_t));
+
+	memcpy(&estructuraDestino->tam3, dataPaquete+ sizeof(uint32_t)+sizeof(uint32_t), sizeof(int32_t));
 
 	return estructuraDestino;
 }

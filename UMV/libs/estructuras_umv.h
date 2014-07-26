@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 typedef uint16_t t_puerto_cpu;
-typedef uint16_t t_puerto_kernel;
+typedef uint16_t t_puerto_conexiones;
 typedef int t_memoria_principal;
 typedef int t_algoritmo;
 typedef char* t_ip_kernel;
@@ -31,15 +31,16 @@ typedef struct { // se define un vector para los programas en new
 
 typedef struct t_config_UMV {
 t_memoria_principal memSize;	//Tamanio de la memoria principal
-t_puerto_cpu puerto_cpus;	//Puerto tcp para recibir las conexiones de las cpus
-t_puerto_kernel puerto_kernel;	//Puerto tcp para recibir las conexiones del kernel
-t_ip_kernel ip_kernel;	//Direccion IP para conectarse al Kernel
+t_puerto_conexiones puerto_conexiones;	//Puerto tcp para recibir las conexiones
 t_algoritmo algoritmo;	//Algoritmo de selección de ubicación de segmento (first-fit o worst-fit)
 } t_config_UMV;
 
 enum tipo_algoritmo{
 					firstfit,worstfit
 };
+typedef struct{
+	int fd;
+}sock_struct;
 
 typedef enum tipo_handshake{
 	kernel, cpu

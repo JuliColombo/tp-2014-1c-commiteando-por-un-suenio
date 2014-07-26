@@ -751,15 +751,8 @@ void leerConfiguracion(void) {
 		configuracion_UMV.memSize = config_get_int_value(config,
 					"MemSize");
 
-		configuracion_UMV.puerto_cpus = config_get_int_value(config,
-					"Puerto TCP para recibir conexiones de los CPUs");
-
-		configuracion_UMV.puerto_kernel = config_get_int_value(config,
-					"Puerto TCP para recibir conexiones del Kernel");
-
-
-		configuracion_UMV.ip_kernel = config_get_string_value(config,
-					"Direccion IP para conectarse al Kernel");
+		configuracion_UMV.puerto_conexiones = config_get_int_value(config,
+					"Puerto TCP para recibir conexiones");
 
 
 		configuracion_UMV.algoritmo = config_get_int_value(config,
@@ -770,9 +763,7 @@ void leerConfiguracion(void) {
 void imprimirConfiguracion(void) { // Funcion para testear que lee correctamente el archivo de configuracion
 
 	printf("Tamanio de memoria Principal: %d\n", configuracion_UMV.memSize);
-	printf("Puerto para conexiones con CPUs: %d\n", configuracion_UMV.puerto_cpus);
-	printf("Puerto para conexiones con Kernel: %d\n", configuracion_UMV.puerto_kernel);
-	printf("IP del Kernel: %s\n", configuracion_UMV.ip_kernel);
+	printf("Puerto para conexiones: %d\n", configuracion_UMV.puerto_conexiones);
 	printf("Algoritmo de segmentacion: %d\n", configuracion_UMV.algoritmo);
 }
 
@@ -900,8 +891,8 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
-void core_conexion(void){
-	if((sock_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
+void handshake_conexion(void){
+	if((sock_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_conexiones))>0){
 	printf("Hilo de Conexiones\n");
 	escribir_log(archLog, "Escuchando en el socket de Conexiones", INFO, "");
 	}
@@ -916,24 +907,24 @@ void core_conexion(void){
 	t_struct_numero* numeroEnviado = malloc(sizeof(t_struct_numero));
 
 	while(1){
+		sock_struct* sock = malloc(sizeof(sock_struct));
 		if((sock_aceptado=socket_aceptarCliente(sock_servidor))>0){
-			printf("Acepta conexion");
+			printf("Acepta conexion\n");
 			escribir_log(archLog, "Conexion", INFO, "Se acepta una conexion");
 		}
 		socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
 		t_struct_numero* numeroRecibido = ((t_struct_numero*)structRecibida);
+		sock->fd=sock_aceptado;
 		switch(numeroRecibido->numero){
 			case 0:
 				numeroEnviado->numero=0;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
-				pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, &sock_aceptado);
-				pthread_join(atender_pedido,NULL);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, sock);
 				break;
 			case 1:
 				numeroEnviado->numero=1;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
-				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, &sock_aceptado);
-				pthread_join(atender_pedido,NULL);
+				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, sock);
 				break;
 
 		}
@@ -941,7 +932,6 @@ void core_conexion(void){
 	}
 
 	free(numeroEnviado);
-
 
 	if(socket_cerrarConexion(sock_servidor)==0){
 		escribir_log(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
@@ -960,10 +950,10 @@ void core_conexion_cpu(void){
 	int sock;
 	pthread_t atender_pedido;
 
-	if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
+	/*/if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
 	printf("Hilo de CPU \n");
 	escribir_log(archLog, "Escuchando en el socket de CPU's", INFO, "");
-	}
+	}*/ 	//TODO ESTO NO VA
 
 	while(1){
 		if((sock=socket_aceptarCliente(sock_cpu))>0){
@@ -1000,7 +990,8 @@ void core_conexion_cpu(void){
 }
 
 
-void atender_cpu(int sock){
+void atender_cpu(sock_struct* sock){
+	pthread_detach(pthread_self());
 	/*UNSOLVED:
 	  int programaEnHilo;
 	  void* estructura;
@@ -1008,6 +999,7 @@ void atender_cpu(int sock){
 	  socket_recibir(sock, &tipo_estructura, &estructura);
 	  ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
 	  send(sock, &tipo_estructura, &estructura); //Esto no deberia ir, que se envie durante la ejecucion
+	  free(sock);
 	 */
 
 }
@@ -1048,20 +1040,38 @@ void atender_cpu(int sock){
 	return;
 }*/
 
-void atender_kernel(int sock){
+void atender_kernel(sock_struct* sock){
+	pthread_detach(pthread_self());
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	t_struct_numero* tamanio;
 	int i,id_prog,memoriaSuficiente=0;
 	int tamanioSolicitado;
 
-	socket_recibir(sock, &tipoRecibido, &structRecibida);
+	/*socket_recibir(sock, &tipoRecibido, &structRecibida);
 	if(tipoRecibido==D_STRUCT_NUMERO){
 		id_prog = ((t_struct_numero*)structRecibida)->numero;
 		free(structRecibida);
+	}*/
+
+	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
+	if(tipoRecibido==D_STRUCT_SOLICITARMEMORIA){
+		t_struct_memoria* mem = ((t_struct_memoria*) structRecibida);
+		printf("El primero es: %d\n", mem->tamanioScript);
+		printf("El segundo es: %d\n", mem->tam2);
+		printf("El tercero es: %d\n", mem->tam3);
+
+		printf("anduvo bien\n");
+
+
+
+	}else{
+		printf("Anda mal\n");
 	}
+
+
 	for(i=0; i<4 && memoriaSuficiente==0;i++){
-		socket_recibir(sock, &tipoRecibido,&structRecibida);
+		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
 		tamanio = ((t_struct_numero*)structRecibida);
 		tamanioSolicitado = tamanio->numero;
 		//memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
@@ -1071,16 +1081,16 @@ void atender_kernel(int sock){
 		destruirSegmentosPrograma(id_prog);
 		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 		respuesta->numero=memoriaSuficiente;
-		socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
+		socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
 		free(respuesta);
 	}
 	if(memoriaSuficiente==1){
 		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 		respuesta->numero=memoriaSuficiente;
-		socket_enviar(sock, D_STRUCT_NUMERO, respuesta);
+		socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
 		free(respuesta);
 		for(i=0;i<4;i++){
-			socket_recibir(sock,&tipoRecibido,&structRecibida);
+			socket_recibir(sock->fd,&tipoRecibido,&structRecibida);
 			//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
 			//enviarBytes(base,offset,longitud,buffer);
 		}
@@ -1089,7 +1099,7 @@ void atender_kernel(int sock){
 
 
 
-
+	free(sock);
 	return;
 }
 
@@ -1108,7 +1118,7 @@ void inicializarMutex(void){
 
 void inicializarHilos(void){
 	pthread_create(&CONSOLA, NULL, (void*) &core_consola, NULL);
-	pthread_create(&CONEXIONES, NULL, (void*) &core_conexion, NULL);
+	pthread_create(&CONEXIONES, NULL, (void*) &handshake_conexion, NULL);
 }
 
 void esperarHilos(void){

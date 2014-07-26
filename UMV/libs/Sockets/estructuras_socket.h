@@ -283,4 +283,10 @@ typedef struct struct_io{
 	int32_t tiempo;
 }__attribute__ ((__packed__)) t_struct_io;
 
+typedef struct t_struct_memoria{
+	uint32_t tamanioScript;
+	uint32_t tam2;
+	uint32_t tam3;
+}__attribute__ ((__packed__)) t_struct_memoria;
+
 #endif /* ESTRUCTURASPACKAGE_H_ */

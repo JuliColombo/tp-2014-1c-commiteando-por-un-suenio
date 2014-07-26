@@ -116,10 +116,10 @@ void* consola(void);
 
 void core_conexion_cpu(void);
 void crear_hilo_por_cpu(void);
-void atender_cpu(int sock);
+void atender_cpu(sock_struct* sock);
 
 void core_conexion_kernel(void);
-void atender_kernel(int sock);
+void atender_kernel(sock_struct* sock);
 
 #endif /* UMV_H_ */
 

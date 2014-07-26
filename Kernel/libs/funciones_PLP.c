@@ -389,12 +389,17 @@ void core_conexion_umv(void){
 	socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+	/*socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
 	if(tipoRecibido==D_STRUCT_NUMERO){
 		num->numero=configuracion_kernel.tamanio_stack;
 		socket_enviar(sock_umv,D_STRUCT_NUMERO,num);
-	}
+	}*/
 	free(num);
+	t_struct_memoria* mem = malloc(sizeof(t_struct_memoria));
+	mem->tamanioScript=100;
+	mem->tam2 = 50;
+	mem->tam3 = 25;
+	socket_enviar(sock_umv, D_STRUCT_SOLICITARMEMORIA, mem);
 
 
 
