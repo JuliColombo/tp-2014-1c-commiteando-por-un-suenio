@@ -285,8 +285,8 @@ typedef struct struct_io{
 
 typedef struct t_struct_memoria{
 	uint32_t tamanioScript;
-	uint32_t tam2;
-	uint32_t tam3;
+	uint32_t tamanioIndiceCodigo;
+	uint32_t tamanioIndiceEtiquetas;
 }__attribute__ ((__packed__)) t_struct_memoria;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

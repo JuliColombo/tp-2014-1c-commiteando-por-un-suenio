@@ -1071,10 +1071,10 @@ void atender_kernel(sock_struct* sock){
 				tamanioSolicitado = tamanio->tamanioScript;
 				memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 				if(memoriaSuficiente==0){
-					tamanioSolicitado = tamanio->tam2;
+					tamanioSolicitado = tamanio->tamanioIndiceCodigo;
 					memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 					if(memoriaSuficiente==0){
-						tamanioSolicitado = tamanio->tam3;
+						tamanioSolicitado = tamanio->tamanioIndiceEtiquetas;
 						memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 					}
 				}

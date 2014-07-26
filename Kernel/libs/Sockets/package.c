@@ -642,11 +642,11 @@ t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen){
 
 	tamanoTotal+=tamanoDato;
 
-	memcpy(data + tamanoTotal, &estructuraOrigen->tam2, tamanoDato=sizeof(uint32_t));
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanioIndiceCodigo, tamanoDato=sizeof(uint32_t));
 
 	tamanoTotal+=tamanoDato;
 
-	memcpy(data + tamanoTotal, &estructuraOrigen->tam3, tamanoDato=sizeof(uint32_t));
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanioIndiceEtiquetas, tamanoDato=sizeof(uint32_t));
 
 	paquete->data = data;
 
@@ -1208,9 +1208,9 @@ t_struct_memoria* despaquetizarStruct_SolicitarMemoria(char* dataPaquete, uint16
 
 	memcpy(&estructuraDestino->tamanioScript, dataPaquete, sizeof(uint32_t));
 
-	memcpy(&estructuraDestino->tam2, dataPaquete+ sizeof(uint32_t), sizeof(int32_t));
+	memcpy(&estructuraDestino->tamanioIndiceCodigo, dataPaquete+ sizeof(uint32_t), sizeof(int32_t));
 
-	memcpy(&estructuraDestino->tam3, dataPaquete+ sizeof(uint32_t)+sizeof(uint32_t), sizeof(int32_t));
+	memcpy(&estructuraDestino->tamanioIndiceEtiquetas, dataPaquete+ sizeof(uint32_t)+sizeof(uint32_t), sizeof(int32_t));
 
 	return estructuraDestino;
 }

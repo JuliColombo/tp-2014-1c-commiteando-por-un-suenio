@@ -130,7 +130,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 }
 
-int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioSeg2, int tamanioSeg3){
+int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int tamanioIndiceEtiquetas){
 
 	t_struct_numero* numpid = malloc(sizeof(t_struct_numero));
 	numpid->numero=pid;
@@ -138,8 +138,8 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioSeg2, int tamanio
 
 	t_struct_memoria* mem = malloc(sizeof(t_struct_memoria));
 	mem->tamanioScript=tamanioScript;
-	mem->tam2 = tamanioSeg2;
-	mem->tam3 = tamanioSeg3;
+	mem->tamanioIndiceCodigo = tamanioIndiceCodigo;
+	mem->tamanioIndiceEtiquetas = tamanioIndiceEtiquetas;
 	socket_enviar(sock_umv, D_STRUCT_SOLICITARMEMORIA, mem);
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
@@ -177,13 +177,12 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	pthread_mutex_lock(mutex_solicitarMemoria);
 	pthread_mutex_lock(mutex_pid);
 	nuevoPCB->pid=program_pid;
-	//t_struct_numero* id = malloc(sizeof(t_struct_numero));
-	//id->numero = program_pid;
-	//socket_enviar(sock_umv,D_STRUCT_NUMERO, id);
-//	free(id);
-	int tamanioScript = strlen(codigo)+1;
-	printf("El tamanio del script es: %d\n", tamanioScript);
-	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,2,3))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
+
+
+	int tamanioScript = strlen(codigo)+1; //DE ESTO NO ESTOY SEGURO
+	int tamanioIndiceCodigo = (metadata_programa->instrucciones_size)*8;
+	int tamanioIndiceEtiquetas = metadata_programa->etiquetas_size;
+	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
 		printf("Print");
 		nuevoPCB->stack=NULL;
