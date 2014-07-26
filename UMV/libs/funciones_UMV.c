@@ -944,100 +944,32 @@ void handshake_conexion(void){
 
 
 
-
-void core_conexion_cpu(void){
-	int sock;
-	pthread_t atender_pedido;
-
-	/*/if((sock_cpu=socket_crearServidor("127.0.0.1", configuracion_UMV.puerto_cpus))>0){
-	printf("Hilo de CPU \n");
-	escribir_log(archLog, "Escuchando en el socket de CPU's", INFO, "");
-	}*/ 	//TODO ESTO NO VA
-
-	while(1){
-		if((sock=socket_aceptarCliente(sock_cpu))>0){
-			printf("Acepta conexion");
-			escribir_log(archLog, "Se acepta la conexion de una CPU", INFO, "");
-			pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, NULL);	//Crea un hilo para atender cada conexion de cpu
-
-			//RECIBO PEDIDO DE INDICE DE ETIQUETAS
-			t_tipoEstructura tipoRecibido;
-			void* structRecibida;
-			t_struct_indice_etiquetas* indice;
-			socket_recibir(sock, &tipoRecibido,&structRecibida);
-			indice = ((t_struct_indice_etiquetas*)structRecibida);
-			//printf("me llego esto %d y %d\n",tamanio->etiquetas_size, *tamanio->index_etiquetas);
-
-			t_struct_string* estructura = malloc(sizeof(t_struct_indice_etiquetas));
-			estructura->string = "hola wachada";		//ACA MANDAN EL INDICE DE ETIQUETAS EN BASE A LO RECIBIDO
-
-			int j=socket_enviar(sock,D_STRUCT_STRING,estructura);
-			if(j == 1){
-			printf("se envio el intento de indice de etiquetas\n");
-			free(estructura);
-			}
-		}
-	}
-		if(socket_cerrarConexion(sock_cpu)==0){
-				escribir_log(archLog, "Se trata de cerrar el socket de CPU", ERROR, "Hay problemas para cerrar el socket");
-				//Error cerrando el socket
-			} else {
-				escribir_log(archLog, "Se cierra el socket de CPU", INFO, "No hay problemas para cerrar el socket");
-			}
-	return;
-
-}
-
-
 void atender_cpu(sock_struct* sock){
 	pthread_detach(pthread_self());
-	/*UNSOLVED:
-	  int programaEnHilo;
-	  void* estructura;
-	  t_tipoEstructura tipo_estructura;
-	  socket_recibir(sock, &tipo_estructura, &estructura);
-	  ejecutar(&tipo_estructura, &estructura);		//ejecutaria lo correspondiente y crearia la estructura a enviar
-	  send(sock, &tipo_estructura, &estructura); //Esto no deberia ir, que se envie durante la ejecucion
-	  free(sock);
-	 */
+	//RECIBO PEDIDO DE INDICE DE ETIQUETAS
+	t_tipoEstructura tipoRecibido;
+	void* structRecibida;
+	t_struct_indice_etiquetas* indice;
+	socket_recibir(sock, &tipoRecibido,&structRecibida);
+	indice = ((t_struct_indice_etiquetas*)structRecibida);
+	//printf("me llego esto %d y %d\n",tamanio->etiquetas_size, *tamanio->index_etiquetas);
 
+	t_struct_string* estructura = malloc(sizeof(t_struct_indice_etiquetas));
+	estructura->string = "hola wachada";		//ACA MANDAN EL INDICE DE ETIQUETAS EN BASE A LO RECIBIDO
+
+	int j=socket_enviar(sock,D_STRUCT_STRING,estructura);
+	if(j == 1){
+	printf("se envio el intento de indice de etiquetas\n");
+	free(estructura);
+	}
+	free(sock);
+	return;
 }
 
 
 
 
-/*void core_conexion_kernel(void){
-	if((sock_kernel_servidor=socket_crearServidor("127.0.0.1",configuracion_UMV.puerto_kernel))>0){
-	printf("Hilo de Kernel\n");
-	escribir_log(archLog, "Escuchando en el socket de Kernel", INFO, "");
-	}
-	int sock_aceptado;
-	if((sock_aceptado=socket_aceptarCliente(sock_kernel_servidor))>0){
-			printf("Acepta conexion");
-			escribir_log(archLog, "Conexion", INFO, "Se acepta conexion del kernel");
-		}
-	t_tipoEstructura tipoRecibido;
-	void* structRecibida;
-	socket_recibir(sock_aceptado, &tipoRecibido, &structRecibida);
-	if(tipoRecibido==D_STRUCT_NUMERO){
-		tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
-		free(structRecibida);
 
-	}
-		while(1){
-
-			atender_kernel(sock_aceptado);
-
-		}
-	if(socket_cerrarConexion(sock_kernel_servidor)==0){
-		escribir_log(archLog, "Se trata de cerrar el socket de Kernel", ERROR, "Hay problemas para cerrar el socket");
-		//Error cerrando el socket
-	} else {
-		escribir_log(archLog, "Se cierra el socket de Kernel", INFO, "No hay problemas para cerrar el socket");
-	}
-
-	return;
-}*/
 
 void atender_kernel(sock_struct* sock){
 	pthread_detach(pthread_self());
