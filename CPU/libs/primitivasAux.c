@@ -243,7 +243,7 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 
 void recuperarPosicionDeDirecciones() {
 	//top_index = *pcb->c_stack -1;
-	top_index = cursor -1;
+	top_index = cursor -4;
 }
 
 void recuperarProgramCounter(t_puntero* program_counter) {
@@ -329,13 +329,13 @@ void guardarAlternado () {
 
 	insertarEnDiccionario(identificador_variable, top_index);
 
-	top_index -=2;
+	top_index -=5;
 
 }
 
 void regenerarDiccionario(int tamanio_contexto) {
 	int i = 0;
-	int top = top_index;
+	int top = top_index -1;
 
 	top_index -=1;
 	while (i < tamanio_contexto) {
