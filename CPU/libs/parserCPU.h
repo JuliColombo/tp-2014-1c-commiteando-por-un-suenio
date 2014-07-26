@@ -28,13 +28,13 @@ int termino;
 int sockUMV;
 int sockKernel;
 
-void proximaInst();
-void parsear();
+void proximaInst(t_pcb* pcb);
+void parsear(t_pcb* pcb);
 void esperar_retardo(int tiempo);
 void hot_plug(int signum);
 void salir(int termino);
-void correrParser();
-void continuarHastaQuantum();
+void correrParser(t_pcb* pcb);
+void continuarHastaQuantum(t_pcb* pcb);
 void destruirEstructuras();
 void mostrarEstadoVariables();
 void salirPorFinalizacion();

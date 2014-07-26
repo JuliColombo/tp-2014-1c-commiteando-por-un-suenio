@@ -39,24 +39,27 @@ void darValoresDeStackYCursor(t_pcb* pcb){
 	}
 }
 
-void proximaInst() {
+void proximaInst(t_pcb* pcb) {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
-
+	int j;
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
 
 	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
 	estructura->inst = inst;
 	estructura->seg_codigo = *pcb->codigo;
-	socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura);
-	free(estructura);
+	if((j=socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura))==1){
+		printf("se mando la instruccion \n");
+		free(estructura);}
 
 	recibirProximaInstruccion(sockUMV);
 
 }
 
-void parsear(){
+void parsear(t_pcb* pcb){
 
-	proximaInst();
+	printf("parseo piola\n");
+
+	proximaInst(pcb);
 
 	pcb->program_counter += 1;
 
@@ -71,17 +74,17 @@ void esperar_retardo(int tiempo){
 	log_escribir(archLog, "Ejecucion", INFO, "Retardo de %d ms",tiempo);
 }
 
-void continuarHastaQuantum() {
+void continuarHastaQuantum(t_pcb* pcb) {
 	for (i; i <= quantum; i++) {
 		termino = CONTINUES;
-		parsear();
+		parsear(pcb);
 		esperar_retardo(retardo);
 	}
 }
 
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
-		continuarHastaQuantum();
+		continuarHastaQuantum(pcb);
 		termino = DONE;
 		i = 0;
 		if(socket_cerrarConexion(sockKernel)==-1){
@@ -236,7 +239,7 @@ void salir(int termino) {
 }
 }
 
-void correrParser() {
+void correrParser(t_pcb* pcb) {
 	dictionary_create(diccionario);
 	termino = CONTINUES;
 
@@ -244,7 +247,7 @@ void correrParser() {
 
 	for(i=0;i<=quantum;i++){
 
-		parsear();
+		parsear(pcb);
 
 		esperar_retardo(retardo);
 

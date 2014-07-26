@@ -46,6 +46,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se definio variable %c",identificador_variable);
 
+	printf("DEFINOOOOOOO \n");
+
 	return posicion;
 }
 

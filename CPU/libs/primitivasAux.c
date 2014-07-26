@@ -59,11 +59,16 @@ t_puntero_instruccion irAIntruccionLabel(t_nombre_etiqueta etiqueta) {
 
 t_intructions instruccionParaBuscarEnIndiceCodigo(t_puntero_instruccion instruccion) {
 
+	printf("busco instruccion para el indice de codigo\n");
+
 	t_struct_instruccion* estructura = malloc(sizeof(t_struct_instruccion));
 	estructura->inst = instruccion;
 	estructura->indice_codigo = *pcb->index_codigo;
 	socket_enviar(sockUMV, D_STRUCT_INSTRUCCION, estructura);
+	printf("a\n");
 	free(estructura);
+
+	printf("se envio\n");
 
 	chequearSiHuboSF();
 
