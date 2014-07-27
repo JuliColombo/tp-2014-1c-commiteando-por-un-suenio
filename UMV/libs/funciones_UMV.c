@@ -978,9 +978,11 @@ void atender_kernel(sock_struct* sock){
 	pthread_detach(pthread_self());
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
+	void* buffer;
 	t_struct_memoria* tamanio;
 	int i,id_prog,memoriaSuficiente=0;
-	int tamanioSolicitado;
+	int tamanioSolicitado,tamanio_escribir;
+	int base_stack,base_codigo,base_index_code,base_index_etiq;
 
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
 	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
@@ -1000,37 +1002,59 @@ void atender_kernel(sock_struct* sock){
 			tamanio = ((t_struct_memoria*)structRecibida);
 
 
-			memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioMaxStack);
-			if(memoriaSuficiente!=-1){
+			base_stack = crearSegmentoPrograma(id_prog, tamanioMaxStack);
+			if(base_stack!=-1){
 				tamanioSolicitado = tamanio->tamanioScript;
-				memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
-				if(memoriaSuficiente!=-1){
+				base_codigo = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+				if(base_codigo!=-1){
 					tamanioSolicitado = tamanio->tamanioIndiceCodigo;
-					memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
-					if(memoriaSuficiente!=-1){
+					base_index_code = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+					if(base_index_code!=-1){
 						tamanioSolicitado = tamanio->tamanioIndiceEtiquetas;
-						memoriaSuficiente = crearSegmentoPrograma(id_prog, tamanioSolicitado);
+						base_index_etiq = crearSegmentoPrograma(id_prog, tamanioSolicitado);
 					}
 				}
 			}
 
 		}
 		t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-		if (memoriaSuficiente==-1){
+		if (base_index_etiq==-1){
 			escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
 			destruirSegmentosPrograma(id_prog);
 			respuesta->numero=1;
 			socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
 		}
-		if(memoriaSuficiente==0){
+		if(base_index_etiq==0){
+			//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
 			respuesta->numero=memoriaSuficiente;
 			socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
 			if(memoriaSuficiente==0){
-				for(i=0;i<4;i++){
+				//Recibir el buffer a escribir
+				//Sacar el tamanio del buffer y asignarlo a una variable
+				i = enviarBytes(base_codigo,0,tamanio_escribir,buffer);
+					if(i!=-1){
+						//Recibir el buffer a escribir
+						//Sacar el tamanio del buffer y asignarlo a una variable
+						i = enviarBytes(base_index_code,0,tamanio_escribir,buffer);
+						if(i!=-1){
+							//Recibir el buffer a escribir
+							//Sacar el tamanio del buffer y asignarlo a una variable
+							i = enviarBytes(base_index_etiq,0,tamanio_escribir,buffer);
+						}
+					}
+
+				if(i==-1){
+					escribir_log(archLog, "Segmentation Fault", ERROR, "Se sobrepasan los limites del segmento");
+					respuesta->numero=1;
+					socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
+				}
+				//No envio nada al segmento de stack, porque al inicio estaría vacio
+
+				/*for(i=0;i<4;i++){
 					//socket_recibir(sock->fd,&tipoRecibido,&structRecibida);
 					//ACA IRIAN LOS SEGMENTOS DE CODIGO PARA GRABAR LOS BYTES
 					//enviarBytes(base,offset,longitud,buffer);
-				}
+				}*/
 			}
 		}
 		free(respuesta);
