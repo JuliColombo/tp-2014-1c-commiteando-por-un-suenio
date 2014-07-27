@@ -784,7 +784,7 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 	return i;
 }
 
-void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
+void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
 		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
 		int base;
 		t_signal senial;
@@ -794,7 +794,8 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 		t_struct_pop* structPop;
 		t_struct_instruccion* structInstr;
 		t_struct_seg_codigo* structCodigo;
-		socket_recibir(sock_cpu,&tipoRecibido,&structRecibida);
+		socket_recibir(sock_cpu->fd,&tipoRecibido,&structRecibida);
+
 		switch(tipoRecibido){
 		case D_STRUCT_PUSH:
 			structPush= ((t_struct_push*)structRecibida);
@@ -804,11 +805,11 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
 				//signaltodopiola
 				senial = D_STRUCT_NORMAL;
-				socket_enviarSignal(sock_cpu,senial);
+				socket_enviarSignal(sock_cpu->fd,senial);
 			}else{
 				//signaltodomal
 				senial = D_STRUCT_SEGFAULT;
-				socket_enviarSignal(sock_cpu,senial);
+				socket_enviarSignal(sock_cpu->fd,senial);
 			}
 			free(structRecibida);
 			break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
@@ -824,7 +825,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
 			t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 			estructura->numero = valor_a_enviar;
-			socket_enviar(sock_cpu, D_STRUCT_NUMERO, estructura);
+			socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
 			free(estructura);
 			break;
 		case D_STRUCT_INSTRUCCION:
@@ -835,6 +836,8 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			//long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
 			//posDelIndice=solicitarBytes(base,pos,tamanio);
 			//t_struct_seg_codigo* segAEnviar;
+
+			printf("me llego de instruccion base %d y pos %d\n",base, pos);
 
 			tamanio = sizeof(int);
 			int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
@@ -850,7 +853,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
 			estruc->inst = instruccion;
 			estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
-			socket_enviar(sock_cpu, D_STRUCT_SEGCODIGO, estruc);
+			socket_enviar(sock_cpu->fd, D_STRUCT_SEGCODIGO, estruc);
 			free(estruc);
 
 			//segAEnviar->inst=primeros4Bytes(posDelIndice);
@@ -871,7 +874,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura){
 			t_struct_string* structure = malloc(sizeof(t_struct_string));
 			structure->string = linea;
 
-			int j=socket_enviar(sock_cpu,D_STRUCT_STRING,estructura);
+			int j=socket_enviar(sock_cpu->fd,D_STRUCT_STRING,estructura);
 			if(j == 1){
 				free(structure);
 			}
@@ -965,6 +968,9 @@ void atender_cpu(sock_struct* sock){
 	printf("se envio el intento de indice de etiquetas\n");
 	free(estructura);
 	}
+
+	ejecutar(tipoRecibido,structRecibida,sock);
+
 	free(sock);
 	return;
 }
