@@ -788,6 +788,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
 		int base;
 		t_signal senial;
+		t_struct_signal* signal = malloc(sizeof(t_struct_signal));
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		t_struct_push* structPush;
@@ -805,10 +806,12 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
 				//signaltodopiola
 				senial = D_STRUCT_NORMAL;
+				signal->signal = senial;
 				socket_enviarSignal(sock_cpu->fd,senial);
 			}else{
 				//signaltodomal
 				senial = D_STRUCT_SEGFAULT;
+				signal->signal = senial;
 				socket_enviarSignal(sock_cpu->fd,senial);
 			}
 			free(structRecibida);
@@ -824,6 +827,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			if(solicitarBytes(baseStack,pos,tamanio) != NULL){
 				//signaltodopiola
 				senial = D_STRUCT_NORMAL;
+				signal->signal = senial;
 				socket_enviarSignal(sock_cpu->fd,senial);
 
 				t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
@@ -834,6 +838,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			}else{
 				//signaltodomal
 				senial = D_STRUCT_SEGFAULT;
+				signal->signal = senial;
 				socket_enviarSignal(sock_cpu->fd,senial);
 			}
 
@@ -849,22 +854,36 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 
 			printf("me llego de instruccion base %d y pos %d\n",base, pos);
 
-			tamanio = sizeof(int);
-			int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
+			if(solicitarBytes(base,pos,tamanio) != NULL){
 
-			pos += sizeof(int);
-			int offset = solicitarBytes(base,pos,tamanio); //busco el offset. Para eso, tengo que correr 4 bytes la posicion, porque sino
-															//les devuelvo nuevamente el start
+				//signaltodopiola
+				senial = D_STRUCT_NORMAL;
+				signal->signal = senial;
+				socket_enviarSignal(sock_cpu->fd,senial);
 
-			t_intructions instruccion;
-			instruccion.start=start;
-			instruccion.offset=offset;
+				tamanio = sizeof(int);
+				int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
 
-			t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
-			estruc->inst = instruccion;
-			estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
-			socket_enviar(sock_cpu->fd, D_STRUCT_SEGCODIGO, estruc);
-			free(estruc);
+				pos += sizeof(int);
+				int offset = solicitarBytes(base,pos,tamanio); //busco el offset. Para eso, tengo que correr 4 bytes la posicion, porque sino
+																//les devuelvo nuevamente el start
+
+				t_intructions instruccion;
+				instruccion.start=start;
+				instruccion.offset=offset;
+
+				t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
+				estruc->inst = instruccion;
+				estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
+				socket_enviar(sock_cpu->fd, D_STRUCT_SEGCODIGO, estruc);
+				free(estruc);
+			}else{
+				//signaltodomal
+				senial = D_STRUCT_SEGFAULT;
+				signal->signal = senial;
+				socket_enviarSignal(sock_cpu->fd,senial);
+			}
+
 
 			//segAEnviar->inst=primeros4Bytes(posDelIndice);
 			//int longitudDeInstr=segundos4Bytes(posDelIndice); //Esta variable se va a usar en el pedido del codigo

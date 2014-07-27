@@ -8,10 +8,14 @@
 #include "primitivasAux.h"
 
 void chequearSiHuboSF(){
-	t_signal* senial;
-	socket_recibirSignal(sockUMV,senial);
 
-	if(*senial == D_STRUCT_SEGFAULT){
+	printf("entre al chequeo!\n");
+
+	t_signal senial;
+	socket_recibirSignal(sockUMV,&senial);
+
+	if(senial == D_STRUCT_SEGFAULT){
+		printf("me llego seg fault!\n");
 		termino = SEG_FAULT;
 		raise(SIGUSR2);
 	} else {

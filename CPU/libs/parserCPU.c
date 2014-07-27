@@ -76,6 +76,7 @@ void esperar_retardo(int tiempo){
 
 void seg_fault(int signum){
 	if(signum == SIGUSR2){
+		printf("ME LLEGO SIGUSR2!!!!!!!!!!\n");
 		salir(termino);
 		termino = CONTINUES;
 	}
