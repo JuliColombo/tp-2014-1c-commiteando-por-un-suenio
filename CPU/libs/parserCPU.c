@@ -39,7 +39,7 @@ void darValoresDeStackYCursor(t_pcb* pcb){
 	}
 }
 
-void proximaInst(t_pcb* pcb) {
+void proximaInst() {
 	//Le mando intruccion a UMV para que busque en su indice de codigo y me devuelva la instruccion a parsear
 	int j;
 	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(pcb->program_counter);
@@ -55,11 +55,11 @@ void proximaInst(t_pcb* pcb) {
 
 }
 
-void parsear(t_pcb* pcb){
+void parsear(){
 
 	printf("parseo piola\n");
 
-	proximaInst(pcb);
+	proximaInst();
 
 	pcb->program_counter += 1;
 
@@ -76,13 +76,13 @@ void esperar_retardo(int tiempo){
 
 void seg_fault(int signum){
 	if(signum == SIGUSR2){
-		printf("ME LLEGO SIGUSR2!!!!!!!!!!\n");
+		printf("ME LLEGO SIGUSR2 Y TERMINO VALE %d!!!!!!!!!!\n",termino);
 		salir(termino);
 		termino = CONTINUES;
 	}
 }
 
-void continuarHastaQuantum(t_pcb* pcb) {
+void continuarHastaQuantum() {
 	for (i; i <= quantum; i++) {
 		termino = CONTINUES;
 		parsear(pcb);
@@ -92,7 +92,7 @@ void continuarHastaQuantum(t_pcb* pcb) {
 
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
-		continuarHastaQuantum(pcb);
+		continuarHastaQuantum();
 		i = 0;
 
 		t_struct_pcb* pcbQ;
@@ -176,8 +176,8 @@ void salir(int termino) {
 	t_struct_pcb* pcbQ;
 	t_struct_pcb_fin* pcbSF;
 
-	pcb->c_stack += cursor;
-	pcb->stack += stack;
+	//*pcb->c_stack += cursor;
+	//*pcb->stack += stack;
 
 	switch (termino) {
 	case DONE:
@@ -222,7 +222,6 @@ void salir(int termino) {
 	break;
 
 	case SEG_FAULT:
-
 	log_escribir(archLog,"Ejecucion",ERROR,"Segmentation Fault. No se puede seguir con la ejecucion");
 
 	pcbSF =malloc(sizeof(t_struct_pcb));
@@ -268,22 +267,24 @@ void salir(int termino) {
 }
 }
 
-void correrParser(t_pcb* pcb) {
+void correrParser(t_pcb* pcb_llego) {
 	dictionary_create(diccionario);
 	termino = CONTINUES;
 	signal(SIGUSR2,seg_fault);
 	signal(SIGUSR1,hot_plug);
+	pcb = malloc(sizeof(t_pcb));
+	pcb = pcb_llego;
 
 	for(i=0;i<=quantum;i++){
 
-		parsear(pcb);
+		parsear();
 
 		esperar_retardo(retardo);
 
 		if((i == quantum) && (termino == CONTINUES)){
 			termino = QUANTUM;
-			pcb->c_stack += cursor;
-			pcb->stack += stack;
+			*pcb->c_stack += cursor;
+			*pcb->stack += stack;
 		}
 
 		if (termino != CONTINUES) {
@@ -294,4 +295,5 @@ void correrParser(t_pcb* pcb) {
 		}
 
 	}
+	free(pcb_llego);
 }

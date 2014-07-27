@@ -896,18 +896,28 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			structCodigo = (t_struct_seg_codigo*)structRecibida;
 			t_intructions inst = structCodigo->inst;
 			base = structCodigo->seg_codigo;
-			char* linea = solicitarBytes(base,inst.start,inst.offset);
 
-			//CHEQUEAN QUE SE PUEDE HACER LO QUE PIDE LA CPU CON EL IF
+			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
+				//signaltodopiola
+				senial = D_STRUCT_NORMAL;
+				signal->signal = senial;
+				socket_enviarSignal(sock_cpu->fd,senial);
 
-			t_struct_string* structure = malloc(sizeof(t_struct_string));
-			structure->string = linea;
+				char* linea = solicitarBytes(base,inst.start,inst.offset);
 
-			int j=socket_enviar(sock_cpu->fd,D_STRUCT_STRING,estructura);
-			if(j == 1){
-				free(structure);
+				t_struct_string* structure = malloc(sizeof(t_struct_string));
+				structure->string = linea;
+
+				int j=socket_enviar(sock_cpu->fd,D_STRUCT_STRING,estructura);
+				if(j == 1){
+					free(structure);
+				}
+			}else{
+				//signaltodomal
+				senial = D_STRUCT_SEGFAULT;
+				signal->signal = senial;
+				socket_enviarSignal(sock_cpu->fd,senial);
 			}
-
 
 			break;
 		default:
@@ -916,6 +926,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 		//Etc
 
 		}
+		free(signal);
 }
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
