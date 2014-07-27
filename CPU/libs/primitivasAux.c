@@ -13,6 +13,7 @@ void chequearSiHuboSF(){
 
 	if(*senial == D_STRUCT_SEGFAULT){
 		termino = SEG_FAULT;
+		raise(SIGUSR2);
 	} else {
 		termino = CONTINUES;
 	}

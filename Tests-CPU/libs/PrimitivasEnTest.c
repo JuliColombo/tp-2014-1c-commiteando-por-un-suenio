@@ -43,6 +43,8 @@ void proximaInst() {
 
 	buscarEnSegmentoCodigo(inst);
 
+	printf("proxima es %s\n",proximaInstruccion);
+
 }
 
 void parsear(){

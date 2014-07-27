@@ -821,12 +821,22 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			baseStack = structPop->stack_base;
 
 			//ACA VENDRIA UN IF CHEQUEANDO QUE SE PUEDE HACER LO QUE LA CPU ME PIDE Y MANDAN SIGNAL
+			if(solicitarBytes(baseStack,pos,tamanio) != NULL){
+				//signaltodopiola
+				senial = D_STRUCT_NORMAL;
+				socket_enviarSignal(sock_cpu->fd,senial);
 
-			t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
-			t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-			estructura->numero = valor_a_enviar;
-			socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
-			free(estructura);
+				t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
+				t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+				estructura->numero = valor_a_enviar;
+				socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
+				free(estructura);
+			}else{
+				//signaltodomal
+				senial = D_STRUCT_SEGFAULT;
+				socket_enviarSignal(sock_cpu->fd,senial);
+			}
+
 			break;
 		case D_STRUCT_INSTRUCCION:
 			structInstr=(t_struct_instruccion*)structRecibida;

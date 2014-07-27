@@ -74,6 +74,13 @@ void esperar_retardo(int tiempo){
 	log_escribir(archLog, "Ejecucion", INFO, "Retardo de %d ms",tiempo);
 }
 
+void seg_fault(int signum){
+	if(signum == SIGUSR2){
+		salir(termino);
+		termino = CONTINUES;
+	}
+}
+
 void continuarHastaQuantum(t_pcb* pcb) {
 	for (i; i <= quantum; i++) {
 		termino = CONTINUES;
@@ -85,8 +92,26 @@ void continuarHastaQuantum(t_pcb* pcb) {
 void hot_plug(int signum) {
 	if(signum == SIGUSR1){
 		continuarHastaQuantum(pcb);
-		termino = DONE;
 		i = 0;
+
+		t_struct_pcb* pcbQ;
+		pcbQ = malloc(sizeof(t_struct_pcb));
+		pcbQ->c_stack=pcb->c_stack;
+		pcbQ->codigo=pcb->codigo;
+		pcbQ->index_codigo=pcb->index_codigo;
+		pcbQ->index_etiquetas=pcb->index_etiquetas;
+		pcbQ->pid=pcb->pid;
+		pcbQ->program_counter=pcb->program_counter;
+		pcbQ->stack=pcb->stack;
+		pcbQ->tamanio_contexto=pcb->tamanio_contexto;
+		pcbQ->tamanio_indice=pcb->tamanio_indice;
+
+		socket_enviar(sockKernel,D_STRUCT_PCB,pcbQ);
+
+		free(pcbQ);
+		free(pcb);
+
+
 		if(socket_cerrarConexion(sockKernel)==-1){
 			log_escribir(archLog,"Conexion",ERROR,"No se pudo cerrar conexion del Kernel");
 		if(socket_cerrarConexion(sockKernel)==-1){
@@ -149,6 +174,9 @@ void salir(int termino) {
 	t_struct_pcb_fin* pcbF;
 	t_struct_pcb* pcbQ;
 	t_struct_pcb_fin* pcbSF;
+
+	pcb->c_stack += cursor;
+	pcb->stack += stack;
 
 	switch (termino) {
 	case DONE:
@@ -242,7 +270,7 @@ void salir(int termino) {
 void correrParser(t_pcb* pcb) {
 	dictionary_create(diccionario);
 	termino = CONTINUES;
-
+	signal(SIGUSR2,seg_fault);
 	signal(SIGUSR1,hot_plug);
 
 	for(i=0;i<=quantum;i++){

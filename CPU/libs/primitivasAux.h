@@ -13,6 +13,7 @@
 #include "estructuras.h"
 #include <stdint.h>
 #include "Sockets/socket.h"
+#include <signal.h>
 
 typedef struct{
 	char* name;

@@ -231,8 +231,6 @@ void finalizar() {
 
 	if(esPrimerContexto()) {
 		termino = DONE;
-		pcb->c_stack += cursor;
-		pcb->stack += stack;
 
 		log_escribir(archLog, "Ejecucion", INFO, "Finalizo ejecucion");
 
