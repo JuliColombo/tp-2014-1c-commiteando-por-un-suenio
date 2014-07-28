@@ -85,6 +85,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SOLICITARMEMORIA:
 				paquete = paquetizarStruct_SolicitarMemoria((t_struct_memoria*) estructuraOrigen);
 				break;
+			case D_STRUCT_DESTRUIRSEGMENTOS:
+				paquete = paquetizarStruct_destruirSegmentos((t_struct_numero*) estructuraOrigen);
+				break;
 		}
 
 
@@ -701,6 +704,32 @@ t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen){
 }
 
 /*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_stream * paquetizarStruct_destruirSegmentos(t_struct_numero * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_DESTRUIRSEGMENTOS, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_numero));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
  * Nombre: crearDataConHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -825,6 +854,10 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_SOLICITARMEMORIA:
 				estructuraDestino = despaquetizarStruct_SolicitarMemoria(dataPaquete, length);
 				break;
+			case D_STRUCT_DESTRUIRSEGMENTOS:
+				estructuraDestino = despaquetizarStruct_destruirSegmentos(dataPaquete, length);
+				break;
+
 		}
 
 	return estructuraDestino;
@@ -1289,6 +1322,24 @@ t_struct_memoria* despaquetizarStruct_SolicitarMemoria(char* dataPaquete, uint16
 	memcpy(&estructuraDestino->tamanioIndiceCodigo, dataPaquete+ sizeof(uint32_t), sizeof(int32_t));
 
 	memcpy(&estructuraDestino->tamanioIndiceEtiquetas, dataPaquete+ sizeof(uint32_t)+sizeof(uint32_t), sizeof(int32_t));
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_struct_numero * despaquetizarStruct_destruirSegmentos(char * dataPaquete, uint16_t length){
+	t_struct_numero * estructuraDestino = malloc(sizeof(t_struct_numero));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
 
 	return estructuraDestino;
 }

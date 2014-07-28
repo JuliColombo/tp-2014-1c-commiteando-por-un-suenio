@@ -1026,6 +1026,7 @@ void atender_kernel(sock_struct* sock){
 	void* structRecibida;
 	void* buffer;
 	t_struct_memoria* tamanio;
+	t_struct_numero* pid;
 	int i,id_prog,memoriaSuficiente=0;
 	int tamanioSolicitado,tamanio_escribir;
 	int base_stack,base_codigo,base_index_code,base_index_etiq;
@@ -1044,47 +1045,60 @@ void atender_kernel(sock_struct* sock){
 			free(id);
 		}
 		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
-		if(tipoRecibido==D_STRUCT_SOLICITARMEMORIA){
-			tamanio = ((t_struct_memoria*)structRecibida);
+
+		switch(tipoRecibido){
+			case D_STRUCT_SOLICITARMEMORIA:
+				tamanio = ((t_struct_memoria*)structRecibida);
 
 
-			t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-			base_stack = crearSegmentoPrograma(id_prog, tamanioMaxStack);
-			base_codigo = crearSegmentoPrograma(id_prog, tamanio->tamanioScript);
-			base_index_code = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceCodigo);
-			base_index_etiq = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceEtiquetas);
-			if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
-				respuesta->numero=memoriaSuficiente;
-				socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
-				//Escribe los segmentos.
-				if(base_index_etiq==0){
-					//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
-					if(memoriaSuficiente==0){
-						//Recibir el buffer a escribir
-						//Sacar el tamanio del buffer y asignarlo a una variable
-						i = enviarBytes(base_codigo,0,tamanio_escribir,buffer);
-							if(i!=-1){
-								//Recibir el buffer a escribir
-								//Sacar el tamanio del buffer y asignarlo a una variable
-								i = enviarBytes(base_index_code,0,tamanio_escribir,buffer);
+				t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+				base_stack = crearSegmentoPrograma(id_prog, tamanioMaxStack);
+				base_codigo = crearSegmentoPrograma(id_prog, tamanio->tamanioScript);
+				base_index_code = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceCodigo);
+				base_index_etiq = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceEtiquetas);
+				if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
+					respuesta->numero=memoriaSuficiente;
+					socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
+					//Escribe los segmentos.
+					if(base_index_etiq==0){
+						//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
+						if(memoriaSuficiente==0){
+							//Recibir el buffer a escribir
+							//Sacar el tamanio del buffer y asignarlo a una variable
+							i = enviarBytes(base_codigo,0,tamanio_escribir,buffer);
 								if(i!=-1){
 									//Recibir el buffer a escribir
 									//Sacar el tamanio del buffer y asignarlo a una variable
-									i = enviarBytes(base_index_etiq,0,tamanio_escribir,buffer);
+									i = enviarBytes(base_index_code,0,tamanio_escribir,buffer);
+									if(i!=-1){
+										//Recibir el buffer a escribir
+										//Sacar el tamanio del buffer y asignarlo a una variable
+										i = enviarBytes(base_index_etiq,0,tamanio_escribir,buffer);
+									}
 								}
-							}
-					}
+						}
 				}
 
-			}else{
-				destruirSegmentos(id_prog);
-				respuesta->numero=1;
-				socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
-				escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
-			}
-			free(respuesta);
+				}else{
+					destruirSegmentos(id_prog);
+					respuesta->numero=1;
+					socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
+					escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
+				}
+				free(respuesta);
+				break;
+
+			case D_STRUCT_DESTRUIRSEGMENTOS:
+				pid = ((t_struct_numero*)structRecibida);
+				destruirSegmentos(pid->numero);
+				pthread_mutex_lock(mutex_log);
+				log_escribir(archLog, "Destruir Segmentos", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d", pid->numero);
+				pthread_mutex_unlock(mutex_log);
+				free(pid);
+				break;
 
 		}
+
 
 		/*if(i==-1){
 		escribir_log(archLog, "Segmentation Fault", ERROR, "Se sobrepasan los limites del segmento");
