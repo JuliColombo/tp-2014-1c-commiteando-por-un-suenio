@@ -1027,6 +1027,7 @@ void atender_kernel(sock_struct* sock){
 	void* buffer;
 	t_struct_memoria* tamanio;
 	t_struct_numero* pid;
+	t_struct_segmento* struct_seg;
 	int i,id_prog,memoriaSuficiente=0;
 	int tamanioSolicitado,tamanio_escribir;
 	int base_stack,base_codigo,base_index_code,base_index_etiq;
@@ -1038,15 +1039,15 @@ void atender_kernel(sock_struct* sock){
 
 	while(1){
 
-		socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
-		if(tipoRecibido==D_STRUCT_NUMERO){
-			t_struct_numero* id = ((t_struct_numero*)structRecibida);
-			id_prog = id->numero;
-			free(id);
-		}
 		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
 
 		switch(tipoRecibido){
+			case D_STRUCT_NUMERO:
+				pid = ((t_struct_numero*)structRecibida);
+				id_prog = pid->numero;
+				free(pid);
+				break;
+
 			case D_STRUCT_SOLICITARMEMORIA:
 				tamanio = ((t_struct_memoria*)structRecibida);
 
@@ -1060,7 +1061,7 @@ void atender_kernel(sock_struct* sock){
 					respuesta->numero=memoriaSuficiente;
 					socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
 					//Escribe los segmentos.
-					if(base_index_etiq==0){
+				/*	if(base_index_etiq==0){
 						//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
 						if(memoriaSuficiente==0){
 							//Recibir el buffer a escribir
@@ -1077,7 +1078,7 @@ void atender_kernel(sock_struct* sock){
 									}
 								}
 						}
-				}
+					}*/
 
 				}else{
 					destruirSegmentos(id_prog);
@@ -1096,6 +1097,12 @@ void atender_kernel(sock_struct* sock){
 				pthread_mutex_unlock(mutex_log);
 				free(pid);
 				break;
+
+			case D_STRUCT_ESCRIBIRSEGMENTO:
+				printf("Entra al case\n");
+				struct_seg = ((t_struct_segmento*) structRecibida);
+				printf("Base: %d\nTamanio:%d\nSeg: %s\n", struct_seg->base, struct_seg->tamanio, struct_seg->segmento);
+				free(struct_seg);
 
 		}
 

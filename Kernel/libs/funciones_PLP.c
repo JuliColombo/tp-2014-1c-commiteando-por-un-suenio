@@ -184,11 +184,40 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	int tamanioIndiceEtiquetas = metadata_programa->etiquetas_size;
 	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
-		printf("Print");
+	/*	t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);*/
+
+
 		nuevoPCB->stack=NULL;
 		nuevoPCB->c_stack=NULL;
 		nuevoPCB->index_codigo=NULL;
 		nuevoPCB->index_etiquetas=NULL;
+
+		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
+		paquete->base=8;
+		paquete->tamanio=142;
+		paquete->segmento=malloc(sizeof(tamanioScript));
+		paquete->segmento=codigo;
+		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+
+/*		paquete->base= nuevoPCB->codigo;
+		paquete->tamanio=tamanioScript;
+		paquete->segmento=codigo;
+		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+
+		paquete->base=nuevoPCB->index_codigo;
+		paquete->tamanio=tamanioIndiceCodigo;
+		paquete->segmento=metadata_programa->instrucciones_serializado;
+		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+
+		paquete->base=nuevoPCB->index_etiquetas;
+		paquete->tamanio=tamanioIndiceEtiquetas;
+		paquete->segmento=metadata_programa->etiquetas
+		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);*/
+
+
+
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
 		nuevoPCB->tamanio_contexto=0;
 		nuevoPCB->tamanio_indice=0;

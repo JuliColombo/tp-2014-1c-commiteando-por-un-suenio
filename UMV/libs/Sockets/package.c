@@ -88,6 +88,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				paquete = paquetizarStruct_destruirSegmentos((t_struct_numero*) estructuraOrigen);
 				break;
+			case D_STRUCT_ESCRIBIRSEGMENTO:
+				paquete = paquetizarStruct_escribirSegmentos((t_struct_segmento*) estructuraOrigen);
+				break;
 		}
 
 
@@ -728,6 +731,40 @@ t_stream * paquetizarStruct_destruirSegmentos(t_struct_numero * estructuraOrigen
 	return paquete;
 }
 
+/*
+ * Nombre: paquetizarStruct_escribirSegmentos
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_stream* paquetizarStruct_escribirSegmentos(t_struct_segmento* estructuraOrigen){
+
+	t_stream* paquete = malloc(sizeof(t_stream));
+
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + strlen(estructuraOrigen->segmento)+1;
+
+	char* data = crearDataConHeader(D_STRUCT_ESCRIBIRSEGMENTO, paquete->length);
+
+	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
+
+	memcpy(data + tamanoTotal, &estructuraOrigen->base, tamanoDato= sizeof(uint32_t));
+
+	tamanoTotal+=tamanoDato;
+
+	memcpy(data + tamanoTotal, &estructuraOrigen->tamanio, tamanoDato= sizeof(uint32_t));
+
+	tamanoTotal+=tamanoDato;
+
+	memcpy(data + tamanoTotal, estructuraOrigen->segmento, tamanoDato = (strlen(estructuraOrigen->segmento)+1));
+
+	return paquete;
+
+}
+
 
 /*
  * Nombre: crearDataConHeader/2
@@ -856,6 +893,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				estructuraDestino = despaquetizarStruct_destruirSegmentos(dataPaquete, length);
+				break;
+			case D_STRUCT_ESCRIBIRSEGMENTO:
+				estructuraDestino = despaquetizarStruct_escribirSegmentos(dataPaquete, length);
 				break;
 
 		}
@@ -1326,6 +1366,36 @@ t_struct_memoria* despaquetizarStruct_SolicitarMemoria(char* dataPaquete, uint16
 	return estructuraDestino;
 }
 
+/*
+ * Nombre:despaquetizarStruct_escribirSegmentos/2
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_struct_segmento* despaquetizarStruct_escribirSegmentos(char* dataPaquete, uint16_t length){
+	t_struct_segmento* estructuraDestino = malloc(sizeof(t_struct_segmento));
+
+	int tamanoDato = 0, tamanoTotal = 0;
+
+	memcpy(&estructuraDestino->base,dataPaquete+tamanoTotal,tamanoDato=sizeof(uint32_t));
+
+	tamanoTotal+= tamanoDato;
+
+	memcpy(&estructuraDestino->tamanio,dataPaquete+tamanoTotal,tamanoDato=sizeof(uint32_t));
+
+	tamanoTotal+= tamanoDato;
+
+	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+
+	estructuraDestino->segmento= malloc(tamanoDato);
+	memcpy(estructuraDestino->segmento, dataPaquete + tamanoTotal, tamanoDato);
+
+	return estructuraDestino;
+}
 /*
  * Nombre:
  * Argumentos:

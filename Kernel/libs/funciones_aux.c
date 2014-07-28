@@ -571,7 +571,12 @@ void finalizarPrograma(t_programa* programa, char* variablesAImprimir){
 	pthread_mutex_unlock(mutex_cola_exec);
 	mostrarColasPorPantalla(cola.exit, "Exit");
 	pthread_mutex_unlock(mutex_cola_exit);
-	escribir_log(archLog, "Estado programa",INFO,"Se finalizo un programa");
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Estado programa",INFO,"Se finalizo el programa: %d", programa->pcb->pid);
+	free(programa->codigo);
+	free(programa->metadata);
+	pthread_mutex_unlock(mutex_log);
+
 	return;
 }
 

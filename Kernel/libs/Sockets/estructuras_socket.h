@@ -66,6 +66,7 @@ enum{
 	D_STRUCT_SF = 23,
 	D_STRUCT_PCBSEM = 24,
 	D_STRUCT_DESTRUIRSEGMENTOS=26,
+	D_STRUCT_ESCRIBIRSEGMENTO=27,
 	D_STRUCT_PROGFIN = 30,
 };
 
@@ -249,5 +250,11 @@ typedef struct t_struct_memoria{
 	uint32_t tamanioIndiceCodigo;
 	uint32_t tamanioIndiceEtiquetas;
 }__attribute__ ((__packed__)) t_struct_memoria;
+
+typedef struct struct_segmento{
+	uint32_t base;
+	uint32_t tamanio;
+	char* segmento;
+}__attribute__ ((__packed__)) t_struct_segmento;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */
