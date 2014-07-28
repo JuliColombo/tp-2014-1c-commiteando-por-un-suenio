@@ -67,6 +67,7 @@ enum{
 	D_STRUCT_PCBSEM = 24,
 	D_STRUCT_DESTRUIRSEGMENTOS=26,
 	D_STRUCT_ESCRIBIRSEGMENTO=27,
+	D_STRUCT_BASES=28,
 	D_STRUCT_PROGFIN = 30,
 };
 
@@ -256,5 +257,12 @@ typedef struct struct_segmento{
 	uint32_t tamanio;
 	char* segmento;
 }__attribute__ ((__packed__)) t_struct_segmento;
+
+typedef struct struct_bases{
+	uint32_t stack;
+	uint32_t codigo;
+	uint32_t indice_codigo;
+	uint32_t indice_etiquetas;
+}__attribute__ ((packed)) t_struct_bases;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

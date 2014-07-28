@@ -158,6 +158,11 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 
 		return -1;
 	}
+	if(tipoRecibido==D_STRUCT_BASES){
+		t_struct_bases* base = ((t_struct_bases*)structRecibida);
+		printf("La bases son: %d  %d  %d  %d\n", base->stack, base->codigo, base->indice_codigo, base->indice_etiquetas);
+		return 0;
+	}
 
 }
 
@@ -184,15 +189,16 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	int tamanioIndiceEtiquetas = metadata_programa->etiquetas_size;
 	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
-	/*	t_tipoEstructura tipoRecibido;
+		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
-		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);*/
+		//socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
 
 
-		nuevoPCB->stack=NULL;
-		nuevoPCB->c_stack=NULL;
-		nuevoPCB->index_codigo=NULL;
-		nuevoPCB->index_etiquetas=NULL;
+	//	nuevoPCB->stack=base->stack;
+		//nuevoPCB->codigo=base->codigo;
+		//nuevoPCB->index_codigo=base->indice_codigo;
+		//nuevoPCB->index_etiquetas=base->indice_etiquetas;
+
 
 		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
 		paquete->base=8;

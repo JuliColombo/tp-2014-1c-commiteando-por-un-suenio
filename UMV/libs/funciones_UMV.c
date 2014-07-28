@@ -1074,8 +1074,14 @@ void atender_kernel(sock_struct* sock){
 				base_index_code = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceCodigo);
 				base_index_etiq = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceEtiquetas);
 				if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
-					respuesta->numero=memoriaSuficiente;
-					socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
+					//respuesta->numero=memoriaSuficiente;
+					//socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
+					t_struct_bases* base = malloc(sizeof(t_struct_bases));
+					base->stack=4;
+					base->codigo=5;
+					base->indice_codigo=6;
+					base->indice_etiquetas=7;
+					socket_enviar(sock->fd, D_STRUCT_BASES, base);
 					//Escribe los segmentos.
 				/*	if(base_index_etiq==0){
 						//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
