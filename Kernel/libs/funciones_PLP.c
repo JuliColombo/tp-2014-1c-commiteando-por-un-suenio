@@ -130,7 +130,7 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 }
 
-int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int tamanioIndiceEtiquetas){
+int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int tamanioIndiceEtiquetas, t_pcb* pcb){
 
 	t_struct_numero* numpid = malloc(sizeof(t_struct_numero));
 	numpid->numero=pid;
@@ -144,14 +144,6 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(sock_umv,&tipoRecibido,&structRecibida);
-	if(tipoRecibido==D_STRUCT_NUMERO){
-		t_struct_numero* valor;
-		valor = ((t_struct_numero*)structRecibida);
-
-		int i = valor->numero;
-		free(valor);
-		return i;
-	}
 	if(tipoRecibido==D_STRUCT_SF){
 		t_struct_numero* sig = ((t_struct_numero*)structRecibida);
 		free(sig);
@@ -160,7 +152,11 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 	}
 	if(tipoRecibido==D_STRUCT_BASES){
 		t_struct_bases* base = ((t_struct_bases*)structRecibida);
-		printf("La bases son: %d  %d  %d  %d\n", base->stack, base->codigo, base->indice_codigo, base->indice_etiquetas);
+		pcb->stack=base->stack;
+		pcb->codigo=base->codigo;
+		pcb->index_codigo=base->indice_codigo;
+		pcb->index_etiquetas=base->indice_etiquetas;
+		free(base);
 		return 0;
 	}
 
@@ -187,7 +183,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	int tamanioScript = strlen(codigo)+1; //DE ESTO NO ESTOY SEGURO
 	int tamanioIndiceCodigo = (metadata_programa->instrucciones_size)*8;
 	int tamanioIndiceEtiquetas = metadata_programa->etiquetas_size;
-	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
+	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas,nuevoPCB))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
 		// enviarBytes()
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
@@ -201,9 +197,8 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 
 		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
-		paquete->base=8;
-		paquete->tamanio=142;
-		paquete->segmento=malloc(sizeof(tamanioScript));
+		paquete->base=nuevoPCB->codigo;
+		paquete->tamanio=tamanioScript;
 		paquete->segmento=codigo;
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 

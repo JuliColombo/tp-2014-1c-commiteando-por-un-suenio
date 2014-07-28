@@ -764,6 +764,8 @@ t_stream* paquetizarStruct_escribirSegmentos(t_struct_segmento* estructuraOrigen
 
 	memcpy(data + tamanoTotal, estructuraOrigen->segmento, tamanoDato = (strlen(estructuraOrigen->segmento)+1));
 
+	paquete->data = data;
+
 	return paquete;
 
 }
@@ -800,6 +802,8 @@ t_stream* paquetizarStruct_bases(t_struct_bases* estructuraOrigen){
 	tamanoTotal+=tamanoDato;
 
 	memcpy(data + tamanoTotal, &estructuraOrigen->indice_etiquetas, tamanoDato = sizeof(uint32_t));
+
+	paquete->data = data;
 
 	return paquete;
 

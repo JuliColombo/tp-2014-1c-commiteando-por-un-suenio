@@ -1068,20 +1068,21 @@ void atender_kernel(sock_struct* sock){
 				tamanio = ((t_struct_memoria*)structRecibida);
 
 
-				t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+				//t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 				base_stack = crearSegmentoPrograma(id_prog, tamanioMaxStack);
 				base_codigo = crearSegmentoPrograma(id_prog, tamanio->tamanioScript);
 				base_index_code = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceCodigo);
 				base_index_etiq = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceEtiquetas);
 				if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
 					//respuesta->numero=memoriaSuficiente;
-					//socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
-					t_struct_bases* base = malloc(sizeof(t_struct_bases));
-					base->stack=4;
-					base->codigo=5;
-					base->indice_codigo=6;
-					base->indice_etiquetas=7;
-					socket_enviar(sock->fd, D_STRUCT_BASES, base);
+					t_struct_bases* respuesta = malloc(sizeof(t_struct_bases));
+					respuesta->stack=base_stack;
+					respuesta->codigo=base_codigo;
+					respuesta->indice_codigo=base_index_code;
+					respuesta->indice_etiquetas=base_index_etiq;
+
+					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
+					//socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					//Escribe los segmentos.
 				/*	if(base_index_etiq==0){
 						//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
@@ -1104,11 +1105,11 @@ void atender_kernel(sock_struct* sock){
 
 				}else{
 					destruirSegmentos(id_prog);
-					respuesta->numero=1;
-					socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
+					//respuesta->numero=1;
+					//socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
 					escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
 				}
-				free(respuesta);
+				//free(respuesta);
 				break;
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
@@ -1121,9 +1122,8 @@ void atender_kernel(sock_struct* sock){
 				break;
 
 			case D_STRUCT_ESCRIBIRSEGMENTO:
-				printf("Entra al case\n");
 				struct_seg = ((t_struct_segmento*) structRecibida);
-				printf("Base: %d\nTamanio:%d\nSeg: %s\n", struct_seg->base, struct_seg->tamanio, struct_seg->segmento);
+				enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
 				free(struct_seg);
 
 		}
