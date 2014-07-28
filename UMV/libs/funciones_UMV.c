@@ -79,17 +79,20 @@ int segmentationFault(int base,int offset,int longitud){
 
 t_buffer solicitarBytes(int base,int offset, int longitud){
 	t_buffer buffer;
+	pthread_mutex_lock(mutex);
 	if(!segmentationFault(base, offset, longitud)){
 	buffer = malloc((longitud+1)*sizeof(char));
 	int j;
 	j=traducirPosicion(base)+offset;
 	printf("La posicion real es: %d\n",j);
 	memcpy((char *) buffer,  &MP[j], longitud);
+	pthread_mutex_unlock(mutex);
 	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
 	} else {
+		pthread_mutex_unlock(mutex);
 		printf("Seg fault\n");
 		return NULL;
 	}
@@ -117,6 +120,7 @@ int traducirPosicion(int base){
 
 int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
+	pthread_mutex_lock(mutex);
 		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
@@ -130,9 +134,11 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("El resultado de la asignacion es:\n");
 			printf("%s\n",(char*)buffer);//TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 			memcpy(&MP[j], (int*) buffer, longitud);
+			pthread_mutex_unlock(mutex);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
 			return 0;
 			} else {
+				pthread_mutex_unlock(mutex);
 				printf("Seg fault\n");
 				sleep(retardo);
 				return -1;
@@ -191,6 +197,7 @@ void agregarHandshake(tipo_handshake tipo){
 /*************************Comandos de Consola:*************************/
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
+	pthread_mutex_lock(mutex);
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
 		printf("El algoritmo se cambio a: firstfit\n");
@@ -201,7 +208,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		printf("El algoritmo se cambio a: worstfit\n");
 		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
 	}
-
+	pthread_mutex_unlock(mutex);
 	sleep(retardo);
 }
 
@@ -217,6 +224,7 @@ void compactar(){
 	int i,j,k,l=0;
 	int posicionSegmento,tamanio;
 	//Recorre la MP
+	pthread_mutex_lock(mutex);
 	while(l<tamanioMP){
 	//Encuentra la primera posicion libre
 	while(MP[posicionFinal]!=NULL){
@@ -227,6 +235,7 @@ void compactar(){
 		//Encuentra la primera posicion ocupada
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
 		if(posicionSegmento == tamanioMP){
+			pthread_mutex_unlock(mutex);
 			printf("Compactacion finalizada\n");
 			escribir_log(archLog, "Se termina de realizar la compactacion", INFO, "");
 			sleep(retardo);
@@ -344,6 +353,8 @@ void dump(){
 	void imprimirBuffer(t_buffer);
 	void imprimirBufferEnArchivo(t_buffer,FILE*);
 
+	pthread_mutex_lock(mutex);
+
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
 	if (archivo_MP==NULL) {
@@ -391,7 +402,7 @@ void dump(){
 	imprimirBufferEnArchivo(buffer,archivo_MP); //Revisar si en archivo_MP, capaz tendria que ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
-
+	pthread_mutex_unlock(mutex);
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 	fclose(archivo_MP);
 	fclose(archivo_TS);
@@ -493,6 +504,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	segmentDescriptor aux;
 	int i,num_segmento;
 	//Escoge la ubicacion en base al algoritmo de config
+	pthread_mutex_lock(mutex);
 	if(configuracion_UMV.algoritmo == firstfit){
 		ubicacion = escogerUbicacionF(tamanio);
 	} else{
@@ -515,6 +527,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 			}
 		}
 	if(ubicacion==-1){
+			pthread_mutex_unlock(mutex);
 			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
 			sleep(retardo);
 			return -1;
@@ -537,6 +550,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
+	pthread_mutex_unlock(mutex);
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
 	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
@@ -688,11 +702,13 @@ int escogerUbicacionW(int tamanio){
 
 void destruirSegmentos(int id_prog){
 	int pos= getPosTabla(id_prog);
+	pthread_mutex_lock(mutex);
 	liberarMP(pos);
 	eliminarSegmentos(pos);
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Se destruyen segmentos de un programa", INFO, "");
 	pthread_mutex_unlock(mutex_log);
+	pthread_mutex_unlock(mutex);
 	printf("Segmentos del programa %d destruidos con exito",id_prog);
 	sleep(retardo);
 	return;
@@ -1178,9 +1194,7 @@ void *consola (void){
 					  scanf("%d",&unOffset);
 					  puts("\nIngrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
-					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  aux_buffer = solicitarBytes(unaBase,unOffset,unTamanio);
-					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
 					 puts("\nIngrese Base");
@@ -1191,9 +1205,7 @@ void *consola (void){
 					 scanf("%s",aux_buffer);
 					 unTamanio=strlen(aux_buffer)+1;
 					 printf("El tamanio es: %d\n",unTamanio);
-					 pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					 enviarBytes(unaBase,unOffset,unTamanio,aux_buffer);
-					 pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
@@ -1202,16 +1214,12 @@ void *consola (void){
 					  puts("\nIngrese el tamaño del segmento");
 					  int tamanio;
 					  scanf("%d",&tamanio);
-					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  crearSegmentoPrograma(procesoDelHilo,tamanio);
-					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 				if(strcmp(tipoOperacion, "destruir") == 0){
 					  puts("\nIngrese el processID de programa a usar");
 					  scanf("%d",&procesoDelHilo);
-					  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 					  destruirSegmentos(procesoDelHilo);
-					  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 				}
 			}
 
@@ -1219,25 +1227,17 @@ void *consola (void){
 				  puts("\nIngrese el valor de retardo en Milisegundos");
 				  int valorRetardo;
 				  scanf("%d", &valorRetardo);
-				  pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				  retardo= valorRetardo/1000;
 				  escribir_log(archLog, "Se cambia el valor del retardo", INFO, "");
-				  pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "algoritmo") == 0){
-				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				   algoritmo();
-				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando, "compactacion") == 0){
-				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				   compactar();
-				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			   if (strcmp(comando,"dump") ==0){
-				   pthread_mutex_lock(mutex);	//Bloquea el semaforo para utilizar una variable compartida
 				   dump();
-				   pthread_mutex_unlock(mutex);	//Desbloquea el semaforo ya que termino de utilizar una variable compartida
 			   }
 			}
 	    puts("\nEscriba la siguiente operacion");
