@@ -395,7 +395,7 @@ void core_conexion_plp_programas(void){
 
 void core_conexion_umv(void){
 	if ((sock_umv=socket_crearYConectarCliente(configuracion_kernel.ip_umv, configuracion_kernel.puerto_umv))>0){
-		escribir_log(archLog, "Conexion", ERROR, "Se conectó a la UMV");
+		escribir_log(archLog, "Conexion", INFO, "Se conectó a la UMV");
 	}else{
 		escribir_log(archLog, "Conexion", ERROR, "No se pudo conectar a la UMV");
 		//abort();
