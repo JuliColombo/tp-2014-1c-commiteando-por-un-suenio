@@ -13,6 +13,8 @@
 #include "commons/collections/list.h"
 #include <stdint.h>
 
+#define TAMANIO_NULO -2
+
 typedef uint16_t t_puerto_cpu;
 typedef uint16_t t_puerto_conexiones;
 typedef int t_memoria_principal;

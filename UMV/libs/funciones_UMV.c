@@ -503,11 +503,6 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion=-1;
 	segmentDescriptor aux;
 	int i,num_segmento;
-	if(tamanio==0){
-		escribir_log(archLog,"Se trata de crear un segmento",INFO,"El tamanio es 0");
-		printf("El tamanio es: %d\n",tamanio);
-		return 0;
-	} else {
 	//Escoge la ubicacion en base al algoritmo de config
 	pthread_mutex_lock(mutex);
 	if(configuracion_UMV.algoritmo == firstfit){
@@ -560,7 +555,6 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	sleep(retardo);
 	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
 	}
-}
 
 void reservarEspacioMP(int ubicacion, int tamanio){
 	int i=0;
@@ -1085,10 +1079,38 @@ void atender_kernel(sock_struct* sock){
 
 				pthread_mutex_lock(mutex_pid);
 				//t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+				if(tamanioMaxStack==0){
+						escribir_log(archLog,"Se trata de crear el segmento de stack",INFO,"El tamanio es 0");
+						printf("El tamanio es: %d\n",tamanioMaxStack);
+						base_stack=TAMANIO_NULO;
+					} else {
 				base_stack = crearSegmentoPrograma(procesoActivo, tamanioMaxStack);
+					}
+
+				if((tamanio->tamanioScript)==0){
+						escribir_log(archLog,"Se trata de crear el segmento de codigo",INFO,"El tamanio es 0");
+						printf("El tamanio es: %d\n",(tamanio->tamanioScript));
+						base_codigo=TAMANIO_NULO;
+					} else {
 				base_codigo = crearSegmentoPrograma(procesoActivo, tamanio->tamanioScript);
+					}
+
+				if((tamanio->tamanioIndiceCodigo)==0){
+						escribir_log(archLog,"Se trata de crear el segmento de indice de codigo",INFO,"El tamanio es 0");
+						printf("El tamanio es: %d\n",(tamanio->tamanioIndiceCodigo));
+						base_index_code=TAMANIO_NULO;
+					} else {
 				base_index_code = crearSegmentoPrograma(procesoActivo, tamanio->tamanioIndiceCodigo);
+					}
+
+				if((tamanio->tamanioIndiceEtiquetas)==0){
+						escribir_log(archLog,"Se trata de crear el segmento de indice etiquetas",INFO,"El tamanio es 0");
+						printf("El tamanio es: %d\n",(tamanio->tamanioIndiceEtiquetas));
+						base_index_etiq=TAMANIO_NULO;
+					} else {
 				base_index_etiq = crearSegmentoPrograma(procesoActivo, tamanio->tamanioIndiceEtiquetas);
+					}
+
 				pthread_mutex_unlock(mutex_pid);
 				if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
 					//respuesta->numero=memoriaSuficiente;
