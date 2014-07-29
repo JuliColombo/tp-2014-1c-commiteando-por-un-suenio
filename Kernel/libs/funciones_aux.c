@@ -610,8 +610,8 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 			paquete->numero= 0;
-			sleep(5);
-			i=socket_enviar(fd_aceptado, D_STRUCT_PROGFIN, paquete);
+			i=socket_enviar(fd_aceptado, D_STRUCT_MO, paquete);
+			printf("Valor i: %d\n", i);
 			free(paquete);
 		}
 		free(k);

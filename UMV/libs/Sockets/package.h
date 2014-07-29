@@ -43,6 +43,7 @@ t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen);
 t_stream * paquetizarStruct_destruirSegmentos(t_struct_numero * estructuraOrigen);
 t_stream* paquetizarStruct_escribirSegmentos(t_struct_segmento* estructuraOrigen);
 t_stream* paquetizarStruct_bases(t_struct_bases* estructuraOrigen);
+t_stream * paquetizarStruct_SF(t_struct_numero * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
@@ -76,6 +77,7 @@ t_struct_memoria* despaquetizarStruct_SolicitarMemoria(char* dataPaquete, uint16
 t_struct_numero * despaquetizarStruct_destruirSegmentos(char*, uint16_t);
 t_struct_segmento* despaquetizarStruct_escribirSegmentos(char* dataPaquete, uint16_t length);
 t_struct_bases* despaquetizarStruct_bases(char* dataPaquete, uint16_t length);
+t_struct_numero * despaquetizarStruct_SF(char * dataPaquete, uint16_t length);
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR

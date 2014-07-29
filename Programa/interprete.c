@@ -58,12 +58,15 @@ int main (int argc, char **argv){
 			break;
 		}
 		if(tipoRecibido==D_STRUCT_SF){
+		}
+		if(tipoRecibido==D_STRUCT_MO){
 			log_escribir(archLog, "Termino el programa", INFO, "No hubo suficiente memoria para el programa");
 			free(structRecibida);
 			cerrarSocket(sock_kernel_servidor);
-			break;
 			return EXIT_FAILURE;
 		}
+
+
 		if(tipoRecibido==D_STRUCT_STRING){
 			t_struct_string* cadenaAImprimir = ((t_struct_string*) structRecibida);
 			printf("%s", cadenaAImprimir->string);

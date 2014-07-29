@@ -65,6 +65,7 @@ t_struct_semaforo * despaquetizarStruct_signalSemaforo(char * dataPaquete, uint1
 t_struct_semaforo * despaquetizarStruct_wait(char * dataPaquete, uint16_t length);
 t_struct_io * despaquetizarStruct_io(char * dataPaquete, uint16_t length);
 t_struct_string * despaquetizarStruct_variables(char * dataPaquete, uint16_t length);
+t_struct_numero * despaquetizarStruct_MO(char * dataPaquete, uint16_t length);
 
 
 

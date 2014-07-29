@@ -147,7 +147,6 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 	if(tipoRecibido==D_STRUCT_SF){
 		t_struct_numero* sig = ((t_struct_numero*)structRecibida);
 		free(sig);
-
 		return -1;
 	}
 	if(tipoRecibido==D_STRUCT_BASES){
@@ -187,10 +186,6 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		// enviarBytes()
 
 		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
-		paquete->base=nuevoPCB->stack;
-		paquete->tamanio=configuracion_kernel.tamanio_stack;
-		paquete->segmento=codigo;
-		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		paquete->base=nuevoPCB->codigo;
 		paquete->tamanio=tamanioScript;

@@ -94,6 +94,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_BASES:
 				paquete = paquetizarStruct_bases((t_struct_bases*) estructuraOrigen);
 				break;
+			case D_STRUCT_SF:
+				paquete = paquetizarStruct_SF((t_struct_numero*) estructuraOrigen);
+				break;
 		}
 
 
@@ -808,6 +811,30 @@ t_stream* paquetizarStruct_bases(t_struct_bases* estructuraOrigen){
 	return paquete;
 
 }
+/*
+ * Nombre: paquetizarStruct_SF/1
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_stream * paquetizarStruct_SF(t_struct_numero * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_SF, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_numero));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
 
 /*
  * Nombre: crearDataConHeader/2
@@ -943,6 +970,8 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_BASES:
 				estructuraDestino = despaquetizarStruct_bases(dataPaquete, length);
 				break;
+			case D_STRUCT_SF:
+				estructuraDestino = despaquetizarStruct_SF(dataPaquete, length);
 		}
 
 	return estructuraDestino;
@@ -1486,6 +1515,23 @@ t_struct_bases* despaquetizarStruct_bases(char* dataPaquete, uint16_t length){
 	tamanoTotal+=tamanoDato;
 
 	memcpy(&estructuraDestino->indice_etiquetas, dataPaquete+tamanoTotal, tamanoDato = sizeof(uint32_t));
+
+	return estructuraDestino;
+}
+/*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_struct_numero * despaquetizarStruct_SF(char * dataPaquete, uint16_t length){
+	t_struct_numero * estructuraDestino = malloc(sizeof(t_struct_numero));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int));
 
 	return estructuraDestino;
 }

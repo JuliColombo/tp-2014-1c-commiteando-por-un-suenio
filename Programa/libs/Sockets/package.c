@@ -740,6 +740,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PROGFIN:
 				estructuraDestino = despaquetizarStruct_PROGFIN(dataPaquete, length);
 				break;
+			case D_STRUCT_MO:
+				estructuraDestino = despaquetizarStruct_MO(dataPaquete, length);
+				break;
 		}
 
 	return estructuraDestino;
@@ -1156,7 +1159,23 @@ t_struct_numero * despaquetizarStruct_PROGFIN(char * dataPaquete, uint16_t lengt
 
 	return estructuraDestino;
 }
+/*
+ * Nombre:
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+t_struct_numero * despaquetizarStruct_MO(char * dataPaquete, uint16_t length){
+	t_struct_numero * estructuraDestino = malloc(sizeof(t_struct_numero));
 
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int));
+
+	return estructuraDestino;
+}
 
 /*
  * Nombre: despaquetizarHeader/1

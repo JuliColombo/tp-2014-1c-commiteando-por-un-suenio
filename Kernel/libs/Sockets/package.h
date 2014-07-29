@@ -45,6 +45,7 @@ t_stream* paquetizarStruct_destruirSegmentos(t_struct_numero* estructuraOrigen);
 t_stream* paquetizarStruct_escribirSegmentos(t_struct_segmento* estructuraOrigen);
 t_stream* paquetizarStruct_bases(t_struct_bases* estructuraOrigen);
 t_stream * paquetizarStruct_SF(t_struct_numero * estructuraOrigen);
+t_stream * paquetizarStruct_MO(t_struct_numero * estructuraOrigen);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
 char* crearDataConHeader(uint8_t tipoEstructura, int length);
