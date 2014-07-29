@@ -23,7 +23,7 @@ typedef char* t_ip_kernel;
 typedef char** t_id_semaforos;
 typedef uint8_t* t_valor_semaforos;
 
-typedef uint32_t* t_buffer;
+typedef void* t_buffer;
 
 typedef struct { // se define un vector para los programas en new
 	int peso;

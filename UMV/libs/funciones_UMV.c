@@ -305,7 +305,7 @@ int getEspacioLibreMP(void){
 	return libre;
 }
 
-void imprimirBuffer(t_buffer buffer){
+void imprimirBuffer(t_buffer buffer){/*
 	int tamanioBuffer= sizeof(buffer);
 	int i=0;
 	while (i<tamanioBuffer){
@@ -317,9 +317,9 @@ void imprimirBuffer(t_buffer buffer){
 		i++;
 	}
 	printf("\n");
-}
+*/}
 
-void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){
+void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){/*
 	int tamanioBuffer= sizeof(buffer);
 	int i=0;
 	while (i<tamanioBuffer){
@@ -331,7 +331,7 @@ void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){
 		i++;
 	}
 	fprintf(archivo,"\n");
-}
+*/}
 
 /*************************Dump: *************************/
 
@@ -383,10 +383,8 @@ void dump(){
 	//Espacio libre
 
 	int espacioLibre= getEspacioLibreMP();
-	printf("\nEl espacio libre en la memoria principal es: \n");
-	printf("%d",espacioLibre);
-	fprintf(archivo_MP,"%s", "\nEl espacio libre en la memoria principal es:\n");
-	fprintf(archivo_MP,"%d",espacioLibre);
+	printf("\nEl espacio libre en la memoria principal es: %d\n",espacioLibre);
+	fprintf(archivo_MP,"El espacio libre en la memoria principal: %d\n",espacioLibre);
 
 	//Contenido de la memoria principal
 	int offset,tamanio;
@@ -395,11 +393,9 @@ void dump(){
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
 	buffer = malloc((tamanio+1)*sizeof(char));
-	memcpy(buffer, (char*) &MP[offset], tamanio);
-	printf("\nLa posicion de memoria %d contiene: \n", offset);
-	imprimirBuffer(buffer);
-	fprintf(archivo_MP, "\nLa posicion de memoria %d contiene: \n", offset);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
-	imprimirBufferEnArchivo(buffer,archivo_MP); //Revisar si en archivo_MP, capaz tendria que ser en otro
+	memcpy((char*)buffer, (char*) &MP[offset], tamanio);
+	printf("\nLa posicion de memoria %d contiene: %s\n", offset, (char*)buffer);
+	fprintf(archivo_MP, "La posicion de memoria %d contiene: %s\n", offset, (char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 	pthread_mutex_unlock(mutex_MP);
@@ -854,7 +850,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 					signal->signal = senial;
 					socket_enviarSignal(sock_cpu->fd,senial);
 
-					t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
+					uint32_t valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
 					t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
 					estructura->numero = valor_a_enviar;
 					socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
@@ -877,8 +873,8 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 
 				printf("me llego de instruccion base %d y pos %d\n",base, pos);
 
-				t_buffer start;
-				t_buffer offset;
+				uint32_t* start;
+				uint32_t* offset;
 				tamanio = sizeof(int);
 
 				if((start=solicitarBytes(base,pos,tamanio)) == NULL){
