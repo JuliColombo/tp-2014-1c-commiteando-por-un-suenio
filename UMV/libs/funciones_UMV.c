@@ -79,20 +79,20 @@ int segmentationFault(int base,int offset,int longitud){
 
 t_buffer solicitarBytes(int base,int offset, int longitud){
 	t_buffer buffer;
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 	if(!segmentationFault(base, offset, longitud)){
 	buffer = malloc((longitud+1)*sizeof(char));
 	int j;
 	j=traducirPosicion(base)+offset;
 	printf("La posicion real es: %d\n",j);
 	memcpy((char *) buffer,  &MP[j], longitud);
-	pthread_mutex_unlock(mutex);
+	pthread_mutex_unlock(mutex_MP);
 	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
 	sleep(retardo);
 	return buffer;
 	} else {
-		pthread_mutex_unlock(mutex);
+		pthread_mutex_unlock(mutex_MP);
 		printf("Seg fault\n");
 		return NULL;
 	}
@@ -120,7 +120,7 @@ int traducirPosicion(int base){
 
 int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 	int j,aux;
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 		if (!segmentationFault(base,offset,longitud)){
 			aux=traducirPosicion(base);
 			if(aux==-1){
@@ -134,11 +134,11 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			printf("El resultado de la asignacion es:\n");
 			printf("%s\n",(char*)buffer);//TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 			memcpy(&MP[j], (int*) buffer, longitud);
-			pthread_mutex_unlock(mutex);
+			pthread_mutex_unlock(mutex_MP);
 			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
 			return 0;
 			} else {
-				pthread_mutex_unlock(mutex);
+				pthread_mutex_unlock(mutex_MP);
 				printf("Seg fault\n");
 				sleep(retardo);
 				return -1;
@@ -197,7 +197,7 @@ void agregarHandshake(tipo_handshake tipo){
 /*************************Comandos de Consola:*************************/
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
 		printf("El algoritmo se cambio a: firstfit\n");
@@ -208,7 +208,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		printf("El algoritmo se cambio a: worstfit\n");
 		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
 	}
-	pthread_mutex_unlock(mutex);
+	pthread_mutex_unlock(mutex_MP);
 	sleep(retardo);
 }
 
@@ -224,7 +224,7 @@ void compactar(){
 	int i,j,k,l=0;
 	int posicionSegmento,tamanio;
 	//Recorre la MP
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 	while(l<tamanioMP){
 	//Encuentra la primera posicion libre
 	while(MP[posicionFinal]!=NULL){
@@ -235,7 +235,7 @@ void compactar(){
 		//Encuentra la primera posicion ocupada
 	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
 		if(posicionSegmento == tamanioMP){
-			pthread_mutex_unlock(mutex);
+			pthread_mutex_unlock(mutex_MP);
 			printf("Compactacion finalizada\n");
 			escribir_log(archLog, "Se termina de realizar la compactacion", INFO, "");
 			sleep(retardo);
@@ -353,7 +353,7 @@ void dump(){
 	void imprimirBuffer(t_buffer);
 	void imprimirBufferEnArchivo(t_buffer,FILE*);
 
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 
 	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
 	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
@@ -402,7 +402,7 @@ void dump(){
 	imprimirBufferEnArchivo(buffer,archivo_MP); //Revisar si en archivo_MP, capaz tendria que ser en otro
 
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
-	pthread_mutex_unlock(mutex);
+	pthread_mutex_unlock(mutex_MP);
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 	fclose(archivo_MP);
 	fclose(archivo_TS);
@@ -507,9 +507,10 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 				escribir_log(archLog,"Se trata de crear un segmento",INFO,"El tamanio es 0");
 				printf("El tamanio es: %d\n",tamanio);
 				ubicacion=TAMANIO_NULO;
+				printf("Devuelve: %d\n",ubicacion);
 	} else {
 	//Escoge la ubicacion en base al algoritmo de config
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 	if(configuracion_UMV.algoritmo == firstfit){
 		ubicacion = escogerUbicacionF(tamanio);
 	} else{
@@ -520,7 +521,9 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 	}
 	if(ubicacion==-1){
+	pthread_mutex_unlock(mutex_MP);
 		compactar();
+	pthread_mutex_lock(mutex_MP);
 	}
 	if(configuracion_UMV.algoritmo == firstfit){
 			ubicacion = escogerUbicacionF(tamanio);
@@ -532,7 +535,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 			}
 		}
 	if(ubicacion==-1){
-			pthread_mutex_unlock(mutex);
+			pthread_mutex_unlock(mutex_MP);
 			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
 			sleep(retardo);
 			return -1;
@@ -555,7 +558,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
 	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
-	pthread_mutex_unlock(mutex);
+	pthread_mutex_unlock(mutex_MP);
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
 	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
@@ -708,13 +711,13 @@ int escogerUbicacionW(int tamanio){
 
 void destruirSegmentos(int id_prog){
 	int pos= getPosTabla(id_prog);
-	pthread_mutex_lock(mutex);
+	pthread_mutex_lock(mutex_MP);
 	liberarMP(pos);
 	eliminarSegmentos(pos);
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Se destruyen segmentos de un programa", INFO, "");
 	pthread_mutex_unlock(mutex_log);
-	pthread_mutex_unlock(mutex);
+	pthread_mutex_unlock(mutex_MP);
 	printf("Segmentos del programa %d destruidos con exito",id_prog);
 	sleep(retardo);
 	return;
@@ -1161,10 +1164,10 @@ void atender_kernel(sock_struct* sock){
 
 
 void inicializarMutex(void){
-	mutex=malloc(sizeof(pthread_mutex_t));
+	mutex_MP=malloc(sizeof(pthread_mutex_t));
 	mutex_log=malloc(sizeof(pthread_mutex_t));
 	mutex_pid=malloc(sizeof(pthread_mutex_t));
-	pthread_mutex_init(mutex,NULL);
+	pthread_mutex_init(mutex_MP,NULL);
 	pthread_mutex_init(mutex_log, NULL);
 	pthread_mutex_init(mutex_pid,NULL);
 }
@@ -1277,7 +1280,7 @@ void *consola (void){
 			destruirTodosLosSegmentos();
 			free(MP);
 			free(tablaDeSegmentos);
-			pthread_mutex_destroy(mutex);
+			pthread_mutex_destroy(mutex_MP);
 			pthread_mutex_destroy(mutex_log);
 			pthread_mutex_destroy(mutex_pid);
 		   	socket_cerrarConexion(sock_servidor);

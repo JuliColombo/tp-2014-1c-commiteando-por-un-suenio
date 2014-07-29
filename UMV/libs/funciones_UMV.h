@@ -35,7 +35,7 @@ extern t_config_UMV configuracion_UMV;
 extern int* MP;
 extern pthread_t CONSOLA,CONEXIONES,CPU;
 extern log_t* archLog;
-extern pthread_mutex_t* mutex;
+extern pthread_mutex_t* mutex_MP;
 extern pthread_mutex_t* mutex_log;
 extern pthread_mutex_t* mutex_pid;
 extern char* PATH;

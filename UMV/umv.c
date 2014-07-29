@@ -18,7 +18,7 @@ int cant_tablas=0;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, CONEXIONES, CPU;
 log_t* archLog;
-pthread_mutex_t* mutex;
+pthread_mutex_t* mutex_MP;
 pthread_mutex_t* mutex_log;
 pthread_mutex_t* mutex_pid;
 int sock_servidor;
