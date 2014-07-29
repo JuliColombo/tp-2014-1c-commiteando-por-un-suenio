@@ -1273,12 +1273,13 @@ void *consola (void){
 }
 
 
-void destruirTodosLosSegmentos(void){/*
+void destruirTodosLosSegmentos(void){
 	int i=0;
 	while(i<cant_tablas){
 	free(tablaDeSegmentos[i].segmentos);
+	i++;
 	}
-	return;*/
+	return;
 }
 
 
