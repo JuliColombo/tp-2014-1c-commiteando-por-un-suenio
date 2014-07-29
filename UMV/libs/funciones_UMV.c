@@ -503,6 +503,9 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	int ubicacion=-1;
 	segmentDescriptor aux;
 	int i,num_segmento;
+	if(tamanio==0){
+		return 0;
+	} else {
 	//Escoge la ubicacion en base al algoritmo de config
 	pthread_mutex_lock(mutex);
 	if(configuracion_UMV.algoritmo == firstfit){
@@ -554,6 +557,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
 	sleep(retardo);
 	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
+	}
 }
 
 void reservarEspacioMP(int ubicacion, int tamanio){
@@ -1265,6 +1269,8 @@ void *consola (void){
 			destruirTodosLosSegmentos();
 			free(MP);
 			free(tablaDeSegmentos);
+			pthread_mutex_destroy(mutex);
+			pthread_mutex_destroy(mutex_log);
 		   	socket_cerrarConexion(sock_servidor);
 			escribir_log(archLog, "Se cierra forzosamente la UMV",INFO,"");
 		   	if(pthread_kill(CONEXIONES,0)==0) printf("Muere el hilo de Conexiones\n");
