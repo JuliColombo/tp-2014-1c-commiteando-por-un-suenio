@@ -981,11 +981,13 @@ void handshake_conexion(void){
 			case 0:
 				numeroEnviado->numero=0;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				escribir_log(archLog, "Handshake", INFO, "La conexion es de Kernel");
 				pthread_create(&atender_pedido, NULL, (void*) &atender_kernel, sock);
 				break;
 			case 1:
 				numeroEnviado->numero=1;
 				socket_enviar(sock_aceptado, D_STRUCT_NUMERO, numeroEnviado);
+				escribir_log(archLog, "Handshake", INFO, "La conexion es de CPU");
 				pthread_create(&atender_pedido, NULL, (void*) &atender_cpu, sock);
 				break;
 
@@ -1129,10 +1131,13 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				pid = ((t_struct_numero*)structRecibida);
-				destruirSegmentos(pid->numero);
+				pthread_mutex_lock(mutex_pid);
+				cambioProcesoActivo(pid->numero);
+				destruirSegmentos(procesoActivo);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Destruir Segmentos", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d", pid->numero);
+				log_escribir(archLog, "Destruir Segmentos", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d", procesoActivo);
 				pthread_mutex_unlock(mutex_log);
+				pthread_mutex_unlock(mutex_pid);
 				free(pid);
 				break;
 
