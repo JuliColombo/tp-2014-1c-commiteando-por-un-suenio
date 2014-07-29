@@ -807,7 +807,6 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 }
 
 void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
-	void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
 			int baseStack; //Tendria que ser global y creada con la conexion del kernel?
 			int base;
 			t_signal senial;
@@ -1305,7 +1304,7 @@ void destruirTodosLosSegmentos(void){
 	int i=0;
 	while(i<cant_tablas){
 	free(tablaDeSegmentos[i].segmentos);
-	i++;
+		i++;
 	}
 	return;
 }
