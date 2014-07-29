@@ -1266,20 +1266,12 @@ void *consola (void){
 			free(MP);
 			free(tablaDeSegmentos);
 		   	socket_cerrarConexion(sock_servidor);
-		   	socket_cerrarConexion(sock_cpu);
-		   	matarHilos();
-			if(pthread_kill(CPU,0)==0) printf("Muere el hilo cpu\n");
-			if(pthread_kill(CONEXIONES,0)==0) printf("Muere el hilo de Conexiones\n");
+			escribir_log(archLog, "Se cierra forzosamente la UMV",INFO,"");
+		   	if(pthread_kill(CONEXIONES,0)==0) printf("Muere el hilo de Conexiones\n");
 			sleep(retardo);
-			system("clear");
 		}
 }
 
-void matarHilos(void){
-	pthread_cancel(CPU);
-	pthread_cancel(CONEXIONES);
-
-}
 
 void destruirTodosLosSegmentos(void){/*
 	int i=0;
