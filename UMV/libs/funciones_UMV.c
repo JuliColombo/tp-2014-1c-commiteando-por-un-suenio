@@ -1101,26 +1101,6 @@ void atender_kernel(sock_struct* sock){
 
 					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					free(respuesta);
-					//socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
-					//Escribe los segmentos.
-				/*	if(base_index_etiq==0){
-						//Aca debería contestarle las 4 bases al kernel (que serían las bases de los segmentos que solicito)
-						if(memoriaSuficiente==0){
-							//Recibir el buffer a escribir
-							//Sacar el tamanio del buffer y asignarlo a una variable
-							i = enviarBytes(base_codigo,0,tamanio_escribir,buffer);
-								if(i!=-1){
-									//Recibir el buffer a escribir
-									//Sacar el tamanio del buffer y asignarlo a una variable
-									i = enviarBytes(base_index_code,0,tamanio_escribir,buffer);
-									if(i!=-1){
-										//Recibir el buffer a escribir
-										//Sacar el tamanio del buffer y asignarlo a una variable
-										i = enviarBytes(base_index_etiq,0,tamanio_escribir,buffer);
-									}
-								}
-						}
-					}*/
 
 				}else{
 					pthread_mutex_lock(mutex_pid);
@@ -1149,7 +1129,11 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_ESCRIBIRSEGMENTO:
 				struct_seg = ((t_struct_segmento*) structRecibida);
+				if(struct_seg->tamanio==0){
+					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
+				} else {
 				enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
+				}
 				free(struct_seg);
 
 		}
