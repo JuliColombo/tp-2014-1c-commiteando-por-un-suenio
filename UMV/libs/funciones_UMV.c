@@ -1100,6 +1100,7 @@ void atender_kernel(sock_struct* sock){
 					respuesta->indice_etiquetas=base_index_etiq;
 
 					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
+					free(respuesta);
 					//socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					//Escribe los segmentos.
 				/*	if(base_index_etiq==0){
@@ -1125,11 +1126,13 @@ void atender_kernel(sock_struct* sock){
 					pthread_mutex_lock(mutex_pid);
 					destruirSegmentos(id_prog);
 					pthread_mutex_unlock(mutex_pid);
-					//respuesta->numero=1;
-					//socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
+					t_struct_numero* respuesta = malloc(sizeof(t_struct_numero));
+					respuesta->numero=1;
+					socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
 					escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
+					free(respuesta);
 				}
-				//free(respuesta);
+
 				break;
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
