@@ -807,149 +807,152 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 }
 
 void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
-		int baseStack; //Tendria que ser global y creada con la conexion del kernel?
-		int base;
-		t_signal senial;
-		t_struct_signal* signal = malloc(sizeof(t_struct_signal));
-		t_tipoEstructura tipoRecibido;
-		void* structRecibida;
-		t_struct_push* structPush;
-		t_struct_pop* structPop;
-		t_struct_instruccion* structInstr;
-		t_struct_seg_codigo* structCodigo;
-		socket_recibir(sock_cpu->fd,&tipoRecibido,&structRecibida);
+	void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
+			int baseStack; //Tendria que ser global y creada con la conexion del kernel?
+			int base;
+			t_signal senial;
+			t_struct_signal* signal = malloc(sizeof(t_struct_signal));
+			t_tipoEstructura tipoRecibido;
+			void* structRecibida;
+			t_struct_push* structPush;
+			t_struct_pop* structPop;
+			t_struct_instruccion* structInstr;
+			t_struct_seg_codigo* structCodigo;
+			socket_recibir(sock_cpu->fd,&tipoRecibido,&structRecibida);
 
-		switch(tipoRecibido){
-		case D_STRUCT_PUSH:
-			structPush= ((t_struct_push*)structRecibida);
-			int pos= structPush->posicion;
-			int valor= structPush->valor;
-			baseStack = structPush->stack_base;
-			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
-				//signaltodopiola
-				senial = D_STRUCT_NORMAL;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
-			}else{
-				//signaltodomal
-				senial = D_STRUCT_SEGFAULT;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
-			}
-			free(structRecibida);
-			break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
+			printf("recibi el tipo %d\n",tipoRecibido);
 
-		case D_STRUCT_POP:
-			structPop= ((t_struct_pop*)structRecibida);
-			pos= structPop->posicion;
-			int tamanio = structPop->tamanio;
-			baseStack = structPop->stack_base;
+			switch(tipoRecibido){
+			case D_STRUCT_PUSH:
+				structPush= ((t_struct_push*)structRecibida);
+				int pos= structPush->posicion;
+				int valor= structPush->valor;
+				baseStack = structPush->stack_base;
+				if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
+					senial = D_STRUCT_NORMAL;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
+				}else{
+					senial = D_STRUCT_SEGFAULT;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
+				}
+				free(structRecibida);
+				break;			//Revisar bien los tipos del valor (int,t_buffer,void*) y como manejarlos
 
-			//ACA VENDRIA UN IF CHEQUEANDO QUE SE PUEDE HACER LO QUE LA CPU ME PIDE Y MANDAN SIGNAL
-			if(solicitarBytes(baseStack,pos,tamanio) != NULL){
-				//signaltodopiola
-				senial = D_STRUCT_NORMAL;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
+			case D_STRUCT_POP:
+				structPop= ((t_struct_pop*)structRecibida);
+				pos= structPop->posicion;
+				int tamanio = structPop->tamanio;
+				baseStack = structPop->stack_base;
 
-				t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
-				t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
-				estructura->numero = valor_a_enviar;
-				socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
-				free(estructura);
-			}else{
-				//signaltodomal
-				senial = D_STRUCT_SEGFAULT;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
-			}
+				//ACA VENDRIA UN IF CHEQUEANDO QUE SE PUEDE HACER LO QUE LA CPU ME PIDE Y MANDAN SIGNAL
+				if(solicitarBytes(baseStack,pos,tamanio) != NULL){
+					senial = D_STRUCT_NORMAL;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
 
-			break;
-		case D_STRUCT_INSTRUCCION:
-			structInstr=(t_struct_instruccion*)structRecibida;
-			base=structInstr->indice_codigo; //El segmento almacenado que en realidad es indice de codigo
-			pos=structInstr->inst;//La instruccion correspondiente
-			//tamanio=2*sizeof(int); //Tamaño fijo de cada lugar en el indice de codigo (4(indice)+4(longitud) bytes)
-			//long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
-			//posDelIndice=solicitarBytes(base,pos,tamanio);
-			//t_struct_seg_codigo* segAEnviar;
+					t_buffer valor_a_enviar = solicitarBytes(baseStack,pos,tamanio);
+					t_struct_numero* estructura = malloc(sizeof(t_struct_numero));
+					estructura->numero = valor_a_enviar;
+					socket_enviar(sock_cpu->fd, D_STRUCT_NUMERO, estructura);
+					free(estructura);
+				}else{
+					senial = D_STRUCT_SEGFAULT;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
+				}
 
-			printf("me llego de instruccion base %d y pos %d\n",base, pos);
+				break;
+			case D_STRUCT_INSTRUCCION:
+				structInstr=(t_struct_instruccion*)structRecibida;
+				base=structInstr->indice_codigo; //El segmento almacenado que en realidad es indice de codigo
+				pos=structInstr->inst;//La instruccion correspondiente
+				//tamanio=2*sizeof(int); //Tamaño fijo de cada lugar en el indice de codigo (4(indice)+4(longitud) bytes)
+				//long long int posDelIndice; //Tiene que ser de 8 bytes (Pag 16 enunciado)
+				//posDelIndice=solicitarBytes(base,pos,tamanio);
+				//t_struct_seg_codigo* segAEnviar;
 
-			if(solicitarBytes(base,pos,tamanio) != NULL){
+				printf("me llego de instruccion base %d y pos %d\n",base, pos);
 
-				//signaltodopiola
-				senial = D_STRUCT_NORMAL;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
-
+				t_buffer start;
+				t_buffer offset;
 				tamanio = sizeof(int);
-				int start = solicitarBytes(base,pos,tamanio); //busco el start de la instruccion que voy a mandar
+
+				if((start=solicitarBytes(base,pos,tamanio)) == NULL){
+						printf("SE ROMPIO TODO\n");
+
+						senial = D_STRUCT_SEGFAULT;
+						signal->signal = senial;
+						socket_enviarSignal(sock_cpu->fd,senial);}
 
 				pos += sizeof(int);
-				int offset = solicitarBytes(base,pos,tamanio); //busco el offset. Para eso, tengo que correr 4 bytes la posicion, porque sino
-																//les devuelvo nuevamente el start
 
-				t_intructions instruccion;
-				instruccion.start=start;
-				instruccion.offset=offset;
+				if((offset=solicitarBytes(base,pos,tamanio)) != NULL){
 
-				t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
-				estruc->inst = instruccion;
-				estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
-				socket_enviar(sock_cpu->fd, D_STRUCT_SEGCODIGO, estruc);
-				free(estruc);
-			}else{
-				//signaltodomal
-				senial = D_STRUCT_SEGFAULT;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
-			}
+					printf("TODO PIOLA POR ACA\n");
+					senial = D_STRUCT_NORMAL;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
+
+					t_intructions instruccion;
+					instruccion.start=*start;
+					instruccion.offset=*offset;
+
+					t_struct_seg_codigo* estruc = malloc(sizeof(t_struct_seg_codigo));
+					estruc->inst = instruccion;
+					estruc->seg_codigo = 0;//No uso el numero,asi que me mandan cualquier cosa
+					socket_enviar(sock_cpu->fd, D_STRUCT_SEGCODIGO, estruc);
+					free(estruc);
+
+					} else {
+						printf("SE ROMPIO TODO\n");
+						senial = D_STRUCT_SEGFAULT;
+						signal->signal = senial;
+						socket_enviarSignal(sock_cpu->fd,senial);}
 
 
-			//segAEnviar->inst=primeros4Bytes(posDelIndice);
-			//int longitudDeInstr=segundos4Bytes(posDelIndice); //Esta variable se va a usar en el pedido del codigo
-			//socket_enviar(sock_cpu,D_STRUCT_SEGCODIGO, segAEnviar);
-			//-------------------Aca se espera la devolucion del seg o es otro case? Preg a juli
+				//segAEnviar->inst=primeros4Bytes(posDelIndice);
+				//int longitudDeInstr=segundos4Bytes(posDelIndice); //Esta variable se va a usar en el pedido del codigo
+				//socket_enviar(sock_cpu,D_STRUCT_SEGCODIGO, segAEnviar);
+				//-------------------Aca se espera la devolucion del seg o es otro case? Preg a juli
 
-			break;
+				break;
 
-		case D_STRUCT_SEGCODIGO:
-			structCodigo = (t_struct_seg_codigo*)structRecibida;
-			t_intructions inst = structCodigo->inst;
-			base = structCodigo->seg_codigo;
+			case D_STRUCT_SEGCODIGO:
+				structCodigo = (t_struct_seg_codigo*)structRecibida;
+				t_intructions inst = structCodigo->inst;
+				base = structCodigo->seg_codigo;
 
-			if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
-				//signaltodopiola
-				senial = D_STRUCT_NORMAL;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
+				if(enviarBytes(baseStack,pos,sizeof(valor),(int*)valor)==0){
+					senial = D_STRUCT_NORMAL;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
 
-				char* linea = solicitarBytes(base,inst.start,inst.offset);
+					char* linea = solicitarBytes(base,inst.start,inst.offset);
 
-				t_struct_string* structure = malloc(sizeof(t_struct_string));
-				structure->string = linea;
+					t_struct_string* structure = malloc(sizeof(t_struct_string));
+					structure->string = linea;
 
-				int j=socket_enviar(sock_cpu->fd,D_STRUCT_STRING,estructura);
-				if(j == 1){
-					free(structure);
+					int j=socket_enviar(sock_cpu->fd,D_STRUCT_STRING,estructura);
+					if(j == 1){
+						free(structure);
+					}
+				}else{
+					senial = D_STRUCT_SEGFAULT;
+					signal->signal = senial;
+					socket_enviarSignal(sock_cpu->fd,senial);
 				}
-			}else{
-				//signaltodomal
-				senial = D_STRUCT_SEGFAULT;
-				signal->signal = senial;
-				socket_enviarSignal(sock_cpu->fd,senial);
+
+				break;
+			default:
+				escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
+				break;
+			//Etc
+
 			}
-
-			break;
-		default:
-			escribir_log(archLog, "Solicitud de CPU", ERROR, "Solicitud no reconocida");
-			break;
-		//Etc
-
-		}
-		free(signal);
-}
+			free(signal);
+	}
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
 
