@@ -187,7 +187,7 @@ void reservarContextoSinRetorno() {
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion = posicionContextoViejo;
 	estructura->valor = cursorrr;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
@@ -201,7 +201,7 @@ void reservarContextoSinRetorno() {
 	estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion = top_index;
 	estructura->valor = pc;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
@@ -226,7 +226,7 @@ void reservarContextoConRetorno(t_puntero donde_retornar){
 	t_struct_push* estructura = malloc(sizeof(t_struct_push));
 	estructura->posicion = top_index;
 	estructura->valor = retornar;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
 	free(estructura);
 
@@ -248,7 +248,7 @@ void recuperarProgramCounter(t_puntero* program_counter) {
 
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = top_index;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	estructura->tamanio = sizeof(t_puntero);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
@@ -271,7 +271,7 @@ void recuperarCursorAnterior(t_puntero* cursor_stack_viejo) {
 
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = top_index;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	estructura->tamanio = sizeof(t_puntero);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
@@ -307,7 +307,7 @@ void guardarAlternado () {
 
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = top_index;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	estructura->tamanio = sizeof(t_nombre_variable);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
@@ -362,7 +362,7 @@ void recuperarDireccionRetorno(t_puntero* direccion_retorno) {
 
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = top_index;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	estructura->tamanio = sizeof(t_puntero);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);

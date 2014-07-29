@@ -174,7 +174,7 @@ void core_conexion_umv(void){
 
 	//ENVIO PEDIDO DE INDICE DE ETIQUETAS
 	t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
-	estructura->index_etiquetas = *pcb->index_etiquetas;
+	estructura->index_etiquetas = pcb->index_etiquetas;
 	estructura->etiquetas_size = pcb->tamanio_indice;
 	int k=socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
 	if(k==1){

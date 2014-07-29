@@ -46,7 +46,7 @@ void proximaInst() {
 
 	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
 	estructura->inst = inst;
-	estructura->seg_codigo = *pcb->codigo;
+	estructura->seg_codigo = pcb->codigo;
 	if((j=socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura))==1){
 		printf("se mando la instruccion \n");
 		free(estructura);}
@@ -130,7 +130,7 @@ void destruirEstructuras(){
 void closureMostrarEstado(char* key, t_elemento* elem) {
 	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
 	estructura->posicion = elem->pos+1;
-	estructura->stack_base = *pcb->stack;
+	estructura->stack_base = pcb->stack;
 	estructura->tamanio = sizeof(t_valor_variable);
 	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
 	free(estructura);
@@ -283,8 +283,8 @@ void correrParser(t_pcb* pcb_llego) {
 
 		if((i == quantum) && (termino == CONTINUES)){
 			termino = QUANTUM;
-			*pcb->c_stack += cursor;
-			*pcb->stack += stack;
+			pcb->c_stack += cursor;
+			pcb->stack += stack;
 		}
 
 		if (termino != CONTINUES) {
