@@ -37,6 +37,7 @@ extern pthread_t CONSOLA,CONEXIONES,CPU;
 extern log_t* archLog;
 extern pthread_mutex_t* mutex;
 extern pthread_mutex_t* mutex_log;
+extern pthread_mutex_t* mutex_pid;
 extern char* PATH;
 extern int tamanioMP;
 extern int tamanioMaxStack;

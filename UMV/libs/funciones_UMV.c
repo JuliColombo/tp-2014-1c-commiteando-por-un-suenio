@@ -504,6 +504,8 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	segmentDescriptor aux;
 	int i,num_segmento;
 	if(tamanio==0){
+		escribir_log(archLog,"Se trata de crear un segmento",INFO,"El tamanio es 0");
+		printf("El tamanio es: %d\n",tamanio);
 		return 0;
 	} else {
 	//Escoge la ubicacion en base al algoritmo de config
@@ -1065,18 +1067,25 @@ void atender_kernel(sock_struct* sock){
 			case D_STRUCT_NUMERO:
 				pid = ((t_struct_numero*)structRecibida);
 				id_prog = pid->numero;
+				pthread_mutex_lock(mutex_pid);
+				cambioProcesoActivo(id_prog);
+				pthread_mutex_lock(mutex_log);
+				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d",procesoActivo);
+				pthread_mutex_unlock(mutex_log);
+				pthread_mutex_unlock(mutex_pid);
 				free(pid);
 				break;
 
 			case D_STRUCT_SOLICITARMEMORIA:
 				tamanio = ((t_struct_memoria*)structRecibida);
 
-
+				pthread_mutex_lock(mutex_pid);
 				//t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
-				base_stack = crearSegmentoPrograma(id_prog, tamanioMaxStack);
-				base_codigo = crearSegmentoPrograma(id_prog, tamanio->tamanioScript);
-				base_index_code = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceCodigo);
-				base_index_etiq = crearSegmentoPrograma(id_prog, tamanio->tamanioIndiceEtiquetas);
+				base_stack = crearSegmentoPrograma(procesoActivo, tamanioMaxStack);
+				base_codigo = crearSegmentoPrograma(procesoActivo, tamanio->tamanioScript);
+				base_index_code = crearSegmentoPrograma(procesoActivo, tamanio->tamanioIndiceCodigo);
+				base_index_etiq = crearSegmentoPrograma(procesoActivo, tamanio->tamanioIndiceEtiquetas);
+				pthread_mutex_unlock(mutex_pid);
 				if((base_stack!=-1)&&(base_codigo!=-1)&&(base_index_code!=-1)&&(base_index_etiq!=-1)){
 					//respuesta->numero=memoriaSuficiente;
 					t_struct_bases* respuesta = malloc(sizeof(t_struct_bases));
@@ -1108,7 +1117,9 @@ void atender_kernel(sock_struct* sock){
 					}*/
 
 				}else{
+					pthread_mutex_lock(mutex_pid);
 					destruirSegmentos(id_prog);
+					pthread_mutex_unlock(mutex_pid);
 					//respuesta->numero=1;
 					//socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
 					escribir_log(archLog, "Memoria insuficiente", ERROR, "No hay memoria suficiente para el programa");
@@ -1157,8 +1168,10 @@ void atender_kernel(sock_struct* sock){
 void inicializarMutex(void){
 	mutex=malloc(sizeof(pthread_mutex_t));
 	mutex_log=malloc(sizeof(pthread_mutex_t));
+	mutex_pid=malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(mutex,NULL);
 	pthread_mutex_init(mutex_log, NULL);
+	pthread_mutex_init(mutex_pid,NULL);
 }
 
 //***********************************************Inicializacion y espera de hilos************************************
@@ -1271,6 +1284,7 @@ void *consola (void){
 			free(tablaDeSegmentos);
 			pthread_mutex_destroy(mutex);
 			pthread_mutex_destroy(mutex_log);
+			pthread_mutex_destroy(mutex_pid);
 		   	socket_cerrarConexion(sock_servidor);
 			escribir_log(archLog, "Se cierra forzosamente la UMV",INFO,"");
 		   	if(pthread_kill(CONEXIONES,0)==0) printf("Muere el hilo de Conexiones\n");

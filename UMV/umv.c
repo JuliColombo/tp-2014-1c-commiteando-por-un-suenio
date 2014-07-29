@@ -20,6 +20,7 @@ pthread_t CONSOLA, CONEXIONES, CPU;
 log_t* archLog;
 pthread_mutex_t* mutex;
 pthread_mutex_t* mutex_log;
+pthread_mutex_t* mutex_pid;
 int sock_servidor;
 int sock_cpu;
 int procesoActivo;
