@@ -1727,6 +1727,8 @@ t_struct_buffer * despaquetizarStruct_buffer(char * dataPaquete,uint16_t length)
  * 		una estructura de tipo t_header.
  *
  */
+
+
 t_header despaquetizarHeader(char * header){
 	t_header estructuraHeader;
 

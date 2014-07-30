@@ -78,7 +78,7 @@ uint32_t var_tamanio_etiquetas;
 uint32_t temp_cursor_ant;
 uint32_t var_seg_stack;
 uint32_t var_tamanio_contexto;
-int quantum;
+t_quantum quantum;
 int fin_quantum;
 int sockKernel;
 int sig_flag;

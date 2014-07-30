@@ -13,6 +13,7 @@
 #include "parserCPU.h"
 #include "estructuras.h"
 #include <semaphore.h>
+#include "primitivas.h"
 
 typedef struct{
 	char* ip_kernel;
@@ -21,6 +22,10 @@ typedef struct{
 	int puerto_umv;
 	int retardo
 }config_cpu;
+
+t_dictionary* dicc_variables;
+int SEG_flag;
+
 
 /************** VARIABLES GLOBALES **************/
 extern t_config* config;

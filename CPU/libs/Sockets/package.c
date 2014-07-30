@@ -85,8 +85,14 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_INSTRUCCION:
 				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
 				break;
+			case D_STRUCT_ENV_BYTES:
+				paquete = paquetizarStruct_env_bytes((t_struct_env_bytes*) estructuraOrigen);
+				break;
 			case D_STRUCT_SOL_BYTES:
-				paquete = paquetizarStruct_sol_bytes((t_struct_sol_bytes *) estructuraOrigen);
+				paquete = paquetizarStruct_sol_bytes((t_struct_sol_bytes*) estructuraOrigen);
+				break;
+			case D_STRUCT_BUFFER:
+				paquete = paquetizarStruct_buffer((t_struct_buffer*) estructuraOrigen);
 				break;
 		}
 
@@ -668,6 +674,31 @@ t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen){
 	return paquete;
 }
 
+t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + (estructuraOrigen->tamanio) + sizeof(t_struct_env_bytes);
+
+	void * data = crearDataConHeader(D_STRUCT_ENV_BYTES, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen,sizeof(t_struct_env_bytes));
+
+	tamanoTotal += sizeof(t_struct_env_bytes);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->buffer, estructuraOrigen->tamanio);		//copio a data el nombre.
+
+	tamanoTotal += estructuraOrigen->tamanio;
+
+
+	paquete->data = data;
+
+	return paquete;
+
+}
+
 /*
  * Nombre: paquetizarStruct_sol_bytes
  * Argumentos:
@@ -694,6 +725,39 @@ t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen){
 
 		return paquete;
 
+}
+
+/*
+ * Nombre:paquetizarStruct_buffer
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_stream * paquetizarStruct_buffer(t_struct_buffer * estructuraOrigen){
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + (estructuraOrigen->tamanio) + sizeof(t_struct_buffer);
+
+	void * data = crearDataConHeader(D_STRUCT_BUFFER, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen,sizeof(t_struct_buffer));
+
+	tamanoTotal += sizeof(t_struct_buffer);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->buffer, estructuraOrigen->tamanio);		//copio a data el nombre.
+
+	tamanoTotal += estructuraOrigen->tamanio;
+
+	paquete->data = data;
+
+	return paquete;
 }
 
 /*
@@ -820,6 +884,15 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_RESPUESTA_UMV:
 				estructuraDestino = despaquetizarStruct_respuesta_umv(dataPaquete, length);
+				break;
+			case D_STRUCT_ENV_BYTES:
+				estructuraDestino = despaquetizarStruct_env_bytes(dataPaquete, length);
+				break;
+			case D_STRUCT_SOL_BYTES:
+				estructuraDestino = despaquetizarStruct_sol_bytes(dataPaquete, length);
+				break;
+			case D_STRUCT_BUFFER:
+				estructuraDestino = despaquetizarStruct_buffer(dataPaquete, length);
 				break;
 		}
 
@@ -1287,6 +1360,72 @@ t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,ui
 	return estructuraDestino;
 }
 
+
+/*
+ * Nombre: despaquetizarStruct_env_bytes
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length){
+
+	void * buffer = malloc(length - sizeof(t_struct_env_bytes));
+	t_struct_env_bytes * estructuraDestino = malloc(sizeof(t_struct_env_bytes));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_env_bytes)); //copio el data del paquete a la estructura.
+	memcpy(buffer, dataPaquete + sizeof(t_struct_env_bytes), length - sizeof(t_struct_env_bytes)); // copiamos los bytes que queriamos enviar
+
+	estructuraDestino->buffer = buffer;
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_sol_bytes
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length){
+	t_struct_sol_bytes * estructuraDestino = malloc(sizeof(t_struct_sol_bytes));
+
+			memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_sol_bytes)); //copio el data del paquete a la estructura.
+
+			return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_buffer
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_struct_buffer * despaquetizarStruct_buffer(char * dataPaquete,uint16_t length){
+	void * buffer = malloc(length - sizeof(t_struct_buffer));
+	t_struct_buffer * estructuraDestino = malloc(sizeof(t_struct_buffer));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_buffer)); //copio el data del paquete a la estructura.
+	memcpy(buffer, dataPaquete + sizeof(t_struct_buffer), length - sizeof(t_struct_buffer)); // copiamos los bytes que queriamos enviar
+
+	estructuraDestino->buffer = buffer;
+
+	return estructuraDestino;
+}
 
 /*
  * Nombre: despaquetizarHeader/1

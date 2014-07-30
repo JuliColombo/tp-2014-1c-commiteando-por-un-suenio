@@ -67,7 +67,9 @@ enum{
 	D_STRUCT_PCBSEM = 24,
 	D_STRUCT_SEGCODIGO = 25,
 	D_STRUCT_SOL_BYTES=29,
-	D_STRUCT_RESPUESTA_UMV=30,
+	D_STRUCT_ENV_BYTES=30,
+	D_STRUCT_BUFFER=31,
+	D_STRUCT_RESPUESTA_UMV=32
 };
 
 
@@ -292,5 +294,26 @@ typedef struct struct_respuesta_UMV{
 	void* buffer;
 	uint32_t tamano_buffer;
 }__attribute__((__packed__)) t_struct_respuesta_umv;
+
+
+/* Estructura tipo STRUCT_ENV_BYTES
+ *
+ */
+
+typedef struct struct_env_bytes{
+	uint32_t base;
+	uint32_t offset;
+	uint32_t tamanio;
+	void* buffer;
+}__attribute__ ((__packed__)) t_struct_env_bytes;
+
+/* Estructura tipo STRUCT_BUFFER
+ *
+ */
+
+typedef struct struct_buffer{
+	void* buffer;
+	uint32_t tamanio;
+}__attribute__ ((__packed__)) t_struct_buffer;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

@@ -11,6 +11,30 @@
 #include "primitivasAux.h"
 #include "log.h"
 
+
+extern int sockKernel; // sockets globales para ser usados en las primitivas
+extern int sockUMV;    // sockets globales para ser usados en las primitivas
+extern uint32_t var_seg_stack;
+extern uint32_t var_tamanio_contexto;
+extern t_dictionary * dicc_variables;
+extern char * dicc_etiquetas;
+extern uint32_t var_ind_etiquetas;
+extern uint32_t var_tamanio_etiquetas;
+extern uint32_t temp_counter;
+extern uint32_t temp_cursor_stack;
+extern uint32_t temp_cursor_ant;
+extern uint32_t temp_id;
+extern int SEG_flag;
+extern uint32_t temp_ind_codigo;
+extern uint32_t temp_seg_codigo;
+extern int fin_quantum;
+int fin_quatum_ansisop;
+extern t_quantum quantum;
+extern int fin_PCB;
+extern log_t * archLog;
+
+
+
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable);
