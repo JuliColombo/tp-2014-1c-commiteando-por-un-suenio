@@ -171,26 +171,34 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
 t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
-//	t_struct_string* estructura = malloc(sizeof(t_struct_string));
-//	estructura->string = variable;
-//	socket_enviar(sockKernel, D_STRUCT_OBTENERCOMPARTIDA, estructura);
-//	free(estructura);
-//
-//	t_valor_variable valor;
-//
-//	t_tipoEstructura tipoRecibido;
-//	void* structRecibida;
-//	int j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
-//	if(j==1){
-//		t_struct_numero* k = ((t_struct_numero*)structRecibida);
-//		valor= k->numero;
-//		free(k);
-//	}
-//
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se obtuvo valo de variable compartida %s",variable);
-//
-//	return valor;
+	if (SEG_flag == 1)
+			return 0;
+		int valorComp;
+		char** partes = string_split(variable, "\n");
+		variable = partes[0];
+		//Se envia una solicitud de obtener valor al kernel
+		t_struct_string * nombreVarComp = malloc(sizeof(t_struct_string));
+		nombreVarComp->string = strdup(variable);
+		socket_enviar(sockKernel, D_STRUCT_OBTENER_VALOR, nombreVarComp); // envio solicitud de valor con nombre de variable
+		//Se recibe la respuesta del kernel
+		void* structRecibido;
+		t_tipoEstructura tipoRecibido;
+		socket_recibir(sockKernel, &tipoRecibido, &structRecibido); // recibo el valor
+		//Se valida la respuesta
+		if (tipoRecibido != D_STRUCT_NUMERO) {
+			printf("%d\n", tipoRecibido);
+			return 0;
+		}
+		valorComp = ((t_struct_numero*) structRecibido)->numero;
+		printf("obtenerValorCompartida\n");
+		//Se libera el espacio alocado
+		free(nombreVarComp);
+		free(structRecibido);
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
+		return valorComp;
+
 
 }
 

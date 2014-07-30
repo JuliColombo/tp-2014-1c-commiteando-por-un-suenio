@@ -94,6 +94,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_BUFFER:
 				paquete = paquetizarStruct_buffer((t_struct_buffer*) estructuraOrigen);
 				break;
+			case D_STRUCT_OBTENER_VALOR:
+				paquete = paquetizarStruct_obtener_valor((t_struct_string *) estructuraOrigen);
+				break;
 		}
 
 
@@ -754,6 +757,32 @@ t_stream * paquetizarStruct_buffer(t_struct_buffer * estructuraOrigen){
 	memcpy(data + tamanoTotal, estructuraOrigen->buffer, estructuraOrigen->tamanio);		//copio a data el nombre.
 
 	tamanoTotal += estructuraOrigen->tamanio;
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_obtener_valor
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ * Funcion:
+ */
+
+t_stream * paquetizarStruct_obtener_valor(t_struct_string * estructuraOrigen){
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + strlen(estructuraOrigen->string) + 1;
+
+	char * data = crearDataConHeader(D_STRUCT_OBTENER_VALOR, paquete->length); //creo el data
+
+	int tamanoTotal = sizeof(t_header);
+
+	memcpy(data + tamanoTotal, estructuraOrigen->string, strlen(estructuraOrigen->string)+1);		//copio a data el string.
 
 	paquete->data = data;
 
