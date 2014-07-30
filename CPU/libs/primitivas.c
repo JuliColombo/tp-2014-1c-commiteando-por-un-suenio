@@ -125,6 +125,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 
 		}
 		printf("dereferenciar\n");
+		//Se libera espacio alocado
 		free(desreferenciar);
 		free(temp_buffer);
 		free(structRecibido);
@@ -135,27 +136,36 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 
 void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 
-//	//int top = top_index;
-//
-//	t_struct_push* estructura = malloc(sizeof(t_struct_push));
-//	estructura->posicion=direccion_variable+1;
-//	estructura->valor = valor;
-//	estructura->stack_base = pcb->stack;
-//	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
-//	free(estructura);
-//
-//	chequearSiHuboSF();
-//
-//	/*int posibleTop = direccion_variable + 4;
-//
-//	if(top < posibleTop) {
-//		top_index = posibleTop;
-//	} else {
-//		top_index = top;
-//	}*/
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a direccion de variable %d",valor, direccion_variable);
+	if (SEG_flag == 1)
+			return;
+		t_valor_variable temp_valor = valor;
+		int recepcion;
+		//Arma y envia un envio de bytes a la umv
+		t_struct_env_bytes * asignar = malloc(sizeof(t_struct_env_bytes));
+		asignar->base = var_seg_stack;
+		asignar->offset = direccion_variable;
+		asignar->tamanio = sizeof(int);
+		void* temp_buffer = malloc(sizeof(t_valor_variable));
+		memcpy(temp_buffer, &temp_valor, sizeof(int));
+		asignar->buffer = temp_buffer;
 
+		socket_enviar(sockUMV, D_STRUCT_ENV_BYTES, asignar);
+		//Recibe la respuesta de la umv
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+
+		socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+		//Valida la respuesta de la umv
+		if (tipoStruct != D_STRUCT_NUMERO) {
+			printf("Respuesta en asignar incorrecta\n");
+		}
+		recepcion = ((t_struct_numero*) structRecibido)->numero;
+		excepcion_UMV(recepcion);
+		//Se libera espacio alocado
+		free(asignar);
+		free(temp_buffer);
+		free(structRecibido);
+		printf("asignar\n");
 }
 
 

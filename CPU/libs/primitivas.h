@@ -34,6 +34,7 @@ extern int fin_PCB;
 extern log_t * archLog;
 
 
+void excepcion_UMV(int i);
 
 t_puntero definirVariable(t_nombre_variable identificador_variable);
 
