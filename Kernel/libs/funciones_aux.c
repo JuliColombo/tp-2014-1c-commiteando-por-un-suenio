@@ -655,7 +655,6 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion del cpu numero %d", n+1);
 			pthread_mutex_unlock(mutex_log);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
-			free(paquete);
 			sem_post(&sem_cpu);
 		}
 	} else {

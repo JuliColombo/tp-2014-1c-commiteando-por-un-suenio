@@ -255,7 +255,8 @@ void enviar_pcb_a_cpu(void){
 
 	}else{
 		free(paquete);
-		enviar_pcb_a_cpu();
+		log_escribir(archLog, "CPU", INFO, "Se envio mal");
+		perror("Se mando mal la pcb");
 	}
 	pthread_mutex_unlock(mutex_array);
 	return;
