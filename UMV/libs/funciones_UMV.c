@@ -807,7 +807,7 @@ int escribir_log(log_t *log, const char *program_name, e_message_type type,	cons
 	return i;
 }
 
-void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){
+void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* sock_cpu){/*
 			int baseStack; //Tendria que ser global y creada con la conexion del kernel?
 			int base;
 			t_signal senial;
@@ -951,7 +951,7 @@ void ejecutar(t_tipoEstructura tipo_estructura,void* estructura,sock_struct* soc
 			//Etc
 
 			}
-			free(signal);
+			free(signal);*/
 	}
 
 //****************************************Atender Conexiones de Kernel/CPU*******************
@@ -1018,11 +1018,13 @@ void atender_cpu(sock_struct* sock){
 	//RECIBO PEDIDO DE INDICE DE ETIQUETAS
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
+	t_struct_sol_bytes * solicitud;
+	t_struct_env_bytes* escritura;
 
 	socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
 	switch(tipoRecibido){
 		case D_STRUCT_SOL_BYTES:
-			t_struct_sol_bytes* solicitud = (t_struct_sol_bytes*) structRecibida;
+			solicitud = (t_struct_sol_bytes*) structRecibida;
 
 			log_info(archLog, "Se solicitan bytes, base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
 			sleep(retardo);
@@ -1031,13 +1033,13 @@ void atender_cpu(sock_struct* sock){
 			log_info(archLog, "Se envia la solicitud de bytes");
 			break;
 		case D_STRUCT_ENV_BYTES:
-			t_struct_env_bytes* solicitud = (t_struct_env_bytes*) structRecibida;
+			escritura = (t_struct_env_bytes*) structRecibida;
 
-			log_info(archLog, "Se envian bytes, base: %d, offset:%d , tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
+			log_info(archLog, "Se envian bytes, base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
 
 			sleep(retardo);
 
-			int resultado = enviarBytes(solicitud->base,solicitud->offset,solicitud->tamanio,solicitud->buffer);
+			int resultado = enviarBytes(escritura->base,escritura->offset,escritura->tamanio,escritura->buffer);
 			t_struct_numero* respuesta = malloc(sizeof(t_struct_numero));
 			respuesta->numero = resultado;
 			socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
@@ -1148,7 +1150,7 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				pid = ((t_struct_numero*)structRecibida);
-				escribir_log(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid);
+				escribir_log(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid->numero);
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(pid->numero);
 				sleep(retardo);
@@ -1223,8 +1225,8 @@ void *consola (void){
 	char comando[32];
 	char* aux_buffer;
 	aux_buffer= malloc(MAX_BUFFER);
+	t_struct_buffer buffer;
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
-	t_buffer buffer;
 	puts("\nIngrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);
 	while(estaEnDicOP(comando)== 0){
@@ -1248,7 +1250,7 @@ void *consola (void){
 					  scanf("%d",&unOffset);
 					  puts("\nIngrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
-					  aux_buffer = solicitarBytes(unaBase,unOffset,unTamanio);
+					  buffer = solicitarBytes(unaBase,unOffset,unTamanio);
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
 					 puts("\nIngrese Base");
