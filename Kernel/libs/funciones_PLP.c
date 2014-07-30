@@ -72,6 +72,7 @@ void inicializarConfiguracion(void){
 		escribir_log(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 	}else{
 		leerConfiguracion();
+		imprimirConfiguracion();
 	}
 }
 
