@@ -1026,7 +1026,7 @@ void atender_cpu(sock_struct* sock){
 			case D_STRUCT_SOL_BYTES:
 				solicitud = (t_struct_sol_bytes*) structRecibida;
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
+				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d");
 				pthread_mutex_unlock(mutex_log);
 				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
 				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
@@ -1034,7 +1034,7 @@ void atender_cpu(sock_struct* sock){
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
+				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d");
 				pthread_mutex_unlock(mutex_log);
 
 				int resultado = enviarBytes(escritura->base,escritura->offset,escritura->tamanio,escritura->buffer);
@@ -1042,12 +1042,12 @@ void atender_cpu(sock_struct* sock){
 				respuesta->numero = resultado;
 				socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Resultado",INFO,"Envio de bytes es: %d",respuesta->numero);
+				log_escribir(archLog, "Resultado",INFO,"Envio de bytes es: %d");
 				pthread_mutex_unlock(mutex_log);
 				free(respuesta);
 				break;
 			case 0:
-				log_escibir(archLog,"Termina la ejecucion",INFO,"CPU");
+				//log_escibir(archLog,"Termina la ejecucion de CPU",INFO,"");
 				break;
 		}
 	}
@@ -1089,7 +1089,7 @@ void atender_kernel(sock_struct* sock){
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
 	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
 	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog,"Se recibe el tamanio del stack",INFO,"El tamanio es: %d",tamanioMaxStack);
+	log_escribir(archLog,"Se recibe el tamanio del stack",INFO,"El tamanio es: %d");
 	pthread_mutex_unlock(mutex_log);
 	free(structRecibida);
 
@@ -1106,7 +1106,7 @@ void atender_kernel(sock_struct* sock){
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(id_prog);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d",procesoActivo);
+				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d");
 				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_unlock(mutex_pid);
 				free(pid);
@@ -1127,9 +1127,13 @@ void atender_kernel(sock_struct* sock){
 					//respuesta->numero=memoriaSuficiente;
 					t_struct_bases* respuesta = malloc(sizeof(t_struct_bases));
 					respuesta->stack=base_stack;
+					printf("Stack: %d\n",base_stack);
 					respuesta->codigo=base_codigo;
+					printf("Stack: %d\n",base_codigo);
 					respuesta->indice_codigo=base_index_code;
+					printf("Stack: %d\n",base_index_code);
 					respuesta->indice_etiquetas=base_index_etiq;
+					printf("Stack: %d\n",base_index_etiq);
 					escribir_log(archLog,"Se envian bases de segmentos",INFO,"");
 					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					free(respuesta);
@@ -1154,7 +1158,7 @@ void atender_kernel(sock_struct* sock){
 				cambioProcesoActivo(pid->numero);
 				destruirSegmentos(procesoActivo);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Destruir Segmentos", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d", procesoActivo);
+				log_escribir(archLog, "Destruir Segmentos del programa: %", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d");
 				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_unlock(mutex_pid);
 				free(pid);
