@@ -231,22 +231,62 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 }
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {
-//
-//	t_puntero_instruccion instruccion = irAIntruccionLabel(etiqueta);
-//
-//	t_intructions inst = instruccionParaBuscarEnIndiceCodigo(instruccion);
-//
-//	t_struct_seg_codigo* estructura = malloc(sizeof(t_struct_seg_codigo));
-//	estructura->inst = inst;
-//	estructura->seg_codigo = pcb->codigo;
-//	socket_enviar(sockUMV, D_STRUCT_SEGCODIGO, estructura);
-//	free(estructura);
-//
-//	chequearSiHuboSF();
-//
-//	recibirProximaInstruccion(sockUMV);
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se va al label %s y se obtiene el numero de su primera instruccion ejecutable",etiqueta);
+	if (SEG_flag == 1)
+			return;
+		char** partes = string_split(etiqueta, "\n");
+		etiqueta = partes[0];
+		//Controla si el diccionario es vacio
+		if (dicc_etiquetas == NULL ) {
+			//Si es vacio, solicita el indice de etiquetas a la umv
+			t_struct_sol_bytes * sol_ind_etiquetas = malloc(sizeof(t_struct_sol_bytes)); //primero debe solicitar nuevamente el indice de etiquetas a la UMV
+			sol_ind_etiquetas->base = var_ind_etiquetas;
+			sol_ind_etiquetas->offset = 0;
+			sol_ind_etiquetas->tamanio = var_tamanio_etiquetas;
+			socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, sol_ind_etiquetas);
+			free(sol_ind_etiquetas);
+			void * structRecibido;
+			t_tipoEstructura tipoStruct;
+			//Recibe respuesta de la UMV
+			socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+			//Valida respuesta de la UMV
+			if (tipoStruct != D_STRUCT_RESPUESTA_UMV) {
+				printf("Tipo incorrecto\n");
+				free(structRecibido);
+				return;
+			}
+			uint32_t temp_tamanio;
+			void * temp_buffer;
+			//Arma el diccionario con lo recibido de la UMV
+			temp_buffer = ((t_struct_respuesta_umv*) structRecibido)->buffer;
+			temp_tamanio = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+			dicc_etiquetas = malloc(temp_tamanio);
+			int tamanio_instruccion;
+			tamanio_instruccion = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+
+			if (tamanio_instruccion == sizeof(int)) {
+				int*respuesta = malloc(sizeof(int));
+				memcpy(respuesta, ((t_struct_respuesta_umv*) structRecibido)->buffer, tamanio_instruccion);
+				int valor1 = *respuesta;
+				if (valor1 < 0) {
+					excepcion_UMV(0);
+					return;
+				}
+
+			}
+
+			memcpy(dicc_etiquetas, temp_buffer, temp_tamanio); // aca dicc_etiquetas me cargo con el char* IMPRIMIR nada mas
+			free(temp_buffer);
+			free(structRecibido);
+		}													 //NO TENDRIA QUE SER TODAS LAS ETIQUETAS?
+
+		printf("irAlLabel\n");
+
+		temp_counter = metadata_buscar_etiqueta(etiqueta, dicc_etiquetas, var_tamanio_etiquetas); //se asigna al program counter
+		temp_counter = temp_counter - 1;
+		//Se libera espacio alocado
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
 }
 
 

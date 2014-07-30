@@ -25,7 +25,7 @@ typedef struct{
 
 t_dictionary* dicc_variables;
 int SEG_flag;
-
+char * dicc_etiquetas;
 
 /************** VARIABLES GLOBALES **************/
 extern t_config* config;
