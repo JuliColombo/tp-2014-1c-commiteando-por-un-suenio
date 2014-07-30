@@ -68,5 +68,6 @@ void signal_ansisop(t_nombre_semaforo identificador_semaforo);
 
 void wait_ansisop(t_nombre_semaforo identificador_semaforo);
 
+t_struct_pcb * PCB_Actualizado(void) ;
 
 #endif /* PRIMITIVAS_H_ */

@@ -730,26 +730,69 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 
 void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 
-//	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
-//	estructura->nombre_semaforo = identificador_semaforo;
-//	socket_enviar(sockKernel, D_STRUCT_WAIT, estructura);
-//	free(estructura);
-//
-//	controlarBloqueo(sockKernel, termino);
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (wait)",identificador_semaforo);
+	if (SEG_flag == 1)
+			return;
+		printf("wait");
+		//Mandamos el nombre del semaforo al kernel
+		char** partes = string_split(identificador_semaforo, "\n");
+		identificador_semaforo = partes[0];
+
+		t_struct_string * sem_wait = malloc(sizeof(t_struct_string));
+		sem_wait->string = strdup(identificador_semaforo);
+		socket_enviar(sockKernel, D_STRUCT_WAIT, sem_wait); //FIXME: No estoy seguro de si esa struct iria bien
+		free(sem_wait);
+		//Esperamos la respuesta del kernel
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+		socket_recibir(sockKernel, &tipoStruct, &structRecibido);
+
+		// luego espera respuesta del kernel, si el semaforo se bloquea le manda el PCB para que lo encole
+		t_struct_numero respuestaKernel = *((t_struct_numero*) structRecibido);
+		free(structRecibido);
+		if (respuestaKernel.numero < 1) {
+			fin_quantum = quantum - 1;
+		}
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
 
 }
 
 void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
-//
-//	t_struct_semaforo* estructura = malloc(sizeof(t_struct_semaforo));
-//	estructura->nombre_semaforo = identificador_semaforo;
-//	socket_enviar(sockKernel, D_STRUCT_SIGNALSEMAFORO, estructura);
-//	free(estructura);
-//
-//	controlarBloqueo(sockKernel, termino);
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se solicito semaforo %s (signal)",identificador_semaforo);
+	if (SEG_flag == 1)
+			return;
+		printf("signal\n");
+		t_struct_string * sem_signal = malloc(sizeof(t_struct_string));
+		char** partes = string_split(identificador_semaforo, "\n");
+		identificador_semaforo = partes[0];
+		free(partes);
+
+		sem_signal->string = identificador_semaforo;
+		socket_enviar(sockKernel, D_STRUCT_SIGNAL, sem_signal);
+		free(sem_signal);
+		//Esperamos la respuesta del kernel
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+		socket_recibir(sockKernel, &tipoStruct, &structRecibido);
+		t_struct_numero respuestaKernel = *((t_struct_numero*) structRecibido);
+		free(structRecibido);
+		// si Respuesta = 0 tengo que finalizar el programa
+		if (respuestaKernel.numero == 0)
+			fin_PCB = 1;
 }
 
+t_struct_pcb * PCB_Actualizado() {
+	t_struct_pcb * PCB_finalizado = malloc(sizeof(t_struct_pcb));
+
+	PCB_finalizado->pid = temp_id;
+	PCB_finalizado->c_stack = temp_cursor_stack;
+	PCB_finalizado->index_codigo = temp_ind_codigo;
+	PCB_finalizado->index_etiquetas = var_ind_etiquetas;
+	PCB_finalizado->program_counter = temp_counter;
+	PCB_finalizado->codigo = temp_seg_codigo;
+	PCB_finalizado->stack = var_seg_stack;
+	PCB_finalizado->tamanio_contexto = var_tamanio_contexto;
+	PCB_finalizado->tamanio_indice = var_tamanio_etiquetas;
+
+	return PCB_finalizado;
+}
