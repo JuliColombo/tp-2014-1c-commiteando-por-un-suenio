@@ -77,23 +77,30 @@ int segmentationFault(int base,int offset,int longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_buffer solicitarBytes(int base,int offset, int longitud){
-	t_buffer buffer;
+t_struct_buffer solicitarBytes(int base,int offset, int longitud){
+	t_struct_buffer respuesta;
 	pthread_mutex_lock(mutex_MP);
 	if(!segmentationFault(base, offset, longitud)){
-	buffer = malloc((longitud+1)*sizeof(char));
+	void* buffer=malloc(longitud);
 	int j;
 	j=traducirPosicion(base)+offset;
 	printf("La posicion real es: %d\n",j);
-	memcpy((char *) buffer,  &MP[j], longitud);
+	memcpy(buffer,  &MP[j], longitud);
+	respuesta.buffer=buffer;
+	respuesta.tamanio=longitud;
 	pthread_mutex_unlock(mutex_MP);
 	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
-	return buffer;
+	return respuesta;
 	} else {
+		void* buffer_fallo=malloc(sizeof(int));
+		int valor=-1;
+		memcpy(buffer_fallo,&valor,sizeof(int));
+		respuesta.buffer=buffer_fallo;
+		respuesta.tamanio=sizeof(int);
 		pthread_mutex_unlock(mutex_MP);
 		printf("Seg fault\n");
-		return NULL;
+		return respuesta;
 	}
 }
 
@@ -1011,11 +1018,38 @@ void atender_cpu(sock_struct* sock){
 	//RECIBO PEDIDO DE INDICE DE ETIQUETAS
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	t_struct_indice_etiquetas* indice;
 
 	socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
-	if(tipoRecibido==D_STRUCT_INDICE_ETIQUETAS){
-			printf("me llego un D_STRUCT_INDICE\n");
+	switch(tipoRecibido){
+		case D_STRUCT_SOL_BYTES:
+			t_struct_sol_bytes* solicitud = (t_struct_sol_bytes*) structRecibida;
+
+			log_info(archLog, "Se solicitan bytes, base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
+			sleep(retardo);
+			t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
+			socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
+			log_info(archLog, "Se envia la solicitud de bytes");
+			break;
+		case D_STRUCT_ENV_BYTES:
+			t_struct_env_bytes* solicitud = (t_struct_env_bytes*) structRecibida;
+
+			log_info(archLog, "Se envian bytes, base: %d, offset:%d , tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
+
+			sleep(retardo);
+
+			int resultado = enviarBytes(solicitud->base,solicitud->offset,solicitud->tamanio,solicitud->buffer);
+			t_struct_numero* respuesta = malloc(sizeof(t_struct_numero));
+			respuesta->numero = resultado;
+			socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
+
+			log_info(archLog, "El resultado del envio de bytes es: %d",respuesta->numero);
+			free(respuesta);
+			break;
+		case 0:
+			log_info(archLog,"Termina la ejecucion de CPU");
+			break;
+	}
+	/*		printf("me llego un D_STRUCT_INDICE\n");
 		}
 	indice = ((t_struct_indice_etiquetas*)structRecibida);
 	printf("me llego esto %d y %d\n",indice->etiquetas_size, indice->index_etiquetas);
@@ -1029,7 +1063,7 @@ void atender_cpu(sock_struct* sock){
 	free(estructura);
 	}
 
-	ejecutar(tipoRecibido,structRecibida,sock);
+	ejecutar(tipoRecibido,structRecibida,sock);*/
 
 	free(sock);
 	return;
@@ -1044,7 +1078,6 @@ void atender_kernel(sock_struct* sock){
 	pthread_detach(pthread_self());
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	void* buffer;
 	t_struct_memoria* tamanio;
 	t_struct_numero* pid;
 	t_struct_segmento* struct_seg;
