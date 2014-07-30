@@ -26,7 +26,6 @@ int main (int argc, char **argv){
 			return EXIT_FAILURE;
 	}
 
-	printf("%s", codigo_ansisop);
 //	int i;
 //	if((i=validarScript())==0){
 //		log_escribir(archLog, "Programa",INFO,"La script es de tipo ANSISOP");
@@ -40,6 +39,7 @@ int main (int argc, char **argv){
 	int sock_kernel_servidor=abrirSocket();
 	t_struct_string* paquete = malloc(sizeof(t_struct_string));
 	paquete->string=codigo_ansisop;
+		printf("%s", paquete->string);
 	int j=socket_enviar(sock_kernel_servidor, D_STRUCT_STRING, paquete);
 	if(j==1){
 		log_escribir(archLog, "Programa", INFO,"La script se envió correctamente");
@@ -49,7 +49,6 @@ int main (int argc, char **argv){
 	}
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
-	int q=0;
 	socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 	while(1){
 		if(tipoRecibido==D_STRUCT_PROGFIN){

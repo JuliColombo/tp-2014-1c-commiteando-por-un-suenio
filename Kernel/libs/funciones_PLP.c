@@ -159,8 +159,10 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 		free(base);
 		return 0;
 	}
+	return -1;
 
 }
+
 
 /*
  * Nombre: crearPcb/3

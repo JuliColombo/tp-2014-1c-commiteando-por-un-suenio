@@ -617,7 +617,6 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 			paquete->numero= 0;
 			i=socket_enviar(fd_aceptado, D_STRUCT_MO, paquete);
-			printf("Valor i: %d\n", i);
 			free(paquete);
 		}
 		free(k);
