@@ -970,7 +970,6 @@ void handshake_conexion(void){
 	pthread_t atender_pedido;
 
 	t_struct_numero* numeroEnviado = malloc(sizeof(t_struct_numero));
-
 	while(1){
 		sock_struct* sock = malloc(sizeof(sock_struct));
 		if((sock_aceptado=socket_aceptarCliente(sock_servidor))>0){
@@ -1026,11 +1025,10 @@ void atender_cpu(sock_struct* sock){
 			case D_STRUCT_SOL_BYTES:
 				solicitud = (t_struct_sol_bytes*) structRecibida;
 
-				log_info(archLog, "Se solicitan bytes, base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
+				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
 				sleep(retardo);
 				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
 				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
-				log_info(archLog, "Se envia la solicitud de bytes");
 				break;
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
@@ -1087,15 +1085,15 @@ void atender_kernel(sock_struct* sock){
 	int i,id_prog,memoriaSuficiente=0;
 	int tamanioSolicitado,tamanio_escribir;
 	int base_stack,base_codigo,base_index_code,base_index_etiq;
-
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
 	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
-	escribir_log(archLog,"Se recibe el tamanio del stack: %d",INFO,tamanioMaxStack);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog,"Se recibe el tamanio del stack",INFO,"El tamanio es: %d",tamanioMaxStack);
+	pthread_mutex_unlock(mutex_log);
 	free(structRecibida);
 
 
 	while(1){
-
 		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
 
 		switch(tipoRecibido){

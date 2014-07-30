@@ -19,6 +19,7 @@ typedef struct{
 	int puerto_kernel;
 	char* ip_umv;
 	int puerto_umv;
+	int retardo
 }config_cpu;
 
 /************** VARIABLES GLOBALES **************/
@@ -43,6 +44,7 @@ void core_conexion_kernel(void);
 void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto);
 void rutina(int n);
 void core_conexion_umv(void);
+void excepcion_UMV(int i);
 
 
 

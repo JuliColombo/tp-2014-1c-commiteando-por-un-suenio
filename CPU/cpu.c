@@ -19,7 +19,7 @@ t_config* config;
 sem_t* sem_kernel;
 
 int main (int argc, char **argv){
-	sem_init(&sem_kernel,0,0);
+	sem_init(&sem_kernel,1,0);
 	PATH=argv[1];
 	inicializarConfiguracion();
 	log_setPrintMode(archLog, M_CONSOLEANDFILE);

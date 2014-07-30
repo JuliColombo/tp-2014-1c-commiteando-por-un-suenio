@@ -51,6 +51,7 @@ void leerConfiguracion(void){
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
 	configuracion_cpu.ip_umv=config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_cpu.puerto_umv=config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
+	configuracion_cpu.retardo=config_get_int_value(config, "Retardo");
 }
 
 void imprimirConfiguracion(void){
@@ -81,6 +82,7 @@ int quantum;
 int fin_quantum;
 int sockKernel;
 int sig_flag;
+int umv_flag;
 
 void core_conexion_kernel(void){
 	//int sock;
@@ -96,6 +98,8 @@ void core_conexion_kernel(void){
 	t_struct_numero* k = ((t_struct_numero*)structRecibida);
 	quantum = k->numero;
 	free(k);
+	log_escribir(archLog, "Quantum", INFO, "Se seteo el quantum en %d al ser recibido del kernel", quantum);
+
 
 	int fin_PCB;
 	int sig_flag;
@@ -109,14 +113,13 @@ void core_conexion_kernel(void){
 	sem_wait(&sem_kernel);
 
 	while(1){
-		sleep(retardo);
+		sleep(configuracion_cpu.retardo);
 		fin_PCB = 0;
 		sig_flag = 0;
 		UMV_flag = 0;
 		SEG_flag = 0;
 		fin_quantum = 0;
 		socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
-			//habria que hacer el free de este pcb cuando se lo mando al kernel
 			pcb_recibida = ((t_struct_pcb*)structRecibida);
 			log_escribir(archLog, "Recibida pcb", INFO, "Se recibio la pcb con pid: %d", pcb_recibida->pid);
 
@@ -305,7 +308,6 @@ void rutina(int n) {
 void excepcion_UMV(int i) {
 
 	if (i == 0) {
-		printf("segmentation fault\n");
 		log_escribir(archLog, "Segmentation fault PCB", INFO, "Hubo SF en el pid:%d", temp_id);
 
 
