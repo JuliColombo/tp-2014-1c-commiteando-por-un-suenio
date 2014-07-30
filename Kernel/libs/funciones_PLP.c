@@ -189,17 +189,17 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 		paquete->base=nuevoPCB->codigo;
 		paquete->tamanio=tamanioScript;
-		paquete->segmento=codigo;
+		paquete->segmento=(void*)codigo;
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		paquete->base=nuevoPCB->index_codigo;
 		paquete->tamanio=tamanioIndiceCodigo;
-		paquete->segmento=metadata_programa->instrucciones_serializado;
+		paquete->segmento=((void*)metadata_programa->instrucciones_serializado);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		paquete->base=nuevoPCB->index_etiquetas;
 		paquete->tamanio=tamanioIndiceEtiquetas;
-		paquete->segmento=metadata_programa->etiquetas;
+		paquete->segmento=((void*)metadata_programa->etiquetas);
 		//socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 		free(paquete);
 
