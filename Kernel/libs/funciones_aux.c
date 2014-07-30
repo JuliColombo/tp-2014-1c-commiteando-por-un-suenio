@@ -312,12 +312,12 @@ void destruirColas(void){
  */
 
 void crearSemaforos(void){
-	if((sem_init(&sem_multiProg, 1, 0))==-1){
+	if((sem_init(&sem_multiProg, 1, configuracion_kernel.multiprogramacion))==-1){
 			perror("No se puede crear el semáforo");
 			exit(1);
 	}
 
-	if((sem_init(&sem_pcp, 1, 0))==-1){
+	if((sem_init(&sem_ready, 1, 0))==-1){
 		perror("No se puede crear el semáforo");
 		exit(1);
 	}
@@ -354,7 +354,7 @@ void cerrarSemaforos(void){
 	sem_cerrado=-1;
 
 	while(sem_cerrado==-1){
-		sem_cerrado=sem_destroy(&sem_pcp);
+		sem_cerrado=sem_destroy(&sem_ready);
 	}
 
 	sem_cerrado=-1;
@@ -420,13 +420,10 @@ int agregarNuevoPrograma(char* codigo, int fd){
 	t_programa* programa=malloc(sizeof(t_programa));
 	programa->peso=0;
 	programa->codigo=codigo;
-	programa->flag_bloqueado=0;
-	programa->flag_terminado=0;
-	programa->metadata=malloc(sizeof(t_medatada_program));
-	programa->metadata=metadata_desde_literal(codigo);
-	programa->pcb=crearPcb(codigo, programa->metadata);
+	t_medatada_program* metadata = metadata_desde_literal(codigo);
+	programa->pcb=crearPcb(codigo, metadata);
 	if(programa->pcb!=0){
-		programa->peso=calcularPeso(programa);
+		programa->peso=calcularPeso(metadata);
 		programa->socket_descriptor_conexion=fd;
 		pthread_mutex_lock(mutex_cola_new);
 		agregarAColaSegunPeso(programa,cola.new);
@@ -435,6 +432,7 @@ int agregarNuevoPrograma(char* codigo, int fd){
 		log_escribir(archLog, "Programa", INFO, "Se conecto un nuevo Programa con el pid %d y peso %d", programa->pcb->pid, programa->peso);
 		pthread_mutex_unlock(mutex_log);
 
+		free(codigo);
 		return 0;
 	}else{
 		free(programa);
@@ -565,23 +563,21 @@ int buscar_cpu_por_fd(int fd){
  */
 
 void finalizarPrograma(t_programa* programa, char* variablesAImprimir){
-	pthread_mutex_lock(mutex_cola_exec);
-	pthread_mutex_lock(mutex_cola_exit);
 	t_struct_string* paquete = malloc(sizeof(t_struct_string));
 	paquete->string=variablesAImprimir;
 	socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_STRING, paquete);
-	paquete->string=0;
-	socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, paquete);
 	free(paquete);
+	t_struct_numero* fin = malloc(sizeof(t_struct_numero));
+	fin->numero=0;
+	socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_PROGFIN, paquete);
+	free(fin);
 	sem_post(&sem_multiProg);
-	list_add(cola.exit,(void*)programa);
-	pthread_mutex_unlock(mutex_cola_exec);
+	mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
+	pthread_mutex_lock(mutex_cola_exit);
 	mostrarColasPorPantalla(cola.exit, "Exit");
 	pthread_mutex_unlock(mutex_cola_exit);
 	pthread_mutex_lock(mutex_log);
 	log_escribir(archLog, "Estado programa",INFO,"Se finalizo el programa: %d", programa->pcb->pid);
-	free(programa->codigo);
-	free(programa->metadata);
 	pthread_mutex_unlock(mutex_log);
 
 	return;
@@ -613,7 +609,9 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 		i = agregarNuevoPrograma(k->string, fd_aceptado);
 		if(i==0){
 			sem_post(&sem_new);
-
+			pthread_mutex_lock(mutex_cola_new);
+			mostrarColasPorPantalla(cola.new,"New");
+			pthread_mutex_unlock(mutex_cola_new);
 		}else{
 			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
@@ -807,7 +805,6 @@ void handler_conexion_cpu(epoll_data_t data){
 		case D_STRUCT_PCBFIN:
 			liberarCPU(data.fd);
 			pcb_fin = ((t_struct_pcb_fin*)structRecibida);
-			sem_post(&sem_new);
 			pcb->c_stack=pcb_fin->c_stack;
 			pcb->codigo=pcb_fin->codigo;
 			pcb->index_codigo=pcb_fin->index_codigo;
@@ -835,11 +832,12 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Exit", programa->pcb->pid);
 			pthread_mutex_unlock(mutex_log);
+			free(programa->pcb);
+			sem_post(&sem_multiProg);
 	}
 	pthread_mutex_lock(mutex_cola_ready);
 	mostrarColasPorPantalla(cola.ready,"Ready");
 	pthread_mutex_unlock(mutex_cola_ready);
-	sem_post(&sem_multiProg);
 	sem_post(&sem_cpu);
 	free(structRecibida);
 

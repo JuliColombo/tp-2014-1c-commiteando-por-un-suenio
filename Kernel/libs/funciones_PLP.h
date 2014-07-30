@@ -48,13 +48,13 @@ extern int efd_cpu;
 extern int efd_programas;
 extern int* fds_conectados_cpu;
 extern int* estado_cpu;
-extern sem_t sem_multiProg, sem_pcp, sem_new, sem_cpu;
+extern sem_t sem_multiProg, sem_ready, sem_new, sem_cpu;
 extern int program_pid;
 
 
 /************************* PROTOTIPOS DE FUNCIONES *************************/
 
-int calcularPeso(t_programa*); //Calcula el peso del programa
+int calcularPeso(t_medatada_program*); //Calcula el peso del programa
 void agregarAColaSegunPeso(t_programa*, t_list*); //Agrega ordenadamente en la cola de new
 void mostrarColasPorPantalla(t_list*, char*); //Muestra los programas que estan en New por pantalla
 void inicializarConfiguracion(void); //Crea el Log. Si el archivo no existe escribe el log con el error correspondiente

@@ -2,8 +2,8 @@
 
 pthread_t hilo_pcp_new, hilo_pcp_ready;
 
-int calcularPeso(t_programa* programa){ //Calcula peso del programa
-	int peso=(5*programa->metadata->cantidad_de_etiquetas + 3* programa->metadata->cantidad_de_funciones + programa->metadata->instrucciones_size);
+int calcularPeso(t_medatada_program* metadata){ //Calcula peso del programa
+	int peso=(5*metadata->cantidad_de_etiquetas + 3* metadata->cantidad_de_funciones + metadata->instrucciones_size);
 
 	return peso;
 }
@@ -205,7 +205,8 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
 		nuevoPCB->tamanio_contexto=0;
-		nuevoPCB->tamanio_indice=0;
+		nuevoPCB->tamanio_indice=tamanioIndiceEtiquetas;
+		nuevoPCB->c_stack=0;
 		pthread_mutex_unlock(mutex_solicitarMemoria);
 		program_pid+=1;
 		pthread_mutex_unlock(mutex_pid);
@@ -267,23 +268,19 @@ void core_plp(void){
 
 	while(1){
 		sem_wait(&sem_new);
+		sem_wait(&sem_multiProg);
+
+
 		pthread_mutex_lock(mutex_cola_new);
-		mostrarColasPorPantalla(cola.new,"New");
+		pthread_mutex_lock(mutex_cola_ready);
+
+		programa = (t_programa*)list_remove(cola.new,0);
+
 		pthread_mutex_unlock(mutex_cola_new);
-
-		if(configuracion_kernel.multiprogramacion > cantidadProgramasEnPCP()){
-			pthread_mutex_lock(mutex_cola_new);
-			pthread_mutex_lock(mutex_cola_ready);
-
-			programa = (t_programa*)list_remove(cola.new,0);
-
-			pthread_mutex_unlock(mutex_cola_new);
-			list_add(cola.ready, (void*) programa);
-			mostrarColasPorPantalla(cola.ready,"Ready");
-			pthread_mutex_unlock(mutex_cola_ready);
-			sem_post(&sem_multiProg);
-
-		}
+		list_add(cola.ready, (void*) programa);
+		mostrarColasPorPantalla(cola.ready,"Ready");
+		pthread_mutex_unlock(mutex_cola_ready);
+		sem_post(&sem_ready);
 
 
 	}
@@ -301,7 +298,7 @@ void core_pcp(void){
 
 
 	while(1){
-		sem_wait(&sem_multiProg);
+		sem_wait(&sem_ready);
 		sem_wait(&sem_cpu);
 
 		if(list_size(cola.ready)!=0){
@@ -312,6 +309,7 @@ void core_pcp(void){
 		}else{
 			printf("No quedan más programas en la cola Ready\n");
 		}
+
 
 
 	}

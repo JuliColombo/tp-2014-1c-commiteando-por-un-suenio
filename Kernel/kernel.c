@@ -31,7 +31,7 @@ int sock_programas, sock_umv, sock_cpu, efd_cpu, efd_programas;
 int* fds_conectados_cpu;
 int* estado_cpu;
 int program_pid;
-sem_t sem_multiProg, sem_pcp, sem_new, sem_cpu;
+sem_t sem_multiProg, sem_ready, sem_new, sem_cpu;
 
 
 
