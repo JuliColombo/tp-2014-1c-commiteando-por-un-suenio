@@ -183,7 +183,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	int tamanioIndiceCodigo = (metadata_programa->instrucciones_size)*8;
 	int tamanioIndiceEtiquetas = metadata_programa->etiquetas_size;
 	if((solicitarMemoriaUMV(nuevoPCB->pid,tamanioScript,tamanioIndiceCodigo,tamanioIndiceEtiquetas,nuevoPCB))==0){ 	//Se fija si hay memoria suficiente para los 4 segmentos de codigo
-		// enviarBytes()
+		// enviarBytes
 
 		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
 
@@ -200,7 +200,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		paquete->base=nuevoPCB->index_etiquetas;
 		paquete->tamanio=tamanioIndiceEtiquetas;
 		paquete->segmento=((void*)metadata_programa->etiquetas);
-		//socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 		free(paquete);
 
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
@@ -217,26 +217,6 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		free(nuevoPCB);
 		return 0;
 	}
-	/*Esto es lo falta cargarle al PCB
-	nuevoPCB.codigo;			//Dirección del primer byte en la UMV del segmento de código
-	nuevoPCB.stack;				//Dirección del primer byte en la UMV del segmento de stack
-	nuevoPCB.c_stack;			//Dirección del primer byte en la UMV del Contexto de Ejecución Actual
-	nuevoPCB.index_codigo;		//Dirección del primer byte en la UMV del Índice de Código
-	nuevoPCB.index_etiquetas;	//Dirección del primer byte en la UMV del Índice de Etiquetas
-	nuevoPCB.tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
-	nuevoPCB.tamanio_indice;
-	*/
-
-	/*Esto es lo que devuelve el parser
-	*pcbAux.instrucciones_size;				// Cantidad de instrucciones
-	*pcbAux.instrucciones_serializado; 		// Instrucciones del programa
-	*pcbAux.etiquetas_size;					// Tamaño del mapa serializado de etiquetas
-	*pcbAux.etiquetas;						// La serializacion de las etiquetas
-	*pcbAux.cantidad_de_funciones;
-	*pcbAux.cantidad_de_etiquetas;
-	*/
-	//Creo que aca podria venir el solicitarMemoria. No use el tamanioIndEti ni tamanioIndCod que son cosas que
-	//me da el parser supuestamente, y podrian servir para solicitar la memoria. No se
 
 	return nuevoPCB;
 }
@@ -264,6 +244,9 @@ void enviar_pcb_a_cpu(void){
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,programa);
 		pthread_mutex_unlock(mutex_cola_exec);
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "CPU", INFO, "Se envio el programa %d a la CPU %d", programa->pcb->pid, pos+1);
+		pthread_mutex_unlock(mutex_log);
 		free(paquete);
 
 	}else{

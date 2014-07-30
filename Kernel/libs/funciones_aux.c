@@ -394,6 +394,9 @@ void bloquearPrograma(int pid){
 	t_programa* programa;
 	programa = (t_programa*) list_remove(cola.exec,position);
 	list_add(cola.block.io,(void*)programa);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Block I/O", programa->pcb->pid);
+	pthread_mutex_unlock(mutex_log);
 
 	return;
 }
@@ -428,6 +431,10 @@ int agregarNuevoPrograma(char* codigo, int fd){
 		pthread_mutex_lock(mutex_cola_new);
 		agregarAColaSegunPeso(programa,cola.new);
 		pthread_mutex_unlock(mutex_cola_new);
+		pthread_mutex_lock(mutex_log);
+		log_escribir(archLog, "Programa", INFO, "Se conecto un nuevo Programa con el pid %d y peso %d", programa->pcb->pid, programa->peso);
+		pthread_mutex_unlock(mutex_log);
+
 		return 0;
 	}else{
 		free(programa);
@@ -595,6 +602,7 @@ void finalizarPrograma(t_programa* programa, char* variablesAImprimir){
 
 void manejar_ConexionNueva_Programas(epoll_data_t data){
 	int fd_aceptado,j, i;
+	log_escribir(archLog, "Programa",INFO,"Se recibe la solicitud de un nuevo programa");
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	fd_aceptado=socket_aceptarCliente(data.fd);
@@ -605,7 +613,7 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 		i = agregarNuevoPrograma(k->string, fd_aceptado);
 		if(i==0){
 			sem_post(&sem_new);
-			escribir_log(archLog, "Conexion Programa", INFO, "Se conecto un nuevo Programa");
+
 		}else{
 			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
@@ -646,6 +654,9 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			fds_conectados_cpu[n]=fd_aceptado;
 			estado_cpu[n]=LIBRE;
 			pthread_mutex_unlock(mutex_array);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion del cpu numero %d", n+1);
+			pthread_mutex_unlock(mutex_log);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
 			k=configuracion_kernel.retardo_quantum;
 			paquete->numero=k;
@@ -724,6 +735,9 @@ void handler_conexion_cpu(epoll_data_t data){
 				int posicion = posicion_Variable_Global(compartida->nombre);
 				pthread_mutex_lock(mutex_var_compartidas);
 				configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
+				pthread_mutex_lock(mutex_log);
+				log_escribir(archLog, "Variables Compartidas", INFO, "Se le asigno el valor %d a la variable %s", compartida->valor, compartida->nombre);
+				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_unlock(mutex_var_compartidas);
 			}else{
 				pthread_mutex_lock(mutex_log);
@@ -745,6 +759,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			}
 			socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
 			configuracion_kernel.semaforos.valor[pos_sem_wait]-=1;
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Semaforo", INFO, "Se dio wait al semaforo %s", semaforo->nombre_semaforo);
+			pthread_mutex_unlock(mutex_log);
 			pthread_mutex_unlock(mutex_semaforos);
 			free(senial);
 			break;
@@ -755,6 +772,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
 			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
 			pthread_mutex_unlock(mutex_semaforos);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Semaforo", INFO, "Se dio signal al semaforo %s", semaforo->nombre_semaforo);
+			pthread_mutex_unlock(mutex_log);
 			break;
 
 		case D_STRUCT_PCBSEM:
@@ -763,6 +783,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			actualizarPCB(programa, pcb);
 			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Block por Semaforos", programa->pcb->pid);
+			pthread_mutex_unlock(mutex_log);
 			pthread_mutex_lock(mutex_cola_block_sem);
 			mostrarColasPorPantalla(cola.block.sem, "Block por Semaforos");
 			pthread_mutex_unlock(mutex_cola_block_sem);
@@ -809,8 +832,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_lock(mutex_cola_exit);
 			mostrarColasPorPantalla(cola.exit, "Exit");
 			pthread_mutex_unlock(mutex_cola_exit);
-
-			printf("llego %s\n",pcb_fin->variables);
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Exit", programa->pcb->pid);
+			pthread_mutex_unlock(mutex_log);
 	}
 	pthread_mutex_lock(mutex_cola_ready);
 	mostrarColasPorPantalla(cola.ready,"Ready");
