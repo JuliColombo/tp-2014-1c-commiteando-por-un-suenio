@@ -291,18 +291,47 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 
 
 void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
-//
-//	reservarContextoSinRetorno();
-//
-//	int posicionAPushear =  top_index +1;
-//	//*pcb->c_stack = posicionAPushear;
-//	cursor = posicionAPushear;
-//
-//	irAlLabel(etiqueta);
-//
-//	pcb->tamanio_contexto = 0;
-//
-//	esConRetorno = 0;
+	if (SEG_flag == 1)
+			return;
+		printf("llamasSinRetorno\n");
+		char** partes = string_split(etiqueta, "\n");
+		etiqueta = partes[0];
+		//Se arma estructura para solicitar envio de bytes a la UMV
+		t_struct_env_bytes * send_punteros = malloc(sizeof(t_struct_env_bytes));
+		send_punteros->base = var_seg_stack;
+		send_punteros->offset = temp_cursor_stack + var_tamanio_contexto * 5;
+		send_punteros->tamanio = 2 * sizeof(int);
+		void * temp_buffer = malloc(2 * sizeof(int));
+		int offset;
+		memcpy(temp_buffer, &temp_cursor_stack, offset = sizeof(int));
+		memcpy(temp_buffer + offset, &temp_counter, sizeof(int));
+		send_punteros->buffer = temp_buffer;
+		//Se envia solicitud de envio de bytes a la UMV
+		socket_enviar(sockUMV, D_STRUCT_ENV_BYTES, send_punteros);
+
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+		//Recibe respuesta de la UMV
+		socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+		//Valida respuesta
+		if (tipoStruct != D_STRUCT_NUMERO) {
+			printf("Respuesta en desreferenciar incorrecta\n");
+			//return 0;
+		}
+		int recepcion = ((t_struct_numero*) structRecibido)->numero;
+		excepcion_UMV(recepcion);
+		temp_cursor_stack = temp_cursor_stack + (var_tamanio_contexto * 5) + 8;
+
+		irAlLabel(etiqueta); //le asignamos al program_counter la proxima ejecucion a ejecutar dentro del procedimiento
+
+		dictionary_clean_and_destroy_elements(dicc_variables, free);
+		var_tamanio_contexto = 0;
+		//Se libera espacio alocado
+		free(temp_buffer);
+		free(send_punteros);
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
 
 }
 
