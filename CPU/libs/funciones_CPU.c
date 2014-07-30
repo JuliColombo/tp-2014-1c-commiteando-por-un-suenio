@@ -8,6 +8,28 @@
 
 config_cpu configuracion_cpu;
 
+AnSISOP_funciones funciones_parser = {
+			.AnSISOP_definirVariable		= definirVariable,
+			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariable,
+			.AnSISOP_dereferenciar			= dereferenciar,
+			.AnSISOP_asignar				= asignar,
+			.AnSISOP_asignarValorCompartida = asignarValorCompartida,
+			.AnSISOP_obtenerValorCompartida = obtenerValorCompartida,
+			.AnSISOP_irAlLabel				= irAlLabel,
+			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
+			.AnSISOP_llamarConRetorno		= llamarConRetorno,
+			.AnSISOP_retornar				= retornar,
+			.AnSISOP_finalizar				= finalizar,
+			.AnSISOP_imprimir				= imprimir,
+			.AnSISOP_imprimirTexto			= imprimirTexto,
+			.AnSISOP_entradaSalida			= entradaSalida,
+
+};
+AnSISOP_kernel funciones_kernel = {
+			.AnSISOP_signal					= signal_ansisop,
+			.AnSISOP_wait					= wait_ansisop,
+};
+
 
 void inicializarConfiguracion(void){
 	archLog = log_crear(PATHLOG);
@@ -58,6 +80,7 @@ uint32_t var_tamanio_contexto;
 int quantum;
 int fin_quantum;
 int sockKernel;
+int sig_flag;
 
 void core_conexion_kernel(void){
 	//int sock;
@@ -91,6 +114,7 @@ void core_conexion_kernel(void){
 		sig_flag = 0;
 		UMV_flag = 0;
 		SEG_flag = 0;
+		fin_quantum = 0;
 		socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
 			//habria que hacer el free de este pcb cuando se lo mando al kernel
 			pcb_recibida = ((t_struct_pcb*)structRecibida);
@@ -108,9 +132,87 @@ void core_conexion_kernel(void){
 			var_tamanio_contexto = pcb_recibida->tamanio_contexto;
 			var_tamanio_etiquetas = pcb_recibida->tamanio_indice;
 			recupero_diccionario(dicc_variables,var_tamanio_contexto);
-			darValoresDeStackYCursor(pcb);
 
-			while(fin_PCB==0){
+			while((fin_quantum!=quantum)&&(fin_PCB==0)){
+				t_struct_sol_bytes * solicitar_indice = malloc(sizeof(t_struct_sol_bytes));
+
+				solicitar_indice->base = temp_ind_codigo;
+				solicitar_indice->offset = temp_counter * 8;
+				solicitar_indice->tamanio = 2 * sizeof(uint32_t);
+				socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, solicitar_indice); //
+				free(solicitar_indice);
+				/************************* Solicita indice *************************/
+				void * estructuraRecibida2;
+				t_tipoEstructura tipoRecibido2;
+
+				socket_recibir(sockUMV, &tipoRecibido2, &estructuraRecibida2);
+				/************************* Recibe indice *************************/
+				uint32_t temp_tamanio;
+				void * temp_buffer;
+				temp_buffer = ((t_struct_respuesta_umv*) estructuraRecibida2)->buffer;
+				temp_tamanio = ((t_struct_respuesta_umv*) estructuraRecibida2)->tamano_buffer;
+
+				uint32_t indice_temp;
+				uint32_t tamanio_temp;
+				int off_set;
+
+				memcpy(&indice_temp, temp_buffer, off_set = sizeof(uint32_t));
+				memcpy(&tamanio_temp, temp_buffer + off_set, sizeof(uint32_t));
+
+
+
+				t_struct_sol_bytes * solicitar_instruccion = malloc(sizeof(t_struct_sol_bytes));
+				solicitar_instruccion->base = temp_seg_codigo;
+				solicitar_instruccion->offset = indice_temp;
+				solicitar_instruccion->tamanio = tamanio_temp;
+				/************************* Se solicita la proxima instruccion *************************/
+				socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, solicitar_instruccion);
+				free(solicitar_instruccion);
+				/************************* Se recibe la siguiente instruccion *************************/
+				void * estructuraRecibida3;
+				t_tipoEstructura tipoRecibido3;
+
+				socket_recibir(sockUMV, &tipoRecibido3, &estructuraRecibida3);
+
+				int tamanio_instruccion = ((t_struct_respuesta_umv*) estructuraRecibida3)->tamano_buffer;
+
+				if (tamanio_instruccion == sizeof(int)) {
+					int*respuesta = malloc(sizeof(int));
+					memcpy(respuesta, ((t_struct_respuesta_umv*) estructuraRecibida3)->buffer, tamanio_instruccion);
+					int valor = *respuesta;
+					if (valor < 0) {
+							excepcion_UMV(0);
+							break;
+						}
+
+				}
+
+				char * codigo = malloc(tamanio_instruccion);
+				memcpy(codigo, ((t_struct_respuesta_umv*) estructuraRecibida3)->buffer, tamanio_instruccion);
+							// codigo=((t_struct_respuesta_umv*)estructuraRecibida3)->buffer;
+				char** partes = string_split(codigo, "\n");
+				free(codigo);
+				codigo = partes[0];
+				free(partes);
+				printf("\n\n>>>>> %s\n\n", codigo);
+				char * codigoContac = strcat(codigo, "\0");
+
+				analizadorLinea(codigoContac, &funciones_parser, &funciones_kernel);
+				free(((t_struct_respuesta_umv*) estructuraRecibida3)->buffer);
+				free(temp_buffer);
+				free(estructuraRecibida3);
+				free(estructuraRecibida2);
+				free(codigo);
+				sleep(retardo);
+				temp_counter++;
+				fin_quantum++;
+
+				signal(SIGUSR1, rutina);
+
+
+
+
+
 
 			}
 
@@ -188,8 +290,43 @@ void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto) {
 }
 
 
+void rutina(int n) {
+	switch (n) {
+	case SIGUSR1:
+
+		sig_flag = 1;
+		log_escribir(archLog, "Señal SIGUSR1", INFO, "Se recibio la señal para cerrar cpu");
+		printf("LLEGO SIGUSR1\n");
+		break;
+	}
+}
 
 
+void excepcion_UMV(int i) {
+
+	if (i == 0) {
+		printf("segmentation fault\n");
+		log_escribir(archLog, "Segmentation fault PCB", INFO, "Hubo SF en el pid:%d", temp_id);
+
+
+		t_struct_pcb * PCB_Segmentation = malloc(sizeof(t_struct_pcb));
+		PCB_Segmentation->pid = temp_id;
+		PCB_Segmentation->c_stack = temp_cursor_stack;
+		PCB_Segmentation->index_codigo = temp_ind_codigo;
+		PCB_Segmentation->index_etiquetas = var_ind_etiquetas;
+		PCB_Segmentation->program_counter = 0;
+		PCB_Segmentation->codigo = temp_seg_codigo;
+		PCB_Segmentation->stack = var_seg_stack;
+		PCB_Segmentation->tamanio_contexto = var_tamanio_contexto;
+		PCB_Segmentation->tamanio_indice = var_tamanio_etiquetas;
+
+		socket_enviar(sockKernel, D_STRUCT_PCBSF, PCB_Segmentation);
+		free(PCB_Segmentation);
+
+		fin_quantum = quantum - 1;
+
+	}
+}
 
 
 /******************************** CONEXION UMV ***************************************************/

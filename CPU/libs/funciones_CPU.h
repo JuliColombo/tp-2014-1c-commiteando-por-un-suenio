@@ -41,7 +41,10 @@ void imprimirConfiguracion(void);
 void log_error_socket(void);
 void core_conexion_kernel(void);
 void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto);
+void rutina(int n);
 void core_conexion_umv(void);
+
+
 
 
 

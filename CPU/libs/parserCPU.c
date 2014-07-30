@@ -7,27 +7,7 @@
 #include "parserCPU.h"
 char* variables = "";
 
-AnSISOP_funciones funciones_parser = {
-			.AnSISOP_definirVariable		= definirVariable,
-			.AnSISOP_obtenerPosicionVariable= obtenerPosicionVariable,
-			.AnSISOP_dereferenciar			= dereferenciar,
-			.AnSISOP_asignar				= asignar,
-			.AnSISOP_asignarValorCompartida = asignarValorCompartida,
-			.AnSISOP_obtenerValorCompartida = obtenerValorCompartida,
-			.AnSISOP_irAlLabel				= irAlLabel,
-			.AnSISOP_llamarSinRetorno		= llamarSinRetorno,
-			.AnSISOP_llamarConRetorno		= llamarConRetorno,
-			.AnSISOP_retornar				= retornar,
-			.AnSISOP_finalizar				= finalizar,
-			.AnSISOP_imprimir				= imprimir,
-			.AnSISOP_imprimirTexto			= imprimirTexto,
-			.AnSISOP_entradaSalida			= entradaSalida,
 
-};
-AnSISOP_kernel funciones_kernel = {
-			.AnSISOP_signal					= signal_ansisop,
-			.AnSISOP_wait					= wait_ansisop,
-};
 
 void darValoresDeStackYCursor(t_pcb* pcb){
 	if(pcb->c_stack == pcb->stack){
@@ -65,7 +45,7 @@ void parsear(){
 
 	log_escribir(archLog, "Ejecucion", INFO, "Se ejecuta nueva instruccion");
 
-	analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
+	//analizadorLinea(strdup(proximaInstruccion),&funciones_parser, &funciones_kernel);
 
 }
 

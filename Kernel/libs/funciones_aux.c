@@ -788,6 +788,18 @@ void handler_conexion_cpu(epoll_data_t data){
 
 
 			break;
+		case D_STRUCT_PCBSF:
+			liberarCPU(data.fd);
+			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=0;
+			socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_SF, num);
+			free(num);
+
+
+			break;
+
 		case D_STRUCT_PCBIO:
 			liberarCPU(data.fd);
 			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);

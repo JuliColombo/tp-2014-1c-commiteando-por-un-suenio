@@ -1020,36 +1020,37 @@ void atender_cpu(sock_struct* sock){
 	void* structRecibida;
 	t_struct_sol_bytes * solicitud;
 	t_struct_env_bytes* escritura;
+	while(1){
+		socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
+		switch(tipoRecibido){
+			case D_STRUCT_SOL_BYTES:
+				solicitud = (t_struct_sol_bytes*) structRecibida;
 
-	socket_recibir(sock->fd, &tipoRecibido,&structRecibida);
-	switch(tipoRecibido){
-		case D_STRUCT_SOL_BYTES:
-			solicitud = (t_struct_sol_bytes*) structRecibida;
+				log_info(archLog, "Se solicitan bytes, base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
+				sleep(retardo);
+				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
+				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
+				log_info(archLog, "Se envia la solicitud de bytes");
+				break;
+			case D_STRUCT_ENV_BYTES:
+				escritura = (t_struct_env_bytes*) structRecibida;
 
-			log_info(archLog, "Se solicitan bytes, base: %d, offset: %d, tamanio: %d", solicitud->base, solicitud->offset, solicitud->tamanio);
-			sleep(retardo);
-			t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
-			socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
-			log_info(archLog, "Se envia la solicitud de bytes");
-			break;
-		case D_STRUCT_ENV_BYTES:
-			escritura = (t_struct_env_bytes*) structRecibida;
+				log_info(archLog, "Se envian bytes, base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
 
-			log_info(archLog, "Se envian bytes, base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
+				sleep(retardo);
 
-			sleep(retardo);
+				int resultado = enviarBytes(escritura->base,escritura->offset,escritura->tamanio,escritura->buffer);
+				t_struct_numero* respuesta = malloc(sizeof(t_struct_numero));
+				respuesta->numero = resultado;
+				socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
 
-			int resultado = enviarBytes(escritura->base,escritura->offset,escritura->tamanio,escritura->buffer);
-			t_struct_numero* respuesta = malloc(sizeof(t_struct_numero));
-			respuesta->numero = resultado;
-			socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
-
-			log_info(archLog, "El resultado del envio de bytes es: %d",respuesta->numero);
-			free(respuesta);
-			break;
-		case 0:
-			log_info(archLog,"Termina la ejecucion de CPU");
-			break;
+				log_info(archLog, "El resultado del envio de bytes es: %d",respuesta->numero);
+				free(respuesta);
+				break;
+			case 0:
+				log_info(archLog,"Termina la ejecucion de CPU");
+				break;
+		}
 	}
 	/*		printf("me llego un D_STRUCT_INDICE\n");
 		}
