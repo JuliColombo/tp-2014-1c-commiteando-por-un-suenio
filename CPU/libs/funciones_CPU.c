@@ -355,33 +355,6 @@ void core_conexion_umv(void){
 	}
 
 
-	//ESTO LO USO DE PRUEBA. TENGO QUE USAR EL PCB
-	uint32_t a= 5;
-	t_pcb* pcb = malloc(sizeof(t_pcb));
-	pcb->index_etiquetas = &a;
-	pcb->tamanio_indice = 3;
-
-	//ENVIO PEDIDO DE INDICE DE ETIQUETAS
-	t_struct_indice_etiquetas* estructura = malloc(sizeof(t_struct_indice_etiquetas));
-	estructura->index_etiquetas = pcb->index_etiquetas;
-	estructura->etiquetas_size = pcb->tamanio_indice;
-	int k=socket_enviar(sockUMV,D_STRUCT_INDICE_ETIQUETAS,estructura);
-	if(k==1){
-		printf("se le mando pedido de indice de etiquetas a umv \n");
-	}
-
-	free(estructura);
-	free(pcb);
-
-	//RECIBO INDICE
-	//t_tipoEstructura tipoRecibido;
-		//void* structRecibida;
-		int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
-		if(j==1){
-			t_struct_string* k = ((t_struct_string*)structRecibida);
-			indiceEtiquetas= k->string;
-			printf("me llego %s\n",indiceEtiquetas);
-			free(k);}
 
 	while(1){
 
