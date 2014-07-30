@@ -13,13 +13,14 @@
 t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	if (SEG_flag == 1)
 		return 0;
-	printf("DefinirVariable\n");
+	printf("definirVariable\n");
 	int recepcion;
+	//Se arma la estructura de definir_variable con lo recibido
 	t_struct_env_bytes * definir_variable = malloc(sizeof(t_struct_env_bytes));
 	definir_variable->base = var_seg_stack;
-	definir_variable->offset = temp_cursor_stack + 5 * var_tamanio_contexto; // por que le suma el temp_cursor_stack
+	definir_variable->offset = temp_cursor_stack + 5 * var_tamanio_contexto;
 	definir_variable->tamanio = sizeof(t_nombre_variable) + sizeof(t_valor_variable);
-
+	//Se agrega la variable en el diccionario
 	char key = identificador_variable;
 	char keyABuscar[2] = { key, '\0' };
 
@@ -60,18 +61,24 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 
 t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
-//	t_puntero posicion = 0;
-//	char* str = convertirAString(identificador_variable);
-//	if(dictionary_has_key(diccionario,str)) {
-//		t_elemento* elemento = dictionary_get(diccionario,str);
-//		posicion = elemento->pos;
-//	} else {
-//		posicion = -1;
-//	}
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se obtuvo posicion de variable %c",identificador_variable);
-//
-//	return posicion;
+	if (SEG_flag == 1)
+			return 0;
+		//Busca la variable en el diccionario
+		printf("obtenerPosicionVariable\n");
+		char key = identificador_variable;
+		char keyABuscar[2] = { key, '\0' };
+
+		int posicion_variable;
+		//void* posicion=malloc(sizeof(int));
+		int * posicion = dictionary_get(dicc_variables, keyABuscar);
+	//	posicion_variable=(temp_cursor_stack + orden_var*5)-4; // aca sacamos el desplazamiento dentro del stack para el valor de una variable
+
+		posicion_variable = ((*posicion) * 5) - 4;
+
+		if (posicion_variable >= 0)
+			return posicion_variable + temp_cursor_stack;
+		else
+			return -1;
 }
 
 
