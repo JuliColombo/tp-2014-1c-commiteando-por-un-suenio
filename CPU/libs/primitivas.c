@@ -380,62 +380,289 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 
 
 void finalizar() {
-//	t_puntero c_stack_viejo;
-//
-//	if(!esPrimerContexto()) {
-//
-//	recuperarPosicionDeDirecciones();
-//	volverAContextoAnterior(&c_stack_viejo);
-//
-//	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
-//
-//	//*pcb->c_stack = c_stack_viejo;
-//	cursor = c_stack_viejo;
-//
-//	regenerarDiccionario(tamanio);
-//	}
-//
-//	if(esPrimerContexto()) {
-//		termino = DONE;
-//
-//		log_escribir(archLog, "Ejecucion", INFO, "Finalizo ejecucion");
-//
-//	}
+	if (SEG_flag == 1)
+			return;
+		printf("finalizar\n");
+
+		uint32_t prog_counter_ant; //vamos a pedir los 8 bytes que guardamos en el stack para volver al cntxt anterior.
+		uint32_t cursor_contexto_ant;
+		uint32_t cant_vars_ant;
+		//Se checkea el cursor del stack
+		if (temp_cursor_stack == 0) {
+			//Si es 0
+			int cant_var = var_tamanio_contexto;
+			int i = 0;
+			int incremento = 0;
+			while (i < cant_var) {						//aca deberiamos imprimir las variables con sus valores.
+				//Se arma estructura de solicitar bytes para la UMV
+				t_struct_sol_bytes * sol_var = malloc(sizeof(t_struct_sol_bytes));
+
+				sol_var->base = var_seg_stack;
+				sol_var->offset = 0 + incremento;
+				sol_var->tamanio = sizeof(char) + sizeof(int);
+				//Se envia solicitar bytes a la UMV
+				socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, sol_var);
+
+				void * structRecibido;
+				t_tipoEstructura tipoStruct;
+				//Se recibe respuesta de la UMV
+				socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+				//Se valida la respuesta
+				if (tipoStruct != D_STRUCT_RESPUESTA_UMV) {
+					printf("Respuesta en finalziar (por parte de UMV) incorrecta\n");
+					//return 0;
+				}
+				int offset;
+				int* valor_var = malloc(sizeof(int));
+				char* nombre_var = malloc(sizeof(char));
+
+				int tamanio_instruccion;
+				tamanio_instruccion = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+
+				if (tamanio_instruccion == sizeof(int)) {
+					int*respuesta = malloc(sizeof(int));
+					memcpy(respuesta, ((t_struct_respuesta_umv*) structRecibido)->buffer, tamanio_instruccion);
+					int valor1 = *respuesta;
+					if (valor1 < 0) {
+						excepcion_UMV(0);
+						return;
+					}
+
+				}
+
+				memcpy(nombre_var, ((t_struct_respuesta_umv*) structRecibido)->buffer, offset = sizeof(char));
+				memcpy(valor_var, ((t_struct_respuesta_umv*) structRecibido)->buffer + offset, sizeof(int));
+
+				char key = *nombre_var;
+				char keyaImprimir[3] = { key, ':', '\0' };
+				int valoraImprimir = *valor_var;
+
+				imprimirTexto(keyaImprimir);
+				imprimir(valoraImprimir);
+
+				i++;
+				incremento = incremento + (sol_var->tamanio);
+				//Se libera espacio alocado
+				free(((t_struct_respuesta_umv*) structRecibido)->buffer);
+				free(structRecibido);
+				free(sol_var);
+				free(valor_var);
+				free(nombre_var);
+
+			}
+
+			//Enviamos el PCB actualizado
+			t_struct_pcb * PCB_finalizado = malloc(sizeof(t_struct_pcb));
+			PCB_finalizado->pid = temp_id;
+			PCB_finalizado->c_stack = temp_cursor_stack;
+			PCB_finalizado->index_codigo = temp_ind_codigo;
+			PCB_finalizado->index_etiquetas = var_ind_etiquetas;
+			PCB_finalizado->program_counter = 0;
+			PCB_finalizado->codigo = temp_seg_codigo;
+			PCB_finalizado->stack = var_seg_stack;
+			PCB_finalizado->tamanio_contexto = var_tamanio_contexto;
+			PCB_finalizado->tamanio_indice = var_tamanio_etiquetas;
+			//PCB_finalizado->estado_finalizacion = 1; TODO: ver esto!!!
+
+			socket_enviar(sockKernel, D_STRUCT_PCB, PCB_finalizado);
+			free(PCB_finalizado);
+			fin_PCB = 1;
+			log_escribir(archLog, "END: El PCB id: %d ha finalizado su ejecucion",INFO, temp_id);
+		}
+
+		else {
+
+			//prueba fallida de invocacion a retornar, no parece funcionar por q el finalizar tiene 2 punteros a retornar, el retornar tiene 3
+			//int no_return = -1;  // verificar si -1 es un posible valor de retorno en ansisop, de ser posible... buscar otro valor que sirve como filtro
+
+			//retornar(no_return);   // pasando como para metro un null, evito la asignacion del retornar, y como aparte de eso, el retornar haria exactamente lo mismo, evito la repeticion de codigo.
+
+			//Se arma estructura para solicitar bytes en la UMV
+			t_struct_sol_bytes * punts_contx_ant = malloc(sizeof(t_struct_sol_bytes));
+			punts_contx_ant->base = var_seg_stack;
+			//punts_contx_ant->offset=(temp_cursor_stack-8)-var_seg_stack; //restamos el cursor actual - 8(xq es el tamaño de los punteros q guarde en la umv) - el inicio del stack.
+			punts_contx_ant->offset = (temp_cursor_stack - (2 * sizeof(uint32_t)));		//var_tamanio_contexto*5;
+			punts_contx_ant->tamanio = 2 * sizeof(uint32_t);
+			//Se envia la solicitud de bytes a la UMV
+			socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, punts_contx_ant);
+			void * structRecibido;
+			t_tipoEstructura tipoStruct;
+			//Se recibe la respuesta de la UMV
+			socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+			//Se valida la respuesta
+			if (tipoStruct != D_STRUCT_RESPUESTA_UMV) {
+				printf("%d\n", tipoStruct);
+			}
+
+			int tmanio_respuesta, offset;
+
+			tmanio_respuesta = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;		//esto esta al pedo
+
+			memcpy(&cursor_contexto_ant, ((t_struct_respuesta_umv*) structRecibido)->buffer, offset = sizeof(uint32_t));
+			memcpy(&prog_counter_ant, ((t_struct_respuesta_umv*) structRecibido)->buffer + offset, sizeof(uint32_t));
+			free(((t_struct_respuesta_umv*) structRecibido)->buffer);
+			free(structRecibido);
+			dictionary_clean_and_destroy_elements(dicc_variables, free);  // debemos limpiar el diccionario y rellenarlo con las variables del contexto anterior
+
+			cant_vars_ant = ((punts_contx_ant->offset) - cursor_contexto_ant) / 5;
+
+			int i = 0;
+			int incremento = 0;
+			int posicion = 1;
+
+			while (i < cant_vars_ant)  // con esto volvemos a llenar el dicc_variables con las variables del contexto anterior
+			{
+				int valor_var;
+				char nombre_var;
+
+				t_struct_sol_bytes * sol_var_ant = malloc(sizeof(t_struct_sol_bytes));
+				sol_var_ant->base = var_seg_stack;
+				sol_var_ant->offset = cursor_contexto_ant + incremento;
+				sol_var_ant->tamanio = sizeof(char) + sizeof(int);
+				socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, sol_var_ant);
+
+				void * structRecibido2;
+				t_tipoEstructura tipoStruct2;
+
+				socket_recibir(sockUMV, &tipoStruct2, &structRecibido2);
+				if (tipoStruct2 != D_STRUCT_RESPUESTA_UMV) {
+					printf("%d\n", tipoStruct2);
+				}
+				void * bufferAux = ((t_struct_respuesta_umv*) structRecibido2)->buffer;
+				memcpy(&nombre_var, bufferAux, 1);
+				memcpy(&valor_var, bufferAux + 1, 4);  // no es necesario este valor
+
+				char key = nombre_var;
+				char keyABuscar[2] = { key, '\0' };
+
+				int* posicion_variable = malloc(sizeof(int));
+				*posicion_variable = posicion;
+
+				dictionary_put(dicc_variables, keyABuscar, posicion_variable);
+
+				incremento = incremento + (sol_var_ant->tamanio);
+				i++;
+				posicion++;
+				free(sol_var_ant);
+				free(structRecibido2);
+				free(bufferAux);
+				//free(posicion_variable);
+			}
+
+			temp_counter = prog_counter_ant; //aca ya cargamos PCounter del cntxt que guradamos en la UMV.
+			temp_cursor_stack = cursor_contexto_ant; //aca cargo elcursor del cntxt anterior q se guardo en la UMV.
+			var_tamanio_contexto = cant_vars_ant;
+			free(punts_contx_ant);
+
+		}
+
 }
 
 
 void retornar(t_valor_variable retorno) {
 
-//	recuperarPosicionDeDirecciones();
-//
-//	t_puntero direccionRetorno;
-//	recuperarDireccionRetorno(&direccionRetorno);
-//
-//	t_puntero c_stack_viejo;
-//	volverAContextoAnterior(&c_stack_viejo);
-//
-//	int tamanio = calcularTamanioContextoAnterior(c_stack_viejo);
-//
-//	//*pcb->c_stack = c_stack_viejo;
-//	cursor = c_stack_viejo;
-//
-//	regenerarDiccionario(tamanio);
-//
-//	t_puntero posicionAsignacion = direccionRetorno + 1;
-//
-//	t_struct_push* estructura = malloc(sizeof(t_struct_push));
-//	estructura->posicion=posicionAsignacion;
-//	estructura->valor = retorno;
-//	estructura->stack_base = pcb->stack;
-//	socket_enviar(sockUMV, D_STRUCT_PUSH, estructura);
-//	free(estructura);
-//
-//	chequearSiHuboSF();
-//
-//	esConRetorno = 0;
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se retorna el valor %d",retorno);
+	if (SEG_flag == 1)
+			return;
+		printf("retornar\n");
+		uint32_t prog_counter_ant; //vamos a pedir los 12 bytes que guardamos en el stack para volver al cntxt anterior.
+		uint32_t cursor_contexto_ant;
+		uint32_t direccion_retornar;
+		uint32_t cant_vars_ant;
 
+		t_struct_sol_bytes * punts_contx_ant = malloc(sizeof(t_struct_sol_bytes));
+		punts_contx_ant->base = var_seg_stack;
+		punts_contx_ant->offset = (temp_cursor_stack - (3 * sizeof(uint32_t))); //-var_seg_stack;estoy casi seguro que no se le resta la base, porq el cursor de contexto ya es el offset de la base  //restamos el cursor actual - 12(xq es el tamaño de los punteros q guarde en la umv) - el inicio del stack.
+		punts_contx_ant->tamanio = 3 * sizeof(uint32_t);
+
+		socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, punts_contx_ant);
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+
+		socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+		if (tipoStruct != D_STRUCT_RESPUESTA_UMV) {
+			printf("%d\n", tipoStruct);
+		}
+
+		int tamanio_instruccion;
+		tamanio_instruccion = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+
+		if (tamanio_instruccion == sizeof(int)) {
+			int*respuesta = malloc(sizeof(int));
+			memcpy(respuesta, ((t_struct_respuesta_umv*) structRecibido)->buffer, tamanio_instruccion);
+			int valor1 = *respuesta;
+			if (valor1 < 0) {
+				excepcion_UMV(0);
+				return;
+			}
+
+		}
+
+		int tmanio_respuesta, offset;
+		tmanio_respuesta = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer; //esto esta al pedo
+
+		memcpy(&cursor_contexto_ant, ((t_struct_respuesta_umv*) structRecibido)->buffer, offset = sizeof(uint32_t));
+		memcpy(&prog_counter_ant, ((t_struct_respuesta_umv*) structRecibido)->buffer + offset, sizeof(uint32_t));
+		offset += sizeof(uint32_t);
+		memcpy(&direccion_retornar, ((t_struct_respuesta_umv*) structRecibido)->buffer + offset, sizeof(uint32_t));
+		free(((t_struct_respuesta_umv*) structRecibido)->buffer);
+		free(structRecibido);
+		dictionary_clean_and_destroy_elements(dicc_variables, free);  // debemos limpiar el diccionario y rellenarlo con las variables del contexto anterior
+
+		cant_vars_ant = ((punts_contx_ant->offset) - cursor_contexto_ant) / 5;
+
+		int i = 0;
+		int incremento = 0;
+		int posicion = 1;
+
+		while (i < cant_vars_ant) {		// con esto volvemos a llenar el dicc_variables con las variables del contexto anterior
+
+			int valor_var;
+			char nombre_var;
+
+			t_struct_sol_bytes * sol_var_ant = malloc(sizeof(t_struct_sol_bytes));
+			sol_var_ant->base = var_seg_stack;
+			sol_var_ant->offset = cursor_contexto_ant + incremento;
+			sol_var_ant->tamanio = sizeof(char) + sizeof(int);
+			socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, sol_var_ant);
+
+			void * structRecibido2;
+			t_tipoEstructura tipoStruct2;
+
+			socket_recibir(sockUMV, &tipoStruct2, &structRecibido2);
+			if (tipoStruct2 != D_STRUCT_RESPUESTA_UMV) {
+				printf("%d\n", tipoStruct2);
+			}
+			memcpy(&nombre_var, ((t_struct_respuesta_umv*) structRecibido2)->buffer, offset = sizeof(char));
+			memcpy(&valor_var, ((t_struct_respuesta_umv*) structRecibido2)->buffer + offset, sizeof(int));		// no es necesario este valor
+
+			char key = nombre_var;
+			char keyABuscar[2] = { key, '\0' };
+
+			int* posicion_variable = malloc(sizeof(int));
+			*posicion_variable = posicion;
+
+			dictionary_put(dicc_variables, keyABuscar, posicion_variable);
+
+			incremento = incremento + (sol_var_ant->tamanio);
+			i++;
+			posicion++;
+			free(sol_var_ant);
+			free(((t_struct_respuesta_umv*) structRecibido2)->buffer);
+			free(structRecibido2);
+			//free(posicion_variable);
+		}
+
+		temp_counter = prog_counter_ant; //aca  cargamos PCounter del cntxt que guradamos en la UMV.
+		temp_cursor_stack = cursor_contexto_ant; //aca cargo elcursor del cntxt anterior q se guardo en la UMV.
+		//direccion_retornar=retorno; // esto no creo q sea asi, me parece que deberia hacerse una asignacion del valor de "reotorno" en la "direccion_retornar". lO hice mas arriba
+		var_tamanio_contexto = cant_vars_ant; // recuperamos nuestro tamanio de contexto anterior cortesia de la variable cant_vars_ant creada para el recupero del diccionario de variables ;)
+
+		if (retorno != -1) {
+			asignar(direccion_retornar, retorno);		// el if es para reutilizar el reotornar en el finalizar omitiendo la asignacion
+		}
+
+		free(punts_contx_ant);
+		printf("retornar\n");
 }
 
 void imprimir(t_valor_variable valor_mostrar) {
