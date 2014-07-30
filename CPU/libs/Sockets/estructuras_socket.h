@@ -70,7 +70,9 @@ enum{
 	D_STRUCT_ENV_BYTES=30,
 	D_STRUCT_BUFFER=31,
 	D_STRUCT_RESPUESTA_UMV=32,
-	D_STRUCT_OBTENER_VALOR=33
+	D_STRUCT_OBTENER_VALOR=33,
+	D_STRUCT_ASIGNAR_VALOR=34,
+	D_STRUCT_ENTRADA_SALIDA=35
 };
 
 
@@ -316,5 +318,12 @@ typedef struct struct_buffer{
 	void* buffer;
 	uint32_t tamanio;
 }__attribute__ ((__packed__)) t_struct_buffer;
+
+typedef struct struct_int_char{
+	char* string;
+	uint32_t tamano;
+	uint32_t numero;
+}__attribute__((__packed__)) t_struct_int_char;
+
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

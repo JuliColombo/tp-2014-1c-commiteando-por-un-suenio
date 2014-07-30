@@ -205,16 +205,29 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 
 t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor) {
 
-//	//Socket enviando Kernel para que asignNe el "valor" a "variable"
-//	t_struct_asignar_compartida* estructura = malloc(sizeof(t_struct_asignar_compartida));
-//	estructura->nombre = variable;
-//	estructura->valor = valor;
-//	socket_enviar(sockKernel, D_STRUCT_ASIGNARCOMPARTIDA, estructura);
-//	free(estructura);
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se asigno valor %d a variable compartida %s",valor, variable);
-//
-//	return valor;
+	if (SEG_flag == 1)
+			return 0;
+		char** partes = string_split(variable, "\n");
+		variable = partes[0];
+		//Arma estructura para solicitar asignar valor al kernel
+		t_struct_int_char * asignarValor = malloc(sizeof(t_struct_int_char));
+		asignarValor->numero = valor;
+		asignarValor->string = variable;
+		asignarValor->tamano = strlen(variable) + 1;
+		//Envia solicitud de asignar valor al kernel
+		socket_enviar(sockKernel, D_STRUCT_ASIGNAR_VALOR, asignarValor);
+
+		void* structRecibido;
+		t_tipoEstructura tipoRecibido;
+		socket_recibir(sockKernel, &tipoRecibido, &structRecibido); // recibo el valor
+		//Recibe respuesta del kernel
+		printf("asignarValorCompartida\n");
+		//Se libera el espacio alocado
+		free(asignarValor);
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
+		return valor;
 }
 
 void irAlLabel(t_nombre_etiqueta etiqueta) {

@@ -43,6 +43,7 @@ t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_buffer(t_struct_buffer * estructuraOrigen);
 t_stream * paquetizarStruct_obtener_valor(t_struct_string * estructuraOrigen);
+t_stream * paquetizarStruct_asignar_valor(t_struct_int_char * estructuraOrigen);
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
@@ -77,7 +78,7 @@ t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,ui
 t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length);
 t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length);
 t_struct_buffer * despaquetizarStruct_buffer(char * dataPaquete,uint16_t length);
-
+t_struct_int_char * despaquetizarStruct_int_char(char * dataPaquete, uint16_t length);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR
 t_header despaquetizarHeader(char * header);
