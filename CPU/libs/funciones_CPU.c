@@ -69,7 +69,6 @@ void core_conexion_kernel(void){
 	t_struct_pcb_io* pcb_actualizada;
 	while(1){
 			j=socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
-			if(j==1){
 				//habria que hacer el free de este pcb cuando se lo mando al kernel
 				pcb_recibida = ((t_struct_pcb*)structRecibida);
 				t_pcb* pcb = malloc(sizeof(t_pcb));
@@ -130,17 +129,13 @@ void core_conexion_kernel(void){
 
 
 */
-
-
-
 	}
-	//CODEO ACA
+
 
 	if(socket_cerrarConexion(sockKernel)==-1){
 		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar al Kernel");
 	}
 	return;
-}
 }
 
 /******************************** CONEXION UMV ***************************************************/

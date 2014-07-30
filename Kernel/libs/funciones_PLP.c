@@ -200,7 +200,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		paquete->base=nuevoPCB->index_etiquetas;
 		paquete->tamanio=tamanioIndiceEtiquetas;
 		paquete->segmento=metadata_programa->etiquetas;
-		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+		//socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 		free(paquete);
 
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
