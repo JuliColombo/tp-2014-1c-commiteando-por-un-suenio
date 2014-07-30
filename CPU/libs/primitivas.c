@@ -713,12 +713,11 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 		dispositivo = partes[0];
 		free(partes);
 
-		t_struct_int_char * IO = malloc(sizeof(t_struct_int_char));
-		IO->numero = tiempo;
-		IO->string = dispositivo;
-		IO->tamano = strlen(dispositivo) + 1;
+		t_struct_pcb_io * IO = malloc(sizeof(t_struct_pcb_io));
+		IO->tiempo= tiempo;
+		IO->dispositivo = dispositivo;
 
-		socket_enviar(sockKernel, D_STRUCT_ENTRADA_SALIDA, IO);
+		socket_enviar(sockKernel, D_STRUCT_PCBIO, IO);
 		free(IO);
 
 		fin_quantum = quantum - 1;
@@ -737,8 +736,8 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 		char** partes = string_split(identificador_semaforo, "\n");
 		identificador_semaforo = partes[0];
 
-		t_struct_string * sem_wait = malloc(sizeof(t_struct_string));
-		sem_wait->string = strdup(identificador_semaforo);
+		t_struct_semaforo * sem_wait = malloc(sizeof(t_struct_string));
+		sem_wait->nombre_semaforo = strdup(identificador_semaforo);
 		socket_enviar(sockKernel, D_STRUCT_WAIT, sem_wait); //FIXME: No estoy seguro de si esa struct iria bien
 		free(sem_wait);
 		//Esperamos la respuesta del kernel
@@ -762,13 +761,10 @@ void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 	if (SEG_flag == 1)
 			return;
 		printf("signal\n");
-		t_struct_string * sem_signal = malloc(sizeof(t_struct_string));
-		char** partes = string_split(identificador_semaforo, "\n");
-		identificador_semaforo = partes[0];
-		free(partes);
+		t_struct_semaforo * sem_signal = malloc(sizeof(t_struct_string));
 
-		sem_signal->string = identificador_semaforo;
-		socket_enviar(sockKernel, D_STRUCT_SIGNAL, sem_signal);
+		sem_signal->nombre_semaforo = identificador_semaforo;
+		socket_enviar(sockKernel, D_STRUCT_SIGNALSEMAFORO, sem_signal);
 		free(sem_signal);
 		//Esperamos la respuesta del kernel
 		void * structRecibido;
