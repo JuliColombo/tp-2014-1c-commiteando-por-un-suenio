@@ -1026,7 +1026,7 @@ void atender_cpu(sock_struct* sock){
 			case D_STRUCT_SOL_BYTES:
 				solicitud = (t_struct_sol_bytes*) structRecibida;
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d");
+				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
 				pthread_mutex_unlock(mutex_log);
 				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
 				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
@@ -1034,7 +1034,7 @@ void atender_cpu(sock_struct* sock){
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d");
+				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
 				pthread_mutex_unlock(mutex_log);
 
 				int resultado = enviarBytes(escritura->base,escritura->offset,escritura->tamanio,escritura->buffer);
@@ -1042,7 +1042,7 @@ void atender_cpu(sock_struct* sock){
 				respuesta->numero = resultado;
 				socket_enviar(sock->fd, D_STRUCT_NUMERO, &respuesta);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Resultado",INFO,"Envio de bytes es: %d");
+				log_escribir(archLog, "Resultado",INFO,"Envio de bytes es: %d",resultado);
 				pthread_mutex_unlock(mutex_log);
 				free(respuesta);
 				break;
