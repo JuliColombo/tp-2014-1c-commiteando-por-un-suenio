@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include "parserCPU.h"
 #include "estructuras.h"
+#include <semaphore.h>
 
 typedef struct{
 	char* ip_kernel;
@@ -26,11 +27,11 @@ extern config_cpu configuracion_CPU;
 extern char* PATH;
 extern int termino;
 //extern t_struct_pcb* pcb;
-extern t_quantum quantum;
 extern t_retardo_quantum retardo;
 extern int sockKernel;
 extern int sockUMV;
 extern char* indiceEtiquetas;
+extern sem_t* sem_kernel;
 
 /*************  PROTOTIPO FUNCIONES  *************/
 
@@ -39,6 +40,7 @@ void leerConfiguracion();
 void imprimirConfiguracion(void);
 void log_error_socket(void);
 void core_conexion_kernel(void);
+void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto);
 void core_conexion_umv(void);
 
 

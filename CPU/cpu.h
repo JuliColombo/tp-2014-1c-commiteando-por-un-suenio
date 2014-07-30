@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "libs/primitivas.h"
 #include "libs/primitivasAux.h"
+#include <semaphore.h>
 #include "libs/funciones_CPU.h"
 
 #endif /* CPU_H_ */

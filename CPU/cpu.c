@@ -16,8 +16,10 @@ t_quantum quantum;
 t_retardo_quantum retardo;
 t_pcb* pcb;
 t_config* config;
+sem_t* sem_kernel;
 
 int main (int argc, char **argv){
+	sem_init(&sem_kernel,0,0);
 	PATH=argv[1];
 	inicializarConfiguracion();
 	log_setPrintMode(archLog, M_CONSOLEANDFILE);
@@ -25,6 +27,9 @@ int main (int argc, char **argv){
 
 	pthread_create(&conexion_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
+
+
+
 
 
 	pthread_join(conexion_umv, NULL);

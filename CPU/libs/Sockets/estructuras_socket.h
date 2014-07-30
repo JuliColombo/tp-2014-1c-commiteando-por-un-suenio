@@ -66,6 +66,8 @@ enum{
 	D_STRUCT_SF=23,
 	D_STRUCT_PCBSEM = 24,
 	D_STRUCT_SEGCODIGO = 25,
+	D_STRUCT_SOL_BYTES=29,
+	D_STRUCT_RESPUESTA_UMV=30,
 };
 
 
@@ -270,6 +272,12 @@ typedef struct struct_semaforo{
 	t_nombre_semaforo nombre_semaforo;
 }__attribute__ ((__packed__)) t_struct_semaforo;
 
+typedef struct struct_sol_bytes{
+	uint32_t base;
+	uint32_t offset;
+	uint32_t tamanio;
+}__attribute__ ((__packed__)) t_struct_sol_bytes;
+
 /* Estructura tipo STRUCT_IO
  *
  */
@@ -279,5 +287,10 @@ typedef struct struct_io{
 	t_nombre_dispositivo dispositivo;
 	int32_t tiempo;
 }__attribute__ ((__packed__)) t_struct_io;
+
+typedef struct struct_respuesta_UMV{
+	void* buffer;
+	uint32_t tamano_buffer;
+}__attribute__((__packed__)) t_struct_respuesta_umv;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

@@ -84,6 +84,10 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 				break;
 			case D_STRUCT_INSTRUCCION:
 				paquete = paquetizarStruct_instruccion((t_struct_instruccion*) estructuraOrigen);
+				break;
+			case D_STRUCT_SOL_BYTES:
+				paquete = paquetizarStruct_sol_bytes((t_struct_sol_bytes *) estructuraOrigen);
+				break;
 		}
 
 
@@ -665,6 +669,34 @@ t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_sol_bytes
+ * Argumentos:
+ *
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen){
+
+	  t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+		paquete->length = sizeof(t_header) + sizeof(t_struct_sol_bytes);
+
+		char * dataNueva; //creo el data
+		dataNueva = crearDataConHeader(D_STRUCT_SOL_BYTES, paquete->length);
+
+		memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_sol_bytes));		//copio a data el numero.
+
+		paquete->data = dataNueva;
+
+		return paquete;
+
+}
+
+/*
  * Nombre: crearDataConHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -785,6 +817,10 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_SEGCODIGO:
 				estructuraDestino = despaquetizarStruct_segCodigo(dataPaquete, length);
+				break;
+			case D_STRUCT_RESPUESTA_UMV:
+				estructuraDestino = despaquetizarStruct_respuesta_umv(dataPaquete, length);
+				break;
 		}
 
 	return estructuraDestino;
@@ -1228,6 +1264,29 @@ t_struct_seg_codigo * despaquetizarStruct_segCodigo(char * dataPaquete, uint16_t
 
 	return estructuraDestino;
 }
+/*
+ * Nombre: despaquetizarStruct_respuesta_umv/2
+ * Argumentos:
+ * 		-
+ *
+ * Devuelve:
+ *
+ *
+ * Funcion:
+ */
+
+t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,uint16_t length){
+	void * buffer = malloc(length - sizeof(t_struct_respuesta_umv));
+	t_struct_respuesta_umv * estructuraDestino = malloc(sizeof(t_struct_respuesta_umv));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_respuesta_umv)); //copio el data del paquete a la estructura.
+	memcpy(buffer, dataPaquete + sizeof(t_struct_respuesta_umv), length - sizeof(t_struct_respuesta_umv)); // copiamos los bytes que queriamos enviar
+
+	estructuraDestino->buffer = buffer;
+
+	return estructuraDestino;
+}
+
 
 /*
  * Nombre: despaquetizarHeader/1

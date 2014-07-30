@@ -83,11 +83,11 @@ void seg_fault(int signum){
 }
 
 void continuarHastaQuantum() {
-	for (i; i <= quantum; i++) {
+	/*for (i; i <= quantum; i++) {
 		termino = CONTINUES;
 		parsear(pcb);
 		esperar_retardo(retardo);
-	}
+	}*/
 }
 
 void hot_plug(int signum) {
@@ -275,7 +275,7 @@ void correrParser(t_pcb* pcb_llego) {
 	pcb = malloc(sizeof(t_pcb));
 	pcb = pcb_llego;
 
-	for(i=0;i<=quantum;i++){
+	/*for(i=0;i<=quantum;i++){
 
 		parsear();
 
@@ -294,6 +294,6 @@ void correrParser(t_pcb* pcb_llego) {
 			break;
 		}
 
-	}
+	}*/
 	free(pcb_llego);
 }
