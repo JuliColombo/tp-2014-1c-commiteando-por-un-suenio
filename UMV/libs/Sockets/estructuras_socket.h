@@ -69,6 +69,9 @@ enum{
 	D_STRUCT_DESTRUIRSEGMENTOS=26,
 	D_STRUCT_ESCRIBIRSEGMENTO=27,
 	D_STRUCT_BASES=28,
+	D_STRUCT_SOL_BYTES=29,
+	D_STRUCT_ENV_BYTES=30,
+	D_STRUCT_BUFFER
 };
 
 
@@ -207,7 +210,7 @@ typedef struct struct_pidycodigo{
  */
 
 typedef uint32_t t_posicion;
-typedef int32_t t_valor;
+typedef uint32_t t_valor;
 
 typedef struct struct_push{
 	t_posicion posicion;
@@ -303,5 +306,35 @@ typedef struct struct_bases{
 	uint32_t indice_codigo;
 	uint32_t indice_etiquetas;
 }__attribute__ ((packed)) t_struct_bases;
+
+/* Estructura tipo STRUCT_SOL_BYTES
+ *
+ */
+
+typedef struct struct_sol_bytes{
+	uint32_t base;
+	uint32_t offset;
+	uint32_t tamanio;
+}__attribute__ ((__packed__)) t_struct_sol_bytes;
+
+/* Estructura tipo STRUCT_ENV_BYTES
+ *
+ */
+
+typedef struct struct_env_bytes{
+	uint32_t base;
+	uint32_t offset;
+	uint32_t tamanio;
+	void* buffer;
+}__attribute__ ((__packed__)) t_struct_env_bytes;
+
+/* Estructura tipo STRUCT_BUFFER
+ *
+ */
+
+typedef struct struct_buffer{
+	void* buffer;
+	uint32_t tamanio;
+}__attribute__ ((__packed__)) t_struct_buffer;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */
