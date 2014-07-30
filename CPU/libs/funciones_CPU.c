@@ -85,7 +85,6 @@ int sig_flag;
 int umv_flag;
 
 void core_conexion_kernel(void){
-	//int sock;
 	if((sockKernel=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
 		log_error_socket();
 		//abort();

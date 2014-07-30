@@ -16,10 +16,12 @@ t_quantum quantum;
 t_retardo_quantum retardo;
 t_pcb* pcb;
 t_config* config;
-sem_t* sem_kernel;
+sem_t sem_kernel;
 
 int main (int argc, char **argv){
-	sem_init(&sem_kernel,1,0);
+	if((sem_init(&sem_kernel,1,0))==-1){
+		perror("No se puede crear el semaforo");
+	}
 	PATH=argv[1];
 	inicializarConfiguracion();
 	log_setPrintMode(archLog, M_CONSOLEANDFILE);

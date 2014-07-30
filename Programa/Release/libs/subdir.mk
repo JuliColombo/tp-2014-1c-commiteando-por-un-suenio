@@ -5,18 +5,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../libs/funcionesInterprete.c \
-../libs/log.c \
-../libs/primitivas.c 
+../libs/log.c 
 
 OBJS += \
 ./libs/funcionesInterprete.o \
-./libs/log.o \
-./libs/primitivas.o 
+./libs/log.o 
 
 C_DEPS += \
 ./libs/funcionesInterprete.d \
-./libs/log.d \
-./libs/primitivas.d 
+./libs/log.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

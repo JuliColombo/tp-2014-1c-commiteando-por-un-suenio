@@ -20,16 +20,15 @@ void leerScript(off_t* fileSize,char* path) {
 		*fileSize = 0;
 
 	}else{
+		long f_size;
 		int c;
-		*fileSize = file_info.st_size;
 		FILE* script = fopen(path, "r");
-		codigo_ansisop = (char*)malloc(*fileSize);
-	    int i=0;
-		while ((c = getc(script)) != EOF){
-			codigo_ansisop[i]=(char)c;
-			i++;
-		}
-		fclose(script);
+		fseek(script, 0L, SEEK_END);
+		f_size = ftell(script);
+		fseek(script, 0L, SEEK_SET);
+		codigo_ansisop = malloc(sizeof(char)*f_size);
+		fread(codigo_ansisop,1,f_size,script);
+	    fclose(script);
 
 
 	}

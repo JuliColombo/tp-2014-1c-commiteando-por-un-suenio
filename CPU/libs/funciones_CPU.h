@@ -20,7 +20,7 @@ typedef struct{
 	int puerto_kernel;
 	char* ip_umv;
 	int puerto_umv;
-	int retardo
+	int retardo;
 }config_cpu;
 
 t_dictionary* dicc_variables;
@@ -38,7 +38,7 @@ extern t_retardo_quantum retardo;
 extern int sockKernel;
 extern int sockUMV;
 extern char* indiceEtiquetas;
-extern sem_t* sem_kernel;
+extern sem_t sem_kernel;
 
 /*************  PROTOTIPO FUNCIONES  *************/
 

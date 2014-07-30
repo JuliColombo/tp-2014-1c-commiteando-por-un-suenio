@@ -26,6 +26,7 @@ int main (int argc, char **argv){
 			return EXIT_FAILURE;
 	}
 
+	printf("%s", codigo_ansisop);
 //	int i;
 //	if((i=validarScript())==0){
 //		log_escribir(archLog, "Programa",INFO,"La script es de tipo ANSISOP");
