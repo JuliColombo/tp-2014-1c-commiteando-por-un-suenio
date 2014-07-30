@@ -668,59 +668,62 @@ void retornar(t_valor_variable retorno) {
 void imprimir(t_valor_variable valor_mostrar) {
 	//Envía valor_mostrar al Kernnel, para que termine siendo mostrado en la consola del Programa en ejecución.
 
-//	//DESPUES SE HACE FREE DE ESTO?
-//	char* valor_variable = string_itoa(valor_mostrar);
-//
-//	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
-//	estructura->mensaje = valor_variable;
-//	estructura->pid = pcb->pid;
-//	socket_enviar(sockKernel,D_STRUCT_NOMBREMENSAJE,estructura);
-//	free(estructura);
-//
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %d para imprimirlo por pantalla",valor_mostrar);
-
+	if (SEG_flag == 1)
+			return;
+		void*estructuraRecibida;
+		t_tipoEstructura tipoRecibido;
+		//Se envia numero a imprimir en kernel
+		t_struct_numero * valor = malloc(sizeof(t_struct_numero));
+		valor->numero = valor_mostrar;
+		socket_enviar(sockKernel, D_STRUCT_IMPRIMIR, valor); // aca esta enviando un 1 al kernel, eso se debe a posicion_memoria+1que mi CPU solo recibe una instruccion por ahora.
+		socket_recibir(sockKernel, &tipoRecibido, &estructuraRecibida);
+		printf("imprimir\n");
+		//Se libera espacio alocado
+		free(valor);
+		free(estructuraRecibida);
 }
 
 void imprimirTexto(char* texto) {
 	//Envía mensaje al Kernel, para que termine siendo mostrado en la consola del Programa en ejecución. mensaje no posee parámetros, secuencias de escape, variables ni nada.
-//
-//	t_struct_nombreMensaje* estructura = malloc(sizeof(t_struct_nombreMensaje));
-//	estructura->mensaje = texto;
-//	estructura->pid = pcb->pid;
-//	socket_enviar(sockKernel,D_STRUCT_NOMBREMENSAJE,estructura);
-//	free(estructura);
-//
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se envia a kernel %s para imprimirlo por pantalla",texto);
-
+	if (SEG_flag == 1)
+			return;
+		void*estructuraRecibida;
+		t_tipoEstructura tipoRecibido;
+		char** partes = string_split(texto, "\n");
+		texto = partes[0];
+		//Se envia texto a imprimir al kernel
+		t_struct_string * cadena = malloc(sizeof(t_struct_string));
+		cadena->string = texto;
+		socket_enviar(sockKernel, D_STRUCT_STRING, cadena); //aca le manda al Kernel la cadena texto pero con algunos bytes mas.
+		socket_recibir(sockKernel, &tipoRecibido, &estructuraRecibida);
+		printf("imprimirTexto\n");
+		//Se libera espacio alocado
+		free(estructuraRecibida);
+		free(cadena);
+		free(partes[0]);
+		free(partes[1]);
+		free(partes);
 }
 
 void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
-//
-//	termino = IO;
-//
-//	t_struct_pcb_io* pcb_actualizada=malloc(sizeof(t_struct_pcb_io));
-//
-//	pcb_actualizada->c_stack=pcb->c_stack;
-//	pcb_actualizada->codigo=pcb->codigo;
-//	pcb_actualizada->index_codigo=pcb->index_codigo;
-//	pcb_actualizada->index_etiquetas=pcb->index_etiquetas;
-//	pcb_actualizada->pid=pcb->pid;
-//	pcb_actualizada->program_counter=pcb->program_counter;
-//	pcb_actualizada->stack=pcb->stack;
-//	pcb_actualizada->tamanio_contexto=pcb->tamanio_contexto;
-//	pcb_actualizada->tamanio_indice=pcb->tamanio_indice;
-//	pcb_actualizada->tiempo = tiempo;
-//	pcb_actualizada->dispositivo = dispositivo;
-//
-//	socket_enviar(sockKernel,D_STRUCT_PCBIO,pcb_actualizada);
-//
-//	free(pcb_actualizada);
-//	free(pcb);
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se conecto %s por %d tiempo",dispositivo,tiempo);
 
+	if (SEG_flag == 1)
+			return;
+		char** partes = string_split(dispositivo, "\n");
+		dispositivo = partes[0];
+		free(partes);
+
+		t_struct_int_char * IO = malloc(sizeof(t_struct_int_char));
+		IO->numero = tiempo;
+		IO->string = dispositivo;
+		IO->tamano = strlen(dispositivo) + 1;
+
+		socket_enviar(sockKernel, D_STRUCT_ENTRADA_SALIDA, IO);
+		free(IO);
+
+		fin_quantum = quantum - 1;
+
+		printf("entradaSalida\n");
 }
 
 /****************************** OPERACIONES DE KERNEL ************************************************/

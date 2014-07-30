@@ -44,6 +44,7 @@ t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_buffer(t_struct_buffer * estructuraOrigen);
 t_stream * paquetizarStruct_obtener_valor(t_struct_string * estructuraOrigen);
 t_stream * paquetizarStruct_asignar_valor(t_struct_int_char * estructuraOrigen);
+t_stream * paquetizarStruct_imprimir(t_struct_numero * estructuraOrigen);
 
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
