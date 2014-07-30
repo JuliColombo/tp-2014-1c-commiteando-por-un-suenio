@@ -83,30 +83,53 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 
 t_valor_variable dereferenciar(t_puntero direccion_variable) {
+	if (SEG_flag == 1)
+			return 0;
+		int valor;
+		t_struct_sol_bytes * desreferenciar = malloc(sizeof(t_struct_sol_bytes));
+		//Arma la estructura para la solicitud de bytes
+		desreferenciar->base = var_seg_stack;
+		desreferenciar->offset = direccion_variable;
+		desreferenciar->tamanio = sizeof(int);
 
-//	t_struct_pop* estructura = malloc(sizeof(t_struct_pop));
-//	estructura->posicion=direccion_variable +1;
-//	estructura->stack_base = pcb->stack;
-//	estructura->tamanio = sizeof(t_valor_variable);
-//	socket_enviar(sockUMV, D_STRUCT_POP, estructura);
-//	free(estructura);
-//
-//	chequearSiHuboSF();
-//
-//	t_valor_variable valor_variable;
-//
-//	t_tipoEstructura tipoRecibido;
-//	void* structRecibida;
-//	int j=socket_recibir(sockUMV,&tipoRecibido,&structRecibida);
-//	if(j==1){
-//		t_struct_numero* k = ((t_struct_numero*)structRecibida);
-//		valor_variable= k->numero;
-//		free(k);
-//	}
-//
-//	log_escribir(archLog, "Ejecucion", INFO, "Se desreferencio la direccion de variable %d",direccion_variable);
-//
-//	return valor_variable;
+		socket_enviar(sockUMV, D_STRUCT_SOL_BYTES, desreferenciar);
+
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+
+		socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+		//Valida la respuesta de la umv
+		if (tipoStruct != D_STRUCT_RESPUESTA_UMV) {
+			printf("Respuesta en dereferenciar incorrecta\n");
+			return 0;
+		}
+
+		int temp_tamanio;
+		void * temp_buffer;
+		//Arma una estructura temporal con lo recibido de la umv
+		temp_buffer = ((t_struct_respuesta_umv*) structRecibido)->buffer;
+		temp_tamanio = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+
+		memcpy(&valor, temp_buffer, temp_tamanio);
+		int tamanio_instruccion;
+		tamanio_instruccion = ((t_struct_respuesta_umv*) structRecibido)->tamano_buffer;
+
+		if (tamanio_instruccion == sizeof(int)) {
+			int*respuesta = malloc(sizeof(int));
+			memcpy(respuesta, ((t_struct_respuesta_umv*) structRecibido)->buffer, tamanio_instruccion);
+			int valor1 = *respuesta;
+			if (valor1 < 0) {
+				excepcion_UMV(0);
+				return 0;
+			}
+
+		}
+		printf("dereferenciar\n");
+		free(desreferenciar);
+		free(temp_buffer);
+		free(structRecibido);
+		return valor;
+
 }
 
 
