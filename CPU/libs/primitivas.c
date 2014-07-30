@@ -337,16 +337,45 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 
 void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
-//
-//	reservarContextoConRetorno(donde_retornar);
-//
-//	int posicionAPushear = top_index +1;
-//	//*pcb->c_stack = posicionAPushear;
-//	cursor = posicionAPushear;
-//
-//	irAlLabel(etiqueta);
-//
-//	pcb->tamanio_contexto = 0;
+	if (SEG_flag == 1)
+			return;
+		char** partes = string_split(etiqueta, "\n");
+		etiqueta = partes[0];
+		free(partes);
+		//Se arma estructura para solicitar envio de bytes a la UMV
+		t_struct_env_bytes * send_punteros = malloc(sizeof(t_struct_env_bytes));
+		send_punteros->base = var_seg_stack;
+		send_punteros->offset = temp_cursor_stack + var_tamanio_contexto * 5;
+		send_punteros->tamanio = 3 * sizeof(int);
+		void* temp_buffer = malloc(3 * sizeof(int));
+		int offset;
+		//temp_counter=temp_counter+1;
+		memcpy(temp_buffer, &temp_cursor_stack, offset = sizeof(int));
+		memcpy(temp_buffer + offset, &temp_counter, sizeof(int));
+		memcpy(temp_buffer + 2 * offset, &donde_retornar, sizeof(int));
+		send_punteros->buffer = temp_buffer;
+		//Se envia solicitud de envio de bytes a la UMV
+		socket_enviar(sockUMV, D_STRUCT_ENV_BYTES, send_punteros);
+
+		void * structRecibido;
+		t_tipoEstructura tipoStruct;
+		//Se recibe respuesta de la UMV
+		socket_recibir(sockUMV, &tipoStruct, &structRecibido);
+		//Se valida la respuesta
+		if (tipoStruct != D_STRUCT_NUMERO) {
+			printf("Respuesta en desreferenciar incorrecta\n");
+			//return 0;
+		}
+		int recepcion = ((t_struct_numero*) structRecibido)->numero;
+		excepcion_UMV(recepcion);
+		temp_cursor_stack = temp_cursor_stack + (var_tamanio_contexto * 5) + 3 * sizeof(int);
+		irAlLabel(etiqueta);
+		dictionary_clean_and_destroy_elements(dicc_variables, free);
+		var_tamanio_contexto = 0;
+		printf("llamarConRetorno\n");
+		//Se libera espacio alocado
+		free(send_punteros);
+		free(temp_buffer);
 }
 
 
