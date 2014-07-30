@@ -89,7 +89,6 @@ t_buffer solicitarBytes(int base,int offset, int longitud){
 	pthread_mutex_unlock(mutex_MP);
 	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
-	sleep(retardo);
 	return buffer;
 	} else {
 		pthread_mutex_unlock(mutex_MP);
@@ -126,7 +125,6 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			if(aux==-1){
 							printf("La direccion base es erronea\n");
 							escribir_log(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
-							sleep(retardo);
 							return -1;
 						}
 			j=traducirPosicion(base)+offset;
@@ -140,7 +138,6 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			} else {
 				pthread_mutex_unlock(mutex_MP);
 				printf("Seg fault\n");
-				sleep(retardo);
 				return -1;
 			}
 }
@@ -209,11 +206,13 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
 	}
 	pthread_mutex_unlock(mutex_MP);
-	sleep(retardo);
 }
 
+/*************************Retardo*************************/
 
-
+void retardoFunc(int retardo_nuevo){
+	retardo=retardo_nuevo;
+}
 
 
 
@@ -238,7 +237,6 @@ void compactar(){
 			pthread_mutex_unlock(mutex_MP);
 			printf("Compactacion finalizada\n");
 			escribir_log(archLog, "Se termina de realizar la compactacion", INFO, "");
-			sleep(retardo);
 			return;
 		}
 		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
@@ -355,8 +353,8 @@ void dump(){
 
 	pthread_mutex_lock(mutex_MP);
 
-	archivo_MP = fopen("/home/utnso/dump_file_MP", "w");
-	archivo_TS = fopen("/home/utnso/dump_file_TS", "w");
+	archivo_MP = fopen("/home/utnso/dump_file_MP", "a");
+	archivo_TS = fopen("/home/utnso/dump_file_TS", "a");
 	if (archivo_MP==NULL) {
 		fputs ("File error",stderr); exit (1);
 	}
@@ -402,7 +400,6 @@ void dump(){
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 	fclose(archivo_MP);
 	fclose(archivo_TS);
-	sleep(retardo); //O dejarlo hasta que apreten algo
 }
 
 void imprimirEstadoMP(FILE* archivo){
@@ -504,16 +501,17 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 				printf("El tamanio es: %d\n",tamanio);
 				ubicacion=TAMANIO_NULO;
 				printf("Devuelve: %d\n",ubicacion);
+				return ubicacion;
 	} else {
 	//Escoge la ubicacion en base al algoritmo de config
 	pthread_mutex_lock(mutex_MP);
 	if(configuracion_UMV.algoritmo == firstfit){
+		escribir_log(archLog,"Se selecciona ubicacion",INFO,"El algoritmo de seleccion es firstfit");
 		ubicacion = escogerUbicacionF(tamanio);
 	} else{
 		if(configuracion_UMV.algoritmo == worstfit){
-			printf("Va a elegir por Worst");
+			escribir_log(archLog,"Se selecciona ubicacion",INFO,"El algoritmo de seleccion es firstfit");
 			ubicacion = escogerUbicacionW(tamanio);
-			printf("La ubicacion es: %d", ubicacion);
 		}
 	}
 	if(ubicacion==-1){
@@ -533,7 +531,6 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	if(ubicacion==-1){
 			pthread_mutex_unlock(mutex_MP);
 			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
-			sleep(retardo);
 			return -1;
 		}
 	reservarEspacioMP(ubicacion, tamanio);
@@ -556,7 +553,6 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
 	pthread_mutex_unlock(mutex_MP);
 	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
-	sleep(retardo);
 	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
 	}
 }
@@ -715,7 +711,6 @@ void destruirSegmentos(int id_prog){
 	pthread_mutex_unlock(mutex_log);
 	pthread_mutex_unlock(mutex_MP);
 	printf("Segmentos del programa %d destruidos con exito",id_prog);
-	sleep(retardo);
 	return;
 }
 
@@ -1059,6 +1054,7 @@ void atender_kernel(sock_struct* sock){
 
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
 	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
+	escribir_log(archLog,"Se recibe el tamanio del stack: %d",INFO,tamanioMaxStack);
 	free(structRecibida);
 
 
@@ -1070,7 +1066,9 @@ void atender_kernel(sock_struct* sock){
 			case D_STRUCT_NUMERO:
 				pid = ((t_struct_numero*)structRecibida);
 				id_prog = pid->numero;
+				escribir_log(archLog,"Se recibe un ID de programa: %d",INFO,id_prog);
 				pthread_mutex_lock(mutex_pid);
+				sleep(retardo);
 				cambioProcesoActivo(id_prog);
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d",procesoActivo);
@@ -1081,9 +1079,10 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_SOLICITARMEMORIA:
 				tamanio = ((t_struct_memoria*)structRecibida);
-
+				escribir_log(archLog,"Se reciben tamanios de segmentos",INFO,"");
 				pthread_mutex_lock(mutex_pid);
 				//t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+				sleep(retardo);
 				base_stack = crearSegmentoPrograma(procesoActivo, tamanioMaxStack);
 				base_codigo = crearSegmentoPrograma(procesoActivo, tamanio->tamanioScript);
 				base_index_code = crearSegmentoPrograma(procesoActivo, tamanio->tamanioIndiceCodigo);
@@ -1097,7 +1096,7 @@ void atender_kernel(sock_struct* sock){
 					respuesta->codigo=base_codigo;
 					respuesta->indice_codigo=base_index_code;
 					respuesta->indice_etiquetas=base_index_etiq;
-
+					escribir_log(archLog,"Se envian bases de segmentos",INFO,"");
 					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					free(respuesta);
 
@@ -1116,8 +1115,10 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				pid = ((t_struct_numero*)structRecibida);
+				escribir_log(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid);
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(pid->numero);
+				sleep(retardo);
 				destruirSegmentos(procesoActivo);
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Destruir Segmentos", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d", procesoActivo);
@@ -1128,6 +1129,7 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_ESCRIBIRSEGMENTO:
 				struct_seg = ((t_struct_segmento*) structRecibida);
+				sleep(retardo);
 				if(struct_seg->tamanio==0){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
 				} else {
@@ -1138,11 +1140,6 @@ void atender_kernel(sock_struct* sock){
 		}
 
 
-		/*if(i==-1){
-		escribir_log(archLog, "Segmentation Fault", ERROR, "Se sobrepasan los limites del segmento");
-		respuesta->numero=1;
-		socket_enviar(sock->fd, D_STRUCT_SF, respuesta);
-		}*/ //TODO de esto no estoy seguro de sacarlo o dejarlo. me parece que no va porque cuando te mando el codigo no deberia dar SF (fede)
 
 
 		//No envio nada al segmento de stack, porque al inicio estaría vacio
