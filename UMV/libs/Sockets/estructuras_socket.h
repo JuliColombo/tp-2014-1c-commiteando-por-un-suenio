@@ -294,7 +294,7 @@ typedef struct t_struct_memoria{
 typedef struct struct_segmento{
 	uint32_t base;
 	uint32_t tamanio;
-	char* segmento;
+	void* segmento;
 }__attribute__ ((__packed__)) t_struct_segmento;
 
 typedef struct struct_bases{
