@@ -97,7 +97,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.var_globales.valor = vector_num(NULL, configuracion_kernel.var_globales.identificador);
 	pthread_mutex_unlock(mutex_var_compartidas);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
-
+	escribir_log(archLog, "Archivo de configuracion", INFO, "Se carga correctamente la configuracion");
 	free(config);
 }
 

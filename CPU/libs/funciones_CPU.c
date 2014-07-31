@@ -211,7 +211,7 @@ void core_conexion_kernel(void){
 				temp_counter++;
 				fin_quantum++;
 
-				signal(SIGUSR1, llegoSeñalParaTerminar);
+				signal(SIGUSR1, llegoSenialParaTerminar);
 
 				if (sig_flag == 1 && (quantum - fin_quantum == 0)) {
 
@@ -302,7 +302,7 @@ void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto) {
 }
 
 
-void llegoSeñalParaTerminar(int n) {
+void llegoSenialParaTerminar(int n) {
 	switch (n) {
 	case SIGUSR1:
 
@@ -318,7 +318,7 @@ void excepcion_UMV(int i) {
 
 	if (i == 0) {
 		log_escribir(archLog, "Segmentation fault PCB", INFO, "Hubo SF en el pid:%d", temp_id);
-
+		printf("Segmentation fault\n");
 
 		t_struct_pcb * PCB_Segmentation = malloc(sizeof(t_struct_pcb));
 		PCB_Segmentation->pid = temp_id;

@@ -419,7 +419,6 @@ void bloquearPrograma(int pid){
 int agregarNuevoPrograma(char* codigo, int fd){
 	t_programa* programa=malloc(sizeof(t_programa));
 	programa->peso=0;
-	programa->codigo=codigo;
 	t_medatada_program* metadata = metadata_desde_literal(codigo);
 	programa->pcb=crearPcb(codigo, metadata);
 	if(programa->pcb!=0){
@@ -788,7 +787,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 		case D_STRUCT_PCBSF:
 			liberarCPU(data.fd);
+			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			free(programa->pcb);
 			mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
 			num = malloc(sizeof(t_struct_numero));
 			num->numero=0;

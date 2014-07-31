@@ -105,10 +105,8 @@ typedef enum {
 
 typedef struct {
 	int peso;
-	t_medatada_program* metadata;
 	t_pcb* pcb;
 	int socket_descriptor_conexion;
-	char* codigo;
 } t_programa;
 
 
