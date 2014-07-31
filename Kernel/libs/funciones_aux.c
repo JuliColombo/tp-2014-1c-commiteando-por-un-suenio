@@ -749,12 +749,24 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_lock(mutex_semaforos);
 			int pos_sem_wait = posicion_Semaforo(semaforo->nombre_semaforo);
 			if(configuracion_kernel.semaforos.valor[pos_sem_wait]>0){
-				senial->numero=0;
-			}else{
 				senial->numero=1;
+				socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
+				configuracion_kernel.semaforos.valor[pos_sem_wait]--;
+			}else{
+				senial->numero=0;
+				socket_enviar(data.fd, D_STRUCT_NUMERO, senial);
+				t_tipoEstructura tipoRecibido;
+				void * estructuraRecibida;
+				socket_recibir(data.fd,&tipoRecibido,&estructuraRecibida);
+				configuracion_kernel.semaforos.valor[pos_sem_wait]--;
+				queue_push(configuracion_kernel.semaforos.cola_procesos[pos_sem_wait],estructuraRecibida);
+				programa=(t_programa*)buscarPrograma(((t_struct_pcb*)estructuraRecibida)->pid, cola.exec, mutex_cola_exec);
+				mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
+				pthread_mutex_lock(mutex_cola_block_sem);
+				mostrarColasPorPantalla(cola.block.sem, "Bloqueados por semaforos");
+				pthread_mutex_unlock(mutex_cola_block_sem);
+
 			}
-			socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
-			configuracion_kernel.semaforos.valor[pos_sem_wait]-=1;
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Semaforo", INFO, "Se dio wait al semaforo %s", semaforo->nombre_semaforo);
 			pthread_mutex_unlock(mutex_log);
@@ -766,7 +778,13 @@ void handler_conexion_cpu(epoll_data_t data){
 			semaforo = ((t_struct_semaforo*)structRecibida);
 			pthread_mutex_lock(mutex_semaforos);
 			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
-			configuracion_kernel.semaforos.valor[pos_sem_signal]+=1;
+			configuracion_kernel.semaforos.valor[pos_sem_signal]++;
+			if(queue_size(configuracion_kernel.semaforos.cola_procesos[pos_sem_signal])>0){
+				t_programa* prog = queue_pop(configuracion_kernel.semaforos.cola_procesos[pos_sem_signal]);
+				programa = (t_programa*)buscarPrograma(prog->pcb->pid, cola.block.sem, mutex_cola_block_sem);
+				mandarAOtraCola(programa, cola.block.sem, mutex_cola_block_sem, cola.ready, mutex_cola_ready);
+
+			}
 			pthread_mutex_unlock(mutex_semaforos);
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Semaforo", INFO, "Se dio signal al semaforo %s", semaforo->nombre_semaforo);

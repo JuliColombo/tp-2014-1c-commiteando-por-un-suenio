@@ -1130,7 +1130,7 @@ void atender_kernel(sock_struct* sock){
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(id_prog);
 				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d");
+				log_escribir(archLog,"Se cambia el proceso activo",INFO,"El pid del proceso activo es: %d", id_prog);
 				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_unlock(mutex_pid);
 				free(pid);

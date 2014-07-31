@@ -44,7 +44,7 @@ typedef struct{
 typedef struct{
 	t_id_semaforos id;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
 	t_valor_semaforos valor;	//Valor inicial de cada semáforo
-	t_queue* cola_procesos;
+	t_queue** cola_procesos;
 }t_semaforos;
 
 typedef struct{
