@@ -179,7 +179,7 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 		//Se envia una solicitud de obtener valor al kernel
 		t_struct_string * nombreVarComp = malloc(sizeof(t_struct_string));
 		nombreVarComp->string = strdup(variable);
-		socket_enviar(sockKernel, D_STRUCT_OBTENER_VALOR, nombreVarComp); // envio solicitud de valor con nombre de variable
+		socket_enviar(sockKernel, D_STRUCT_OBTENERCOMPARTIDA, nombreVarComp); // envio solicitud de valor con nombre de variable
 		//Se recibe la respuesta del kernel
 		void* structRecibido;
 		t_tipoEstructura tipoRecibido;
@@ -210,12 +210,11 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 		char** partes = string_split(variable, "\n");
 		variable = partes[0];
 		//Arma estructura para solicitar asignar valor al kernel
-		t_struct_int_char * asignarValor = malloc(sizeof(t_struct_int_char));
-		asignarValor->numero = valor;
-		asignarValor->string = variable;
-		asignarValor->tamano = strlen(variable) + 1;
+		t_struct_asignar_compartida * asignarValor = malloc(sizeof(t_struct_asignar_compartida));
+		asignarValor->valor = valor;
+		asignarValor->nombre = variable;
 		//Envia solicitud de asignar valor al kernel
-		socket_enviar(sockKernel, D_STRUCT_ASIGNAR_VALOR, asignarValor);
+		socket_enviar(sockKernel, D_STRUCT_ASIGNARCOMPARTIDA, asignarValor);
 
 		void* structRecibido;
 		t_tipoEstructura tipoRecibido;

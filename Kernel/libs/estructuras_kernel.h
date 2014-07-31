@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include "commons/collections/list.h"
 #include "parser/metadata_program.h"
+#include "commons/collections/queue.h"
 
 typedef uint16_t t_puerto_programa;
 typedef uint16_t t_puerto_cpu;
@@ -42,7 +43,8 @@ typedef struct{
 
 typedef struct{
 	t_id_semaforos id;			//Identificador de cada semáforo del sistema. Cada posición del array representa un semáforo
-	t_valor_semaforos valor;		//Valor inicial de cada semáforo
+	t_valor_semaforos valor;	//Valor inicial de cada semáforo
+	t_queue* cola_procesos;
 }t_semaforos;
 
 typedef struct{

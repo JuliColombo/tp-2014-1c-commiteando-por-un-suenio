@@ -732,6 +732,9 @@ void handler_conexion_cpu(epoll_data_t data){
 				log_escribir(archLog, "Variables Compartidas", INFO, "Se le asigno el valor %d a la variable %s", compartida->valor, compartida->nombre);
 				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_unlock(mutex_var_compartidas);
+				num = malloc(sizeof(t_struct_numero));
+				num->numero=1;
+				socket_enviar(data.fd,D_STRUCT_NUMERO,num);
 			}else{
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
