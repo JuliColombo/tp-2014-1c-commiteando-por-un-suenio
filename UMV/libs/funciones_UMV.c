@@ -82,7 +82,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 		memcpy(buffer,(MP + segmento.baseVirtual + offset), longitud);
 		respuesta.buffer = buffer;
 		respuesta.tamano_buffer = longitud;
-		log_escribir(archLog,"Copiamos la informacion a un Buffer para devolverla",INFO,"");
+		log_escribir(archLog,"Se realiza una solicitud de bytes",INFO,"La solicitud tiene exito");
 
 		pthread_mutex_unlock(&Sem_DevuelveBytes);
 
@@ -100,7 +100,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 
 		if(segmento.programa == -1){
 			printf("No existe un segmento con este id:%d",base);
-			log_escribir(archLog,"No existe un segmento con este id",ERROR,"");
+			log_escribir(archLog,"Se hace un envio de bytes",ERROR,"No existe un segmento con este id: %d",segmento.programa);
 			return -1;
 		}
 
@@ -115,6 +115,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 
 		else{
 			memcpy((MP + segmento.baseVirtual + offset),buffer,longitud);
+			log_escribir(archLog,"Se hace un envio de bytes",INFO,"El envio tiene exito");
 			result ++;
 		}
 
@@ -258,7 +259,7 @@ void compactar(){
 		}
 		else{
 			RangoInicial = create_rango_mem(0 , tamanioMP);
-			log_escribir(archLog,"no hay segmentos en memoria, se compacta toda la memoria libre",INFO,"");
+			log_escribir(archLog,"No hay segmentos en memoria, se compacta toda la memoria libre",INFO,"");
 		}
 
 		sleep(Retardo);
@@ -516,8 +517,11 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	}
 	pthread_mutex_unlock(&Sem_GrabaBytes);
 
+	log_escribir(archLog,"Se solicita crear un segmento",INFO,"El segmento se crea con exito");
 	return result;
 	}
+
+	log_escribir(archLog,"Se solicita crear un segmento",ERROR,"El tamanio indicado es menor a 0");
 	result=-2;
 	return result;
 
