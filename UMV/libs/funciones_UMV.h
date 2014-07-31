@@ -57,7 +57,7 @@ int asignarFisicamente();
 void log_error_socket(void);
 int segmentationFault(int base,int offset,int longitud);
 int validacionSegFault(int base, int offset,int longitud);
-t_struct_buffer* solicitarBytes(int base,int offset, int longitud);
+t_struct_buffer solicitarBytes(int base,int offset, int longitud);
 
 void destruirTodosLosSegmentos(void);
 void matarHilos(void);

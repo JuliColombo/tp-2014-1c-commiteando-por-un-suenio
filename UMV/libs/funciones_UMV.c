@@ -77,8 +77,8 @@ int segmentationFault(int base,int offset,int longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_struct_buffer* solicitarBytes(int base,int offset, int longitud){
-	t_struct_buffer* respuesta = malloc(sizeof(t_struct_buffer));
+t_struct_buffer solicitarBytes(int base,int offset, int longitud){
+	t_struct_buffer respuesta;
 	pthread_mutex_lock(mutex_MP);
 	if(!segmentationFault(base, offset, longitud)){
 		void* buffer=malloc(longitud);
@@ -86,8 +86,8 @@ t_struct_buffer* solicitarBytes(int base,int offset, int longitud){
 		j=traducirPosicion(base)+offset;
 		printf("La posicion real es: %d\n",j);
 		memcpy(buffer,  &MP[j], longitud);
-		respuesta->buffer=buffer;
-		respuesta->tamanio=longitud;
+		respuesta.buffer=buffer;
+		respuesta.tamanio=longitud;
 		pthread_mutex_unlock(mutex_MP);
 		printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 		escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
@@ -96,8 +96,8 @@ t_struct_buffer* solicitarBytes(int base,int offset, int longitud){
 		void* buffer_fallo=malloc(sizeof(int));
 		int valor=-1;
 		memcpy(buffer_fallo,&valor,sizeof(int));
-		respuesta->buffer=buffer_fallo;
-		respuesta->tamanio=sizeof(int);
+		respuesta.buffer=buffer_fallo;
+		respuesta.tamanio=sizeof(int);
 		pthread_mutex_unlock(mutex_MP);
 		printf("Seg fault\n");
 		return respuesta;
@@ -1028,7 +1028,7 @@ void atender_cpu(sock_struct* sock){
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
 				pthread_mutex_unlock(mutex_log);
-				t_struct_buffer* buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
+				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
 				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
 				break;
 			case D_STRUCT_ENV_BYTES:
