@@ -7,7 +7,7 @@
 
 #include "libs/funciones_UMV.h"
 
-int* MP;
+void* MP;
 int tamanioMP;
 int tamanioMaxStack;
 char* PATH=PATHCONFIG;
@@ -27,18 +27,41 @@ int procesoActivo;
 int gradoDeMultiprogramacion;
 lista_handshake lista_handshakes;
 
+t_list * Segmentos_UMV;
+t_list * Rangos_Libres;
+List_Base_ID;
+int AlgoritmoActual, Puerto;
+int FinPrograma = 0;
+int Retardo = 0;
+
+// Semaforos
+pthread_mutex_t Sem_Graba_Segmento = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Sem_Elimina_Segmento = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Sem_GrabaBytes = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Sem_DevuelveBytes = PTHREAD_MUTEX_INITIALIZER;
+
+
 
 int main (int argc, char **argv){
+	//Inicializamos las listas
+	Segmentos_UMV = list_create();
+	Rangos_Libres = list_create();
+	List_Base_ID = list_create();
+	srand(time(NULL));
 
 	inicializarConfiguracion();
 	//Acceder a archConfig y obtener datos
 	MP=crearMP();
 
-	//Crear estructuras administrativas
+	//Guardamos el primer rango de memoria libre
+	RangoMemoria * RangoInicial = create_rango_mem(0,tamanioMP);
+	list_add(Rangos_Libres,RangoInicial);
 
-	inicializarListaHandshakes();
+
 	inicializarMutex();
 	inicializarHilos();
+
+
 
 	esperarHilos();
 
