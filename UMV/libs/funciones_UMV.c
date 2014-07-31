@@ -1047,7 +1047,7 @@ void atender_cpu(sock_struct* sock){
 				free(respuesta);
 				break;
 			case 0:
-				log_escribir(archLog,"Termina la ejecucion de un pedido",INFO,"El pedido es de CPU");
+				//log_escribir(archLog,"Termina la ejecucion de un pedido",INFO,"El pedido es de CPU");
 				break;
 		}
 	}
@@ -1172,6 +1172,9 @@ void atender_kernel(sock_struct* sock){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
 				} else {
 					enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
+					t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
+					respuesta->numero=1;
+					socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
 				}
 				free(struct_seg);
 

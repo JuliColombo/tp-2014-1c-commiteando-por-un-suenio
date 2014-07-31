@@ -190,21 +190,30 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 		t_struct_segmento* paquete = malloc(sizeof(t_struct_segmento));
 
+		t_tipoEstructura tipoRecibido;
+		void* structRecibida;
+
 		paquete->base=nuevoPCB->codigo;
 		paquete->tamanio=tamanioScript;
 		paquete->segmento=(void*)codigo;
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
+
+		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
 
 		paquete->base=nuevoPCB->index_codigo;
 		paquete->tamanio=tamanioIndiceCodigo;
 		paquete->segmento=((void*)metadata_programa->instrucciones_serializado);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
+		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+
 		paquete->base=nuevoPCB->index_etiquetas;
 		paquete->tamanio=tamanioIndiceEtiquetas;
 		paquete->segmento=((void*)metadata_programa->etiquetas);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 		free(paquete);
+
+		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
 
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
 		nuevoPCB->tamanio_contexto=0;
