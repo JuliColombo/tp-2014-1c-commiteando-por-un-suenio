@@ -1228,7 +1228,7 @@ void *consola (void){
 	char comando[32];
 	char* aux_buffer;
 	aux_buffer= malloc(MAX_BUFFER);
-	t_struct_buffer* buffer;
+	t_struct_buffer buffer;
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	puts("\nIngrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);
