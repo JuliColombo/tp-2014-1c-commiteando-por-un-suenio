@@ -36,11 +36,11 @@ int estaEnDicTOP(char palabra[]){
 }
 
 
-int* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
+void* crearMP(void) { // Cambie para que no reciba parametro, total la config es una variable externa -- Fede
 
 	tamanioMP = configuracion_UMV.memSize;
-	int* aux_MP;
-	aux_MP = malloc(tamanioMP*(sizeof(t_memoria_principal)));
+	void* aux_MP;
+	aux_MP = malloc(tamanioMP);
 	if(aux_MP==NULL){
 		log_escribir(archLog, "Error en tamaño de memoria principal", ERROR, "No hay memoria suficiente");
 		abort();
@@ -54,99 +54,73 @@ void log_error_socket(void){
 	pthread_mutex_unlock(mutex_log);
 }
 
-int validacionSegFault(int base, int offset,int longitud){
-	int pos=traducirPosicion(base);
-	int numTabla=ubicarEnTabla(pos);
-	int numSeg=ubicarSegmentoEnTabla(pos);
-	printf("El numero de tabla es: %d y el numero de segmento es: %d\n", numTabla, numSeg);
-	if (tablaDeSegmentos[numTabla].segmentos[numSeg].tamanio >= (offset+longitud)){
-		return 0;
-	} else {
-	return 1;
-	}
-}
-
-int segmentationFault(int base,int offset,int longitud){
-	if (validacionSegFault(base,offset,longitud) ) {
-		escribir_log(archLog, "Segmentation Fault", ERROR, "Segmentation fault al intentar acceder a la posicion");
-		return 1;
-	} else return 0;
-}
-
 
 
 // ***********************************Solicitar bytes en memoria*******************
 
 t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
-	t_struct_respuesta_umv respuesta;
-	pthread_mutex_lock(mutex_MP);
-	if(!segmentationFault(base, offset, longitud)){
-		void* buffer=malloc(longitud);
-		int j;
-		j=traducirPosicion(base)+offset;
-		printf("La posicion real es: %d\n",j);
-		memcpy(buffer,  &MP[j], longitud);
-		respuesta.buffer=buffer;
-		respuesta.tamano_buffer=longitud;
-		pthread_mutex_unlock(mutex_MP);
-		printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
-		escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
+	pthread_mutex_lock(&Sem_DevuelveBytes);
+
+		t_struct_respuesta_umv respuesta;
+		Segmento segmento = BuscarSegmentoIndice(base);
+		log_escribir(archLog,"Se busca el segmento que contiene informacion a enviar",INFO,"");
+		int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
+
+		if(max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud){
+			printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
+			log_escribir(archLog,"Segmentation Fault",ERROR,"Memoria no accesible por este segmento.");
+			void*buff_fault=malloc(sizeof(int));
+			int valor=-30;
+			memcpy(buff_fault,&valor,sizeof(int));
+			respuesta.buffer=buff_fault;
+			respuesta.tamano_buffer=sizeof(int);
+			pthread_mutex_unlock(&Sem_DevuelveBytes);
+			return respuesta ;
+		}
+
+		void * buffer = malloc(longitud);
+		memcpy(buffer,(MP + segmento.baseVirtual + offset), longitud);
+		respuesta.buffer = buffer;
+		respuesta.tamano_buffer = longitud;
+		log_escribir(archLog,"Copiamos la informacion a un Buffer para devolverla",INFO,"");
+
+		pthread_mutex_unlock(&Sem_DevuelveBytes);
+
 		return respuesta;
-	} else {
-		void* buffer_fallo=malloc(sizeof(int));
-		int valor=-1;
-		memcpy(buffer_fallo,&valor,sizeof(int));
-		respuesta.buffer=buffer_fallo;
-		respuesta.tamano_buffer=sizeof(int);
-		pthread_mutex_unlock(mutex_MP);
-		printf("Seg fault\n");
-		return respuesta;
-	}
 }
 
-int traducirPosicion(int base){
-	int i=0,j;
-	while(i<cant_tablas){
-		j=0;
-		while(j<tablaDeSegmentos[i].cant_segmentos){
-			if(tablaDeSegmentos[i].segmentos[j].inicio == base){
-						return tablaDeSegmentos[i].segmentos[j].ubicacionMP;
-					} else {
-						j++;
-					}
-		}
-		i++;
-	}
-	log_escribir(archLog, "Solicitar memoria", ERROR, "Posicion erronea");
-	return -1;
-}
 
 //****************************************enviarBytes*************************************
 
 
 int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	int j,aux;
-	pthread_mutex_lock(mutex_MP);
-		if (!segmentationFault(base,offset,longitud)){
-			aux=traducirPosicion(base);
-			if(aux==-1){
-							printf("La direccion base es erronea\n");
-							escribir_log(archLog, "Se realiza un envio de bytes", ERROR, "La direccion base es erronea");
-							return -1;
-						}
-			j=traducirPosicion(base)+offset;
-			printf("La posicion Virtual es: %d y la Real es : %d\n", base, j);
-			printf("El resultado de la asignacion es:\n");
-			printf("%s\n",(char*)buffer);//TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
-			memcpy(&MP[j], (int*) buffer, longitud);
-			pthread_mutex_unlock(mutex_MP);
-			escribir_log(archLog, "Se realiza envio de bytes", INFO, "El envio tiene exito");
-			return 0;
-			} else {
-				pthread_mutex_unlock(mutex_MP);
-				printf("Seg fault\n");
-				return -1;
-			}
+	pthread_mutex_lock(&Sem_GrabaBytes);
+		int result = 0;
+		Segmento segmento = BuscarSegmentoIndice(base);
+
+		if(segmento.programa == -1){
+			printf("No existe un segmento con este id:%d",base);
+			log_escribir(archLog,"No existe un segmento con este id",ERROR,"");
+			return -1;
+		}
+
+		log_escribir(archLog,"Se busca el segmento de base para grabar",INFO,"Base: %d", segmento.baseVirtual);
+
+		int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
+
+		if(max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud){
+			printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
+			log_escribir(archLog,"Violacion de Segmento",ERROR,"Se quiere grabar en la pos %d, y la maxima direccion del segmento es: %d", max_direccion_mem_segmento,segmento.baseVirtual + offset + longitud);
+		}
+
+		else{
+			memcpy((MP + segmento.baseVirtual + offset),buffer,longitud);
+			result ++;
+		}
+
+		pthread_mutex_unlock(&Sem_GrabaBytes);
+
+		return result;
 }
 
 
@@ -154,49 +128,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 
 
 
-/*************************Handshake*************************/
 
-void hacerHandshake(tipo_handshake tipo){
-	if(lista_handshakes.cantidad == 0){
-		inicializarYAgregar(tipo);
-	} else { agregarHandshake(tipo);
-	  }
-}
-
-void inicializarListaHandshakes(void){
-	lista_handshakes.cantidad=0;
-	lista_handshakes.handshakes=NULL;
-}
-
-
-void inicializarYAgregar(tipo_handshake tipo){
-	tipo_handshake* aux_lista;
-	tipo_handshake aux_handshake;
-	aux_lista = malloc(sizeof(tipo_handshake));
-	if(aux_lista==NULL){
-		log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
-		abort();
-	}
-	lista_handshakes.cantidad ++;
-	aux_handshake = tipo;
-	lista_handshakes.handshakes[0] = aux_handshake;
-}
-
-void agregarHandshake(tipo_handshake tipo){
-	tipo_handshake* aux_lista;
-	tipo_handshake aux_handshake;
-	int aux=lista_handshakes.cantidad;
-	aux_lista = realloc(lista_handshakes.handshakes,(sizeof(lista_handshakes.handshakes)+sizeof(tipo_handshake)));
-	if(aux_lista==NULL){
-		log_escribir(archLog, "Error en la lista de handshakes", ERROR, "No hay memoria suficiente");
-		abort();
-	}
-	lista_handshakes.handshakes = aux_lista;
-	aux_handshake=tipo;
-	lista_handshakes.handshakes[aux] = aux_handshake;
-	lista_handshakes.cantidad++;
-	return;
-}
 
 /*************************Comandos de Consola:*************************/
 
@@ -226,117 +158,147 @@ void retardoFunc(int retardo_nuevo){
 //****************************************Compactacion*****************************************
 
 void compactar(){
-	int posicionFinal=0;
-	int i,j,k,l=0;
-	int posicionSegmento,tamanio;
-	//Recorre la MP
-	pthread_mutex_lock(mutex_MP);
-	while(l<tamanioMP){
-	//Encuentra la primera posicion libre
-	while(MP[posicionFinal]!=NULL){
-		posicionFinal++;
-	}
-	printf("La posicion a reubicar es: %d\n", posicionFinal);
-	posicionSegmento=posicionFinal;
-		//Encuentra la primera posicion ocupada
-	while(MP[posicionSegmento]==NULL && posicionSegmento<tamanioMP) posicionSegmento++;
-		if(posicionSegmento == tamanioMP){
-			pthread_mutex_unlock(mutex_MP);
-			printf("Compactacion finalizada\n");
-			escribir_log(archLog, "Se termina de realizar la compactacion", INFO, "");
-			return;
+		pthread_mutex_lock(&Sem_DevuelveBytes);
+		pthread_mutex_lock(&Sem_GrabaBytes);
+		pthread_mutex_lock(&Sem_Elimina_Segmento);
+		pthread_mutex_lock(&Sem_Graba_Segmento);
+
+		log_escribir(archLog,"Empieza el proceso de compactado",INFO,"");
+
+		// liberamos la memoria todos los rangos que ya no usaremos.
+		RangoMemoria * RangoInicial;
+		list_iterate(Rangos_Libres, free);
+		free(Rangos_Libres);
+		Rangos_Libres = list_create();
+
+		void * MemAux;
+		t_list * MemAuxList = list_create();
+
+		log_escribir(archLog,"Se libera la memoria se crea una lista nueva",INFO,"");
+
+		sleep(Retardo);
+		if(!list_is_empty(Segmentos_UMV)){
+
+			Segmento * SegmentoAnterior;
+			int posSegmento = 0;
+
+			//Obtenemos el primer segmento de la lista
+			Segmento * SegmentoActual = ((Segmento*)list_get(Segmentos_UMV,posSegmento));
+
+			log_escribir(archLog,"El primer segmento",INFO,"Tiene base: %d y un tamaño: %d",SegmentoActual->baseVirtual,SegmentoActual->tamano);
+
+			MemAux = malloc(SegmentoActual->tamano + 1);
+
+			//Copiamos toda la info que va a estar en el nuevo lugar
+			memcpy(MemAux, MP + SegmentoActual->baseVirtual, SegmentoActual->tamano);
+
+			list_add(MemAuxList, MemAux);
+
+			log_escribir(archLog,"copiamos el contenido del segmento",INFO,"");
+
+			// asignamos la base 0 al primer compactado
+			SegmentoActual->baseVirtual = 0;
+
+			// Actualizamos la base del segmento en la tabla de BaseID
+			BaseID * bi = BuscarBI(SegmentoActual->ID);
+			bi->base = 0;
+
+			log_escribir(archLog,"Actualizamos la base en la tabla de id",INFO,"");
+
+			sleep(Retardo);
+
+			posSegmento ++;
+			while(list_size(Segmentos_UMV) > posSegmento && list_size(Segmentos_UMV) > 1 ){
+
+				// sacamos el segmento de despues y guardamos el anterior en una auxiliar
+				SegmentoAnterior = SegmentoActual;
+				SegmentoActual = ((Segmento*)list_get(Segmentos_UMV,posSegmento));
+
+				log_escribir(archLog,"Informacion de segmento",INFO,"Segmento numero %d tiene base: %d y un tamaño: %d",posSegmento + 1,SegmentoActual->baseVirtual,SegmentoActual->tamano);
+
+				//Copiamos toda la info al segmento que va a estar en su lugar
+				MemAux = malloc(SegmentoActual->tamano + 1);
+				memcpy(MemAux, MP + SegmentoActual->baseVirtual, SegmentoActual->tamano);
+				list_add(MemAuxList, MemAux);
+
+				log_escribir(archLog,"Informacion de copiado de segmento",INFO,"copiamos el contenido del segmento: %d",SegmentoActual->baseVirtual);
+
+				// Asignamos la nueva base al segmento
+				SegmentoActual->baseVirtual = SegmentoAnterior->baseVirtual + SegmentoAnterior->tamano + 1;
+
+				// Actualizamos la base del segmento en la tabla de BaseID
+				BaseID * bi = BuscarBI(SegmentoActual->ID);
+				bi->base =  SegmentoActual->baseVirtual;
+
+				log_escribir(archLog,"Informacion de actualizacion",INFO,"Actualizamos la base en la tabla de id ID:%d Base:%d",bi->ID,bi->base);
+
+				posSegmento ++;
+			}
+
+			int ultimaPosMemoriaOcupada = SegmentoActual->baseVirtual + SegmentoActual->tamano;
+
+			RangoInicial = create_rango_mem(ultimaPosMemoriaOcupada +1 , tamanioMP - (ultimaPosMemoriaOcupada +1));
+			log_escribir(archLog,"Informacion de creado",INFO,"creamos el ultimo RangoLibre Base:%d Tamaño:%d", RangoInicial->base,RangoInicial->tamano);
+
+			// Copiamos toda la memoria a sus respectivos nuevos lugares
+			int pos = 0;
+
+			log_escribir(archLog,"Volcamos todos los datos comapctados a la memoria principal",INFO,"");
+			while(pos < list_size(MemAuxList)){
+				Segmento * aSeg = ((Segmento*)list_get(Segmentos_UMV,pos));
+				MemAux = (void*)list_get(MemAuxList, pos);
+				memcpy(MP + aSeg->baseVirtual, MemAux , aSeg->tamano);
+
+				pos++;
+			}
+
+			list_iterate(MemAuxList, free);
+			free(MemAuxList);
+
 		}
-		printf("La posicion de inicio del segmento es: %d\n", posicionSegmento);
-		i=ubicarEnTabla(posicionSegmento);
-		printf("La tabla correspondiente es: %d\n",i);
-		j=ubicarSegmentoEnTabla(posicionSegmento);
-		printf("El segmento correspondiente es: %d\n",j);
-		tamanio=tablaDeSegmentos[i].segmentos[j].tamanio;
-		k=posicionFinal;
-		//Traslado el segmento
-	while(tamanio>0){
-			MP[k]=MP[posicionSegmento];
-			MP[posicionSegmento]=NULL;
-			k++;
-			posicionSegmento++;
-			tamanio--;
-	}
-	tablaDeSegmentos[i].segmentos[j].ubicacionMP = posicionFinal;
-	posicionFinal = posicionFinal+tamanio;
-	l++;
-	}
+		else{
+			RangoInicial = create_rango_mem(0 , tamanioMP);
+			log_escribir(archLog,"no hay segmentos en memoria, se compacta toda la memoria libre",INFO,"");
+		}
+
+		sleep(Retardo);
+		list_add(Rangos_Libres,RangoInicial);
+
+		pthread_mutex_unlock(&Sem_DevuelveBytes);
+		pthread_mutex_unlock(&Sem_GrabaBytes);
+		pthread_mutex_unlock(&Sem_Elimina_Segmento);
+		pthread_mutex_unlock(&Sem_Graba_Segmento);
 }
 
-int ubicarEnTabla(int posicionR){
-	int i=0,j;
-	while(i<cant_tablas){
-		j=0;
-		while(j<tablaDeSegmentos[i].cant_segmentos){
-			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
-				return i;
-			} else {
-			j++;
-				}
-		}
-		i++;
+// devuelve la posicion de un segmento en la lista de segmentos por su base
+BaseID * BuscarBI(int ID){
+	BaseID * bi;
+	int pos = 0;
+
+	while( pos < list_size(List_Base_ID) ){
+		bi = (BaseID*)list_get(List_Base_ID,pos);
+		if(bi->ID == ID)
+			break;
+		pos ++;
 	}
-	return -1;
+
+	return bi;
+}
+
+//Nos muestra los rangos libres de mem -- ok
+void MostrarTablaBI() {
+
+	void PrintTable(BaseID *  rango) {
+		 printf("Rango: Base %d , ID: %d \n", rango->base, rango->ID);
+	}
+
+	printf("TABLAS DE BASESxID: \n");
+	list_iterate(List_Base_ID, (void*)PrintTable);
+
 }
 
 
 
-int ubicarSegmentoEnTabla(int posicionR){
-	int i=0,j;
-	while(i<cant_tablas){
-		j=0;
-		while(j<tablaDeSegmentos[i].cant_segmentos){
-			if(tablaDeSegmentos[i].segmentos[j].ubicacionMP == posicionR){
-							return j;
-				}
-			j++;
-		}
-		i++;
-	}
-	return -1;
-}
-
-int getEspacioLibreMP(void){
-	int libre=0;
-	int i=0;
-	while (i<tamanioMP){
-		if (MP[i] == NULL) libre++;
-		i++;
-	}
-	return libre;
-}
-
-void imprimirBuffer(t_buffer buffer){/*
-	int tamanioBuffer= sizeof(buffer);
-	int i=0;
-	while (i<tamanioBuffer){
-		if(buffer[i] != NULL){
-		printf("%c", (char)buffer[i]);
-		}	else{
-			printf(" (NULL) ");
-		}
-		i++;
-	}
-	printf("\n");
-*/}
-
-void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){/*
-	int tamanioBuffer= sizeof(buffer);
-	int i=0;
-	while (i<tamanioBuffer){
-		if(buffer[i] != NULL){
-		fprintf(archivo,"%c",(char)buffer[i]);
-		} else{
-			fprintf(archivo," (NULL) ");
-		}
-		i++;
-	}
-	fprintf(archivo,"\n");
-*/}
 
 /*************************Dump: *************************/
 
@@ -351,7 +313,7 @@ void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo){/*
  */
 
 void dump(){
-	FILE* archivo_MP;
+	/*FILE* archivo_MP;
 	FILE* archivo_TS;
 	int procesoAVer;
 	int getEspacioLibreMP(void);
@@ -406,11 +368,11 @@ void dump(){
 	pthread_mutex_unlock(mutex_MP);
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
 	fclose(archivo_MP);
-	fclose(archivo_TS);
+	fclose(archivo_TS);*/
 }
 
 void imprimirEstadoMP(FILE* archivo){
-	int i=0;
+/*	int i=0;
 	fprintf(archivo, "%s", "El estado de la memoria principal:\n");
 		while(i<tamanioMP){
 			fprintf(archivo, "%s", "La posicion ");
@@ -423,7 +385,7 @@ void imprimirEstadoMP(FILE* archivo){
 			}
 			fprintf(archivo, "%s", " \n");
 			i++;
-		}
+		}*/
 }
 
 void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
@@ -474,20 +436,6 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 }
 
 
-int validarPosicionVirtual(int posVirtual) {
-	int i=0,j=0;
-	while(i<cant_tablas){
-		while(j<tablaDeSegmentos[i].cant_segmentos){
-			if(tablaDeSegmentos[i].segmentos[j].inicio == posVirtual){
-						return 0;
-					} else {
-						j++;
-					}
-		}
-		i++;
-	}
-	return 1;
-}
 
 /*
  * Nombre: crearSegmentoPrograma
@@ -500,203 +448,199 @@ int validarPosicionVirtual(int posVirtual) {
  */
 
 int crearSegmentoPrograma(int id_prog, int tamanio){
-	int ubicacion=-1;
-	segmentDescriptor aux;
-	int i,num_segmento;
-	if(tamanio==0){
-				escribir_log(archLog,"Se trata de crear un segmento",INFO,"El tamanio es 0");
-				printf("El tamanio es: %d\n",tamanio);
-				ubicacion=TAMANIO_NULO;
-				printf("Devuelve: %d\n",ubicacion);
-				return ubicacion;
-	} else {
-	//Escoge la ubicacion en base al algoritmo de config
-	pthread_mutex_lock(mutex_MP);
-	if(configuracion_UMV.algoritmo == firstfit){
-		escribir_log(archLog,"Se selecciona ubicacion",INFO,"El algoritmo de seleccion es firstfit");
-		ubicacion = escogerUbicacionF(tamanio);
-	} else{
-		if(configuracion_UMV.algoritmo == worstfit){
-			escribir_log(archLog,"Se selecciona ubicacion",INFO,"El algoritmo de seleccion es firstfit");
-			ubicacion = escogerUbicacionW(tamanio);
+	int result;
+	RangoMemoria rango;
+
+	pthread_mutex_lock(&Sem_GrabaBytes);
+
+	if (!SePuedeGrabarSegmento(tamanio)) {
+		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento \n");
+		log_escribir(archLog,"Memory Overload",ERROR,"No se puede crear el segmento porque no hay memoria suficiente");
+		result = -1;
+	}
+	else
+	{
+		sleep(Retardo);
+		// segun el algoritmo se elige un rago de memoria para grabar
+		if (configuracion_UMV.algoritmo == firstfit)
+		{
+			int pos = 0;
+			long int tamanoRangoLibre = 0;
+			// calculamos el primer rango de memoria en el que entra el segmento
+			while (tamanoRangoLibre < tamanio)
+			{
+				rango = *((RangoMemoria*)list_get(Rangos_Libres, pos));
+				tamanoRangoLibre = rango.tamano;
+				pos++;
+			}
+			log_escribir(archLog,"Algoritmo de seleccion",INFO,"First-Fit");
+			}
+		else // algortimo worst fit
+		{
+			rango = RangoMasGrandeLibre();
+			log_escribir(archLog,"Algoritmo de seleccion",INFO,"Worst-Fit");
 		}
-	}
-	if(ubicacion==-1){
-	pthread_mutex_unlock(mutex_MP);
-		compactar();
-	pthread_mutex_lock(mutex_MP);
-	}
-	if(configuracion_UMV.algoritmo == firstfit){
-			ubicacion = escogerUbicacionF(tamanio);
-		} else{
-			if(configuracion_UMV.algoritmo == worstfit){
-				printf("Va a elegir por Worst");
-				ubicacion = escogerUbicacionW(tamanio);
-				printf("La ubicacion es: %d", ubicacion);
+		sleep(Retardo);
+		// calculamos el id aletoria dentro del rango
+		int ID = rand() % tamanioMP + 1;
+		int pos = 0;
+
+		//**** Este while villero nos dice si un segmento ya tiene ese id asignado ****
+		while(!list_is_empty(List_Base_ID)){
+			// si la pos es mayor o igual al tamaño de la lista es porque no esta.
+			if(list_size(List_Base_ID) <= pos) break;
+
+			BaseID bi = *((BaseID*)list_get(List_Base_ID,pos));
+			if(bi.ID == ID){
+				pos = 0;
+				ID = rand() % 1 + tamanioMP;
+			}else{
+				pos ++;
 			}
 		}
-	if(ubicacion==-1){
-			pthread_mutex_unlock(mutex_MP);
-			escribir_log(archLog, "Se trata de crear un segmento [MEMORY OVERLOAD]:", ERROR, "No hay espacio para reservar en memoria");
-			return -1;
+		printf("La base es: %d\n",ID);
+		sleep(Retardo);
+
+		// guardamos ordenado
+		GuardarNuevoSegmentoOrdenado(ID, id_prog, rango.base, tamanio);
+
+		log_escribir(archLog,"Se guardo el nuevo segmento ordenado",INFO,"");
+
+		ActualizarRangoGrabado(tamanio, rango);
+
+		//Se agrega la referencia del ID a esa base
+		BaseID * bi2 = create_BaseID(rango.base, ID);
+		list_add(List_Base_ID,bi2);
+
+		result = ID;
+	}
+	pthread_mutex_unlock(&Sem_GrabaBytes);
+
+	return result;
+}
+
+// crea un segmento nuevo -- OK
+Segmento *create_segmento(int ID,int programa, void* base, int base_virtual,int tamano) {
+	Segmento * segmento_nuevo = malloc(sizeof(Segmento));
+	segmento_nuevo->ID = ID;
+	segmento_nuevo->base = base;
+	segmento_nuevo->baseVirtual = base_virtual;
+	segmento_nuevo->programa = programa;
+	segmento_nuevo->tamano = tamano;
+
+	return segmento_nuevo;
+}
+
+// crea un rango de memoria --OK
+RangoMemoria *create_rango_mem(int base, int tamano) {
+	RangoMemoria *aRango = malloc(sizeof(RangoMemoria));
+	aRango->base = base;
+	aRango->tamano = tamano;
+
+	return aRango;
+}
+
+// crea una BaseID
+BaseID *create_BaseID(int base, int ID) {
+	BaseID *aRango = malloc(sizeof(BaseID));
+	aRango->base = base;
+	aRango->ID = ID;
+
+	return aRango;
+}
+
+int GuardarNuevoSegmentoOrdenado(int ID, int programa, int base_virtual, int tamano) {
+
+	Segmento * nuevo_segmento = create_segmento(ID,programa,(MP + base_virtual), base_virtual, tamano);
+
+	if (list_is_empty(Segmentos_UMV)) { // si la lista esta vacia lo agregamos en la primer posicion
+		list_add(Segmentos_UMV, nuevo_segmento);
+		return 1;
+	}
+	else {   // si no esta vacia agregamos ordenado por la baseVirtual
+		int pos = 0;
+		Segmento aSeg = *((Segmento*) list_get(Segmentos_UMV, pos));
+		while (list_size(Segmentos_UMV) > pos && aSeg.baseVirtual < base_virtual) // vamos a la posicion donde este ordenado
+		{
+			pos++;
+			if(pos != list_size(Segmentos_UMV)){
+				aSeg = *((Segmento*) list_get(Segmentos_UMV, pos));
+			}
 		}
-	reservarEspacioMP(ubicacion, tamanio);
-	int pos=inicializarTabla(id_prog);
-	i=rand();
-	while(!validarPosicionVirtual(i)) rand();//-Lei que esto es innecesario, pero bueno,ya esta- Recorrer la tabla de segmentos validando que ninguno ocupe entre la posicion y la posicion y el tamanio
-	//Armado del segmento creado
-	aux.ubicacionMP=ubicacion;
-	aux.inicio=i;
-	aux.tamanio=tamanio;
-	//Asignación de los campos de la tabla de segmentos correspondiente
-	tablaDeSegmentos[pos].id_prog = id_prog;
-	num_segmento=tablaDeSegmentos[pos].cant_segmentos;
-	tablaDeSegmentos[pos].cant_segmentos++;
-	tablaDeSegmentos[pos].segmentos[num_segmento]=aux;
-	printf("El programa es : %d\n", tablaDeSegmentos[pos].id_prog);
-	printf("La cantidad de segmentos es: %d\n", tablaDeSegmentos[pos].cant_segmentos);
-	printf("La posicion real es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].ubicacionMP);
-	printf("La posicion virtual es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].inicio);
-	printf("El tamanio es : %d\n", tablaDeSegmentos[pos].segmentos[num_segmento].tamanio);
-	pthread_mutex_unlock(mutex_MP);
-	escribir_log(archLog, "Se trata de crear un segmento", INFO, "El segmento se crea con exito");
-	return tablaDeSegmentos[pos].segmentos[num_segmento].inicio;
+
+		list_add_in_index(Segmentos_UMV, pos, nuevo_segmento);
+
+		//logueamos
+		log_escribir(archLog,"Guardamos el segmento en la lista",INFO,"En la pos %d",pos);
+
+		return 1;
 	}
 }
 
-void reservarEspacioMP(int ubicacion, int tamanio){
-	int i=0;
-	int aux=tamanio;
-	while(i<=tamanioMP && aux>0){
-			MP[ubicacion+i]=-1;
-			aux--;
-			i++;
-		}
-}
+// Nos dice si hay memoria disponible junta para grabar un sengmento de tamaño fijo -- Ok
+bool SePuedeGrabarSegmento(int tamano) {
 
-int inicializarTabla(int id_prog){
-	int i=0;
-	tablaSeg* aux_tabla;
-	segmentDescriptor* aux_segmentos;
-	//Verifico si hay tablas
 
-	if(cant_tablas==0){
-		//Como no hay tablas, la inicializo y asigno la cantidad de segmentos a 0
-		aux_tabla = malloc(sizeof(tablaSeg));
-			if(aux_tabla==NULL){
-				log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-				abort();
-			}
-		tablaDeSegmentos = aux_tabla;
-		tablaDeSegmentos[i].cant_segmentos=0;
-		aux_segmentos = malloc(sizeof(segmentDescriptor));
-						if(aux_segmentos==NULL){
-							log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-							abort();
-						}
-		tablaDeSegmentos[i].segmentos = aux_segmentos;
-		cant_tablas++;
-		printf("La cant de tablas es: %d\n", cant_tablas);
-		return i;
+	// esta funcion auxiliar para fijarse si algun rango satisface la condicion
+	int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango) {
+		return rango->tamano >= tamano;
 	}
-	else{
-		//Como hay tablas, busco si ya hay una para el prog correspondiente
-	while (tablaDeSegmentos[i].id_prog != id_prog && i<= cant_tablas) i++;
-	if (tablaDeSegmentos[i].id_prog != id_prog){
-		//Si no encuentra una tabla para el programa, agrego una tabla e incremento la cantidad total de tablas
-		aux_tabla =realloc(tablaDeSegmentos, (sizeof(tablaSeg)*(cant_tablas+1)));
-		if(aux_tabla==NULL){
-			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-			abort();
+
+	bool result = (list_any_satisfy(Rangos_Libres, (void*) Hay_algun_rango_de_tamano_suficiente));
+
+	log_escribir(archLog,"Checkea si se puede grabar un segmento",INFO,"");
+
+	return result;
+}
+
+// Nos devuelve la pos del rango de mayor tamaño -- OK
+RangoMemoria RangoMasGrandeLibre() {
+	int pos = 0;
+	long int mayorTamano = 0;
+	RangoMemoria mayorRango;
+	escribir_log(archLog,"Adquiriendo rango de memoria mas grande",INFO,"");
+
+	while (list_size(Rangos_Libres) > pos) {
+		RangoMemoria rango = *((RangoMemoria*) list_get(Rangos_Libres, pos));
+		if (rango.tamano > mayorTamano) {
+			mayorRango = rango;
+			mayorTamano = rango.tamano;
 		}
-		tablaDeSegmentos = aux_tabla;
-		i=cant_tablas;
-		aux_segmentos = malloc(sizeof(segmentDescriptor));
-			if(aux_segmentos==NULL){
-			log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-			abort();
-			}
-		tablaDeSegmentos[i].segmentos = aux_segmentos;
-		tablaDeSegmentos[i].cant_segmentos=0;
-		cant_tablas++;
-		printf("La cant de tablas es: %d\n", cant_tablas);
-		return i;
-		} else {
-			aux_segmentos = realloc(tablaDeSegmentos[i].segmentos, ((tablaDeSegmentos[i].cant_segmentos+1)*sizeof(segmentDescriptor)));
-									if(aux_segmentos==NULL){
-										log_escribir(archLog, "Error en la tabla de segmentos", ERROR, "No hay memoria suficiente");
-										abort();
-									}
-			tablaDeSegmentos[i].segmentos = aux_segmentos;
-			printf("La cant de tablas es: %d\n", cant_tablas);
-			return i;
-		}
+		pos++;
 	}
+
+	return mayorRango;
 }
 
-int escogerUbicacionF(int tamanio){
-	int posicionDeDestino;
-	int i=0;
-	int aux;
-			//Recorro la memoria principal
-		while(i<tamanioMP){
-			 aux=0;			//Obtengo primer posicion libre en MP
-			while (MP[i]!=NULL && i<tamanioMP) i++;
-			posicionDeDestino= i;
-			//Checkeo la cantidad de posiciones libres hasta llegar a
-			//una posicion ocupada, o el final de la memoria
-			while(MP[i] == NULL && i<tamanioMP){
-				aux++;
-				i++;
-			}
-			//Checkeo si la cantidad de posiciones es mayor o igual al tamanio
-			//solicitado
-			if(aux>=tamanio){
-			//Devuelve la posicion de ubicacion del segmento
-			return posicionDeDestino;
-			}
+//Actualiza la lista de rangos de memoria libres
+void ActualizarRangoGrabado(int tamano_guardado, RangoMemoria rango){
+	RangoMemoria * rangoAux;
+	RangoMemoria * rangoActualizado = create_rango_mem(rango.base + tamano_guardado + 1, rango.tamano - tamano_guardado);
+	int posRemplazo = 0;
+
+	// Buscamos la posicion del rango que queremos actualizar
+	while (list_size(Rangos_Libres) > posRemplazo) // vamos a la posicion donde este ordenado
+	{
+	    rangoAux = (RangoMemoria*)list_get(Rangos_Libres,posRemplazo);
+		// si encuentra el rango con la misma base tomamos esa posicion para remplazarlo por el rango actualizado
+		if(rangoAux->base == rango.base)
+			break;
+
+		posRemplazo++;
 	}
-			//Si llega hasta acá es porque no encontró una posición posible para el segmento
-			//Le pongo que retorne -1 para mostrar este error
-			return -1;
+
+	// Remplazamos en la posicion encontrada
+	if(rangoActualizado->tamano == 0)
+		list_remove(Rangos_Libres,posRemplazo);
+	else
+		list_replace(Rangos_Libres,posRemplazo, rangoActualizado);
+
+	free(rangoAux);
+
 }
 
-int escogerUbicacionW(int tamanio){
-	int posicionDeDestino;
-	int max=0;
-	//La inicializo en -1, para que al final, si no se encontro una posicion libre
-	//retorne este valor de error
-	int posicionFinal=-1;
-	int i=0;
-	//Recorro la memoria principal
-	while(i<tamanioMP){
-				int aux=0;
-			//Obtengo primer posicion libre en MP
-				while (MP[i]!=NULL && i<tamanioMP) i++;
-				posicionDeDestino= i;
-			//Checkeo la cantidad de posiciones libres hasta llegar a
-			//una posicion ocupada, o el final de la memoria
-				while(MP[i]== NULL && i<tamanioMP){
-					aux++;
-					i++;
-				}
-			//Checkeo si la cantidad de posiciones es mayor o igual al tamanio
-			//solicitado
-				if(aux>=tamanio){
-			//Checkeo si esta cantidad es mayor que el maximo numero de posiciones
-			//libres encontradas
-						if(max>aux){
-			//Reasigno el maximo y la posicionFinal
-							max=aux;
-							posicionFinal=posicionDeDestino;
-						}
-						posicionFinal=posicionDeDestino;
-				}
-		}
 
-	//Devuelve la posicionFinal, que valdrá -1 de no encontrar espacio
-		return posicionFinal;
-}
+
 
 /*
  * Nombre: destruirSegmentosPrograma
@@ -709,16 +653,114 @@ int escogerUbicacionW(int tamanio){
  */
 
 void destruirSegmentos(int id_prog){
-	int pos= getPosTabla(id_prog);
-	pthread_mutex_lock(mutex_MP);
-	liberarMP(pos);
-	eliminarSegmentos(pos);
-	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog, "Se destruyen segmentos de un programa", INFO, "");
-	pthread_mutex_unlock(mutex_log);
-	pthread_mutex_unlock(mutex_MP);
-	printf("Segmentos del programa %d destruidos con exito",id_prog);
-	return;
+
+	pthread_mutex_lock(&Sem_Elimina_Segmento);
+
+	Segmento segmento;
+	int pos = 0;
+
+	while( pos < list_size(Segmentos_UMV))
+	{
+		segmento = *((Segmento*)list_get(Segmentos_UMV,pos));
+		if(segmento.programa == id_prog)
+		{
+			EliminarSegmento(segmento.baseVirtual);
+			sleep(Retardo);
+		}
+		else
+		{
+			pos ++;
+		}
+	}
+
+	pthread_mutex_unlock(&Sem_Elimina_Segmento);
+
+	log_escribir(archLog,"Informacion de destruccion de segmentos de un programa",INFO,"se eliminaron los segmentos del programa ID: %d",id_prog);
+}
+
+// elimina un segmento por su base
+void EliminarSegmento(int base){
+	Segmento aSeg = BuscarSegmento(base);
+	BaseID * bi;
+	RangoMemoria * aRango = create_rango_mem(aSeg.baseVirtual,aSeg.tamano);
+	list_remove(Segmentos_UMV,PosicionDeSegmento(base));
+
+	int posBI = 0;
+	while( posBI <= ((int)list_size(List_Base_ID)) ){
+		bi = (BaseID*)list_get(List_Base_ID,posBI);
+		if(bi->base == aSeg.baseVirtual)
+			break;
+		posBI ++;
+	}
+
+
+	list_remove(List_Base_ID,posBI);
+	free(bi);
+
+	int pos = 0;
+
+	while(pos < list_size(Rangos_Libres)){
+		RangoMemoria RangoAux = *((RangoMemoria*)list_get(Rangos_Libres,pos));
+
+		if(RangoAux.base > aRango->base)
+			break;
+		pos ++;
+	}
+
+	if(aRango->tamano > 0)
+		list_add_in_index(Rangos_Libres,pos, aRango);
+
+	//logueamos
+	log_escribir(archLog,"Informacion de eliminacion de segmento",INFO,"se elimino el segmento de base: %d",base);
+
+}
+
+// devuelve la posicion de un segmento en la lista de segmentos por su base --OK
+Segmento BuscarSegmentoIndice(int ID){
+	BaseID bi;
+	int pos = 0;
+	log_escribir(archLog,"Informacion de busqueda de segmento",INFO,"Buscando el segmento de id %d",ID);
+	while( pos < list_size(List_Base_ID)){
+		bi = *((BaseID*)list_get(List_Base_ID,pos));
+		if(bi.ID == ID)
+			break;
+		pos ++;
+	}
+
+	if(pos < list_size(List_Base_ID))
+		return BuscarSegmento(bi.base);
+	else
+		return *create_segmento(1,-1,MP+tamanioMP,-1,MP);
+
+}
+
+// devuelve la posicion de un segmento en la lista de segmentos por su base
+int PosicionDeSegmento(int base){
+	Segmento segmento;
+	int pos = 0;
+	while( pos <= list_size(Segmentos_UMV) ){
+		segmento = *((Segmento*)list_get(Segmentos_UMV,pos));
+		if(segmento.baseVirtual == base)
+			break;
+		pos ++;
+	}
+
+	return pos;
+}
+
+// devuelve la posicion de un segmento en la lista de segmentos por su base
+Segmento BuscarSegmento(int base){
+	Segmento segmento;
+	int pos = 0;
+	log_escribir(archLog,"Informacion de busqueda de segmento",INFO,"Buscando el segmento de base %d",base);
+	while( pos <= ((int)list_size(Segmentos_UMV)) ){
+		segmento = *((Segmento*)list_get(Segmentos_UMV,pos));
+		if(segmento.baseVirtual == base)
+			break;
+		pos ++;
+	}
+
+	return segmento;
 }
 
 int getPosTabla(int id_prog){
@@ -732,26 +774,6 @@ int getPosTabla(int id_prog){
 }
 
 
-void liberarMP(int pos){
-	int i,ubicacion,tam;
-	i=0;
-	while(i<tablaDeSegmentos[pos].cant_segmentos){
-
-		//Recorro las posiciones ocupadas de la tabla de segmentos y obtengo la
-		//ubicacionMP y tamanio
-			ubicacion=tablaDeSegmentos[pos].segmentos[i].ubicacionMP;
-			tam=tablaDeSegmentos[pos].segmentos[i].tamanio;
-		//Recorro las posiciones de MP en base a ubicacionMP y tamanio
-		// y las igualo a NULL
-			while(tam!=0){
-				MP[ubicacion]=NULL;
-				ubicacion++;
-				tam--;
-			}
-			i++;
-	}
-
-}
 
 void eliminarSegmentos(int pos){
 	free(tablaDeSegmentos[pos].segmentos);
@@ -1299,7 +1321,7 @@ void *consola (void){
 				   compactar();
 			   }
 			   if (strcmp(comando,"dump") ==0){
-				   dump();
+				  // dump();
 			   }
 			}
 	    puts("\nEscriba la siguiente operacion");

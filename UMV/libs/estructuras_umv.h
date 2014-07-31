@@ -66,4 +66,23 @@ typedef struct tablaSeg{
 	segmentDescriptor* segmentos;
 }tablaSeg;
 
+//Definicion de Structss
+typedef struct{
+   int ID;
+   int programa;
+   void* base;
+   int baseVirtual;
+   int tamano;
+}Segmento;
+
+typedef struct{
+   int base;
+   int tamano;
+}RangoMemoria;
+
+typedef struct{
+   int base;
+   int ID;
+}BaseID;
+
 #endif /* ESTRUCTURAS_UMV_H_ */
