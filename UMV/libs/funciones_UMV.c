@@ -1055,6 +1055,7 @@ void atender_cpu(sock_struct* sock){
 				break;
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
+				printf("%d        %d        %d", escritura->base, escritura->offset, escritura->tamanio);
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
 				pthread_mutex_unlock(mutex_log);
@@ -1153,11 +1154,11 @@ void atender_kernel(sock_struct* sock){
 					respuesta->stack=base_stack;
 					printf("Stack: %d\n",base_stack);
 					respuesta->codigo=base_codigo;
-					printf("Stack: %d\n",base_codigo);
+					printf("codigo: %d\n",base_codigo);
 					respuesta->indice_codigo=base_index_code;
-					printf("Stack: %d\n",base_index_code);
+					printf("ind cod: %d\n",base_index_code);
 					respuesta->indice_etiquetas=base_index_etiq;
-					printf("Stack: %d\n",base_index_etiq);
+					printf("ind et: %d\n",base_index_etiq);
 					escribir_log(archLog,"Se envian bases de segmentos",INFO,"");
 					socket_enviar(sock->fd, D_STRUCT_BASES, respuesta);
 					free(respuesta);
@@ -1177,7 +1178,7 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				pid = ((t_struct_numero*)structRecibida);
-				escribir_log(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid->numero);
+				log_escribir(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid->numero);
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(pid->numero);
 				destruirSegmentos(procesoActivo);
@@ -1190,14 +1191,17 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_ESCRIBIRSEGMENTO:
 				struct_seg = ((t_struct_segmento*) structRecibida);
+				printf("%d         %d\n", struct_seg->base, struct_seg->tamanio);
 				if(struct_seg->tamanio==0){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
+
 				} else {
 					enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
+				}
 					t_struct_numero* respuesta= malloc(sizeof(t_struct_numero));
 					respuesta->numero=1;
 					socket_enviar(sock->fd, D_STRUCT_NUMERO, respuesta);
-				}
+
 				free(struct_seg);
 
 		}

@@ -88,9 +88,9 @@ void leerConfiguracion(void){
 	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
 	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
 	int i;
-	for(i=0; i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
-	configuracion_kernel.semaforos.cola_procesos[i]=queue_create();
-	}
+	/*for(i=0; i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
+		configuracion_kernel.semaforos.cola_procesos[i]=queue_create();
+	}*/
 	pthread_mutex_unlock(mutex_semaforos);
 	configuracion_kernel.hio.id = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);
@@ -160,6 +160,7 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 		pcb->codigo=base->codigo;
 		pcb->index_codigo=base->indice_codigo;
 		pcb->index_etiquetas=base->indice_etiquetas;
+		printf("%d    %d     %d     %d\n",pcb->stack,pcb->codigo,pcb->index_codigo,pcb->index_etiquetas);
 		free(base);
 		return 0;
 	}
@@ -203,13 +204,14 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
-
+		free(structRecibida);
 		paquete->base=nuevoPCB->index_codigo;
 		paquete->tamanio=tamanioIndiceCodigo;
 		paquete->segmento=((void*)metadata_programa->instrucciones_serializado);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+		free(structRecibida);
 
 		paquete->base=nuevoPCB->index_etiquetas;
 		paquete->tamanio=tamanioIndiceEtiquetas;
@@ -218,6 +220,7 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		free(paquete);
 
 		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
+		free(structRecibida);
 
 		nuevoPCB->program_counter=metadata_programa->instruccion_inicio;
 		nuevoPCB->tamanio_contexto=0;
@@ -229,12 +232,11 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	}else{	//Si no hay memoria suficiente, le avisa al programa
 		pthread_mutex_unlock(mutex_solicitarMemoria);
 
-
 		pthread_mutex_unlock(mutex_pid);
 		free(nuevoPCB);
 		return 0;
 	}
-
+	metadata_destruir(metadata_programa);
 	return nuevoPCB;
 }
 
