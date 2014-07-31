@@ -77,27 +77,27 @@ int segmentationFault(int base,int offset,int longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_struct_buffer solicitarBytes(int base,int offset, int longitud){
-	t_struct_buffer respuesta;
+t_struct_buffer* solicitarBytes(int base,int offset, int longitud){
+	t_struct_buffer* respuesta = malloc(sizeof(t_struct_buffer));
 	pthread_mutex_lock(mutex_MP);
 	if(!segmentationFault(base, offset, longitud)){
-	void* buffer=malloc(longitud);
-	int j;
-	j=traducirPosicion(base)+offset;
-	printf("La posicion real es: %d\n",j);
-	memcpy(buffer,  &MP[j], longitud);
-	respuesta.buffer=buffer;
-	respuesta.tamanio=longitud;
-	pthread_mutex_unlock(mutex_MP);
-	printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
-	escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
-	return respuesta;
+		void* buffer=malloc(longitud);
+		int j;
+		j=traducirPosicion(base)+offset;
+		printf("La posicion real es: %d\n",j);
+		memcpy(buffer,  &MP[j], longitud);
+		respuesta->buffer=buffer;
+		respuesta->tamanio=longitud;
+		pthread_mutex_unlock(mutex_MP);
+		printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
+		escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
+		return respuesta;
 	} else {
 		void* buffer_fallo=malloc(sizeof(int));
 		int valor=-1;
 		memcpy(buffer_fallo,&valor,sizeof(int));
-		respuesta.buffer=buffer_fallo;
-		respuesta.tamanio=sizeof(int);
+		respuesta->buffer=buffer_fallo;
+		respuesta->tamanio=sizeof(int);
 		pthread_mutex_unlock(mutex_MP);
 		printf("Seg fault\n");
 		return respuesta;
@@ -1028,7 +1028,7 @@ void atender_cpu(sock_struct* sock){
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
 				pthread_mutex_unlock(mutex_log);
-				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
+				t_struct_buffer* buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
 				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
 				break;
 			case D_STRUCT_ENV_BYTES:
@@ -1089,7 +1089,7 @@ void atender_kernel(sock_struct* sock){
 	socket_recibir(sock->fd, &tipoRecibido, &structRecibida);
 	tamanioMaxStack = ((t_struct_numero*)structRecibida)->numero;
 	pthread_mutex_lock(mutex_log);
-	log_escribir(archLog,"Se recibe el tamanio del stack",INFO,"El tamanio es: %d");
+	log_escribir(archLog,"Se recibe el tamanio del stack",INFO,"El tamanio es: %d", tamanioMaxStack);
 	pthread_mutex_unlock(mutex_log);
 	free(structRecibida);
 
@@ -1102,7 +1102,9 @@ void atender_kernel(sock_struct* sock){
 			case D_STRUCT_NUMERO:
 				pid = ((t_struct_numero*)structRecibida);
 				id_prog = pid->numero;
-				escribir_log(archLog,"Se recibe un ID de programa: %d",INFO,id_prog);
+				pthread_mutex_unlock(mutex_log);
+				log_escribir(archLog,"Se recibe un ID",INFO,"El id es: %d", id_prog);
+				pthread_mutex_unlock(mutex_log);
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(id_prog);
 				pthread_mutex_lock(mutex_log);
@@ -1169,7 +1171,7 @@ void atender_kernel(sock_struct* sock){
 				if(struct_seg->tamanio==0){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
 				} else {
-				enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
+					enviarBytes(struct_seg->base,0,struct_seg->tamanio,struct_seg->segmento);
 				}
 				free(struct_seg);
 
@@ -1226,7 +1228,7 @@ void *consola (void){
 	char comando[32];
 	char* aux_buffer;
 	aux_buffer= malloc(MAX_BUFFER);
-	t_struct_buffer buffer;
+	t_struct_buffer* buffer;
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	puts("\nIngrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);

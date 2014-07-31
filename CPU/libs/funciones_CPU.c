@@ -113,7 +113,7 @@ void core_conexion_kernel(void){
 
 	while(1){
 		t_tipoEstructura tipoRecibido;
-			void* structRecibida;
+		void* structRecibida;
 		sleep(configuracion_cpu.retardo);
 		fin_PCB = 0;
 		sig_flag = 0;
@@ -121,28 +121,21 @@ void core_conexion_kernel(void){
 		SEG_flag = 0;
 		fin_quantum = 0;
 		socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
-		if(D_STRUCT_NUMERO==tipoRecibido){
-			printf("Llega num\n");
-		}
-		if(D_STRUCT_PCB==tipoRecibido){
-			printf("\n\nEs pcb\n\n");
-		}
-			printf("\n\n%d\n\n",tipoRecibido);
-			pcb_recibida = ((t_struct_pcb*)structRecibida);
-			log_escribir(archLog, "Recibida pcb", INFO, "Se recibio la pcb con pid: %d", pcb_recibida->pid);
+		pcb_recibida = ((t_struct_pcb*)structRecibida);
+		log_escribir(archLog, "Recibida pcb", INFO, "Se recibio la pcb con pid: %d", pcb_recibida->pid);
 
 
-			temp_id=pcb_recibida->pid;
-			log_escribir(archLog, "PCB", INFO, "Se recibio el pid %d", temp_id);
-			temp_cursor_stack= pcb_recibida->c_stack;
-			temp_seg_codigo = pcb_recibida->codigo;
-			temp_ind_codigo = pcb_recibida->index_codigo;
-			var_ind_etiquetas = pcb_recibida->index_etiquetas;
-			temp_counter = pcb_recibida->program_counter;
-			var_seg_stack = pcb_recibida->stack;
-			var_tamanio_contexto = pcb_recibida->tamanio_contexto;
-			var_tamanio_etiquetas = pcb_recibida->tamanio_indice;
-			recupero_diccionario(dicc_variables,var_tamanio_contexto);
+		temp_id=pcb_recibida->pid;
+		log_escribir(archLog, "PCB", INFO, "Se recibio el pid %d", temp_id);
+		temp_cursor_stack= pcb_recibida->c_stack;
+		temp_seg_codigo = pcb_recibida->codigo;
+		temp_ind_codigo = pcb_recibida->index_codigo;
+		var_ind_etiquetas = pcb_recibida->index_etiquetas;
+		temp_counter = pcb_recibida->program_counter;
+		var_seg_stack = pcb_recibida->stack;
+		var_tamanio_contexto = pcb_recibida->tamanio_contexto;
+		var_tamanio_etiquetas = pcb_recibida->tamanio_indice;
+		recupero_diccionario(dicc_variables,var_tamanio_contexto);
 
 			while((fin_quantum!=quantum)&&(fin_PCB==0)){
 				t_struct_sol_bytes * solicitar_indice = malloc(sizeof(t_struct_sol_bytes));
