@@ -68,7 +68,6 @@ enum{
 	D_STRUCT_SEGCODIGO = 25,
 	D_STRUCT_SOL_BYTES=29,
 	D_STRUCT_ENV_BYTES=30,
-	D_STRUCT_BUFFER=31,
 	D_STRUCT_RESPUESTA_UMV=32,
 	D_STRUCT_OBTENER_VALOR=33,
 	D_STRUCT_ASIGNAR_VALOR=34,
@@ -311,14 +310,6 @@ typedef struct struct_env_bytes{
 	void* buffer;
 }__attribute__ ((__packed__)) t_struct_env_bytes;
 
-/* Estructura tipo STRUCT_BUFFER
- *
- */
-
-typedef struct struct_buffer{
-	void* buffer;
-	uint32_t tamanio;
-}__attribute__ ((__packed__)) t_struct_buffer;
 
 typedef struct struct_int_char{
 	char* string;

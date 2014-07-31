@@ -21,8 +21,8 @@ typedef int t_cursor_stack;
 typedef int t_index_codigo;
 typedef int t_index_etiquetas;
 
-typedef unsigned int t_quantum;
-typedef long int t_retardo_quantum;
+typedef uint8_t t_quantum;
+typedef long t_retardo_quantum;
 
 typedef struct{
 	t_pid pid;								//Identificador único del Programa en el sistema

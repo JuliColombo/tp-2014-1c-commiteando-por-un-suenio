@@ -77,8 +77,8 @@ int segmentationFault(int base,int offset,int longitud){
 
 // ***********************************Solicitar bytes en memoria*******************
 
-t_struct_buffer solicitarBytes(int base,int offset, int longitud){
-	t_struct_buffer respuesta;
+t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
+	t_struct_respuesta_umv respuesta;
 	pthread_mutex_lock(mutex_MP);
 	if(!segmentationFault(base, offset, longitud)){
 		void* buffer=malloc(longitud);
@@ -87,7 +87,7 @@ t_struct_buffer solicitarBytes(int base,int offset, int longitud){
 		printf("La posicion real es: %d\n",j);
 		memcpy(buffer,  &MP[j], longitud);
 		respuesta.buffer=buffer;
-		respuesta.tamanio=longitud;
+		respuesta.tamano_buffer=longitud;
 		pthread_mutex_unlock(mutex_MP);
 		printf("El buffer solicitado es: %s\n",(char*)buffer); //TODO: Cuando este funcionando, reemplazar por imprimirBuffer(t_buffer)
 		escribir_log(archLog, "Se realiza una solicitud de bytes", INFO, "La solicitud tiene exito");
@@ -97,7 +97,7 @@ t_struct_buffer solicitarBytes(int base,int offset, int longitud){
 		int valor=-1;
 		memcpy(buffer_fallo,&valor,sizeof(int));
 		respuesta.buffer=buffer_fallo;
-		respuesta.tamanio=sizeof(int);
+		respuesta.tamano_buffer=sizeof(int);
 		pthread_mutex_unlock(mutex_MP);
 		printf("Seg fault\n");
 		return respuesta;
@@ -1028,8 +1028,8 @@ void atender_cpu(sock_struct* sock){
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog,"Solicitud bytes",INFO, "Se solicitan; base: %d, offset: %d, tamanio: %d",solicitud->base, solicitud->offset, solicitud->tamanio);
 				pthread_mutex_unlock(mutex_log);
-				t_struct_buffer buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
-				socket_enviar(sock->fd, D_STRUCT_BUFFER, &buffer);
+				t_struct_respuesta_umv buffer = solicitarBytes(solicitud->base, solicitud->offset, solicitud->tamanio);
+				socket_enviar(sock->fd, D_STRUCT_RESPUESTA_UMV, &buffer);
 				break;
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
@@ -1047,7 +1047,7 @@ void atender_cpu(sock_struct* sock){
 				free(respuesta);
 				break;
 			case 0:
-				//log_escibir(archLog,"Termina la ejecucion de CPU",INFO,"");
+				log_escribir(archLog,"Termina la ejecucion de un pedido",INFO,"El pedido es de CPU");
 				break;
 		}
 	}
@@ -1228,7 +1228,7 @@ void *consola (void){
 	char comando[32];
 	char* aux_buffer;
 	aux_buffer= malloc(MAX_BUFFER);
-	t_struct_buffer buffer;
+	t_struct_respuesta_umv buffer;
 	int procesoDelHilo,unaBase,unOffset,unTamanio;
 	puts("\nIngrese operacion a ejecutar (operacion, retardo, algoritmo, compactacion, dump y exit para salir)");
 	scanf("%s",&comando);
@@ -1268,7 +1268,7 @@ void *consola (void){
 
 				}
 				if(strcmp(tipoOperacion, "crear") == 0){
-					    puts("\nIngrese el processID de programa a usar");
+					  puts("\nIngrese el processID de programa a usar");
 				 	  scanf("%d",&procesoDelHilo);
 					  puts("\nIngrese el tamaño del segmento");
 					  int tamanio;

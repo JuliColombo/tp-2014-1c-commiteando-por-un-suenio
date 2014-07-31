@@ -41,7 +41,7 @@ t_stream* paquetizarStruct_pcbSem(t_struct_pcb* estructuraOrigen);
 t_stream * paquetizarStruct_segCodigo(t_struct_seg_codigo * estructuraOrigen);
 t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen);
-t_stream * paquetizarStruct_buffer(t_struct_buffer * estructuraOrigen);
+t_stream * paquetizarStruct_respuesta_umv(t_struct_respuesta_umv * estructuraOrigen);
 t_stream * paquetizarStruct_obtener_valor(t_struct_string * estructuraOrigen);
 t_stream * paquetizarStruct_asignar_valor(t_struct_int_char * estructuraOrigen);
 t_stream * paquetizarStruct_imprimir(t_struct_numero * estructuraOrigen);
@@ -78,7 +78,6 @@ t_struct_seg_codigo * despaquetizarStruct_segCodigo(char * dataPaquete, uint16_t
 t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,uint16_t length);
 t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length);
 t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length);
-t_struct_buffer * despaquetizarStruct_buffer(char * dataPaquete,uint16_t length);
 t_struct_int_char * despaquetizarStruct_int_char(char * dataPaquete, uint16_t length);
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR

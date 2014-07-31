@@ -14,8 +14,6 @@
 #include <signal.h>
 #include "estructuras.h"
 
-typedef unsigned int t_quantum;
-typedef long int t_retardo_quantum;
 
 extern t_retardo_quantum retardo;
 extern t_dictionary* diccionario;

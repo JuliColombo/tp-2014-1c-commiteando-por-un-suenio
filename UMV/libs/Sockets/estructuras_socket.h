@@ -71,7 +71,7 @@ enum{
 	D_STRUCT_BASES=28,
 	D_STRUCT_SOL_BYTES=29,
 	D_STRUCT_ENV_BYTES=30,
-	D_STRUCT_BUFFER=31
+	D_STRUCT_RESPUESTA_UMV=32
 };
 
 
@@ -332,9 +332,9 @@ typedef struct struct_env_bytes{
  *
  */
 
-typedef struct struct_buffer{
+typedef struct struct_respuesta_UMV{
 	void* buffer;
-	uint32_t tamanio;
-}__attribute__ ((__packed__)) t_struct_buffer;
+	uint32_t tamano_buffer;
+}__attribute__((__packed__)) t_struct_respuesta_umv;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */
