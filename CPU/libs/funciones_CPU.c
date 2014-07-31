@@ -156,7 +156,6 @@ void core_conexion_kernel(void){
 				void * temp_buffer;
 				temp_buffer = ((t_struct_respuesta_umv*) estructuraRecibida2)->buffer;
 				temp_tamanio = ((t_struct_respuesta_umv*) estructuraRecibida2)->tamano_buffer;
-
 				uint32_t indice_temp;
 				uint32_t tamanio_temp;
 				int off_set;
@@ -212,9 +211,12 @@ void core_conexion_kernel(void){
 				temp_counter++;
 				fin_quantum++;
 
-				signal(SIGUSR1, rutina);
+				signal(SIGUSR1, llegoSeñalParaTerminar);
 
+				if (sig_flag == 1 && (quantum - fin_quantum == 0)) {
 
+					break;
+				}
 
 
 
@@ -237,6 +239,11 @@ void core_conexion_kernel(void){
 
 
 				socket_enviar(sockKernel, D_STRUCT_PCBFIN, pcb_fin);
+			}
+
+			fin_quantum = 0;
+			if (sig_flag == 1) {
+				break;
 			}
 
 	}
@@ -295,7 +302,7 @@ void recupero_diccionario(t_dictionary* diccionario, int tamanio_contexto) {
 }
 
 
-void rutina(int n) {
+void llegoSeñalParaTerminar(int n) {
 	switch (n) {
 	case SIGUSR1:
 
