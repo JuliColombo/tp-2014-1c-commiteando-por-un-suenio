@@ -450,7 +450,7 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 int crearSegmentoPrograma(int id_prog, int tamanio){
 	int result;
 	RangoMemoria rango;
-
+	if(tamanio>0){
 	pthread_mutex_lock(&Sem_GrabaBytes);
 
 	if (!SePuedeGrabarSegmento(tamanio)) {
@@ -517,6 +517,10 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	pthread_mutex_unlock(&Sem_GrabaBytes);
 
 	return result;
+	}
+	result=-2;
+	return result;
+
 }
 
 // crea un segmento nuevo -- OK
