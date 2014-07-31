@@ -36,7 +36,9 @@ int main (int argc, char **argv){
 
 	pthread_join(conexion_umv, NULL);
 	pthread_join(conexion_kernel,NULL);
-
+	if(socket_cerrarConexion(sockUMV)==-1){
+		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar a la UMV");
+	}
 	free(config->path);
 	dictionary_destroy(config->properties);
 	free(config);

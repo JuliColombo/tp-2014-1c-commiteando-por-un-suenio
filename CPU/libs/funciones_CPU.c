@@ -39,8 +39,8 @@ void inicializarConfiguracion(void){
 		log_escribir(archLog, "Leer archivo de configuracion", ERROR, "El archivo no existe");
 	}
 	else{
-	leerConfiguracion(PATH);
-	imprimirConfiguracion();
+		leerConfiguracion(PATH);
+		imprimirConfiguracion();
 	}
 }
 
@@ -59,6 +59,7 @@ void imprimirConfiguracion(void){
 	printf("Puerto para conexiones con Kernel: %d\n", configuracion_cpu.puerto_kernel);
 	printf("Direccion IP para conectarse a la UMV: %s\n", configuracion_cpu.ip_umv);
 	printf("Puerto para conexiones con UMV: %d\n", configuracion_cpu.puerto_umv);
+	printf("El retardo es: %d\n", configuracion_cpu.retardo);
 }
 
 void log_error_socket(void){
@@ -356,15 +357,5 @@ void core_conexion_umv(void){
 	}
 
 
-
-	while(1){
-
-
-
-	}
-
-	if(socket_cerrarConexion(sockUMV)==-1){
-		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar a la UMV");
-	}
 }
 
