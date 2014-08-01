@@ -245,8 +245,9 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 
 void enviar_pcb_a_cpu(void){
 	pthread_mutex_lock(mutex_array);
-	int pos = buscar_cpu_libre();
-	int fd_cpu_libre = fds_conectados_cpu[pos];
+	int pos;
+	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->estado!=LIBRE; pos++);
+	t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
 	t_struct_pcb* paquete = malloc(sizeof(t_struct_pcb));
 	pthread_mutex_lock(mutex_cola_ready);
 	t_programa* programa = (t_programa*)list_remove(cola.ready,0);
@@ -260,9 +261,10 @@ void enviar_pcb_a_cpu(void){
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
-	int i = socket_enviar(fd_cpu_libre,D_STRUCT_PCB,paquete);
+	int i = socket_enviar(cpu->socketCPU,D_STRUCT_PCB,paquete);
 	if(i==1){
-		estado_cpu[pos]=USADA;
+		cpu->estado=USADA;
+		cpu->id=programa->pcb->pid;
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,programa);
 		pthread_mutex_unlock(mutex_cola_exec);
@@ -419,12 +421,13 @@ void core_conexion_pcp_cpu(void){
 
 	int i;
 	pthread_mutex_lock(mutex_array);
-	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
-	estado_cpu=malloc(MAX_EVENTS_EPOLL*sizeof(int));
-	for(i=0; i<MAX_EVENTS_EPOLL;i++){
-		 estado_cpu[i]=LIBRE;
-		 fds_conectados_cpu[i]=0;
-	}
+//	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
+//	estado_cpu=malloc(MAX_EVENTS_EPOLL*sizeof(int));
+//	for(i=0; i<MAX_EVENTS_EPOLL;i++){
+//		 estado_cpu[i]=LIBRE;
+//		 fds_conectados_cpu[i]=0;
+//	}
+	cpus = list_create();
 	pthread_mutex_unlock(mutex_array);
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);
 	efd_cpu=epoll_crear();

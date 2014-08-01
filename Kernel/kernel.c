@@ -32,6 +32,7 @@ int* fds_conectados_cpu;
 int* estado_cpu;
 int program_pid;
 sem_t sem_multiProg, sem_ready, sem_new, sem_cpu;
+t_list* cpus;
 
 
 

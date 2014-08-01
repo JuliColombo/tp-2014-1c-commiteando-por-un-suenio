@@ -99,11 +99,12 @@ typedef struct{
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
-typedef enum {
-	NUEVO,
-	BLOQUEADO,
-	RAFAGA
-} t_prioridad_rr;
+typedef struct aux_cpu {
+	int estado;
+	int socketCPU;
+	int id;
+}t_struct_descriptor_cpu;
+
 
 typedef struct {
 	int peso;

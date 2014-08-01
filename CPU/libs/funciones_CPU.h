@@ -23,7 +23,6 @@ typedef struct{
 	int retardo;
 }config_cpu;
 
-t_dictionary* dicc_variables;
 int SEG_flag;
 char * dicc_etiquetas;
 int fin_PCB;

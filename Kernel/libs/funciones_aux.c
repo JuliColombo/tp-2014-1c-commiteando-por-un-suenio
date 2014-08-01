@@ -206,8 +206,11 @@ int posicion_Semaforo(char* semaforo){
 
 void liberarCPU(int fd){
 	pthread_mutex_lock(mutex_array);
-	int pos = buscar_cpu_por_fd(fd);
-	estado_cpu[pos]=LIBRE;
+	int pos;
+	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU!=fd;pos++);
+	t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus,pos);
+	cpu->estado=LIBRE;
+	cpu->id=-1;
 	pthread_mutex_unlock(mutex_array);
 	return;
 }
@@ -637,25 +640,27 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
  */
 
 void manejar_ConexionNueva_CPU(epoll_data_t data){
-	int n, fd_aceptado;
+	int fd_aceptado;
 	t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 	uint32_t k=configuracion_kernel.quantum;
 	paquete->numero=k;
-	for(n=0; fds_conectados_cpu[n]!=0;n++);
-	if(n<MAX_EVENTS_EPOLL){
-		fd_aceptado=socket_aceptarCliente(data.fd);
-		if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
+	fd_aceptado=socket_aceptarCliente(data.fd);
+	if((epoll_agregarSocketCliente(efd_cpu,fd_aceptado))==0){
 		//	escribir_log(archLog,"Conexion", INFO, "Se acepto la conexion de cpu");
 			pthread_mutex_lock(mutex_array);
-			fds_conectados_cpu[n]=fd_aceptado;
-			estado_cpu[n]=LIBRE;
+			t_struct_descriptor_cpu* cpuNueva = malloc(sizeof(t_struct_descriptor_cpu));
+			cpuNueva->estado=LIBRE;
+			cpuNueva->id=-1;
+			cpuNueva->socketCPU=fd_aceptado;
+			list_add(cpus,(void*) cpuNueva);
+//			fds_conectados_cpu[n]=fd_aceptado;
+//			estado_cpu[n]=LIBRE;
 			pthread_mutex_unlock(mutex_array);
 			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion del cpu numero %d", n+1);
+			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion de una cpu");
 			pthread_mutex_unlock(mutex_log);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
 			sem_post(&sem_cpu);
-		}
 	} else {
 		escribir_log(archLog,"Conexion",ERROR,"No se pudo conectar la cpu");
 	}

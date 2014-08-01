@@ -84,6 +84,7 @@ int fin_quantum;
 int sockKernel;
 int sig_flag;
 int umv_flag;
+t_dictionary* dicc_variables;
 
 void core_conexion_kernel(void){
 	if((sockKernel=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
@@ -99,13 +100,12 @@ void core_conexion_kernel(void){
 	free(k);
 	log_escribir(archLog, "Quantum", INFO, "Se seteo el quantum en %d al ser recibido del kernel", quantum);
 
-
 	int fin_PCB;
 	int sig_flag;
 	int UMV_flag;
 	int SEG_flag;
 	int id;
-	t_dictionary* dicc_variables =dictionary_create();
+	dicc_variables =dictionary_create();
 
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;

@@ -32,6 +32,7 @@ int fin_quatum_ansisop;
 extern t_quantum quantum;
 extern int fin_PCB;
 extern log_t * archLog;
+extern t_dictionary* dicc_variables;
 
 
 void excepcion_UMV(int i);
