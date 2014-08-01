@@ -51,6 +51,14 @@ int main (int argc, char **argv){
 	void* structRecibida;
 	socket_recibir(sock_kernel_servidor, &tipoRecibido, &structRecibida);
 	while(1){
+		if(tipoRecibido==D_STRUCT_NUMERO){
+			t_struct_numero* num = ((t_struct_numero*)structRecibida);
+			printf("%d\n", num->numero);
+			free(structRecibida);
+
+
+		}
+
 		if(tipoRecibido==D_STRUCT_PROGFIN){
 			t_struct_numero* num = ((t_struct_numero*)structRecibida);
 			log_escribir(archLog, "Termino el programa", INFO, "Se finalizo correctamente el programa");

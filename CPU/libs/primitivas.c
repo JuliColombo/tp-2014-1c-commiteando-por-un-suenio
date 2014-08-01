@@ -674,6 +674,7 @@ void imprimir(t_valor_variable valor_mostrar) {
 		//Se envia numero a imprimir en kernel
 		t_struct_numero * valor = malloc(sizeof(t_struct_numero));
 		valor->numero = valor_mostrar;
+
 		socket_enviar(sockKernel, D_STRUCT_IMPRIMIR, valor); // aca esta enviando un 1 al kernel, eso se debe a posicion_memoria+1que mi CPU solo recibe una instruccion por ahora.
 		socket_recibir(sockKernel, &tipoRecibido, &estructuraRecibida);
 		printf("imprimir\n");

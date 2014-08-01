@@ -544,12 +544,10 @@ int buscar_cpu_libre(void){
 }
 
 int buscar_cpu_por_fd(int fd){
-	int i=0;
-	while(fds_conectados_cpu[i]!=fd){
-		i++;
-	}
+	int pos=0;
+	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU!=fd; pos++);
 
-	return i;
+	return pos;
 }
 
 
@@ -713,6 +711,32 @@ void handler_conexion_cpu(epoll_data_t data){
 				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 			}
 			break;
+		case D_STRUCT_STRING:
+			string = malloc(sizeof(t_struct_string));
+			string->string= ((t_struct_string*)structRecibida)->string;
+			printf("%s", ((t_struct_string*)structRecibida)->string);
+			int pos = buscar_cpu_por_fd(data.fd);
+			t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
+			programa = (t_programa*)buscarPrograma(cpu->id, cola.exec, mutex_cola_exec);
+			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, string);
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=1;
+			socket_enviar(data.fd, D_STRUCT_NUMERO, string);
+			free(string);
+			free(num);
+			break;
+		case D_STRUCT_IMPRIMIR:
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=((t_struct_numero*)structRecibida)->numero;
+			printf("%d\n",num->numero);
+			pos = buscar_cpu_por_fd(data.fd);
+			cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
+			programa = (t_programa*)buscarPrograma(cpu->id, cola.exec, mutex_cola_exec);
+			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_NUMERO, num);
+			free(num);
+
+
+			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
 			string = ((t_struct_string*)structRecibida);
 			if((validarVarGlobal(string->string))==0){
@@ -870,9 +894,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			free(programa->pcb);
 			sem_post(&sem_multiProg);
 	}
-	pthread_mutex_lock(mutex_cola_ready);
-	mostrarColasPorPantalla(cola.ready,"Ready");
-	pthread_mutex_unlock(mutex_cola_ready);
+//	pthread_mutex_lock(mutex_cola_ready);
+//	mostrarColasPorPantalla(cola.ready,"Ready");
+//	pthread_mutex_unlock(mutex_cola_ready);
 	sem_post(&sem_cpu);
 	free(structRecibida);
 
@@ -892,13 +916,11 @@ void handler_conexion_cpu(epoll_data_t data){
 
 void desconexion_cpu(epoll_data_t data){
 	int pos;
-	for(pos=0; pos<MAX_EVENTS_EPOLL; pos++){
-		if(fds_conectados_cpu[pos]==data.fd){
-			estado_cpu[pos]=LIBRE;
-		//	escribir_log(archLog, "Conexiones CPU", INFO, "Se desconectó una cpu");
-			fds_conectados_cpu[pos]=0;
-			break;
-		}
+	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU!=data.fd; pos++);
+	list_remove(cpus,pos);
+	pthread_mutex_lock(mutex_log);
+	log_escribir(archLog, "Conexiones CPU", INFO, "Se desconecto una cpu");
+	pthread_mutex_unlock(mutex_log);
 
-	}
+
 }

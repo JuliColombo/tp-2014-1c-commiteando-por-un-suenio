@@ -887,12 +887,14 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_NOMBREMENSAJE:
 				estructuraDestino = despaquetizarStruct_nombreMensaje(dataPaquete, length);
 				break;
+			case D_STRUCT_IMPRIMIR:
 			case D_STRUCT_NUMERO:
 				estructuraDestino = despaquetizarStruct_numero(dataPaquete, length);
 				break;
 			case D_STRUCT_CHAR:
 				estructuraDestino = despaquetizarStruct_char(dataPaquete,length);
 				break;
+			case D_STRUCT_IMPRIMIRTEXTO:
 			case D_STRUCT_STRING:
 				estructuraDestino = despaquetizarStruct_string(dataPaquete,length);
 				break;
