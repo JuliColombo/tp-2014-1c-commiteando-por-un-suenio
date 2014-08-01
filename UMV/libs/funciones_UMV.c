@@ -313,13 +313,12 @@ void MostrarTablaBI() {
  * Funcion: Genera archivos con el estado de la MP y la tabla de segmentos
  */
 
-void dump(){/*
+void dump(){
 	FILE* archivo_MP;
 	FILE* archivo_TS;
 	int procesoAVer;
-	int getEspacioLibreMP(void);
-	void imprimirBuffer(t_buffer);
-	void imprimirBufferEnArchivo(t_buffer,FILE*);
+	//void imprimirBuffer(t_buffer);
+	//void imprimirBufferEnArchivo(t_buffer,FILE*);
 
 	pthread_mutex_lock(mutex_MP);
 
@@ -334,16 +333,16 @@ void dump(){/*
 
 
 	//Estructuras de memoria
-	fprintf(archivo_MP, "\tDump del estado de la memoria principal");
-	fprintf(archivo_TS, "\tDump del estado de la tabla de segmentos");
+	fprintf(archivo_MP, "Dump del estado de la memoria principal\n");
+	fprintf(archivo_TS, "Dump del estado de la tabla de segmentos\n");
 
 	puts("\nIngrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
-		imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
+		//imprimirEstadoTablaSeg(archivo_TS,0,cant_tablas);
 	}else {
-		int ubicacion= getPosTabla(procesoAVer);
-		int tablaFinal=ubicacion+1;
+		//int ubicacion= getPosTabla(procesoAVer);
+		//int tablaFinal=ubicacion+1;
 		DumpDeUnPrograma(procesoAVer,archivo_TS);
 	}
 
@@ -363,14 +362,12 @@ void dump(){/*
 
 
 	//Espacio libre
+	fprintf(archivo_MP,"\tCantidad Memoria Libre: %d \n", CantidadMemoriaLibre());
 
-	int espacioLibre= getEspacioLibreMP();
-	printf("\nEl espacio libre en la memoria principal es: %d\n",espacioLibre);
-	fprintf(archivo_MP,"El espacio libre en la memoria principal: %d\n",espacioLibre);
 
 	//Contenido de la memoria principal
 	int offset,tamanio;
-	t_buffer buffer;
+	char* buffer;
 	printf("\nIngrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer\n");
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
@@ -379,8 +376,8 @@ void dump(){/*
 
 	pthread_mutex_lock(&Sem_DevuelveBytes);
 
-	buffer = malloc((tamanio+1)*sizeof(char));
-	memcpy((char*)buffer, (char*) &MP[offset], tamanio);
+	buffer = malloc((tamanio)*sizeof(char));
+	memcpy(buffer, MP+offset, tamanio);
 	printf("\nLa posicion de memoria %d contiene: %s\n", offset, (char*)buffer);
 	fprintf(archivo_MP, "La posicion de memoria %d contiene: %s\n", offset, (char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 
@@ -395,7 +392,7 @@ void dump(){/*
 
 	fclose(archivo_MP);
 	fclose(archivo_TS);
-*/}
+}
 
 // Muestreo de Datos por Programa
 void DumpDeUnPrograma(int Programa,FILE* archivo){
@@ -405,7 +402,7 @@ void DumpDeUnPrograma(int Programa,FILE* archivo){
 
 	void Mostrar(Segmento* rango) {
 		 if(Programa == rango->programa)
-			 fprintf(archivo,"Rango: Base %d  - Tamano: %d \n", rango->baseVirtual, rango->tamano);
+			 fprintf(archivo,"\tRango: Base %d  - Tamano: %d \n", rango->baseVirtual, rango->tamano);
 	}
 
 	fprintf(archivo,"Segmetos actuales del programa: %d \n", Programa);
@@ -476,6 +473,20 @@ void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal){
 			}
 }
 
+// Nos dice la cantidad total de memoria libre,
+int CantidadMemoriaLibre() {
+
+	int tamanoTotal = 0;
+
+	void ContarTamano(RangoMemoria* rango) {
+		tamanoTotal = tamanoTotal + rango->tamano;
+	}
+
+	list_iterate(Rangos_Libres, (void*)ContarTamano);
+
+	return tamanoTotal;
+}
+
 
 
 /*
@@ -540,6 +551,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 			}
 		}
 		printf("La base es: %d\n",ID);
+		printf("La dir real es: %d\n",rango.base);
 		sleep(Retardo);
 
 		// guardamos ordenado
@@ -1376,7 +1388,7 @@ void *consola (void){
 				   compactar();
 			   }
 			   if (strcmp(comando,"dump") ==0){
-				  // dump();
+				   dump();
 			   }
 			}
 	    puts("\nEscriba la siguiente operacion");
