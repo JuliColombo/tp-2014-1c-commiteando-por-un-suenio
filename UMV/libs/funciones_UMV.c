@@ -1238,9 +1238,11 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_DESTRUIRSEGMENTOS:
 				pid = ((t_struct_numero*)structRecibida);
-				log_escribir(archLog,"Se recibe peticion de destruccion de segmentos del programa: %d",INFO,pid->numero);
+				id_prog = pid->numero;
+				printf("Se recibe pid a destruir: %d\n",id_prog);
+				log_escribir(archLog,"Se recibe peticion de destruccion de segmentos",INFO,"Del programa de id: %d",id_prog);
 				pthread_mutex_lock(mutex_pid);
-				cambioProcesoActivo(pid->numero);
+				cambioProcesoActivo(id_prog);
 				destruirSegmentos(procesoActivo);
 				printf("Se destruyen los segmentos del programa %d\n",procesoActivo);
 				pthread_mutex_lock(mutex_log);
