@@ -130,7 +130,7 @@ void core_conexion_kernel(void){
 
 
 		temp_id=pcb_recibida->pid;
-		log_escribir(archLog, "PCB", INFO, "Se recibio el pid %d\n", temp_id);
+		log_escribir(archLog, "PCB", INFO, "Se recibio el pid %d", temp_id);
 		temp_cursor_stack= pcb_recibida->c_stack;
 		temp_seg_codigo = pcb_recibida->codigo;
 		temp_ind_codigo = pcb_recibida->index_codigo;

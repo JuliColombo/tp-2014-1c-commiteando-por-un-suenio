@@ -48,6 +48,8 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 
 	socket_recibir(sockUMV, &tipoStruct, &structRecibido);
 
+
+
 	if (tipoStruct != D_STRUCT_NUMERO) {
 		printf("Respuesta en desreferenciar incorrecta\n");
 		return 0;
@@ -56,6 +58,7 @@ t_puntero definirVariable(t_nombre_variable identificador_variable) {
 	excepcion_UMV(recepcion);
 	var_tamanio_contexto++; //aumentamos el tamanio de contexto
 	free(structRecibido);
+	log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto definirVariable");
 	return obtenerPosicionVariable(keyABuscar[0]); //mejor que devuelva el desplazamiento dentro del stack y no la direccion por que el stack esta en otro proceso
 }
 
@@ -75,10 +78,13 @@ t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable) {
 
 		posicion_variable = ((*posicion) * 5) - 4;
 
-		if (posicion_variable >= 0)
+		if (posicion_variable >= 0){
+			log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto obtenerPosicionVariable");
 			return posicion_variable + temp_cursor_stack;
-		else
+		}else{
+			log_escribir(archLog,"Se termina de ejecutar una instruccion",ERROR,"No se ejecuto correctamente obtenerPosicionVariable");
 			return -1;
+		}
 }
 
 
@@ -120,6 +126,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 			int valor1 = *respuesta;
 			if (valor1 < 0) {
 				excepcion_UMV(0);
+				log_escribir(archLog,"Se termina de ejecutar una instruccion",ERROR,"Se lanza excepcion de umv en dereferenciar");
 				return 0;
 			}
 
@@ -129,6 +136,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 		free(desreferenciar);
 		free(temp_buffer);
 		free(structRecibido);
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto dereferenciar");
 		return valor;
 
 }
@@ -166,6 +174,7 @@ void asignar(t_puntero direccion_variable, t_valor_variable valor) {
 		free(temp_buffer);
 		free(structRecibido);
 		printf("asignar\n");
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto asignar");
 }
 
 
@@ -191,6 +200,7 @@ t_valor_variable obtenerValorCompartida(t_nombre_compartida variable) {
 		}
 		valorComp = ((t_struct_numero*) structRecibido)->numero;
 		printf("obtenerValorCompartida\n");
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto obtenerValorCompartida");
 		//Se libera el espacio alocado
 		free(nombreVarComp);
 		free(structRecibido);
@@ -221,6 +231,7 @@ t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_va
 		socket_recibir(sockKernel, &tipoRecibido, &structRecibido); // recibo el valor
 		//Recibe respuesta del kernel
 		printf("asignarValorCompartida\n");
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto asignarValorCompartida");
 		//Se libera el espacio alocado
 		free(asignarValor);
 		free(partes[0]);
@@ -268,6 +279,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 				int valor1 = *respuesta;
 				if (valor1 < 0) {
 					excepcion_UMV(0);
+					log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se produjo una excepcion de umv en irAlLabel");
 					return;
 				}
 
@@ -279,7 +291,7 @@ void irAlLabel(t_nombre_etiqueta etiqueta) {
 		}													 //NO TENDRIA QUE SER TODAS LAS ETIQUETAS?
 
 		printf("irAlLabel\n");
-
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto irAlLabel");
 		temp_counter = metadata_buscar_etiqueta(etiqueta, dicc_etiquetas, var_tamanio_etiquetas); //se asigna al program counter
 		temp_counter = temp_counter - 1;
 		//Se libera espacio alocado
@@ -323,6 +335,7 @@ void llamarSinRetorno(t_nombre_etiqueta etiqueta) {
 
 		irAlLabel(etiqueta); //le asignamos al program_counter la proxima ejecucion a ejecutar dentro del procedimiento
 
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto llamarSinRetorno");
 		dictionary_clean_and_destroy_elements(dicc_variables, free);
 		var_tamanio_contexto = 0;
 		//Se libera espacio alocado
@@ -368,7 +381,10 @@ void llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar) {
 		int recepcion = ((t_struct_numero*) structRecibido)->numero;
 		excepcion_UMV(recepcion);
 		temp_cursor_stack = temp_cursor_stack + (var_tamanio_contexto * 5) + 3 * sizeof(int);
+
 		irAlLabel(etiqueta);
+
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto llamarConRetorno");
 		dictionary_clean_and_destroy_elements(dicc_variables, free);
 		var_tamanio_contexto = 0;
 		printf("llamarConRetorno\n");
@@ -439,6 +455,7 @@ void finalizar() {
 				imprimirTexto(keyaImprimir);
 				imprimir(valoraImprimir);
 
+				log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto finalizar");
 				i++;
 				incremento = incremento + (sol_var->tamanio);
 				//Se libera espacio alocado
@@ -660,7 +677,7 @@ void retornar(t_valor_variable retorno) {
 		if (retorno != -1) {
 			asignar(direccion_retornar, retorno);		// el if es para reutilizar el reotornar en el finalizar omitiendo la asignacion
 		}
-
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto retornar");
 		free(punts_contx_ant);
 		printf("retornar\n");
 }
@@ -722,7 +739,7 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 		free(IO);
 
 		fin_quantum = quantum - 1;
-
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto entradaSalida");
 		printf("entradaSalida\n");
 }
 
@@ -752,6 +769,7 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 		if (respuestaKernel.numero < 1) {
 			fin_quantum = quantum - 1;
 		}
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto wait");
 		free(partes[0]);
 		free(partes[1]);
 		free(partes);
@@ -776,6 +794,7 @@ void signal_ansisop(t_nombre_semaforo identificador_semaforo) {
 		// si Respuesta = 0 tengo que finalizar el programa
 		if (respuestaKernel.numero == 0)
 			fin_PCB = 1;
+		log_escribir(archLog,"Se termina de ejecutar una instruccion",INFO,"Se ejecuto signal");
 }
 
 t_struct_pcb * PCB_Actualizado() {

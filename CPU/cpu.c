@@ -24,7 +24,6 @@ int main (int argc, char **argv){
 	}
 	PATH=argv[1];
 	inicializarConfiguracion();
-	log_setPrintMode(archLog, M_CONSOLEANDFILE);
 
 	pthread_create(&conexion_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
