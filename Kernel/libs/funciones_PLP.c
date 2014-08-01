@@ -324,7 +324,9 @@ void core_pcp(void){
 	while(1){
 		sem_wait(&sem_ready);
 		sem_wait(&sem_cpu);
-
+		pthread_mutex_lock(mutex_cola_ready);
+		mostrarColasPorPantalla(cola.ready, "Ready");
+		pthread_mutex_unlock(mutex_cola_ready);
 		if(list_size(cola.ready)!=0){
 			enviar_pcb_a_cpu();
 			pthread_mutex_lock(mutex_cola_exec);
@@ -367,9 +369,6 @@ void core_io(t_struct_pcb_io* bloqueo){
 		t_programa* programa = buscarPrograma(bloqueo->pid,cola.block.io,mutex_cola_block_io);
 		actualizarPCB(programa, pcb);
 		mandarAOtraCola(programa, cola.block.io, mutex_cola_block_io, cola.ready, mutex_cola_ready);
-//		pthread_mutex_lock(mutex_cola_ready);
-//		mostrarColasPorPantalla(cola.ready, "Ready");
-//		pthread_mutex_unlock(mutex_cola_ready);
 		sem_post(&sem_multiProg);
 
 		free(bloqueo);
@@ -421,12 +420,6 @@ void core_conexion_pcp_cpu(void){
 
 	int i;
 	pthread_mutex_lock(mutex_array);
-//	fds_conectados_cpu = malloc(MAX_EVENTS_EPOLL*sizeof(int));
-//	estado_cpu=malloc(MAX_EVENTS_EPOLL*sizeof(int));
-//	for(i=0; i<MAX_EVENTS_EPOLL;i++){
-//		 estado_cpu[i]=LIBRE;
-//		 fds_conectados_cpu[i]=0;
-//	}
 	cpus = list_create();
 	pthread_mutex_unlock(mutex_array);
 	sock_cpu=socket_crearServidor("127.0.0.1", configuracion_kernel.puerto_cpus);

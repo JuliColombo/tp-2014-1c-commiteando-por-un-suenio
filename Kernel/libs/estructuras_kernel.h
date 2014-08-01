@@ -47,6 +47,13 @@ typedef struct{
 	t_queue** cola_procesos;
 }t_semaforos;
 
+enum {
+	NORMAL = 0,
+	FIN = 1,
+	IO = 2,
+} estado_pcb;
+
+
 typedef struct{
 	char** identificador;
 	int* valor;

@@ -701,6 +701,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			free(textoAImprimir);
 			break;
 		case D_STRUCT_PCB:
+			printf("------>LLEGA UNA PCB\n");
 			liberarCPU(data.fd);
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);

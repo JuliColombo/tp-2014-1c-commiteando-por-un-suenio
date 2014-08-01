@@ -84,6 +84,7 @@ int fin_quantum;
 int sockKernel;
 int sig_flag;
 int umv_flag;
+int fin_PCB;
 t_dictionary* dicc_variables;
 
 void core_conexion_kernel(void){
@@ -100,7 +101,6 @@ void core_conexion_kernel(void){
 	free(k);
 	log_escribir(archLog, "Quantum", INFO, "Se seteo el quantum en %d al ser recibido del kernel", quantum);
 
-	int fin_PCB;
 	int sig_flag;
 	int UMV_flag;
 	int SEG_flag;
@@ -239,7 +239,8 @@ void core_conexion_kernel(void){
 
 
 
-			if(fin_PCB==0){
+			if(fin_PCB==0 && UMV_flag == 0){
+				printf("STRUCT PCB FIN\n\n");
 				t_struct_pcb_fin* pcb_fin = malloc(sizeof(t_struct_pcb_fin));
 				pcb_fin->c_stack=pcb->c_stack;
 				pcb_fin->codigo=pcb->codigo;
@@ -250,6 +251,7 @@ void core_conexion_kernel(void){
 				pcb_fin->stack=pcb->stack;
 				pcb_fin->tamanio_contexto=pcb->tamanio_contexto;
 				pcb_fin->tamanio_indice=pcb->tamanio_contexto;
+				pcb_fin->variables="fin";
 
 
 				socket_enviar(sockKernel, D_STRUCT_PCBFIN, pcb_fin);
