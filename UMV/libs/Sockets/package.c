@@ -1579,7 +1579,7 @@ t_struct_segmento* despaquetizarStruct_escribirSegmentos(char* dataPaquete, uint
 
 	tamanoTotal+= tamanoDato;
 
-	for(tamanoDato = 1; (dataPaquete + tamanoTotal)[tamanoDato -1] != '\0';tamanoDato++); 	//incremento tamanoDato, hasta el tamaño del nombre.
+	tamanoDato=estructuraDestino->tamanio;
 
 	estructuraDestino->segmento= malloc(tamanoDato);
 	memcpy(estructuraDestino->segmento, dataPaquete + tamanoTotal, tamanoDato);

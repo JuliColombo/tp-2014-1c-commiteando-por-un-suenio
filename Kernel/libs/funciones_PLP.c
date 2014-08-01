@@ -208,6 +208,9 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		paquete->base=nuevoPCB->index_codigo;
 		paquete->tamanio=tamanioIndiceCodigo;
 		paquete->segmento=((void*)metadata_programa->instrucciones_serializado);
+		t_intructions* aux=malloc(sizeof(t_intructions));
+		memcpy(aux,((t_intructions*)paquete->segmento), sizeof(t_intructions));
+		printf("Supuesto offset:%d       Supuesto tamanio:%d", aux->start,aux->offset);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);

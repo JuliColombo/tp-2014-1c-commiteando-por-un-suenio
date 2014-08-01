@@ -707,7 +707,7 @@ t_stream* paquetizarStruct_escribirSegmentos(t_struct_segmento* estructuraOrigen
 
 	t_stream* paquete = malloc(sizeof(t_stream));
 
-	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + estructuraOrigen->tamanio;
+	paquete->length = sizeof(t_header) + sizeof(uint32_t) + sizeof(uint32_t) + (estructuraOrigen->tamanio);
 
 	char* data = crearDataConHeader(D_STRUCT_ESCRIBIRSEGMENTO, paquete->length);
 

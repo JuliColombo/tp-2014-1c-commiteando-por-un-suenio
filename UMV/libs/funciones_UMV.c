@@ -1240,6 +1240,9 @@ void atender_kernel(sock_struct* sock){
 			case D_STRUCT_ESCRIBIRSEGMENTO:
 				struct_seg = ((t_struct_segmento*) structRecibida);
 				printf("%d         %d\n", struct_seg->base, struct_seg->tamanio);
+				t_intructions* aux=malloc(sizeof(t_intructions));
+				memcpy(aux,((t_intructions *)struct_seg->segmento),sizeof(t_intructions));
+				printf("Supuesto offset: %d      Supuesto tamanio: %d\n",aux->start,aux->offset);
 				if(struct_seg->tamanio==0){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
 
