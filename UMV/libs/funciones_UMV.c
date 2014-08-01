@@ -1116,7 +1116,6 @@ void atender_cpu(sock_struct* sock){
 				break;
 			case D_STRUCT_ENV_BYTES:
 				escritura = (t_struct_env_bytes*) structRecibida;
-				printf("%d        %d        %d", escritura->base, escritura->offset, escritura->tamanio);
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Se envian bytes",INFO, "base: %d, offset:%d , tamanio: %d",escritura->base, escritura->offset, escritura->tamanio);
 				pthread_mutex_unlock(mutex_log);
@@ -1243,6 +1242,7 @@ void atender_kernel(sock_struct* sock){
 				pthread_mutex_lock(mutex_pid);
 				cambioProcesoActivo(pid->numero);
 				destruirSegmentos(procesoActivo);
+				printf("Se destruyen los segmentos del programa %d\n",procesoActivo);
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Destruir Segmentos del programa: %", INFO, "Por solicitud del kernel se destruyen los segmentos del proceso: %d");
 				pthread_mutex_unlock(mutex_log);

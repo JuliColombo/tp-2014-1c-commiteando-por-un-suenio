@@ -716,10 +716,10 @@ void handler_conexion_cpu(epoll_data_t data){
 				if(pcb->estado==FIN){
 					printf("PCB FIN\n");
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado finalizado");
-//					num = malloc(sizeof(t_struct_numero));
-//					num->numero=programa->pcb->pid;
-//					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
-//					free(num);
+					num = malloc(sizeof(t_struct_numero));
+					num->numero=programa->pcb->pid;
+					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
+					free(num);
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
 					pthread_mutex_lock(mutex_cola_exit);
 					mostrarColasPorPantalla(cola.exit, "Exit");
@@ -727,8 +727,8 @@ void handler_conexion_cpu(epoll_data_t data){
 					pthread_mutex_lock(mutex_log);
 					log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Exit", programa->pcb->pid);
 					pthread_mutex_unlock(mutex_log);
-					//free(programa->pcb);
-					//sem_post(&sem_multiProg);
+					free(programa->pcb);
+					sem_post(&sem_multiProg);
 					socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
 				if(pcb->estado==IO){
