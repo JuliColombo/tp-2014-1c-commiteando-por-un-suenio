@@ -73,6 +73,10 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 			memcpy(buff_fault,&valor,sizeof(int));
 			respuesta.buffer=buff_fault;
 			respuesta.tamano_buffer=sizeof(int);
+			int resp;
+			memcpy(&resp,respuesta.buffer,sizeof(int));
+			printf("Valor respondido:%d\n",resp);
+			printf("Tamanio respondido:%d\n",respuesta.tamano_buffer);
 			pthread_mutex_unlock(&Sem_DevuelveBytes);
 			return respuesta ;
 		}

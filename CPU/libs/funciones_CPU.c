@@ -155,6 +155,20 @@ void core_conexion_kernel(void){
 				void * temp_buffer;
 				temp_buffer = ((t_struct_respuesta_umv*) estructuraRecibida2)->buffer;
 				temp_tamanio = ((t_struct_respuesta_umv*) estructuraRecibida2)->tamano_buffer;
+
+				if (temp_tamanio == sizeof(int)) {
+					int*respuesta2 = malloc(sizeof(int));
+					memcpy(respuesta2, ((t_struct_respuesta_umv*) estructuraRecibida2)->buffer, temp_tamanio);
+					int valor = *respuesta2;
+					printf("Valor respondido: %d",valor);
+					if (valor < 0) {
+							excepcion_UMV(0);
+							break;
+						}
+
+				}
+
+
 				uint32_t indice_temp;
 				uint32_t tamanio_temp;
 				int off_set;
@@ -183,6 +197,7 @@ void core_conexion_kernel(void){
 					int*respuesta = malloc(sizeof(int));
 					memcpy(respuesta, ((t_struct_respuesta_umv*) estructuraRecibida3)->buffer, tamanio_instruccion);
 					int valor = *respuesta;
+					printf("Valor respondido: %d",valor);
 					if (valor < 0) {
 							excepcion_UMV(0);
 							break;
