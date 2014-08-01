@@ -28,6 +28,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_NOMBREMENSAJE:
 				paquete = paquetizarStruct_nombreMensaje((t_struct_nombreMensaje *) estructuraOrigen);
 				break;
+			case D_STRUCT_PROGFIN:
+				paquete = paquetizarStruct_Progfin((t_struct_numero *) estructuraOrigen);
+				break;
 			case D_STRUCT_NUMERO:
 				paquete = paquetizarStruct_numero((t_struct_numero *) estructuraOrigen);
 				break;
@@ -154,6 +157,23 @@ t_stream * paquetizarStruct_numero(t_struct_numero * estructuraOrigen){
 	paquete->length = sizeof(t_header) + sizeof(unsigned int);
 
 	char * data = crearDataConHeader(D_STRUCT_NUMERO, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_numero));		//copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+
+t_stream * paquetizarStruct_Progfin(t_struct_numero * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_PROGFIN, paquete->length); //creo el data
 
 	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_numero));		//copio a data el numero.
 

@@ -31,7 +31,7 @@ t_stream * paquetizarStruct_asignarCompartida(t_struct_asignar_compartida * estr
 t_stream * paquetizarStruct_instruccion(t_struct_instruccion * estructuraOrigen);
 t_stream* paquetizarStruct_SolicitarMemoria(t_struct_memoria* estructuraOrigen);
 t_stream * paquetizarStruct_SF(t_struct_numero * estructuraOrigen);
-t_stream * paquetizarStruct_PROGFIN(t_struct_numero * estructuraOrigen);
+t_stream * paquetizarStruct_Progfin(t_struct_numero * estructuraOrigen);
 t_stream * paquetizarStruct_indiceEtiquetas(t_struct_indice_etiquetas * estructuraOrigen);
 t_stream * paquetizarStruct_obtenerCompartida(t_struct_string * estructuraOrigen);
 t_stream * paquetizarStruct_wait(t_struct_semaforo * estructuraOrigen);

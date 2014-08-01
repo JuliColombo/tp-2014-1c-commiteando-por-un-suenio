@@ -719,6 +719,7 @@ void handler_conexion_cpu(epoll_data_t data){
 					num = malloc(sizeof(t_struct_numero));
 					num->numero=programa->pcb->pid;
 					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
+					socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_PROGFIN, num);
 					free(num);
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
 					pthread_mutex_lock(mutex_cola_exit);
@@ -727,9 +728,9 @@ void handler_conexion_cpu(epoll_data_t data){
 					pthread_mutex_lock(mutex_log);
 					log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Exit", programa->pcb->pid);
 					pthread_mutex_unlock(mutex_log);
-					free(programa->pcb);
+					//free(programa->pcb);
 					sem_post(&sem_multiProg);
-					socket_cerrarConexion(programa->socket_descriptor_conexion);
+					//socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
 				if(pcb->estado==IO){
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado IO");
@@ -739,7 +740,7 @@ void handler_conexion_cpu(epoll_data_t data){
 //			}
 
 
-
+				free(pcb);
 
 
 			break;
@@ -747,8 +748,7 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			break;
 		case D_STRUCT_STRING:
-			string = malloc(sizeof(t_struct_string));
-			string->string= ((t_struct_string*)structRecibida)->string;
+			string = ((t_struct_string*)structRecibida);
 			printf("%s", ((t_struct_string*)structRecibida)->string);
 			int pos = buscar_cpu_por_fd(data.fd);
 			t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
@@ -756,7 +756,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_STRING, string);
 			num = malloc(sizeof(t_struct_numero));
 			num->numero=1;
-			socket_enviar(data.fd, D_STRUCT_NUMERO, string);
+			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
 			free(string);
 			free(num);
 			break;
@@ -773,6 +773,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			num->numero=1;
 			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
 			free(num);
+			free(structRecibida);
 
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
@@ -937,7 +938,7 @@ void handler_conexion_cpu(epoll_data_t data){
 //	mostrarColasPorPantalla(cola.ready,"Ready");
 //	pthread_mutex_unlock(mutex_cola_ready);
 	sem_post(&sem_cpu);
-	free(structRecibida);
+
 
 	return;
 }

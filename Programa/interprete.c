@@ -54,7 +54,6 @@ int main (int argc, char **argv){
 		if(tipoRecibido==D_STRUCT_NUMERO){
 			t_struct_numero* num = ((t_struct_numero*)structRecibida);
 			printf("%d\n", num->numero);
-			free(structRecibida);
 
 
 		}
@@ -76,8 +75,9 @@ int main (int argc, char **argv){
 
 
 		if(tipoRecibido==D_STRUCT_STRING){
+			printf("LLEGO UN STRING!\n");
 			t_struct_string* cadenaAImprimir = ((t_struct_string*) structRecibida);
-			printf("%s", cadenaAImprimir->string);
+			printf("\n%s", cadenaAImprimir->string);
 		}
 		free(structRecibida);
 
