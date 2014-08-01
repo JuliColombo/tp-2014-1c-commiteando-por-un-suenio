@@ -109,7 +109,7 @@ void core_conexion_kernel(void){
 
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;
-	//sem_wait(&sem_kernel);
+	sem_wait(&sem_kernel);
 
 	while(1){
 		t_tipoEstructura tipoRecibido;
@@ -121,6 +121,10 @@ void core_conexion_kernel(void){
 		SEG_flag = 0;
 		fin_quantum = 0;
 		socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
+		if(tipoRecibido!=D_STRUCT_PCB){
+			printf("NO ES PCB!\nEs tipo %d\n", tipoRecibido);
+			return;
+		}
 		pcb_recibida = ((t_struct_pcb*)structRecibida);
 		log_escribir(archLog, "Recibida pcb", INFO, "Se recibio la pcb con pid: %d", pcb_recibida->pid);
 

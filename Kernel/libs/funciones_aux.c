@@ -702,18 +702,18 @@ void handler_conexion_cpu(epoll_data_t data){
 			liberarCPU(data.fd);
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
-			if(programa != NULL){
-				actualizarPCB(programa, pcb);
+			//if(programa != NULL){
+			actualizarPCB(programa, pcb);
 				if(pcb->estado==NORMAL){
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 					sem_post(&sem_ready);
 				}
 				if(pcb->estado==FIN){
 					printf("PCB FIN\n");
-					num = malloc(sizeof(t_struct_numero));
-					num->numero=programa->pcb->pid;
-					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
-					free(num);
+//					num = malloc(sizeof(t_struct_numero));
+//					num->numero=programa->pcb->pid;
+//					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
+//					free(num);
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
 					pthread_mutex_lock(mutex_cola_exit);
 					mostrarColasPorPantalla(cola.exit, "Exit");
@@ -722,14 +722,15 @@ void handler_conexion_cpu(epoll_data_t data){
 					log_escribir(archLog, "Programa", INFO, "Se envio el programa %d a la cola Exit", programa->pcb->pid);
 					pthread_mutex_unlock(mutex_log);
 					//free(programa->pcb);
-					sem_post(&sem_multiProg);
+					//sem_post(&sem_multiProg);
+					socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
 				if(pcb->estado==IO){
 
 				}
-			}else{
-				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
-			}
+//			}else{
+//				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
+//			}
 
 
 
