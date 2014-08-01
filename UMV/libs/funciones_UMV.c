@@ -63,7 +63,6 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 
 		t_struct_respuesta_umv respuesta;
 		Segmento segmento = BuscarSegmentoIndice(base);
-		log_escribir(archLog,"Se busca el segmento que contiene informacion a enviar",INFO,"");
 		int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
 
 		if(max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud){
@@ -557,7 +556,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		// guardamos ordenado
 		GuardarNuevoSegmentoOrdenado(ID, id_prog, rango.base, tamanio);
 
-		log_escribir(archLog,"Se guardo el nuevo segmento ordenado",INFO,"");
+
 
 		ActualizarRangoGrabado(tamanio, rango);
 
@@ -569,7 +568,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	}
 	pthread_mutex_unlock(&Sem_GrabaBytes);
 
-	log_escribir(archLog,"Se solicita crear un segmento",INFO,"El segmento se crea con exito");
+	log_escribir(archLog,"Se solicita crear un segmento",INFO,"El segmento se crea con exito, base: %d   tamanio: %d",result,tamanio);
 	return result;
 	}
 
@@ -779,7 +778,6 @@ void EliminarSegmento(int base){
 Segmento BuscarSegmentoIndice(int ID){
 	BaseID bi;
 	int pos = 0;
-	log_escribir(archLog,"Informacion de busqueda de segmento",INFO,"Buscando el segmento de id %d",ID);
 	while( pos < list_size(List_Base_ID)){
 		bi = *((BaseID*)list_get(List_Base_ID,pos));
 		if(bi.ID == ID)
@@ -812,7 +810,6 @@ int PosicionDeSegmento(int base){
 Segmento BuscarSegmento(int base){
 	Segmento segmento;
 	int pos = 0;
-	log_escribir(archLog,"Informacion de busqueda de segmento",INFO,"Buscando el segmento de base %d",base);
 	while( pos <= ((int)list_size(Segmentos_UMV)) ){
 		segmento = *((Segmento*)list_get(Segmentos_UMV,pos));
 		if(segmento.baseVirtual == base)
@@ -1251,10 +1248,8 @@ void atender_kernel(sock_struct* sock){
 
 			case D_STRUCT_ESCRIBIRSEGMENTO:
 				struct_seg = ((t_struct_segmento*) structRecibida);
-				printf("%d         %d\n", struct_seg->base, struct_seg->tamanio);
 				t_intructions* aux=malloc(sizeof(t_intructions));
 				memcpy(aux,((t_intructions *)struct_seg->segmento),sizeof(t_intructions));
-				printf("Supuesto offset: %d      Supuesto tamanio: %d\n",aux->start,aux->offset);
 				if(struct_seg->tamanio==0){
 					escribir_log(archLog,"Se realizo envio de bytes",INFO,"El segmento es de tamanio 0");
 
