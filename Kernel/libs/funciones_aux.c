@@ -740,7 +740,6 @@ void handler_conexion_cpu(epoll_data_t data){
 //			}
 
 
-				free(pcb);
 
 
 			break;
@@ -761,8 +760,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			free(num);
 			break;
 		case D_STRUCT_IMPRIMIR:
-			num = malloc(sizeof(t_struct_numero));
-			num->numero=((t_struct_numero*)structRecibida)->numero;
+			num = ((t_struct_numero*)structRecibida);
 			printf("%d\n",num->numero);
 			pos = buscar_cpu_por_fd(data.fd);
 			cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
@@ -773,7 +771,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			num->numero=1;
 			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
 			free(num);
-			free(structRecibida);
 
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:

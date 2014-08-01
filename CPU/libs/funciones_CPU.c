@@ -268,7 +268,7 @@ void core_conexion_kernel(void){
 
 
 	if(socket_cerrarConexion(sockKernel)==-1){
-		log_escribir(archLog,"Cerrar Conexion",ERROR,"No se pudo conectar al Kernel");
+		log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
 	}
 	return;
 }
