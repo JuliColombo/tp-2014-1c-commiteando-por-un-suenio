@@ -774,7 +774,7 @@ void EliminarSegmento(int base){
 		list_add_in_index(Rangos_Libres,pos, aRango);
 
 	//logueamos
-	log_escribir(archLog,"Informacion de eliminacion de segmento",INFO,"se elimino el segmento de base: %d",base);
+	log_escribir(archLog,"Informacion de eliminacion de segmento",INFO,"se elimino el segmento de base: %d",aSeg.ID);
 
 }
 
