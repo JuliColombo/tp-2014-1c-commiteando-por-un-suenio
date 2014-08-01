@@ -91,7 +91,6 @@ void core_conexion_kernel(void){
 		//abort();
 	}
 	log_escribir(archLog, "Conexion", INFO, "Se conecto correctamente al Kernel");
-
 	t_tipoEstructura tipoRecibido;
 	void* structRecibida;
 	socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
