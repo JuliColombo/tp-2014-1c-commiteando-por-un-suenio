@@ -54,7 +54,7 @@ extern lista_handshake lista_handshakes;
 // Variables Globales de la UMV
 extern t_list * Segmentos_UMV;
 extern t_list * Rangos_Libres;
-extern List_Base_ID;
+extern t_list * List_Base_ID;
 extern int AlgoritmoActual, Puerto;
 extern int FinPrograma;
 extern int Retardo;
@@ -133,7 +133,7 @@ void DumpInConsole();
 void Dump();
 void logRangosLibres(RangoMemoria* rango);
 void logSegmentos(Segmento* rango);
-void DumpDeUnPrograma(int Programa);
+void DumpDeUnPrograma(int Programa,FILE* archivo);
 void DumpMemory(int base, int tamano);
 void ActualizarRangoGrabado(int tamano_guardado, RangoMemoria rango);
 void PrintTable(BaseID *  rango);

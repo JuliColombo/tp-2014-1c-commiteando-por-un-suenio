@@ -313,8 +313,8 @@ void MostrarTablaBI() {
  * Funcion: Genera archivos con el estado de la MP y la tabla de segmentos
  */
 
-void dump(){
-	/*FILE* archivo_MP;
+void dump(){/*
+	FILE* archivo_MP;
 	FILE* archivo_TS;
 	int procesoAVer;
 	int getEspacioLibreMP(void);
@@ -334,6 +334,9 @@ void dump(){
 
 
 	//Estructuras de memoria
+	fprintf(archivo_MP, "\tDump del estado de la memoria principal");
+	fprintf(archivo_TS, "\tDump del estado de la tabla de segmentos");
+
 	puts("\nIngrese el numero de proceso del cual se quiere conocer sus segmentos o '-1' para verlos todos");
 	scanf("%d",&procesoAVer);
 	if(procesoAVer == -1){
@@ -341,12 +344,23 @@ void dump(){
 	}else {
 		int ubicacion= getPosTabla(procesoAVer);
 		int tablaFinal=ubicacion+1;
-		imprimirEstadoTablaSeg(archivo_TS,ubicacion,tablaFinal);
+		DumpDeUnPrograma(procesoAVer,archivo_TS);
 	}
 
 	//Memoria Principal
 
 	//Segmentos de los programas TODO
+
+
+	// Logueamos los Segmentos
+	void logSegmentos(Segmento* rango) {
+		 fprintf(archivo_TS,"\t Programa: %d - ID: %d - Base %d  - Tam: %d \n",rango->programa,rango->ID, rango->baseVirtual, rango->tamano);
+	}
+
+	fprintf(archivo_TS,"Segmetos actuales del Sistema: \n");
+
+	list_iterate(Segmentos_UMV, (void*)logSegmentos);
+
 
 	//Espacio libre
 
@@ -360,16 +374,42 @@ void dump(){
 	printf("\nIngrese el offset con la posicion de MP a conocer y la cantidad de bytes a leer\n");
 	scanf("%d", &offset);
 	scanf("%d", &tamanio);
+
+
+
+	pthread_mutex_lock(&Sem_DevuelveBytes);
+
 	buffer = malloc((tamanio+1)*sizeof(char));
 	memcpy((char*)buffer, (char*) &MP[offset], tamanio);
 	printf("\nLa posicion de memoria %d contiene: %s\n", offset, (char*)buffer);
 	fprintf(archivo_MP, "La posicion de memoria %d contiene: %s\n", offset, (char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 
+	pthread_mutex_unlock(&Sem_DevuelveBytes);
 	//imprimirEstadoMP(archivo_MP);//-Ya no deberia ir no?-Va escribiendo en el archivo el contenido de las posiciones de la MP
 	pthread_mutex_unlock(mutex_MP);
+
+	fprintf(archivo_MP,"Termina el dump del estado de la memoria");
+	fprintf(archivo_TS,"Termina el dump del estado de la tabla de segmentos");
+
 	escribir_log(archLog, "Se realiza un dump", INFO, "El dump se realiza con exito");
+
 	fclose(archivo_MP);
-	fclose(archivo_TS);*/
+	fclose(archivo_TS);
+*/}
+
+// Muestreo de Datos por Programa
+void DumpDeUnPrograma(int Programa,FILE* archivo){
+
+	if(list_is_empty(Segmentos_UMV))
+			return;
+
+	void Mostrar(Segmento* rango) {
+		 if(Programa == rango->programa)
+			 fprintf(archivo,"Rango: Base %d  - Tamano: %d \n", rango->baseVirtual, rango->tamano);
+	}
+
+	fprintf(archivo,"Segmetos actuales del programa: %d \n", Programa);
+	list_iterate(Segmentos_UMV, (void*)Mostrar);
 }
 
 void imprimirEstadoMP(FILE* archivo){

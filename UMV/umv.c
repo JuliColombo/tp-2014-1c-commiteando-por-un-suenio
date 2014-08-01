@@ -29,7 +29,7 @@ lista_handshake lista_handshakes;
 
 t_list * Segmentos_UMV;
 t_list * Rangos_Libres;
-List_Base_ID;
+t_list * List_Base_ID;
 int AlgoritmoActual, Puerto;
 int FinPrograma = 0;
 int Retardo = 0;
