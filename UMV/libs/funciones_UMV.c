@@ -65,7 +65,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 		Segmento segmento = BuscarSegmentoIndice(base);
 		int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
 
-		if(max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud){
+		if((max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud)||(segmento.baseVirtual==-1)){
 			printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
 			log_escribir(archLog,"Segmentation Fault",ERROR,"Memoria no accesible por este segmento.");
 			void*buff_fault=malloc(sizeof(int));
