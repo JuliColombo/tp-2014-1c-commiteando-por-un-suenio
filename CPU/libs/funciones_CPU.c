@@ -225,7 +225,7 @@ void core_conexion_kernel(void){
 				free(estructuraRecibida3);
 				free(estructuraRecibida2);
 				free(codigo);
-				sleep(retardo);
+				sleep(configuracion_cpu.retardo);
 				temp_counter++;
 				fin_quantum++;
 
@@ -244,17 +244,16 @@ void core_conexion_kernel(void){
 
 			if(fin_PCB==0 && UMV_flag == 0){
 				t_struct_pcb* pcb_fin = malloc(sizeof(t_struct_pcb));
-				pcb_fin->c_stack=pcb->c_stack;
-				pcb_fin->codigo=pcb->codigo;
-				pcb_fin->index_codigo=pcb->index_codigo;
-				pcb_fin->index_etiquetas=pcb->index_etiquetas;
-				pcb_fin->pid=pcb->pid;
-				pcb_fin->program_counter=pcb->program_counter;
-				pcb_fin->stack=pcb->stack;
-				pcb_fin->tamanio_contexto=pcb->tamanio_contexto;
-				pcb_fin->tamanio_indice=pcb->tamanio_contexto;
+				pcb_fin->c_stack=temp_cursor_stack;
+				pcb_fin->codigo=temp_seg_codigo;
+				pcb_fin->index_codigo=temp_ind_codigo;
+				pcb_fin->index_etiquetas=var_ind_etiquetas;
+				pcb_fin->pid=temp_id;
+				pcb_fin->program_counter=temp_counter ;
+				pcb_fin->stack=var_seg_stack;
+				pcb_fin->tamanio_contexto=var_tamanio_contexto;
+				pcb_fin->tamanio_indice=var_tamanio_etiquetas;
 				pcb_fin->estado=NORMAL;
-
 
 				socket_enviar(sockKernel, D_STRUCT_PCB, pcb_fin);
 			}

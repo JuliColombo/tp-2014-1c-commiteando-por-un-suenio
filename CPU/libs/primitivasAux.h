@@ -42,7 +42,6 @@ char* indiceEtiquetas;
 int esConRetorno;
 int recienReserve;
 
-t_pcb* pcb;
 
 t_puntero calcularPosicionAsignacionCPU(int top_index);
 
