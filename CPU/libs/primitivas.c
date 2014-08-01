@@ -463,6 +463,7 @@ void finalizar() {
 			PCB_finalizado->tamanio_indice = var_tamanio_etiquetas;
 			PCB_finalizado->estado=FIN;
 
+			printf("Estado de pcb_fin:%d\n", PCB_finalizado->estado);
 			socket_enviar(sockKernel, D_STRUCT_PCB, PCB_finalizado);
 			free(PCB_finalizado);
 			fin_PCB = 1;

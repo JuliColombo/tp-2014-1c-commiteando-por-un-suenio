@@ -261,6 +261,7 @@ void enviar_pcb_a_cpu(void){
 	paquete->stack=programa->pcb->stack;
 	paquete->tamanio_contexto=programa->pcb->tamanio_contexto;
 	paquete->tamanio_indice=programa->pcb->tamanio_indice;
+	escribir_log(archLog,"Se armo un pcb y se envia a cpu",INFO,"");
 	int i = socket_enviar(cpu->socketCPU,D_STRUCT_PCB,paquete);
 	if(i==1){
 		cpu->estado=USADA;

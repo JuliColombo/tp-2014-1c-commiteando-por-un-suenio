@@ -242,7 +242,6 @@ void core_conexion_kernel(void){
 			}
 
 
-
 			if(fin_PCB==0 && UMV_flag == 0){
 				t_struct_pcb* pcb_fin = malloc(sizeof(t_struct_pcb));
 				pcb_fin->c_stack=pcb->c_stack;

@@ -463,6 +463,7 @@ void actualizarPCB(t_programa* programa, t_struct_pcb* pcb ){
 	programa->pcb->stack=pcb->stack;
 	programa->pcb->tamanio_contexto=pcb->tamanio_contexto;
 	programa->pcb->tamanio_indice=pcb->tamanio_indice;
+	programa->pcb->estado=pcb->estado;
 	free(pcb);
 
 	return;
@@ -689,6 +690,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
+			escribir_log(archLog,"Se solicita enviar a imprimir",INFO,"");
 			mensaje = ((t_struct_nombreMensaje*)structRecibida);
 			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
 			t_struct_string* textoAImprimir = malloc(sizeof(t_struct_string));
@@ -704,12 +706,16 @@ void handler_conexion_cpu(epoll_data_t data){
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			//if(programa != NULL){
 			actualizarPCB(programa, pcb);
+			printf("El estado del programa es: %d\n",pcb->estado);
+
 				if(pcb->estado==NORMAL){
+					escribir_log(archLog,"Llega un pcb",INFO,"Estado normal");
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 					sem_post(&sem_ready);
 				}
 				if(pcb->estado==FIN){
 					printf("PCB FIN\n");
+					escribir_log(archLog,"Llega un pcb",INFO,"Estado finalizado");
 //					num = malloc(sizeof(t_struct_numero));
 //					num->numero=programa->pcb->pid;
 //					socket_enviar(sock_umv, D_STRUCT_DESTRUIRSEGMENTOS,num);
@@ -726,7 +732,7 @@ void handler_conexion_cpu(epoll_data_t data){
 					socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
 				if(pcb->estado==IO){
-
+					escribir_log(archLog,"Llega un pcb",INFO,"Estado IO");
 				}
 //			}else{
 //				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");

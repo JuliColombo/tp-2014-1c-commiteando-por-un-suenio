@@ -104,6 +104,7 @@ typedef struct{
 	t_program_counter	program_counter;	//Número de la próxima instrucción a ejecutar
 	t_tamanio_contexto tamanio_contexto;	//Cantidad de variables (locales y parámetros) del Contexto de Ejecución Actual
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
+	uint32_t estado;
 } t_pcb;
 
 typedef struct aux_cpu {
