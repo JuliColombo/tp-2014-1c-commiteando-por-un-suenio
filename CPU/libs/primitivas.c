@@ -461,12 +461,12 @@ void finalizar() {
 			PCB_finalizado->stack = var_seg_stack;
 			PCB_finalizado->tamanio_contexto = var_tamanio_contexto;
 			PCB_finalizado->tamanio_indice = var_tamanio_etiquetas;
-			//PCB_finalizado->estado_finalizacion = 1; TODO: ver esto!!!
+			PCB_finalizado->estado=FIN;
 
 			socket_enviar(sockKernel, D_STRUCT_PCB, PCB_finalizado);
 			free(PCB_finalizado);
 			fin_PCB = 1;
-			log_escribir(archLog, "END: El PCB id: %d ha finalizado su ejecucion",INFO, temp_id);
+			log_escribir(archLog, "END: ",INFO, "El PCB id: %d ha finalizado su ejecucion", temp_id);
 		}
 
 		else {

@@ -25,7 +25,7 @@ enum{
 	DONE = 5,
 	QUANTUM = 3,
 	SEG_FAULT = 4,
-	IO = 6,
+	//IO = 6,
 	BLOQUEADO = 7,
 }numeros_utiles;
 

@@ -36,6 +36,10 @@ typedef struct{
 	t_tamanio_indice tamanio_indice;		//Cantidad de bytes que ocupa el Índice de etiquetas
 } t_pcb;
 
-
+enum {
+	NORMAL = 0,
+	FIN = 1,
+	IO = 2,
+} estado_pcb;
 
 #endif /* ESTRUCTURAS_H_ */

@@ -328,6 +328,7 @@ void core_pcp(void){
 		mostrarColasPorPantalla(cola.ready, "Ready");
 		pthread_mutex_unlock(mutex_cola_ready);
 		if(list_size(cola.ready)!=0){
+			printf("-----> SE ENVIA UNA PCB A CPU\n");
 			enviar_pcb_a_cpu();
 			pthread_mutex_lock(mutex_cola_exec);
 			mostrarColasPorPantalla(cola.exec, "Exec");
