@@ -685,19 +685,42 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_string* string;
 	t_struct_numero* num;
 	t_struct_asignar_compartida* compartida;
+	t_tipoEstructura tipoRecibido2;
+				void* structRecibida2;
 	t_struct_pcb* pcb;
 	t_struct_pcb_fin* pcb_fin;
 	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
-			escribir_log(archLog,"Se solicita enviar a imprimir",INFO,"");
-			mensaje = ((t_struct_nombreMensaje*)structRecibida);
-			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
-			t_struct_string* textoAImprimir = malloc(sizeof(t_struct_string));
-			textoAImprimir->string = mensaje->mensaje;
-			int fd = programa->socket_descriptor_conexion;
-			socket_enviar(fd,D_STRUCT_STRING,textoAImprimir);
-			free(textoAImprimir);
+			escribir_log(archLog,"IO",INFO,"Llega solicitud de IO");
+			socket_recibir(data.fd, &tipoRecibido2, &structRecibida2);
+			if(tipoRecibido2!=D_STRUCT_PCB){
+				printf("NO ES PCB, ERROR.");
+				return;
+			}
+			pcb = ((t_struct_pcb*)structRecibida2);
+			if(pcb->estado!=IO){
+				printf("Error, no es io\n");
+				return;
+			}
+			liberarCPU(data.fd);
+			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			actualizarPCB(programa, pcb);
+			t_struct_nombreMensaje* bloqueo = ((t_struct_nombreMensaje*)structRecibida);
+			pthread_mutex_lock(mutex_cola_exec);
+			pthread_mutex_lock(mutex_cola_block_io);
+			bloquearPrograma(programa->pcb->pid);
+			pthread_mutex_unlock(mutex_cola_exec);
+			mostrarColasPorPantalla(cola.block.io,"block I/O");
+			pthread_mutex_unlock(mutex_cola_block_io);
+			sleep(1);
+			t_struct_pcb_io* io = malloc(sizeof(t_struct_pcb_io));
+			io->pid=programa->pcb->pid;
+			io->tiempo=bloqueo->pid;
+			io->dispositivo=bloqueo->mensaje;
+			pthread_create(&io, NULL, (void*) &core_io, io);
+			free(bloqueo);
+
 			break;
 		case D_STRUCT_PCB:
 			printf("------>LLEGA UNA PCB\n");
@@ -887,7 +910,7 @@ void handler_conexion_cpu(epoll_data_t data){
 
 		case D_STRUCT_PCBIO:
 			liberarCPU(data.fd);
-			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
+			//t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block_io);
 			bloquearPrograma(bloqueo->pid);
