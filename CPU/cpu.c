@@ -25,6 +25,8 @@ int main (int argc, char **argv){
 	PATH=argv[1];
 	inicializarConfiguracion();
 
+	printf("\n\n EL PID DE ESTA CPU ES: %d\n\n",(int)getpid());
+
 	pthread_create(&conexion_umv, NULL, (void*) &core_conexion_umv, NULL);
 	pthread_create(&conexion_kernel, NULL, (void*) &core_conexion_kernel, NULL);
 

@@ -102,7 +102,7 @@ void core_conexion_kernel(void){
 	free(k);
 	log_escribir(archLog, "Quantum", INFO, "Se seteo el quantum en %d al ser recibido del kernel", quantum);
 
-	int sig_flag;
+
 	int UMV_flag;
 	int SEG_flag;
 	int id;
@@ -258,6 +258,8 @@ void core_conexion_kernel(void){
 				pcb_fin->estado=temp_estado;
 
 				socket_enviar(sockKernel, D_STRUCT_PCB, pcb_fin);
+
+				log_escribir(archLog,"Se envio la PCB al kernel",INFO,"El estado de finalizacion es normal");
 			}
 
 			fin_quantum = 0;
