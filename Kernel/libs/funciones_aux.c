@@ -734,7 +734,10 @@ void handler_conexion_cpu(epoll_data_t data){
 			programa = (t_programa*)buscarPrograma(cpu->id, cola.exec, mutex_cola_exec);
 			socket_enviar(programa->socket_descriptor_conexion,D_STRUCT_NUMERO, num);
 			free(num);
-
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=1;
+			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
+			free(num);
 
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
