@@ -815,37 +815,36 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 		case D_STRUCT_OBTENERCOMPARTIDA:
 			string = ((t_struct_string*)structRecibida);
-			if((validarVarGlobal(string->string))==0){
+			//if((validarVarGlobal(string->string))==0){
 				int valor = valor_Variable_Global(string->string);
 				t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
 				paquete->numero=valor;
 				socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
 				free(paquete);
-			}else{
-				pthread_mutex_lock(mutex_log);
+			//}else{
+				/*pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
 				pthread_mutex_unlock(mutex_log);
-			}
+			//}*/
 			break;
 		case D_STRUCT_ASIGNARCOMPARTIDA:
 			compartida = ((t_struct_asignar_compartida*)structRecibida);
-			if((validarVarGlobal(string->string))==0){
-				int posicion = posicion_Variable_Global(compartida->nombre);
-				pthread_mutex_lock(mutex_var_compartidas);
-				configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
-				pthread_mutex_lock(mutex_log);
-				log_escribir(archLog, "Variables Compartidas", INFO, "Se le asigno el valor %d a la variable %s", compartida->valor, compartida->nombre);
-				pthread_mutex_unlock(mutex_log);
-				pthread_mutex_unlock(mutex_var_compartidas);
-				num = malloc(sizeof(t_struct_numero));
-				num->numero=1;
-				socket_enviar(data.fd,D_STRUCT_NUMERO,num);
-			}else{
+			int posicion = posicion_Variable_Global(compartida->nombre);
+			pthread_mutex_lock(mutex_var_compartidas);
+			configuracion_kernel.var_globales.valor[posicion]=compartida->valor;
+			pthread_mutex_lock(mutex_log);
+			log_escribir(archLog, "Variables Compartidas", INFO, "Se le asigno el valor %d a la variable %s", compartida->valor, compartida->nombre);
+			pthread_mutex_unlock(mutex_log);
+			pthread_mutex_unlock(mutex_var_compartidas);
+			num = malloc(sizeof(t_struct_numero));
+			num->numero=1;
+			socket_enviar(data.fd,D_STRUCT_NUMERO,num);
+			/*}else{
 				pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
 				pthread_mutex_unlock(mutex_log);
 
-			}
+			}*/
 			break;
 
 		case D_STRUCT_WAIT:
@@ -856,13 +855,10 @@ void handler_conexion_cpu(epoll_data_t data){
 			int pos_sem_wait = posicion_Semaforo(semaforo->nombre_semaforo);
 			printf("El valor del semaforo %s es: %d\n", configuracion_kernel.semaforos.id[pos_sem_wait], configuracion_kernel.semaforos.valor[pos_sem_wait]);
 			if(configuracion_kernel.semaforos.valor[pos_sem_wait]>0){
-				printf("Entra al true\n");
-
 				senial->numero=1;
 				socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
 				configuracion_kernel.semaforos.valor[pos_sem_wait]--;
 			}else{
-				printf("Entra al false\n");
 				senial->numero=0;
 				socket_enviar(data.fd, D_STRUCT_NUMERO, senial);
 				socket_recibir(data.fd,&tipoRecibido2,&structRecibida2);
