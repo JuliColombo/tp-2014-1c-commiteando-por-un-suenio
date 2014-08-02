@@ -124,7 +124,10 @@ void core_conexion_kernel(void){
 		sleep(configuracion_cpu.retardo);
 		solicitarPCB = malloc(sizeof(t_struct_numero));
 		solicitarPCB->numero = 1;
-		socket_enviar(sockKernel, D_STRUCT_NUMERO, solicitarPCB);
+		int j = socket_enviar(sockKernel, D_STRUCT_NUMERO, solicitarPCB);
+		if(j==1){
+		printf("Se solicita la liberacion de la cpu\n");}else{printf("NO MANDA\n");}
+		free(solicitarPCB);
 		fin_PCB = 0;
 		sig_flag = 0;
 		UMV_flag = 0;

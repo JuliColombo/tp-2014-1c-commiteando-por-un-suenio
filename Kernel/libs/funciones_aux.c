@@ -675,7 +675,6 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			paquete->numero=configuracion_kernel.retardo_quantum;
 			socket_enviar(fd_aceptado, D_STRUCT_NUMERO, paquete);
 
-			sem_post(&sem_cpu);
 	} else {
 		escribir_log(archLog,"Conexion",ERROR,"No se pudo conectar la cpu");
 	}
@@ -794,6 +793,7 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			break;
 		case D_STRUCT_NUMERO:
+			printf("Llego solicitud de liberar\n");
 			liberarCPU(data.fd);
 			free(structRecibida);
 			break;
