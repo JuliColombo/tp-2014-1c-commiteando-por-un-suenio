@@ -1,0 +1,31 @@
+RM:=rm -rf
+CC:=gcc
+
+OBJS := funciones_aux.o funciones_PLP.o log.o package.o socket.o
+HDRS := funciones_aux.h funciones_PLP.h log.h package.h socket.h estructuras_socket.h estructuras_kernel.h
+
+#ALL
+all: kernel
+
+#Kernel
+kernel: $(OBJS)
+$(CC) -c kernel.c -o kernel.o
+
+funciones_aux.o: funciones_aux.c funciones_aux.h
+$(CC) -c funciones_aux.c
+
+funciones_PLP.o: funciones_PLP.c funciones_PLP.h
+$(CC) -c funciones_PLP.c
+
+log.o: log.c log.h
+$(CC) -c log.c
+
+package.o: package.c package.h
+$(CC) -c package.c
+
+socket.o = socket.c socket.h
+$(CC) -c socket.c
+
+#Clean
+clean:
+ $(RM) kernel.o $(OBJS)
