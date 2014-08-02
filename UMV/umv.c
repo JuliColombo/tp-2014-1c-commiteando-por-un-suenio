@@ -12,31 +12,27 @@ int tamanioMP;
 int tamanioMaxStack;
 char* PATH=PATHCONFIG;
 int retardo=0;
-int procesoEnUso;
-int cant_tablas=0;
 t_config_UMV configuracion_UMV;
 pthread_t CONSOLA, CONEXIONES, CPU;
 log_t* archLog;
-pthread_mutex_t* mutex_log;
-pthread_mutex_t* mutex_pid;
 int sock_servidor;
 int sock_cpu;
 int procesoActivo;
-int gradoDeMultiprogramacion;
+int AlgoritmoActual, Puerto;
+int FinPrograma = 0;
 
+//Listas
 t_list * Segmentos_UMV;
 t_list * Rangos_Libres;
 t_list * List_Base_ID;
-int AlgoritmoActual, Puerto;
-int FinPrograma = 0;
-int Retardo = 0;
 
 // Semaforos
-pthread_mutex_t Sem_Graba_Segmento = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t Sem_Elimina_Segmento = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t Sem_GrabaBytes = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t Sem_DevuelveBytes = PTHREAD_MUTEX_INITIALIZER;
-
+pthread_mutex_t sem_crear_segmento = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t sem_destruir_Segmento = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t sem_enviarBytes = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t sem_solicitarBytes = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t* mutex_log;
+pthread_mutex_t* mutex_pid;
 
 
 int main (int argc, char **argv){

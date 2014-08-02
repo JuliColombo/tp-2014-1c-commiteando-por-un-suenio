@@ -59,7 +59,7 @@ void log_error_socket(void){
 // ***********************************Solicitar bytes en memoria*******************
 
 t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
-	pthread_mutex_lock(&Sem_DevuelveBytes);
+	pthread_mutex_lock(&sem_solicitarBytes);
 
 		t_struct_respuesta_umv respuesta;
 		Segmento segmento = BuscarSegmentoIndice(base);
@@ -77,7 +77,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 			memcpy(&resp,respuesta.buffer,sizeof(int));
 			printf("Valor respondido:%d\n",resp);
 			printf("Tamanio respondido:%d\n",respuesta.tamano_buffer);
-			pthread_mutex_unlock(&Sem_DevuelveBytes);
+			pthread_mutex_unlock(&sem_solicitarBytes);
 			destruirSegmentos(segmento.programa);
 			return respuesta ;
 		}
@@ -88,7 +88,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 		respuesta.tamano_buffer = longitud;
 		log_escribir(archLog,"Se realiza una solicitud de bytes",INFO,"La solicitud tiene exito");
 
-		pthread_mutex_unlock(&Sem_DevuelveBytes);
+		pthread_mutex_unlock(&sem_solicitarBytes);
 
 		return respuesta;
 }
@@ -98,7 +98,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 
 
 int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
-	pthread_mutex_lock(&Sem_GrabaBytes);
+	pthread_mutex_lock(&sem_enviarBytes);
 		int result = 0;
 		Segmento segmento = BuscarSegmentoIndice(base);
 
@@ -124,7 +124,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 			result ++;
 		}
 
-		pthread_mutex_unlock(&Sem_GrabaBytes);
+		pthread_mutex_unlock(&sem_enviarBytes);
 
 		return result;
 }
@@ -139,7 +139,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 /*************************Comandos de Consola:*************************/
 
 void algoritmo(void){//Cambiar entre Worst fit y First fit
-	pthread_mutex_lock(&Sem_GrabaBytes);
+	pthread_mutex_lock(&sem_enviarBytes);
 	if(configuracion_UMV.algoritmo==worstfit){
 		configuracion_UMV.algoritmo=firstfit;
 		printf("El algoritmo se cambio a: firstfit\n");
@@ -150,7 +150,7 @@ void algoritmo(void){//Cambiar entre Worst fit y First fit
 		printf("El algoritmo se cambio a: worstfit\n");
 		escribir_log(archLog, "Se cambia el algoritmo de seleccion", INFO, "De first-fit a worst-fit");
 	}
-	pthread_mutex_unlock(&Sem_GrabaBytes);
+	pthread_mutex_unlock(&sem_enviarBytes);
 }
 
 /*************************Retardo*************************/
@@ -164,10 +164,10 @@ void retardoFunc(int retardo_nuevo){
 //****************************************Compactacion*****************************************
 
 void compactar(){
-		pthread_mutex_lock(&Sem_DevuelveBytes);
-		pthread_mutex_lock(&Sem_GrabaBytes);
-		pthread_mutex_lock(&Sem_Elimina_Segmento);
-		pthread_mutex_lock(&Sem_Graba_Segmento);
+		pthread_mutex_lock(&sem_solicitarBytes);
+		pthread_mutex_lock(&sem_enviarBytes);
+		pthread_mutex_lock(&sem_destruir_Segmento);
+		pthread_mutex_lock(&sem_crear_segmento);
 
 		log_escribir(archLog,"Empieza el proceso de compactado",INFO,"");
 
@@ -182,7 +182,7 @@ void compactar(){
 
 		log_escribir(archLog,"Se libera la memoria se crea una lista nueva",INFO,"");
 
-		sleep(Retardo);
+		sleep(retardo);
 		if(!list_is_empty(Segmentos_UMV)){
 
 			Segmento * SegmentoAnterior;
@@ -211,7 +211,7 @@ void compactar(){
 
 			log_escribir(archLog,"Actualizamos la base en la tabla de id",INFO,"");
 
-			sleep(Retardo);
+			sleep(retardo);
 
 			posSegmento ++;
 			while(list_size(Segmentos_UMV) > posSegmento && list_size(Segmentos_UMV) > 1 ){
@@ -267,13 +267,13 @@ void compactar(){
 			log_escribir(archLog,"No hay segmentos en memoria, se compacta toda la memoria libre",INFO,"");
 		}
 
-		sleep(Retardo);
+		sleep(retardo);
 		list_add(Rangos_Libres,RangoInicial);
 
-		pthread_mutex_unlock(&Sem_DevuelveBytes);
-		pthread_mutex_unlock(&Sem_GrabaBytes);
-		pthread_mutex_unlock(&Sem_Elimina_Segmento);
-		pthread_mutex_unlock(&Sem_Graba_Segmento);
+		pthread_mutex_unlock(&sem_solicitarBytes);
+		pthread_mutex_unlock(&sem_enviarBytes);
+		pthread_mutex_unlock(&sem_destruir_Segmento);
+		pthread_mutex_unlock(&sem_crear_segmento);
 }
 
 // devuelve la posicion de un segmento en la lista de segmentos por su base
@@ -374,14 +374,14 @@ void dump(){
 
 
 
-	pthread_mutex_lock(&Sem_DevuelveBytes);
+	pthread_mutex_lock(&sem_solicitarBytes);
 
 	buffer = malloc((tamanio)*sizeof(char));
 	memcpy(buffer, MP+offset, tamanio);
 	printf("\nLa posicion de memoria %d contiene: %s\n", offset, (char*)buffer);
 	fprintf(archivo_MP, "\nLa posicion de memoria %d contiene: %s\n", offset, (char*)buffer);//Ojo que pongo archivo_MP pero capaz deberia ser en otro
 
-	pthread_mutex_unlock(&Sem_DevuelveBytes);
+	pthread_mutex_unlock(&sem_solicitarBytes);
 
 	fprintf(archivo_MP,"\nTermina el dump del estado de la memoria");
 	fprintf(archivo_TS,"\nTermina el dump del estado de la tabla de segmentos");
@@ -454,7 +454,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	int result;
 	RangoMemoria rango;
 	if(tamanio>0){
-	pthread_mutex_lock(&Sem_GrabaBytes);
+	pthread_mutex_lock(&sem_enviarBytes);
 
 	if (!sePuedeGrabarSegmento(tamanio)) {
 		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento \n");
@@ -463,7 +463,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 	}
 	else
 	{
-		sleep(Retardo);
+		sleep(retardo);
 		// segun el algoritmo se elige un rago de memoria para grabar
 		if (configuracion_UMV.algoritmo == firstfit)
 		{
@@ -483,7 +483,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 			rango = rangoMasGrandeLibre();
 			log_escribir(archLog,"Algoritmo de seleccion",INFO,"Worst-Fit");
 		}
-		sleep(Retardo);
+		sleep(retardo);
 		// calculamos el id aletoria dentro del rango
 		int ID = rand() % tamanioMP + 1;
 		int pos = 0;
@@ -503,7 +503,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 		}
 		printf("La base es: %d\n",ID);
 		printf("La dir real es: %d\n",rango.dir_real);
-		sleep(Retardo);
+		sleep(retardo);
 
 		// guardamos ordenado
 		guardarNuevoSegmentoOrdenado(ID, id_prog, rango.dir_real, tamanio);
@@ -518,7 +518,7 @@ int crearSegmentoPrograma(int id_prog, int tamanio){
 
 		result = ID;
 	}
-	pthread_mutex_unlock(&Sem_GrabaBytes);
+	pthread_mutex_unlock(&sem_enviarBytes);
 
 	log_escribir(archLog,"Se solicita crear un segmento",INFO,"El segmento se crea con exito, base: %d   tamanio: %d",result,tamanio);
 	return result;
@@ -665,7 +665,7 @@ void actualizarRangoGrabado(int tamano_guardado, RangoMemoria rango){
 
 void destruirSegmentos(int id_prog){
 
-	pthread_mutex_lock(&Sem_Elimina_Segmento);
+	pthread_mutex_lock(&sem_destruir_Segmento);
 
 	Segmento segmento;
 	int pos = 0;
@@ -676,7 +676,7 @@ void destruirSegmentos(int id_prog){
 		if(segmento.programa == id_prog)
 		{
 			EliminarSegmento(segmento.dir_real);
-			sleep(Retardo);
+			sleep(retardo);
 		}
 		else
 		{
@@ -684,7 +684,7 @@ void destruirSegmentos(int id_prog){
 		}
 	}
 
-	pthread_mutex_unlock(&Sem_Elimina_Segmento);
+	pthread_mutex_unlock(&sem_destruir_Segmento);
 
 	log_escribir(archLog,"Informacion de destruccion de segmentos de un programa",INFO,"se eliminaron los segmentos del programa ID: %d",id_prog);
 }
@@ -1283,6 +1283,7 @@ void *consola (void){
 					  puts("\nIngrese Tamanio de segmento");
 					  scanf("%d",&unTamanio);
 					  buffer = solicitarBytes(unaBase,unOffset,unTamanio);
+					  printf("Los bytes solicitados en formato string: %s\n",(char*)buffer.buffer);
 				}
 				if(strcmp(tipoOperacion, "escribir") == 0){
 					 puts("\nIngrese Base");

@@ -124,7 +124,7 @@ t_valor_variable dereferenciar(t_puntero direccion_variable) {
 			int*respuesta = malloc(sizeof(int));
 			memcpy(respuesta, ((t_struct_respuesta_umv*) structRecibido)->buffer, tamanio_instruccion);
 			int valor1 = *respuesta;
-			if (valor1 < 0) {
+			if (valor1 == -30) {
 				excepcion_UMV(0);
 				log_escribir(archLog,"Se termina de ejecutar una instruccion",ERROR,"Se lanza excepcion de umv en dereferenciar");
 				return 0;

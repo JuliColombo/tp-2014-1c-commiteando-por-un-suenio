@@ -38,25 +38,21 @@ extern log_t* archLog;
 extern char* PATH;
 extern int tamanioMP;
 extern int tamanioMaxStack;
-extern int procesoEnUso;
-extern int cant_tablas;
 extern int sock_servidor;
 extern int sock_cpu;
 extern int retardo;
 extern int procesoActivo;
-extern int gradoDeMultiprogramacion;
 extern t_list * Segmentos_UMV;
 extern t_list * Rangos_Libres;
 extern t_list * List_Base_ID;
 extern int AlgoritmoActual, Puerto;
 extern int FinPrograma;
-extern int Retardo;
 
 // Semaforos
-extern pthread_mutex_t Sem_Graba_Segmento;
-extern pthread_mutex_t Sem_Elimina_Segmento;
-extern pthread_mutex_t Sem_GrabaBytes;
-extern pthread_mutex_t Sem_DevuelveBytes;
+extern pthread_mutex_t sem_crear_segmento;
+extern pthread_mutex_t sem_destruir_Segmento;
+extern pthread_mutex_t sem_enviarBytes;
+extern pthread_mutex_t sem_solicitarBytes;
 extern pthread_mutex_t* mutex_log;
 extern pthread_mutex_t* mutex_pid;
 
