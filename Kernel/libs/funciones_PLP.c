@@ -87,10 +87,14 @@ void leerConfiguracion(void){
 	pthread_mutex_lock(mutex_semaforos);
 	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
 	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
+	procesos_en_espera = list_create();
 	int i;
-	/*for(i=0; i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
-		configuracion_kernel.semaforos.cola_procesos[i]=queue_create();
-	}*/
+	for(i=0; i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
+		t_cola_procesos* cola_proc = malloc(sizeof(t_cola_procesos));
+		cola_proc->id = configuracion_kernel.semaforos.id[i];
+		cola_proc->cola_procesos=queue_create();
+		list_add(procesos_en_espera, cola_proc);
+	}
 	pthread_mutex_unlock(mutex_semaforos);
 	configuracion_kernel.hio.id = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);

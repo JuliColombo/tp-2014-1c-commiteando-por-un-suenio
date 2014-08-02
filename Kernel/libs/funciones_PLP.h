@@ -48,6 +48,8 @@ extern int efd_cpu;
 extern int efd_programas;
 extern int* fds_conectados_cpu;
 extern t_list* cpus;
+extern t_list* procesos_en_espera;
+extern t_list* block_sem;
 extern int* estado_cpu;
 extern sem_t sem_multiProg, sem_ready, sem_new, sem_cpu;
 extern int program_pid;

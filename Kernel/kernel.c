@@ -33,12 +33,15 @@ int* estado_cpu;
 int program_pid;
 sem_t sem_multiProg, sem_ready, sem_new, sem_cpu;
 t_list* cpus;
+t_list* procesos_en_espera;
+t_list* block_sem;
 
 
 
 
 int main(int argc, char **argv) { //Recibe la ruta del archivo de configuracion del Kernel o el nombre del archivo si esta en la misma carpeta
 	program_pid=0;
+	block_sem = list_create();
 	PATH_config = argv[1];
 	inicializarMutex();
 
