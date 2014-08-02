@@ -919,6 +919,7 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_WAIT:
 			case D_STRUCT_IMPRIMIRTEXTO:
+			case D_STRUCT_OBTENERCOMPARTIDA:
 			case D_STRUCT_STRING:
 				estructuraDestino = despaquetizarStruct_string(dataPaquete,length);
 				break;
