@@ -186,8 +186,13 @@ int valor_Variable_Global(char* variable){
  */
 
 int posicion_Semaforo(char* semaforo){
-	int pos;
-	for(pos=0;configuracion_kernel.semaforos.id[pos]!=semaforo;pos++);
+	int pos=0;
+	while(configuracion_kernel.semaforos.id[pos]!=NULL){
+		if((strcmp(configuracion_kernel.semaforos.id[pos],semaforo))==0){
+			break;
+		}
+		pos++;
+	}
 	return pos;
 }
 
@@ -849,7 +854,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			t_struct_numero* senial = malloc(sizeof(t_struct_numero));
 			pthread_mutex_lock(mutex_semaforos);
 			int pos_sem_wait = posicion_Semaforo(semaforo->nombre_semaforo);
-			printf("El valor del semaforo %s es: %d\n", semaforo->nombre_semaforo, configuracion_kernel.semaforos.valor[pos_sem_wait]);
+			printf("El valor del semaforo %s es: %d\n", configuracion_kernel.semaforos.id[pos_sem_wait], configuracion_kernel.semaforos.valor[pos_sem_wait]);
 			if(configuracion_kernel.semaforos.valor[pos_sem_wait]>0){
 				printf("Entra al true\n");
 
