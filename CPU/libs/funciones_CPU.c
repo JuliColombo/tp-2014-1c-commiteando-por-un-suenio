@@ -120,7 +120,7 @@ void core_conexion_kernel(void){
 	while(1){
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
-		usleep(configuracion_cpu.retardo);
+		sleep(configuracion_cpu.retardo);
 		fin_PCB = 0;
 		sig_flag = 0;
 		UMV_flag = 0;
@@ -232,7 +232,7 @@ void core_conexion_kernel(void){
 				free(estructuraRecibida3);
 				free(estructuraRecibida2);
 				free(codigo);
-				usleep(configuracion_cpu.retardo);
+				sleep(configuracion_cpu.retardo);
 				temp_counter++;
 				fin_quantum++;
 
