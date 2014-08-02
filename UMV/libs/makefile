@@ -1,9 +1,9 @@
 CC=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=funciones_UMV.c log.c stack.c
+SOURCES=funciones_UMV.c log.c stack.c funciones_UMV.h log.h stack.h estructuras_umv.h
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=umvaux1
+EXECUTABLE=umv1
 
 all: 
 	cd Sockets; make
