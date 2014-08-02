@@ -1,13 +1,14 @@
 CC=gcc
-VPATH= Kernel:../libs/Sockets
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=kernel.c
+SOURCES=umv.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=kernel
+EXECUTABLE=umv
 
-all: $(SOURCES) $(EXECUTABLE)
-	$(MAKE) -C libs all	
+all: 
+	cd libs; make
+	$(SOURCES) $(EXECUTABLE)
+
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 

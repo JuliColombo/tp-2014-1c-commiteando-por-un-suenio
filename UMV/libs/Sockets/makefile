@@ -1,13 +1,12 @@
 CC=gcc
-VPATH= Kernel:../libs/Sockets
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=kernel.c
+SOURCES=package.c socket.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=kernel
+EXECUTABLE=umvaux2
 
 all: $(SOURCES) $(EXECUTABLE)
-	$(MAKE) -C libs all	
+
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
