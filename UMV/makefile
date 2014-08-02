@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=umv.c
+SOURCES=umv.c umv1 umv2
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=umv
 
