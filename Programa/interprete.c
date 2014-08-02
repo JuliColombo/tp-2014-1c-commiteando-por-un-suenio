@@ -76,6 +76,7 @@ int main (int argc, char **argv){
 
 		}
 		if(tipoRecibido==D_STRUCT_MO){
+			printf("NO HAY MEMORIA SUFICIENTE\n");
 			log_escribir(archLog, "Termino el programa", INFO, "No hubo suficiente memoria para el programa");
 			free(structRecibida);
 			cerrarSocket(sock_kernel_servidor);
