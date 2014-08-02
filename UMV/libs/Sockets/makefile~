@@ -1,13 +1,13 @@
 CC=gcc
-VPATH= Kernel:../libs/Sockets
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=kernel.c
+SOURCES=funciones_UMV.c log.c stack.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=kernel
+EXECUTABLE=umvaux1
 
-all: $(SOURCES) $(EXECUTABLE)
-	$(MAKE) -C libs all	
+all: 	cd Sockets; make; cd ..;
+	$(SOURCES) $(EXECUTABLE)
+
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
