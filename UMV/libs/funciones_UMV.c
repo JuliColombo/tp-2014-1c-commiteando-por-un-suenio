@@ -1064,9 +1064,12 @@ void atender_cpu(sock_struct* sock){
 				pthread_mutex_unlock(mutex_log);
 				free(respuesta);
 				break;
-			case 0:
-				//log_escribir(archLog,"Termina la ejecucion de un pedido",INFO,"El pedido es de CPU");
-				break;
+			case D_STRUCT_NUMERO:
+				if(socket_cerrarConexion(sock->fd)==0){
+								log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
+							}
+				printf("Se cierra conexion con CPU");
+				return;
 		}
 	}
 	/*		printf("me llego un D_STRUCT_INDICE\n");

@@ -282,7 +282,14 @@ void core_conexion_kernel(void){
 	}
 
 
-	if(socket_cerrarConexion(sockKernel)==-1){
+	printf("Gracias al SIGUSR1, se sale del bucle");
+	t_struct_numero* valor = malloc(sizeof(t_struct_numero));
+	valor->numero=0;
+	socket_enviar(sockUMV,D_STRUCT_NUMERO,valor);
+	if(socket_cerrarConexion(sockUMV)==0){
+				log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
+			}
+	if(socket_cerrarConexion(sockKernel)==0){
 		log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
 	}
 	return;
