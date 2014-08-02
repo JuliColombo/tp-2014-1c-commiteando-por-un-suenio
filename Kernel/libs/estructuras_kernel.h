@@ -73,12 +73,17 @@ typedef struct{ //Hay que pensar bien esta estructura, porque no se puede tener 
 	t_quantum quantum;						//Valor del Quantum (en instrucciones a ejecutar) del algoritmo Round Robin
 	t_retardo_quantum retardo_quantum;		//Valor de retardo en milisegundos que el CPU deberá esperar luego de ejecutar cada	sentencia
 	t_grado_multip multiprogramacion;		//Grado de multiprogramacion del sistema
-	t_semaforos semaforos;
+	t_dictionary* semaforos;
 	t_hio hio;
 	t_ip_umv ip_umv;						//IP de la UMV
 	t_variables_globales var_globales;		//Variables globales del sistema
 	t_tamanio_stack tamanio_stack;			//Tamaño del Stack
 } t_config_kernel;
+
+typedef struct semaforo_cola {
+	int estado;
+	t_queue *cola_procesos;
+}t_struct_contenido_semaforo;
 
 typedef struct{
 	t_list* lista;
