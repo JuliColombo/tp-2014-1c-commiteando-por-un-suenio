@@ -35,23 +35,16 @@ extern t_config_UMV configuracion_UMV;
 extern void* MP;
 extern pthread_t CONSOLA,CONEXIONES,CPU;
 extern log_t* archLog;
-extern pthread_mutex_t* mutex_MP;
-extern pthread_mutex_t* mutex_log;
-extern pthread_mutex_t* mutex_pid;
 extern char* PATH;
 extern int tamanioMP;
 extern int tamanioMaxStack;
 extern int procesoEnUso;
-extern tablaSeg* tablaDeSegmentos;
 extern int cant_tablas;
 extern int sock_servidor;
 extern int sock_cpu;
 extern int retardo;
 extern int procesoActivo;
 extern int gradoDeMultiprogramacion;
-extern lista_handshake lista_handshakes;
-
-// Variables Globales de la UMV
 extern t_list * Segmentos_UMV;
 extern t_list * Rangos_Libres;
 extern t_list * List_Base_ID;
@@ -64,27 +57,47 @@ extern pthread_mutex_t Sem_Graba_Segmento;
 extern pthread_mutex_t Sem_Elimina_Segmento;
 extern pthread_mutex_t Sem_GrabaBytes;
 extern pthread_mutex_t Sem_DevuelveBytes;
-
+extern pthread_mutex_t* mutex_log;
+extern pthread_mutex_t* mutex_pid;
 
 /*************************Fin de variable globales*************************/
 
 
 /*Prototipos de funciones auxiliares*/
 
-void log_error_socket(void);
-
-
-void destruirTodosLosSegmentos(void);
-void matarHilos(void);
 void* crearMP();
+
+void log_error_socket(void);
+void matarHilos(void);
+void cambioProcesoActivo(int);
+void ContarTamano(RangoMemoria* rango);
+void EliminarSegmento(int base);
+void Mostrar(Segmento* rango);
+void MostrarSegmentos();
+void logRangosLibres(RangoMemoria* rango);
+void logSegmentos(Segmento* rango);
+void dumpDeUnPrograma(int Programa,FILE* archivo);
+void actualizarRangoGrabado(int tamano_guardado, RangoMemoria rango);
+void PrintTable(Base_ID *  rango);
+void mostrarTablaBasesID();
+
 int estaEnDicOP(char palabra[]);
 int estaEnDicTOP(char palabra[]);
-void imprimirBuffer(t_buffer buffer);
-void imprimirBufferEnArchivo(t_buffer buffer,FILE* archivo);
-void imprimirEstadoMP(FILE* archivo);
-void imprimirEstadoTablaSeg(FILE* archivo,int i, int tablaFinal);
 int escribir_log(log_t *log, const char *program_name, e_message_type type,	const char* format);
-void cambioProcesoActivo(int);
+int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
+int cantidadMemoriaLibre();
+int guardarNuevoSegmentoOrdenado(int ID, int programa, int baseVirtual, int tamano);
+int PosicionDeSegmento(int base);
+
+Segmento *create_segmento(int ID,int programa,void* base, int baseVirtual,int tamano);
+RangoMemoria rangoMasGrandeLibre();
+bool sePuedeGrabarSegmento(int tamano);
+Segmento BuscarSegmento(int base);
+RangoMemoria *create_rango_mem(int base, int tamano);
+Base_ID *create_BaseID(int base, int ID);
+Segmento BuscarSegmentoIndice(int ID);
+Base_ID * buscarEnListaBasesID(int base);
+
 
 /*Operaciones de Consola*/
 void algoritmo(void);
@@ -117,48 +130,7 @@ void atender_cpu(sock_struct* sock);
 
 void atender_kernel(sock_struct* sock);
 
-/*************************Segunda tanda de funciones*************************/
 
-// Firmas funciones Void
-void ContarTamano(RangoMemoria* rango);
-void Grabar(int posMem, void * element);
-void * Consultar(int posMem);
-void ManejoKernel(int coneccion);
-void MostrarRangosMemoriaLibre();
-void EliminarSegmento(int base);
-void EliminarSegmentosDePrograma(int programa);
-void Mostrar(Segmento* rango);
-void MostrarSegmentos();
-void DumpInConsole();
-void Dump();
-void logRangosLibres(RangoMemoria* rango);
-void logSegmentos(Segmento* rango);
-void DumpDeUnPrograma(int Programa,FILE* archivo);
-void DumpMemory(int base, int tamano);
-void ActualizarRangoGrabado(int tamano_guardado, RangoMemoria rango);
-void PrintTable(BaseID *  rango);
-void MostrarTablaBI();
-//Firmas funciones Int
-int GrabarSegmento(int programa, int tamanoSegmento);
-int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
-int CantidadMemoriaLibre();
-int GuardarNuevoSegmentoOrdenado(int ID, int programa, int baseVirtual, int tamano);
-int PosicionDeSegmento(int base);
-int GrabarBytes(int ID, int offset, int tamano, void* buffer);
-int GuardarNuevoRangoOrdenado(RangoMemoria Rango);
-
-
-//Otra firmas de funciones
-Segmento *create_segmento(int ID,int programa,void* base, int baseVirtual,int tamano);
-RangoMemoria RangoMasGrandeLibre();
-bool SePuedeGrabarSegmento(int tamano);
-Segmento BuscarSegmento(int base);
-t_struct_respuesta_umv EnviarBytes(int base, int offset, int tamano);
-RangoMemoria *create_rango_mem(int base, int tamano);
-BaseID *create_BaseID(int base, int ID);
-Segmento BuscarSegmentoIndice(int ID);
-BaseID * BuscarBI(int base);
-char * ObtenerIP();
 
 #endif /* UMV_H_ */
 
