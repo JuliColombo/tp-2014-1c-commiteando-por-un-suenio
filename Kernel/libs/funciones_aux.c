@@ -891,7 +891,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
 			configuracion_kernel.semaforos.valor[pos_sem_signal]++;
 			//t_queue* queue = ((t_cola_procesos*)list_get(procesos_en_espera,pos_sem_signal))->cola_procesos;
-			if(list_size(cola.block.sem)>0){
+			if((list_size(cola.block.sem)>0) && (configuracion_kernel.semaforos.valor[pos_sem_signal]>0)){
 				pthread_mutex_lock(mutex_cola_block_sem);
 				pthread_mutex_lock(mutex_cola_ready);
 				programa = (t_programa*)list_remove(cola.block.sem,0);
@@ -901,6 +901,11 @@ void handler_conexion_cpu(epoll_data_t data){
 				pthread_mutex_unlock(mutex_cola_ready);
 
 			}
+			num = malloc(sizeof(t_struct_numero));
+			num->numero = 1;
+			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
+			free(num);
+
 			pthread_mutex_unlock(mutex_semaforos);
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Semaforo", INFO, "Se dio signal al semaforo %s", semaforo->nombre_semaforo);
