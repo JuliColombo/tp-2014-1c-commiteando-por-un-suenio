@@ -1,0 +1,9 @@
+
+
+gcc -I"../../pruebaShared" -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/procesoKernel.d" -MT"src/procesoKernel.d" -o "src/procesoKernel.o" "../src/procesoKernel.c"
+
+ 
+
+gcc -L"../../pruebaShared/Debug" -o "procesoKernel"  ./src/procesoKernel.o   -lpruebaShared -lparser-ansisop -lcommons -lpthread 
+
+

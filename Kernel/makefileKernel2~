@@ -1,0 +1,9 @@
+
+
+gcc -I"../../Kernel" -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"Kernel/kernel.c" -MT"Kernel/kernel.c" -o "Kernel/kernel.o" "../Kernel/kernel.c"
+
+ 
+
+gcc -L"../../Kernel" -o "kernel"  ./procesoKernel.o   -kernel -lparser-ansisop -lcommons -lpthread 
+
+
