@@ -45,44 +45,28 @@ typedef struct{
 }sock_struct;
 
 typedef enum tipo_handshake{
-	kernel, cpu
+	kernel=0,
+	cpu=1
 }tipo_handshake;
 
-typedef struct lista_handshake{
-	int cantidad;
-	tipo_handshake* handshakes;
-}lista_handshake;
-
-typedef struct segmentDescriptor{
-	int inicio;
-	int tamanio;
-	int ubicacionMP;
-} segmentDescriptor;
-
-
-typedef struct tablaSeg{
-	int id_prog;
-	int cant_segmentos;
-	segmentDescriptor* segmentos;
-}tablaSeg;
 
 //Definicion de Structss
 typedef struct{
-   int ID;
+   int dir_virtual;
    int programa;
-   void* base;
-   int baseVirtual;
+   void* puntero_MP;
+   int dir_real;
    int tamano;
 }Segmento;
 
 typedef struct{
-   int base;
+   int dir_real;
    int tamano;
 }RangoMemoria;
 
 typedef struct{
-   int base;
-   int ID;
-}BaseID;
+   int dir_real;
+   int dir_virtual;
+}Base_ID;
 
 #endif /* ESTRUCTURAS_UMV_H_ */
