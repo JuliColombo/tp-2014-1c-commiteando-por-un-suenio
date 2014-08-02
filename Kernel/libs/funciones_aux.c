@@ -853,10 +853,11 @@ void handler_conexion_cpu(epoll_data_t data){
 			t_struct_numero* respuestaCPU = malloc(sizeof(t_struct_numero));
 			if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
 				t_struct_contenido_semaforo *semaforo = dictionary_get(configuracion_kernel.semaforos, string->string);
-				printf("Estado del semaforo %s : %d\n", string->string, semaforo->estado);
+				printf("Estado previo del semaforo %s : %d\n", string->string, semaforo->estado);
 				if (semaforo->estado >= 1) {
 					respuestaCPU->numero = 1;
 					semaforo->estado--;
+					printf("Estado despues de wait: %d\n", semaforo->estado);
 					socket_enviar(data.fd, D_STRUCT_NUMERO, respuestaCPU);
 				} else {
 					respuestaCPU->numero = 0;
@@ -865,8 +866,10 @@ void handler_conexion_cpu(epoll_data_t data){
 					void * estructuraRecibida;
 					socket_recibir(data.fd,&tipoRecibido,&estructuraRecibida);
 					liberarCPU(data.fd);
+					pcb = ((t_struct_pcb*)estructuraRecibida);
 					semaforo->estado--;
-					programa = (t_programa*)buscarPrograma(((t_struct_pcb*)estructuraRecibida)->pid, cola.exec, mutex_cola_exec);
+					programa = (t_programa*)buscarPrograma(pcb->pid, cola.exec, mutex_cola_exec);
+					actualizarPCB(programa,pcb);
 					queue_push(semaforo->cola_procesos,programa);
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
 					pthread_mutex_lock(mutex_cola_block_sem);
@@ -884,17 +887,23 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 
 		case D_STRUCT_SIGNALSEMAFORO:
+			printf("\n\nLLEGA SIGNAL\n\n");
 			string = ((t_struct_string*)structRecibida);
 			t_struct_numero * respuesta = malloc(sizeof(t_struct_numero));
 				if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
+					printf("Encuentra el key\n");
 					t_struct_contenido_semaforo * semaforo = dictionary_get(configuracion_kernel.semaforos, string->string);
+					printf("\nEstado anterior: %d \n", semaforo->estado);
 					semaforo->estado++;
 					respuesta->numero = 1;
+					printf("Semaforo: %s    estado: %d\n",string->string,semaforo->estado);
 					socket_enviar(data.fd, D_STRUCT_NUMERO, respuesta);
 					if (queue_size(semaforo->cola_procesos) > 0) {
 						printf("ENTRA AL IF\n");
 						programa = (t_programa*)queue_pop(semaforo->cola_procesos);
-						mandarAOtraCola(programa, cola.block.sem, mutex_cola_block_sem, cola.ready, mutex_cola_ready);
+						printf("EL PID QUE SE SACA EN QUEUE ES: %d\n", programa->pcb->pid);
+						t_programa* prog = (t_programa*)buscarPrograma(programa->pcb->pid, cola.block.sem,mutex_cola_block_sem);
+						mandarAOtraCola(prog, cola.block.sem, mutex_cola_block_sem, cola.ready, mutex_cola_ready);
 						pthread_mutex_lock(mutex_cola_ready);
 						mostrarColasPorPantalla(cola.ready, "Ready");
 						pthread_mutex_unlock(mutex_cola_ready);

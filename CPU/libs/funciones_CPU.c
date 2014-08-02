@@ -256,7 +256,7 @@ void core_conexion_kernel(void){
 				pcb_fin->index_codigo=temp_ind_codigo;
 				pcb_fin->index_etiquetas=var_ind_etiquetas;
 				pcb_fin->pid=temp_id;
-				pcb_fin->program_counter=temp_counter ;
+				pcb_fin->program_counter=temp_counter;
 				pcb_fin->stack=var_seg_stack;
 				pcb_fin->tamanio_contexto=var_tamanio_contexto;
 				pcb_fin->tamanio_indice=var_tamanio_etiquetas;
