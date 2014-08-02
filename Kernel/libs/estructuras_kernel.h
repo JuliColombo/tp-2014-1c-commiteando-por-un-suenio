@@ -51,6 +51,7 @@ enum {
 	NORMAL = 0,
 	FIN = 1,
 	IO = 2,
+	SF = 3,
 } estado_pcb;
 
 

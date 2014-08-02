@@ -656,6 +656,9 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion de una cpu");
 			pthread_mutex_unlock(mutex_log);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			paquete->numero=configuracion_kernel.retardo_quantum;
+			socket_enviar(fd_aceptado, D_STRUCT_NUMERO, paquete);
+
 			sem_post(&sem_cpu);
 	} else {
 		escribir_log(archLog,"Conexion",ERROR,"No se pudo conectar la cpu");
@@ -686,7 +689,7 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_numero* num;
 	t_struct_asignar_compartida* compartida;
 	t_tipoEstructura tipoRecibido2;
-				void* structRecibida2;
+	void* structRecibida2;
 	t_struct_pcb* pcb;
 	t_struct_pcb_fin* pcb_fin;
 	t_programa* programa;
@@ -713,7 +716,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			pthread_mutex_unlock(mutex_cola_exec);
 			mostrarColasPorPantalla(cola.block.io,"block I/O");
 			pthread_mutex_unlock(mutex_cola_block_io);
-			sleep(1);
 			t_struct_pcb_io* io = malloc(sizeof(t_struct_pcb_io));
 			io->pid=programa->pcb->pid;
 			io->tiempo=bloqueo->pid;
@@ -732,6 +734,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			printf("El estado del programa es: %d\n",pcb->estado);
 
 				if(pcb->estado==NORMAL){
+					printf("NORMAL\n");
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado normal");
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 					sem_post(&sem_ready);
@@ -753,11 +756,21 @@ void handler_conexion_cpu(epoll_data_t data){
 					pthread_mutex_unlock(mutex_log);
 					//free(programa->pcb);
 					sem_post(&sem_multiProg);
-					//socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
-				if(pcb->estado==IO){
-					escribir_log(archLog,"Llega un pcb",INFO,"Estado IO");
+				if(pcb->estado==SF){
+					printf("SEG FAULT\n");
+					num = malloc(sizeof(t_struct_numero));
+					num->numero=0;
+					socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_SF, num);
+					free(programa->pcb);
+					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
+					sem_post(&sem_multiProg);
+					pthread_mutex_lock(mutex_cola_exit);
+					mostrarColasPorPantalla(cola.exit, "Exit");
+					pthread_mutex_unlock(mutex_cola_exit);
 				}
+
+
 //			}else{
 //				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 //			}

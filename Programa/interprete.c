@@ -65,6 +65,15 @@ int main (int argc, char **argv){
 			break;
 		}
 		if(tipoRecibido==D_STRUCT_SF){
+			printf("Segmentation fault (core dumped)\n");
+			sleep(4);
+			printf("\n\nSe excede del stack desponible\n\n");
+
+			log_escribir(archLog, "Termino el programa", INFO, "Segmentation fault");
+			free(structRecibida);
+			break;
+
+
 		}
 		if(tipoRecibido==D_STRUCT_MO){
 			log_escribir(archLog, "Termino el programa", INFO, "No hubo suficiente memoria para el programa");

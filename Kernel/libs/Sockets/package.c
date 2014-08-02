@@ -100,6 +100,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_MO:
 				paquete = paquetizarStruct_MO((t_struct_numero*) estructuraOrigen);
 				break;
+			case D_STRUCT_SF:
+				paquete = paquetizarStruct_SF((t_struct_numero*) estructuraOrigen);
+				break;
 		}
 
 
@@ -914,6 +917,7 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_CHAR:
 				estructuraDestino = despaquetizarStruct_char(dataPaquete,length);
 				break;
+			case D_STRUCT_WAIT:
 			case D_STRUCT_IMPRIMIRTEXTO:
 			case D_STRUCT_STRING:
 				estructuraDestino = despaquetizarStruct_string(dataPaquete,length);
@@ -953,9 +957,6 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_SIGNALSEMAFORO:
 				estructuraDestino = despaquetizarStruct_signalSemaforo(dataPaquete, length);
-				break;
-			case D_STRUCT_WAIT:
-				estructuraDestino = despaquetizarStruct_wait(dataPaquete, length);
 				break;
 			case D_STRUCT_VARIABLES:
 				estructuraDestino = despaquetizarStruct_variables(dataPaquete, length);
