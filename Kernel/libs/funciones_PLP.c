@@ -284,14 +284,20 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 	return nuevoPCB;
 }
 
+
+
+
+
 void enviar_pcb_a_cpu(void){
 	pthread_mutex_lock(mutex_array);
-	int pos;
-	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->estado!=LIBRE; pos++);
-	t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
-	t_struct_pcb* paquete = malloc(sizeof(t_struct_pcb));
+	int pos = buscar_cpu_libre();
 	pthread_mutex_lock(mutex_cola_ready);
+	printf("-----> SE ENVIA PCB A CPU %d\n",pos);
+	t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus, pos);
+	cpu->estado=USADA;
+	t_struct_pcb* paquete = malloc(sizeof(t_struct_pcb));
 	t_programa* programa = (t_programa*)list_remove(cola.ready,0);
+	cpu->id=programa->pcb->pid;
 	pthread_mutex_unlock(mutex_cola_ready);
 	paquete->c_stack=programa->pcb->c_stack;
 	paquete->codigo=programa->pcb->codigo;
@@ -305,8 +311,6 @@ void enviar_pcb_a_cpu(void){
 	escribir_log(archLog,"Se armo un pcb y se envia a cpu",INFO,"");
 	int i = socket_enviar(cpu->socketCPU,D_STRUCT_PCB,paquete);
 	if(i==1){
-		cpu->estado=USADA;
-		cpu->id=programa->pcb->pid;
 		pthread_mutex_lock(mutex_cola_exec);
 		list_add(cola.exec,programa);
 		pthread_mutex_unlock(mutex_cola_exec);
@@ -369,7 +373,7 @@ void core_pcp(void){
 		mostrarColasPorPantalla(cola.ready, "Ready");
 		pthread_mutex_unlock(mutex_cola_ready);
 		if(list_size(cola.ready)!=0){
-			printf("-----> SE ENVIA UNA PCB A CPU\n");
+
 			enviar_pcb_a_cpu();
 			pthread_mutex_lock(mutex_cola_exec);
 			mostrarColasPorPantalla(cola.exec, "Exec");

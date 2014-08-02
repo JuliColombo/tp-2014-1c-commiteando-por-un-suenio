@@ -115,12 +115,19 @@ void core_conexion_kernel(void){
 
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;
+	t_struct_numero * solicitarPCB;
 	sem_wait(&sem_kernel);
 
 	while(1){
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		sleep(configuracion_cpu.retardo);
+		solicitarPCB = malloc(sizeof(t_struct_numero));
+		solicitarPCB->numero = 1;
+		int j = socket_enviar(sockKernel, D_STRUCT_NUMERO, solicitarPCB);
+		if(j==1){
+		printf("Se solicita la liberacion de la cpu\n");}else{printf("NO MANDA\n");}
+		free(solicitarPCB);
 		fin_PCB = 0;
 		sig_flag = 0;
 		UMV_flag = 0;
@@ -275,7 +282,14 @@ void core_conexion_kernel(void){
 	}
 
 
-	if(socket_cerrarConexion(sockKernel)==-1){
+	printf("Gracias al SIGUSR1, se sale del bucle");
+	t_struct_numero* valor = malloc(sizeof(t_struct_numero));
+	valor->numero=0;
+	socket_enviar(sockUMV,D_STRUCT_NUMERO,valor);
+	if(socket_cerrarConexion(sockUMV)==0){
+				log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
+			}
+	if(socket_cerrarConexion(sockKernel)==0){
 		log_escribir(archLog,"Cerrar Conexion",ERROR,"Finalizo la ejecucion de la CPU por SISGUR1");
 	}
 	return;

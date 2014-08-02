@@ -210,8 +210,15 @@ int posicion_Semaforo(char* semaforo){
 
 void liberarCPU(int fd){
 	pthread_mutex_lock(mutex_array);
-	int pos;
-	for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU!=fd;pos++);
+	int pos=0;
+	//for(pos=0; ((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU!=fd;pos++);
+	while(pos < list_size(cpus)){
+		if((((t_struct_descriptor_cpu*)list_get(cpus, pos))->socketCPU)==fd){
+			break;
+		}
+		pos++;
+	}
+	printf("LA POSICION DE LA CPU ES: %d\n", pos);
 	t_struct_descriptor_cpu* cpu = (t_struct_descriptor_cpu*)list_get(cpus,pos);
 	cpu->estado=LIBRE;
 	cpu->id=-1;
@@ -543,7 +550,10 @@ void mandarAOtraCola(t_programa* programa, t_list* listaActual, pthread_mutex_t*
  */
 int buscar_cpu_libre(void){
 	int i=0;
-	while(estado_cpu[i]!=LIBRE){
+	while(i<list_size(cpus)){
+		if((((t_struct_descriptor_cpu*)list_get(cpus, i))->estado)==LIBRE){
+			break;
+		}
 		i++;
 	}
 	return i;
@@ -657,6 +667,7 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			cpuNueva->socketCPU=fd_aceptado;
 			list_add(cpus,(void*) cpuNueva);
 			pthread_mutex_unlock(mutex_array);
+			printf("La cantidad total de CPUs es %d\n", list_size(cpus));
 			pthread_mutex_lock(mutex_log);
 			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion de una cpu");
 			pthread_mutex_unlock(mutex_log);
@@ -664,7 +675,6 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			paquete->numero=configuracion_kernel.retardo_quantum;
 			socket_enviar(fd_aceptado, D_STRUCT_NUMERO, paquete);
 
-			sem_post(&sem_cpu);
 	} else {
 		escribir_log(archLog,"Conexion",ERROR,"No se pudo conectar la cpu");
 	}
@@ -711,7 +721,7 @@ void handler_conexion_cpu(epoll_data_t data){
 				printf("Error, no es io\n");
 				return;
 			}
-			liberarCPU(data.fd);
+			//liberarCPU(data.fd);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			actualizarPCB(programa, pcb);
 			t_struct_nombreMensaje* bloqueo = ((t_struct_nombreMensaje*)structRecibida);
@@ -731,7 +741,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 		case D_STRUCT_PCB:
 			printf("------>LLEGA UNA PCB\n");
-			liberarCPU(data.fd);
+			//liberarCPU(data.fd);
 			pcb = ((t_struct_pcb*)structRecibida);
 			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
 			//if(programa != NULL){
@@ -739,13 +749,11 @@ void handler_conexion_cpu(epoll_data_t data){
 			printf("El estado del programa es: %d\n",pcb->estado);
 
 				if(pcb->estado==NORMAL){
-					printf("NORMAL\n");
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado normal");
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 					sem_post(&sem_ready);
 				}
 				if(pcb->estado==FIN){
-					printf("PCB FIN\n");
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado finalizado");
 					num = malloc(sizeof(t_struct_numero));
 					num->numero=programa->pcb->pid;
@@ -785,7 +793,9 @@ void handler_conexion_cpu(epoll_data_t data){
 
 			break;
 		case D_STRUCT_NUMERO:
-
+			printf("Llego solicitud de liberar\n");
+			liberarCPU(data.fd);
+			free(structRecibida);
 			break;
 		case D_STRUCT_STRING:
 			string = ((t_struct_string*)structRecibida);
@@ -822,6 +832,7 @@ void handler_conexion_cpu(epoll_data_t data){
 				paquete->numero=valor;
 				socket_enviar(data.fd,D_STRUCT_NUMERO,paquete);
 				free(paquete);
+				free(structRecibida);
 			//}else{
 				/*pthread_mutex_lock(mutex_log);
 				log_escribir(archLog, "Variables globales", ERROR, "La variable '%s' no está en el archivo de Configuraciones", string->string);
@@ -853,11 +864,9 @@ void handler_conexion_cpu(epoll_data_t data){
 			t_struct_numero* respuestaCPU = malloc(sizeof(t_struct_numero));
 			if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
 				t_struct_contenido_semaforo *semaforo = dictionary_get(configuracion_kernel.semaforos, string->string);
-				printf("Estado previo del semaforo %s : %d\n", string->string, semaforo->estado);
 				if (semaforo->estado >= 1) {
 					respuestaCPU->numero = 1;
 					semaforo->estado--;
-					printf("Estado despues de wait: %d\n", semaforo->estado);
 					socket_enviar(data.fd, D_STRUCT_NUMERO, respuestaCPU);
 				} else {
 					respuestaCPU->numero = 0;
@@ -865,7 +874,7 @@ void handler_conexion_cpu(epoll_data_t data){
 					t_tipoEstructura tipoRecibido;
 					void * estructuraRecibida;
 					socket_recibir(data.fd,&tipoRecibido,&estructuraRecibida);
-					liberarCPU(data.fd);
+					//liberarCPU(data.fd);
 					pcb = ((t_struct_pcb*)estructuraRecibida);
 					semaforo->estado--;
 					programa = (t_programa*)buscarPrograma(pcb->pid, cola.exec, mutex_cola_exec);
@@ -887,7 +896,6 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 
 		case D_STRUCT_SIGNALSEMAFORO:
-			printf("\n\nLLEGA SIGNAL\n\n");
 			string = ((t_struct_string*)structRecibida);
 			t_struct_numero * respuesta = malloc(sizeof(t_struct_numero));
 				if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
@@ -899,9 +907,7 @@ void handler_conexion_cpu(epoll_data_t data){
 					printf("Semaforo: %s    estado: %d\n",string->string,semaforo->estado);
 					socket_enviar(data.fd, D_STRUCT_NUMERO, respuesta);
 					if (queue_size(semaforo->cola_procesos) > 0) {
-						printf("ENTRA AL IF\n");
 						programa = (t_programa*)queue_pop(semaforo->cola_procesos);
-						printf("EL PID QUE SE SACA EN QUEUE ES: %d\n", programa->pcb->pid);
 						t_programa* prog = (t_programa*)buscarPrograma(programa->pcb->pid, cola.block.sem,mutex_cola_block_sem);
 						mandarAOtraCola(prog, cola.block.sem, mutex_cola_block_sem, cola.ready, mutex_cola_ready);
 						pthread_mutex_lock(mutex_cola_ready);
