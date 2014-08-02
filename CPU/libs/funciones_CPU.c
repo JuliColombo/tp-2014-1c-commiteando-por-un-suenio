@@ -115,12 +115,16 @@ void core_conexion_kernel(void){
 
 	t_struct_pcb* pcb_recibida;
 	t_struct_pcb_io* pcb_actualizada;
+	t_struct_numero * solicitarPCB;
 	sem_wait(&sem_kernel);
 
 	while(1){
 		t_tipoEstructura tipoRecibido;
 		void* structRecibida;
 		sleep(configuracion_cpu.retardo);
+		solicitarPCB = malloc(sizeof(t_struct_numero));
+		solicitarPCB->numero = 1;
+		socket_enviar(sockKernel, D_STRUCT_NUMERO, solicitarPCB);
 		fin_PCB = 0;
 		sig_flag = 0;
 		UMV_flag = 0;
