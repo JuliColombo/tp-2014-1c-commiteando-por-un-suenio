@@ -1,0 +1,9 @@
+
+
+gcc -I"../../pruebaShared" -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"Kernel.c" -MT"Kernel.c" -o "Kernel.o" "Kernel.c"
+
+ 
+
+gcc -L"../../pruebaShared/Debug" -o "procesoKernel"  ./Kernel.o   -lpruebaShared -lparser-ansisop -lcommons -lpthread 
+
+
