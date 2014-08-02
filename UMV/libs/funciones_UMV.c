@@ -78,6 +78,7 @@ t_struct_respuesta_umv solicitarBytes(int base,int offset, int longitud){
 			printf("Valor respondido:%d\n",resp);
 			printf("Tamanio respondido:%d\n",respuesta.tamano_buffer);
 			pthread_mutex_unlock(&Sem_DevuelveBytes);
+			destruirSegmentos(segmento.programa);
 			return respuesta ;
 		}
 
@@ -114,6 +115,7 @@ int enviarBytes(int base,int offset,int longitud,t_buffer buffer){
 		if(max_direccion_mem_segmento < segmento.baseVirtual + offset + longitud){
 			printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
 			log_escribir(archLog,"Violacion de Segmento",ERROR,"Se quiere grabar en la pos %d, y la maxima direccion del segmento es: %d", max_direccion_mem_segmento,segmento.baseVirtual + offset + longitud);
+			destruirSegmentos(segmento.programa);
 		}
 
 		else{

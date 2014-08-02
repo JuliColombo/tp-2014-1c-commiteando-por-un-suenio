@@ -352,26 +352,21 @@ void core_pcp(void){
 
 void core_io(t_struct_pcb_io* bloqueo){
 	pthread_detach(pthread_self());
+
+
 	int i;
+
+
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL; i++){
 		if((strcmp(bloqueo->dispositivo,configuracion_kernel.hio.id[i]))==0){
 			usleep((bloqueo->tiempo)*configuracion_kernel.hio.retardo[i]);
 			break;
 		}
 	}
-		t_struct_pcb* pcb = malloc(sizeof(t_struct_pcb));
-		pcb->c_stack=bloqueo->c_stack;
-		pcb->codigo=bloqueo->codigo;
-		pcb->index_codigo=bloqueo->index_codigo;
-		pcb->index_etiquetas=bloqueo->index_etiquetas;
-		pcb->program_counter=bloqueo->program_counter;
-		pcb->stack=bloqueo->stack;
-		pcb->tamanio_contexto=bloqueo->tamanio_contexto;
-		pcb->tamanio_indice=bloqueo->tamanio_indice;
+
 		t_programa* programa = buscarPrograma(bloqueo->pid,cola.block.io,mutex_cola_block_io);
-		actualizarPCB(programa, pcb);
 		mandarAOtraCola(programa, cola.block.io, mutex_cola_block_io, cola.ready, mutex_cola_ready);
-		sem_post(&sem_multiProg);
+		sem_post(&sem_ready);
 
 		free(bloqueo);
 

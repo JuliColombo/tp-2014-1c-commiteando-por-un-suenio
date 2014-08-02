@@ -656,6 +656,9 @@ void manejar_ConexionNueva_CPU(epoll_data_t data){
 			log_escribir(archLog, "Conexion", INFO, "Se acepto la conexion de una cpu");
 			pthread_mutex_unlock(mutex_log);
 			socket_enviar(fd_aceptado,D_STRUCT_NUMERO,paquete);
+			paquete->numero=configuracion_kernel.retardo_quantum;
+			socket_enviar(fd_aceptado, D_STRUCT_NUMERO, paquete);
+
 			sem_post(&sem_cpu);
 	} else {
 		escribir_log(archLog,"Conexion",ERROR,"No se pudo conectar la cpu");
@@ -685,19 +688,41 @@ void handler_conexion_cpu(epoll_data_t data){
 	t_struct_string* string;
 	t_struct_numero* num;
 	t_struct_asignar_compartida* compartida;
+	t_tipoEstructura tipoRecibido2;
+	void* structRecibida2;
 	t_struct_pcb* pcb;
 	t_struct_pcb_fin* pcb_fin;
 	t_programa* programa;
 	switch(tipoRecibido){
 		case D_STRUCT_NOMBREMENSAJE:
-			escribir_log(archLog,"Se solicita enviar a imprimir",INFO,"");
-			mensaje = ((t_struct_nombreMensaje*)structRecibida);
-			programa = (t_programa*)buscarPrograma(mensaje->pid,cola.exec, mutex_cola_exec);
-			t_struct_string* textoAImprimir = malloc(sizeof(t_struct_string));
-			textoAImprimir->string = mensaje->mensaje;
-			int fd = programa->socket_descriptor_conexion;
-			socket_enviar(fd,D_STRUCT_STRING,textoAImprimir);
-			free(textoAImprimir);
+			escribir_log(archLog,"IO",INFO,"Llega solicitud de IO");
+			socket_recibir(data.fd, &tipoRecibido2, &structRecibida2);
+			if(tipoRecibido2!=D_STRUCT_PCB){
+				printf("NO ES PCB, ERROR.");
+				return;
+			}
+			pcb = ((t_struct_pcb*)structRecibida2);
+			if(pcb->estado!=IO){
+				printf("Error, no es io\n");
+				return;
+			}
+			liberarCPU(data.fd);
+			programa = (t_programa*)buscarPrograma(pcb->pid,cola.exec, mutex_cola_exec);
+			actualizarPCB(programa, pcb);
+			t_struct_nombreMensaje* bloqueo = ((t_struct_nombreMensaje*)structRecibida);
+			pthread_mutex_lock(mutex_cola_exec);
+			pthread_mutex_lock(mutex_cola_block_io);
+			bloquearPrograma(programa->pcb->pid);
+			pthread_mutex_unlock(mutex_cola_exec);
+			mostrarColasPorPantalla(cola.block.io,"block I/O");
+			pthread_mutex_unlock(mutex_cola_block_io);
+			t_struct_pcb_io* io = malloc(sizeof(t_struct_pcb_io));
+			io->pid=programa->pcb->pid;
+			io->tiempo=bloqueo->pid;
+			io->dispositivo=bloqueo->mensaje;
+			pthread_create(&io, NULL, (void*) &core_io, io);
+			free(bloqueo);
+
 			break;
 		case D_STRUCT_PCB:
 			printf("------>LLEGA UNA PCB\n");
@@ -709,6 +734,7 @@ void handler_conexion_cpu(epoll_data_t data){
 			printf("El estado del programa es: %d\n",pcb->estado);
 
 				if(pcb->estado==NORMAL){
+					printf("NORMAL\n");
 					escribir_log(archLog,"Llega un pcb",INFO,"Estado normal");
 					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.ready, mutex_cola_ready);
 					sem_post(&sem_ready);
@@ -730,11 +756,21 @@ void handler_conexion_cpu(epoll_data_t data){
 					pthread_mutex_unlock(mutex_log);
 					//free(programa->pcb);
 					sem_post(&sem_multiProg);
-					//socket_cerrarConexion(programa->socket_descriptor_conexion);
 				}
-				if(pcb->estado==IO){
-					escribir_log(archLog,"Llega un pcb",INFO,"Estado IO");
+				if(pcb->estado==SF){
+					printf("SEG FAULT\n");
+					num = malloc(sizeof(t_struct_numero));
+					num->numero=0;
+					socket_enviar(programa->socket_descriptor_conexion, D_STRUCT_SF, num);
+					free(programa->pcb);
+					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.exit, mutex_cola_exit);
+					sem_post(&sem_multiProg);
+					pthread_mutex_lock(mutex_cola_exit);
+					mostrarColasPorPantalla(cola.exit, "Exit");
+					pthread_mutex_unlock(mutex_cola_exit);
 				}
+
+
 //			}else{
 //				escribir_log(archLog, "PCB", ERROR, "La cola de exec estaba vacia al recibir un pcb de CPU");
 //			}
@@ -887,7 +923,7 @@ void handler_conexion_cpu(epoll_data_t data){
 
 		case D_STRUCT_PCBIO:
 			liberarCPU(data.fd);
-			t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
+			//t_struct_pcb_io* bloqueo = ((t_struct_pcb_io*)structRecibida);
 			pthread_mutex_lock(mutex_cola_exec);
 			pthread_mutex_lock(mutex_cola_block_io);
 			bloquearPrograma(bloqueo->pid);

@@ -51,7 +51,6 @@ void leerConfiguracion(void){
 	configuracion_cpu.puerto_kernel=config_get_int_value(config,"Puerto TCP para conectarse al Kernel");
 	configuracion_cpu.ip_umv=config_get_string_value(config,"Direccion IP para conectarse a la UMV");
 	configuracion_cpu.puerto_umv=config_get_int_value(config,"Puerto TCP para conectarse a la UMV");
-	configuracion_cpu.retardo=config_get_int_value(config, "Retardo");
 }
 
 void imprimirConfiguracion(void){
@@ -86,6 +85,9 @@ int sig_flag;
 int umv_flag;
 int fin_PCB;
 t_dictionary* dicc_variables;
+uint32_t temp_estado;
+int UMV_flag;
+int SEG_flag;
 
 void core_conexion_kernel(void){
 	if((sockKernel=socket_crearYConectarCliente(configuracion_cpu.ip_kernel,configuracion_cpu.puerto_kernel))==-1){
@@ -101,9 +103,13 @@ void core_conexion_kernel(void){
 	free(k);
 	log_escribir(archLog, "Quantum", INFO, "Se seteo el quantum en %d al ser recibido del kernel", quantum);
 
-	int sig_flag;
-	int UMV_flag;
-	int SEG_flag;
+
+	socket_recibir(sockKernel,&tipoRecibido,&structRecibida);
+	k = ((t_struct_numero*)structRecibida);
+	configuracion_cpu.retardo= k->numero;
+	free(k);
+
+
 	int id;
 	dicc_variables =dictionary_create();
 
@@ -139,6 +145,7 @@ void core_conexion_kernel(void){
 		var_seg_stack = pcb_recibida->stack;
 		var_tamanio_contexto = pcb_recibida->tamanio_contexto;
 		var_tamanio_etiquetas = pcb_recibida->tamanio_indice;
+		temp_estado = pcb_recibida->estado;
 		recupero_diccionario(dicc_variables,var_tamanio_contexto);
 
 			while((fin_quantum!=quantum)&&(fin_PCB==0)){
@@ -253,9 +260,11 @@ void core_conexion_kernel(void){
 				pcb_fin->stack=var_seg_stack;
 				pcb_fin->tamanio_contexto=var_tamanio_contexto;
 				pcb_fin->tamanio_indice=var_tamanio_etiquetas;
-				pcb_fin->estado=NORMAL;
+				pcb_fin->estado=temp_estado;
 
 				socket_enviar(sockKernel, D_STRUCT_PCB, pcb_fin);
+
+				log_escribir(archLog,"Se envio la PCB al kernel",INFO,"El estado de finalizacion es normal");
 			}
 
 			fin_quantum = 0;
@@ -347,10 +356,11 @@ void excepcion_UMV(int i) {
 		PCB_Segmentation->stack = var_seg_stack;
 		PCB_Segmentation->tamanio_contexto = var_tamanio_contexto;
 		PCB_Segmentation->tamanio_indice = var_tamanio_etiquetas;
-
-		socket_enviar(sockKernel, D_STRUCT_PCBSF, PCB_Segmentation);
+		PCB_Segmentation->estado=SF;
+		socket_enviar(sockKernel, D_STRUCT_PCB, PCB_Segmentation);
 		free(PCB_Segmentation);
-
+		UMV_flag = 1;
+		SEG_flag = 1;
 		fin_quantum = quantum - 1;
 
 	}

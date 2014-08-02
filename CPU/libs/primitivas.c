@@ -731,11 +731,12 @@ void entradaSalida(t_nombre_dispositivo dispositivo, int tiempo) {
 		dispositivo = partes[0];
 		free(partes);
 
-		t_struct_pcb_io * IO = malloc(sizeof(t_struct_pcb_io));
-		IO->tiempo= tiempo;
-		IO->dispositivo = dispositivo;
+		t_struct_nombreMensaje * IO = malloc(sizeof(t_struct_nombreMensaje));
+		IO->pid= tiempo;
+		IO->mensaje= dispositivo;
+		temp_estado = 2;
 
-		socket_enviar(sockKernel, D_STRUCT_PCBIO, IO);
+		socket_enviar(sockKernel, D_STRUCT_NOMBREMENSAJE, IO);
 		free(IO);
 
 		fin_quantum = quantum - 1;

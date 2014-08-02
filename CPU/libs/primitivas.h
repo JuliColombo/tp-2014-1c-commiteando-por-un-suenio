@@ -16,6 +16,7 @@ extern int sockKernel; // sockets globales para ser usados en las primitivas
 extern int sockUMV;    // sockets globales para ser usados en las primitivas
 extern uint32_t var_seg_stack;
 extern uint32_t var_tamanio_contexto;
+extern uint32_t temp_estado;
 extern t_dictionary * dicc_variables;
 extern char * dicc_etiquetas;
 extern uint32_t var_ind_etiquetas;
