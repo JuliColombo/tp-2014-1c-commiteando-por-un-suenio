@@ -63,7 +63,7 @@ int* vector_num(char** vector_string_num, char** config_ids){
  * Funcion: busca si el semaforo existe
  */
 
-int validarSemaforo(char* semaforo){
+/*int validarSemaforo(char* semaforo){
 	int i=0;
 	pthread_mutex_lock(mutex_semaforos);
 	while(configuracion_kernel.semaforos.id[i]!=semaforo){
@@ -74,7 +74,7 @@ int validarSemaforo(char* semaforo){
 		return 0;
 	}
 	return -1;
-}
+}*/
 
 /*
  * Nombre: validarVarGlobal
@@ -187,12 +187,12 @@ int valor_Variable_Global(char* variable){
 
 int posicion_Semaforo(char* semaforo){
 	int pos=0;
-	while(configuracion_kernel.semaforos.id[pos]!=NULL){
+	/*while(configuracion_kernel.semaforos.id[pos]!=NULL){
 		if((strcmp(configuracion_kernel.semaforos.id[pos],semaforo))==0){
 			break;
 		}
 		pos++;
-	}
+	}*/
 	return pos;
 }
 
@@ -216,6 +216,7 @@ void liberarCPU(int fd){
 	cpu->estado=LIBRE;
 	cpu->id=-1;
 	pthread_mutex_unlock(mutex_array);
+	sem_post(&sem_cpu);
 	return;
 }
 
@@ -613,10 +614,10 @@ void manejar_ConexionNueva_Programas(epoll_data_t data){
 		t_struct_string* k = ((t_struct_string*)structRecibida);
 		i = agregarNuevoPrograma(k->string, fd_aceptado);
 		if(i==0){
-			sem_post(&sem_new);
 			pthread_mutex_lock(mutex_cola_new);
 			mostrarColasPorPantalla(cola.new,"New");
 			pthread_mutex_unlock(mutex_cola_new);
+			sem_post(&sem_new);
 		}else{
 			escribir_log(archLog, "Conexion Programa", INFO, "Se rechazó el programa nuevo por falta de espacio en memoria");
 			t_struct_numero* paquete = malloc(sizeof(t_struct_numero));
@@ -848,68 +849,65 @@ void handler_conexion_cpu(epoll_data_t data){
 			break;
 
 		case D_STRUCT_WAIT:
-			printf("Llega al wait!\n");
-			semaforo = ((t_struct_semaforo*)structRecibida);
-			t_struct_numero* senial = malloc(sizeof(t_struct_numero));
-			pthread_mutex_lock(mutex_semaforos);
-			int pos_sem_wait = posicion_Semaforo(semaforo->nombre_semaforo);
-			printf("El valor del semaforo %s es: %d\n", configuracion_kernel.semaforos.id[pos_sem_wait], configuracion_kernel.semaforos.valor[pos_sem_wait]);
-			if(configuracion_kernel.semaforos.valor[pos_sem_wait]>0){
-				senial->numero=1;
-				socket_enviar(data.fd, D_STRUCT_NUMERO,senial);
-				configuracion_kernel.semaforos.valor[pos_sem_wait]--;
-			}else{
-				senial->numero=0;
-				socket_enviar(data.fd, D_STRUCT_NUMERO, senial);
-				socket_recibir(data.fd,&tipoRecibido2,&structRecibida2);
-				liberarCPU(data.fd);
-				if(tipoRecibido2==D_STRUCT_PCB){
-					printf("Es pcb lo que llega\n");
-				}
-				configuracion_kernel.semaforos.valor[pos_sem_wait]--;
-				printf("Sem valor: %d\n",configuracion_kernel.semaforos.valor[pos_sem_wait]);
-				/*t_queue* queue = ((t_cola_procesos*)list_get(procesos_en_espera,pos_sem_wait))->cola_procesos;
-				queue_push(queue,structRecibida2);*/
-				printf("Pasa el push\n");
-				programa=(t_programa*)buscarPrograma(((t_struct_pcb*)structRecibida2)->pid, cola.exec, mutex_cola_exec);
-				mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
-				pthread_mutex_lock(mutex_cola_block_sem);
-				mostrarColasPorPantalla(cola.block.sem, "Bloqueados por semaforos");
-				pthread_mutex_unlock(mutex_cola_block_sem);
+			string = ((t_struct_string*)structRecibida);
+			t_struct_numero* respuestaCPU = malloc(sizeof(t_struct_numero));
+			if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
+				t_struct_contenido_semaforo *semaforo = dictionary_get(configuracion_kernel.semaforos, string->string);
+				printf("Estado del semaforo %s : %d\n", string->string, semaforo->estado);
+				if (semaforo->estado >= 1) {
+					respuestaCPU->numero = 1;
+					semaforo->estado--;
+					socket_enviar(data.fd, D_STRUCT_NUMERO, respuestaCPU);
+				} else {
+					respuestaCPU->numero = 0;
+					socket_enviar(data.fd, D_STRUCT_NUMERO, respuestaCPU);
+					t_tipoEstructura tipoRecibido;
+					void * estructuraRecibida;
+					socket_recibir(data.fd,&tipoRecibido,&estructuraRecibida);
+					liberarCPU(data.fd);
+					semaforo->estado--;
+					programa = (t_programa*)buscarPrograma(((t_struct_pcb*)estructuraRecibida)->pid, cola.exec, mutex_cola_exec);
+					queue_push(semaforo->cola_procesos,programa);
+					mandarAOtraCola(programa, cola.exec, mutex_cola_exec, cola.block.sem, mutex_cola_block_sem);
+					pthread_mutex_lock(mutex_cola_block_sem);
+					mostrarColasPorPantalla(cola.block.sem, "Block por Semaforos");
+					pthread_mutex_unlock(mutex_cola_block_sem);
 
+
+
+				}
+			}else {
+				respuestaCPU->numero = 2;
+				socket_enviar(data.fd, D_STRUCT_NUMERO, respuestaCPU);
 			}
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Semaforo", INFO, "Se dio wait al semaforo %s", semaforo->nombre_semaforo);
-			pthread_mutex_unlock(mutex_log);
-			pthread_mutex_unlock(mutex_semaforos);
-			free(senial);
+			free(respuestaCPU);
 			break;
 
 		case D_STRUCT_SIGNALSEMAFORO:
-			semaforo = ((t_struct_semaforo*)structRecibida);
-			pthread_mutex_lock(mutex_semaforos);
-			int pos_sem_signal = posicion_Semaforo(semaforo->nombre_semaforo);
-			configuracion_kernel.semaforos.valor[pos_sem_signal]++;
-			//t_queue* queue = ((t_cola_procesos*)list_get(procesos_en_espera,pos_sem_signal))->cola_procesos;
-			if((list_size(cola.block.sem)>0) && (configuracion_kernel.semaforos.valor[pos_sem_signal]>0)){
-				pthread_mutex_lock(mutex_cola_block_sem);
-				pthread_mutex_lock(mutex_cola_ready);
-				programa = (t_programa*)list_remove(cola.block.sem,0);
-				pthread_mutex_unlock(mutex_cola_block_sem);
-				list_add(cola.ready,programa);
-				mostrarColasPorPantalla(cola.ready, "Ready");
-				pthread_mutex_unlock(mutex_cola_ready);
+			string = ((t_struct_string*)structRecibida);
+			t_struct_numero * respuesta = malloc(sizeof(t_struct_numero));
+				if (dictionary_has_key(configuracion_kernel.semaforos, string->string)) {
+					t_struct_contenido_semaforo * semaforo = dictionary_get(configuracion_kernel.semaforos, string->string);
+					semaforo->estado++;
+					respuesta->numero = 1;
+					socket_enviar(data.fd, D_STRUCT_NUMERO, respuesta);
+					if (queue_size(semaforo->cola_procesos) > 0) {
+						printf("ENTRA AL IF\n");
+						programa = (t_programa*)queue_pop(semaforo->cola_procesos);
+						mandarAOtraCola(programa, cola.block.sem, mutex_cola_block_sem, cola.ready, mutex_cola_ready);
+						pthread_mutex_lock(mutex_cola_ready);
+						mostrarColasPorPantalla(cola.ready, "Ready");
+						pthread_mutex_unlock(mutex_cola_ready);
+						sem_post(&sem_ready);
+					}
+				} else {
+					respuesta->numero = 0;
+					socket_enviar(data.fd, D_STRUCT_NUMERO, respuesta);
 
-			}
-			num = malloc(sizeof(t_struct_numero));
-			num->numero = 1;
-			socket_enviar(data.fd, D_STRUCT_NUMERO, num);
-			free(num);
+				}
+			free(respuesta);
+			free(string->string);
 
-			pthread_mutex_unlock(mutex_semaforos);
-			pthread_mutex_lock(mutex_log);
-			log_escribir(archLog, "Semaforo", INFO, "Se dio signal al semaforo %s", semaforo->nombre_semaforo);
-			pthread_mutex_unlock(mutex_log);
 			break;
 
 		case D_STRUCT_PCBSEM:
@@ -990,7 +988,7 @@ void handler_conexion_cpu(epoll_data_t data){
 //	pthread_mutex_lock(mutex_cola_ready);
 //	mostrarColasPorPantalla(cola.ready,"Ready");
 //	pthread_mutex_unlock(mutex_cola_ready);
-	sem_post(&sem_cpu);
+
 
 
 	return;

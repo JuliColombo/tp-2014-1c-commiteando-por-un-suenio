@@ -767,6 +767,7 @@ void wait_ansisop(t_nombre_semaforo identificador_semaforo) {
 		// luego espera respuesta del kernel, si el semaforo se bloquea le manda el PCB para que lo encole
 		t_struct_numero respuestaKernel = *((t_struct_numero*) structRecibido);
 		free(structRecibido);
+		printf("Respuesta = %d\n",respuestaKernel.numero );
 		if (respuestaKernel.numero < 1) {
 			fin_quantum = quantum - 1;
 		}

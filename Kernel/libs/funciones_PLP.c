@@ -85,7 +85,7 @@ void leerConfiguracion(void){
 	configuracion_kernel.retardo_quantum = config_get_long_value(config,"Retardo del Quantum");
 	configuracion_kernel.multiprogramacion = config_get_int_value(config,"Maximo nivel de multiprogramacion");
 	pthread_mutex_lock(mutex_semaforos);
-	configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
+	/*configuracion_kernel.semaforos.id = config_get_array_value(config,"Lista de nombres de Semaforos");
 	configuracion_kernel.semaforos.valor =vector_num(config_get_array_value(config,"Lista de valores de Semaforos"),configuracion_kernel.semaforos.id);
 	procesos_en_espera = list_create();
 	int i;
@@ -94,7 +94,7 @@ void leerConfiguracion(void){
 		cola_proc->id = configuracion_kernel.semaforos.id[i];
 		cola_proc->cola_procesos=queue_create();
 		list_add(procesos_en_espera, cola_proc);
-	}
+	}*/
 	pthread_mutex_unlock(mutex_semaforos);
 	configuracion_kernel.hio.id = config_get_array_value(config,"Lista de hio");
 	configuracion_kernel.hio.retardo = vector_num(config_get_array_value(config,"Retardo de hio"),configuracion_kernel.hio.id);
@@ -106,8 +106,47 @@ void leerConfiguracion(void){
 	pthread_mutex_unlock(mutex_var_compartidas);
 	configuracion_kernel.tamanio_stack = config_get_int_value(config,"Tamanio del Stack");
 	escribir_log(archLog, "Archivo de configuracion", INFO, "Se carga correctamente la configuracion");
+
+	char* tempSemaforos = strdup(config_get_string_value(config,"Lista de nombres de Semaforos"));
+	int cantidad_semaforos = string_count(tempSemaforos, ',') + 1;
+	char** semaforos = string_get_string_as_array(tempSemaforos);
+	free(tempSemaforos);
+
+	char* temp_valorIni = strdup(config_get_string_value(config,"Lista de valores de Semaforos"));
+	char** valor_semaforo = string_get_string_as_array(temp_valorIni);
+	free(temp_valorIni);
+
+	configuracion_kernel.semaforos = dictionary_create();
+
+	int j = 0;
+	int valor_entero;
+
+	while (j < cantidad_semaforos) {
+		t_struct_contenido_semaforo *contenido = malloc(sizeof(t_struct_contenido_semaforo));
+		contenido->estado = atoi(valor_semaforo[j]); //hay que buscar el valor del arch
+		contenido->cola_procesos = queue_create();
+
+		dictionary_put(configuracion_kernel.semaforos, semaforos[j], contenido);
+		valor_entero = atoi(valor_semaforo[j]);
+		printf("- Semaforo: %s -> Valor: %d\n", semaforos[j], valor_entero);
+		j++;
+	}
+
 	free(config);
 }
+
+int string_count(char * text, char c) {
+	int i = 0;
+	int pos = 0;
+
+	while (text[pos] != '\0') {
+		if (text[pos] == c)
+			i++;
+		pos++;
+	}
+	return i;
+}
+
 
 void imprimirConfiguracion() { // Funcion para testear que lee correctamente el archivo de configuracion
 
@@ -119,9 +158,9 @@ void imprimirConfiguracion() { // Funcion para testear que lee correctamente el 
 
 
 	int i;
-	for(i=0;i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
+	/*for(i=0;i<cant_identificadores(configuracion_kernel.semaforos.id);i++){
 		printf("Semaforo (valor): %s (%d)\n",configuracion_kernel.semaforos.id[i], configuracion_kernel.semaforos.valor[i]);
-	}
+	}*/
 
 	for(i=0;configuracion_kernel.hio.id[i]!=NULL;i++){
 		printf("ID HIO (retardo): %s ", configuracion_kernel.hio.id[i]);
@@ -164,7 +203,6 @@ int solicitarMemoriaUMV(int pid, int tamanioScript, int tamanioIndiceCodigo, int
 		pcb->codigo=base->codigo;
 		pcb->index_codigo=base->indice_codigo;
 		pcb->index_etiquetas=base->indice_etiquetas;
-		printf("%d    %d     %d     %d\n",pcb->stack,pcb->codigo,pcb->index_codigo,pcb->index_etiquetas);
 		free(base);
 		return 0;
 	}
@@ -214,7 +252,6 @@ t_pcb* crearPcb(char* codigo, t_medatada_program* metadata_programa) {
 		paquete->segmento=((void*)metadata_programa->instrucciones_serializado);
 		t_intructions* aux=malloc(sizeof(t_intructions));
 		memcpy(aux,((t_intructions*)paquete->segmento), sizeof(t_intructions));
-		printf("Supuesto offset:%d       Supuesto tamanio:%d", aux->start,aux->offset);
 		socket_enviar(sock_umv,D_STRUCT_ESCRIBIRSEGMENTO, paquete);
 
 		socket_recibir(sock_umv, &tipoRecibido, &structRecibida);
@@ -307,7 +344,6 @@ void core_plp(void){
 
 		pthread_mutex_unlock(mutex_cola_new);
 		list_add(cola.ready, (void*) programa);
-		mostrarColasPorPantalla(cola.ready,"Ready");
 		pthread_mutex_unlock(mutex_cola_ready);
 		sem_post(&sem_ready);
 
